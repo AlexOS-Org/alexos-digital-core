@@ -37,7 +37,8 @@ export const modules: ModuleDef[] = [
     title: "People",
     url: "/people",
     icon: Users,
-    description: "Contacts, clients, team and relationships.",
+    description:
+      "AI-powered CRM for customers, prospects, leads, follow-ups and relationships.",
     group: "Operations",
   },
   {
@@ -51,35 +52,40 @@ export const modules: ModuleDef[] = [
     title: "Banking",
     url: "/banking",
     icon: Landmark,
-    description: "Accounts, transfers and reconciliations.",
+    description:
+      "Sales pipeline, customer onboarding, loans, deposits and relationship management.",
     group: "Operations",
   },
   {
     title: "Vehicle Sales",
     url: "/vehicle-sales",
     icon: Car,
-    description: "Inventory, deals and dealer performance.",
+    description:
+      "Manage inventory, customers, quotations, financing and vehicle sales.",
     group: "Operations",
   },
   {
     title: "E-Commerce",
     url: "/e-commerce",
     icon: ShoppingBag,
-    description: "Storefronts, orders and product catalog.",
+    description:
+      "Products, inventory, orders, suppliers, customers and online sales.",
     group: "Growth",
   },
   {
     title: "Marketing",
     url: "/marketing",
     icon: Megaphone,
-    description: "Campaigns, funnels and attribution.",
+    description:
+      "Campaigns, social media, copywriting, ads and AI marketing automation.",
     group: "Growth",
   },
   {
     title: "Goals",
     url: "/goals",
     icon: Target,
-    description: "Objectives, key results and milestones.",
+    description:
+      "Personal, business and financial goals with intelligent progress tracking.",
     group: "Growth",
   },
   {
@@ -107,7 +113,8 @@ export const modules: ModuleDef[] = [
     title: "Reports",
     url: "/reports",
     icon: BarChart3,
-    description: "Analytics, exports and insights.",
+    description:
+      "Business intelligence, dashboards, KPIs and executive reporting.",
     group: "Growth",
   },
   {
@@ -133,4 +140,10 @@ export const modules: ModuleDef[] = [
   },
 ];
 
-export const moduleGroups = ["Overview", "Operations", "Growth", "Productivity", "System"] as const;
+export const moduleGroups = [
+  "Overview",
+  "Operations",
+  "Growth",
+  "Productivity",
+  "System",
+] as const;
