@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useRecordDebtPayment, type Debt, debtRemaining } from "@/lib/debts/api";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  useRecordDebtPayment,
+  type Debt,
+  debtRemaining,
+} from "@/lib/debts/api";
+import { useAccounts } from "@/lib/money/api";
 import { formatMoney } from "@/lib/money/format";
 
 interface Props {
@@ -18,51 +30,150 @@ interface Props {
   debt: Debt | null;
 }
 
-export function DebtPaymentDialog({ open, onOpenChange, debt }: Props) {
+export function DebtPaymentDialog({
+  open,
+  onOpenChange,
+  debt,
+}: Props) {
   const pay = useRecordDebtPayment();
+  const { data: accounts = [] } = useAccounts();
+
   const [amount, setAmount] = useState("");
+  const [accountId, setAccountId] = useState("");
+  const [paymentDate, setPaymentDate] = useState(
+    new Date().toISOString().slice(0, 10),
+  );
+  const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    if (!open) return;
+
+    setAmount("");
+    setDescription("");
+
+    setPaymentDate(new Date().toISOString().slice(0, 10));
+
+    if (accounts.length > 0) {
+      setAccountId(accounts[0].id);
+    }
+  }, [open, accounts]);
 
   const submit = async () => {
     if (!debt) return;
+
     const n = Number(amount);
+
     if (!n || n <= 0) return;
-    await pay.mutateAsync({ debt, amount: n });
-    setAmount("");
+
+    await pay.mutateAsync({
+      debt,
+      amount: n,
+      accountId,
+      paymentDate,
+      description,
+    });
+
     onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-sm">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Record Payment</DialogTitle>
+          <DialogTitle>Record Debt Payment</DialogTitle>
         </DialogHeader>
+
         {debt && (
           <div className="space-y-4">
-            <div className="rounded-lg border p-3 text-sm">
+            <div className="rounded-xl border p-3">
               <div className="font-medium">{debt.name}</div>
-              <div className="text-muted-foreground text-xs">
+              <div className="text-sm text-muted-foreground">
                 Remaining: {formatMoney(debtRemaining(debt))}
               </div>
             </div>
+
             <div className="space-y-1.5">
-              <Label>Payment Amount</Label>
+              <Label>Payment Account</Label>
+
+              <Select
+                value={accountId}
+                onValueChange={setAccountId}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select account" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {accounts.map((a) => (
+                    <SelectItem
+                      key={a.id}
+                      value={a.id}
+                    >
+                      {a.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Payment Date</Label>
+
+              <Input
+                type="date"
+                value={paymentDate}
+                onChange={(e) =>
+                  setPaymentDate(e.target.value)
+                }
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Amount</Label>
+
               <Input
                 type="number"
                 step="0.01"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                autoFocus
+                onChange={(e) =>
+                  setAmount(e.target.value)
+                }
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Description (Optional)</Label>
+
+              <Input
+                value={description}
+                onChange={(e) =>
+                  setDescription(e.target.value)
+                }
+                placeholder="Payment notes"
               />
             </div>
           </div>
         )}
+
         <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="ghost"
+            onClick={() => onOpenChange(false)}
+          >
             Cancel
           </Button>
-          <Button onClick={submit} disabled={pay.isPending || !amount}>
-            {pay.isPending ? "Saving..." : "Record Payment"}
+
+          <Button
+            onClick={submit}
+            disabled={
+              pay.isPending ||
+              !amount ||
+              !accountId
+            }
+          >
+            {pay.isPending
+              ? "Saving..."
+              : "Record Payment"}
           </Button>
         </DialogFooter>
       </DialogContent>
