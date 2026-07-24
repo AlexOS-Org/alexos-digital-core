@@ -30,7 +30,9 @@ export function useBills() {
         .select("*")
         .is("deleted_at", null)
         .order("due_date", { ascending: true });
+
       if (error) throw error;
+
       return data ?? [];
     },
   });
@@ -38,20 +40,33 @@ export function useBills() {
 
 function advanceDueDate(dueDate: string, frequency: BillFrequency): string {
   const d = new Date(dueDate + "T00:00:00");
-  if (frequency === "weekly") d.setDate(d.getDate() + 7);
-  else if (frequency === "monthly") d.setMonth(d.getMonth() + 1);
+
+  if (frequency === "weekly") {
+    d.setDate(d.getDate() + 7);
+  } else if (frequency === "monthly") {
+    d.setMonth(d.getMonth() + 1);
+  } else if (frequency === "quarterly") {
+    d.setMonth(d.getMonth() + 3);
+  } else if (frequency === "yearly") {
+    d.setFullYear(d.getFullYear() + 1);
+  }
+
   return d.toISOString().slice(0, 10);
 }
 
 export function useSaveBill() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (input: BillInput): Promise<Bill> => {
       const {
         data: { user },
         error: userError,
       } = await supabase.auth.getUser();
-      if (userError || !user) throw new Error("Not authenticated");
+
+      if (userError || !user) {
+        throw new Error("Not authenticated");
+      }
 
       const payload = {
         user_id: user.id,
@@ -60,7 +75,7 @@ export function useSaveBill() {
         category: input.category ?? null,
         due_date: input.due_date,
         frequency: input.frequency,
-        status: input.status ?? "pending",
+        status: input.status ?? "active",
         account_id: input.account_id ?? null,
         notes: input.notes ?? null,
         auto_create_transaction: input.auto_create_transaction ?? false,
@@ -73,38 +88,49 @@ export function useSaveBill() {
           .eq("id", input.id)
           .select()
           .single();
+
         if (error) throw error;
+
         return data;
       }
 
-      const { data, error } = await supabase
-        .from("bills")
-        .insert(payload)
-        .select()
-        .single();
+      const { data, error } = await supabase.from("bills").insert(payload).select().single();
+
       if (error) throw error;
+
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: BILLS_KEY }),
+
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: BILLS_KEY });
+    },
   });
 }
 
 export function useDeleteBill() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("bills")
-        .update({ deleted_at: new Date().toISOString() })
+        .update({
+          deleted_at: new Date().toISOString(),
+        })
         .eq("id", id);
+
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: BILLS_KEY }),
+
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: BILLS_KEY });
+    },
   });
 }
 
 export function useMarkBillPaid() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (bill: Bill) => {
       const now = new Date().toISOString();
@@ -113,6 +139,7 @@ export function useMarkBillPaid() {
         const {
           data: { user },
         } = await supabase.auth.getUser();
+
         if (user) {
           await supabase.from("transactions").insert({
             user_id: user.id,
@@ -126,26 +153,35 @@ export function useMarkBillPaid() {
         }
       }
 
-      if (bill.frequency === "one_time") {
+      if (
+        bill.frequency === "weekly" ||
+        bill.frequency === "monthly" ||
+        bill.frequency === "quarterly" ||
+        bill.frequency === "yearly"
+      ) {
         const { error } = await supabase
           .from("bills")
-          .update({ status: "paid", last_paid_at: now })
+          .update({
+            status: "active",
+            last_paid_at: now,
+            due_date: bill.due_date ? advanceDueDate(bill.due_date, bill.frequency) : null,
+          })
           .eq("id", bill.id);
+
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from("bills")
           .update({
-            status: "pending",
+            status: "paid",
             last_paid_at: now,
-            due_date: bill.due_date
-              ? advanceDueDate(bill.due_date, bill.frequency)
-              : bill.due_date,
           })
           .eq("id", bill.id);
+
         if (error) throw error;
       }
     },
+
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: BILLS_KEY });
       qc.invalidateQueries({ queryKey: ["transactions"] });

@@ -1,5 +1,4 @@
-import { Brain, Calendar, CircleDollarSign, TrendingDown, TrendingUp, Target } from "lucide-react";
-
+import { Brain, CircleDollarSign, TrendingDown, TrendingUp, Target } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useExpected, useTransactions } from "@/lib/money/api";
 import { formatMoney } from "@/lib/money/format";

@@ -16,11 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  useRecordDebtPayment,
-  type Debt,
-  debtRemaining,
-} from "@/lib/debts/api";
+import { useRecordDebtPayment, type Debt, debtRemaining } from "@/lib/debts/api";
 import { useAccounts } from "@/lib/money/api";
 import { formatMoney } from "@/lib/money/format";
 
@@ -30,19 +26,13 @@ interface Props {
   debt: Debt | null;
 }
 
-export function DebtPaymentDialog({
-  open,
-  onOpenChange,
-  debt,
-}: Props) {
+export function DebtPaymentDialog({ open, onOpenChange, debt }: Props) {
   const pay = useRecordDebtPayment();
   const { data: accounts = [] } = useAccounts();
 
   const [amount, setAmount] = useState("");
   const [accountId, setAccountId] = useState("");
-  const [paymentDate, setPaymentDate] = useState(
-    new Date().toISOString().slice(0, 10),
-  );
+  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().slice(0, 10));
   const [description, setDescription] = useState("");
 
   useEffect(() => {
@@ -95,20 +85,14 @@ export function DebtPaymentDialog({
             <div className="space-y-1.5">
               <Label>Payment Account</Label>
 
-              <Select
-                value={accountId}
-                onValueChange={setAccountId}
-              >
+              <Select value={accountId} onValueChange={setAccountId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select account" />
                 </SelectTrigger>
 
                 <SelectContent>
                   {accounts.map((a) => (
-                    <SelectItem
-                      key={a.id}
-                      value={a.id}
-                    >
+                    <SelectItem key={a.id} value={a.id}>
                       {a.name}
                     </SelectItem>
                   ))}
@@ -122,9 +106,7 @@ export function DebtPaymentDialog({
               <Input
                 type="date"
                 value={paymentDate}
-                onChange={(e) =>
-                  setPaymentDate(e.target.value)
-                }
+                onChange={(e) => setPaymentDate(e.target.value)}
               />
             </div>
 
@@ -135,9 +117,7 @@ export function DebtPaymentDialog({
                 type="number"
                 step="0.01"
                 value={amount}
-                onChange={(e) =>
-                  setAmount(e.target.value)
-                }
+                onChange={(e) => setAmount(e.target.value)}
               />
             </div>
 
@@ -146,9 +126,7 @@ export function DebtPaymentDialog({
 
               <Input
                 value={description}
-                onChange={(e) =>
-                  setDescription(e.target.value)
-                }
+                onChange={(e) => setDescription(e.target.value)}
                 placeholder="Payment notes"
               />
             </div>
@@ -156,24 +134,12 @@ export function DebtPaymentDialog({
         )}
 
         <DialogFooter>
-          <Button
-            variant="ghost"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
 
-          <Button
-            onClick={submit}
-            disabled={
-              pay.isPending ||
-              !amount ||
-              !accountId
-            }
-          >
-            {pay.isPending
-              ? "Saving..."
-              : "Record Payment"}
+          <Button onClick={submit} disabled={pay.isPending || !amount || !accountId}>
+            {pay.isPending ? "Saving..." : "Record Payment"}
           </Button>
         </DialogFooter>
       </DialogContent>

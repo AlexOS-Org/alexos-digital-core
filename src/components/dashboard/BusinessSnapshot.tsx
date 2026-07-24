@@ -1,11 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Users,
-  Car,
-  ShoppingBag,
-  Megaphone,
-  ArrowUpRight,
-} from "lucide-react";
+import { Users, Car, ShoppingBag, Megaphone, ArrowUpRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 const businessItems = [
@@ -56,14 +50,13 @@ export default function BusinessSnapshot() {
             "
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
-              <CardTitle className="text-sm font-medium">
-                {item.title}
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
 
               <div className="flex items-center gap-2">
                 <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
 
-                <div className="
+                <div
+                  className="
                   h-10 
                   w-10 
                   rounded-xl 
@@ -72,20 +65,17 @@ export default function BusinessSnapshot() {
                   flex 
                   items-center 
                   justify-center
-                ">
+                "
+                >
                   <item.icon className="h-5 w-5" />
                 </div>
               </div>
             </CardHeader>
 
             <CardContent>
-              <p className="text-2xl font-bold">
-                {item.value}
-              </p>
+              <p className="text-2xl font-bold">{item.value}</p>
 
-              <p className="text-xs text-muted-foreground mt-2">
-                {item.description}
-              </p>
+              <p className="text-xs text-muted-foreground mt-2">{item.description}</p>
             </CardContent>
           </Card>
         </Link>

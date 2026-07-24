@@ -1,14 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import {
-  Calendar,
-  CheckCircle2,
-  Clock3,
-  DollarSign,
-  Edit,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { Calendar, CheckCircle2, Clock3, DollarSign, Edit, Plus, Trash2 } from "lucide-react";
 
 import {
   Bill,
@@ -22,12 +14,7 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -38,19 +25,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export const Route = createFileRoute(
-  "/_authenticated/money-center/bills"
-)({
+export const Route = createFileRoute("/_authenticated/money-center/bills")({
   component: BillsPage,
 });
 
-const frequencies: BillFrequency[] = ["one_time", "weekly", "monthly"];
-
-const frequencyLabels: Record<BillFrequency, string> = {
-  one_time: "One-time",
-  weekly: "Weekly",
-  monthly: "Monthly",
-};
+const frequencies: BillFrequency[] = ["one_time", "weekly", "monthly", "quarterly", "yearly"];
 
 function currency(value: number) {
   return new Intl.NumberFormat("en-KE", {
@@ -69,26 +48,17 @@ function BillsPage() {
   const [editing, setEditing] = useState<Bill | null>(null);
   const [open, setOpen] = useState(false);
 
-  const activeBills = useMemo(
-    () => bills.filter((b) => b.status === "pending"),
-    [bills]
-  );
+  const activeBills = useMemo(() => bills.filter((b) => b.status === "active"), [bills]);
 
   const totalMonthly = useMemo(
-    () =>
-      activeBills.reduce(
-        (sum, bill) => sum + Number(bill.amount ?? 0),
-        0
-      ),
-    [activeBills]
+    () => activeBills.reduce((sum, bill) => sum + Number(bill.amount ?? 0), 0),
+    [activeBills],
   );
 
   const overdue = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
 
-    return activeBills.filter(
-      (bill) => bill.due_date && bill.due_date < today
-    );
+    return activeBills.filter((bill) => bill.due_date && bill.due_date < today);
   }, [activeBills]);
 
   const upcoming = useMemo(() => {
@@ -105,15 +75,12 @@ function BillsPage() {
       return due >= today && due <= next7;
     });
   }, [activeBills]);
-    return (
+  return (
     <div className="space-y-6">
-
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Bills</h1>
-          <p className="text-muted-foreground">
-            Manage recurring expenses and upcoming payments.
-          </p>
+          <p className="text-muted-foreground">Manage recurring expenses and upcoming payments.</p>
         </div>
 
         <Button
@@ -126,9 +93,7 @@ function BillsPage() {
           Add Bill
         </Button>
       </div>
-
       <div className="grid gap-4 md:grid-cols-4">
-
         <Card>
           <CardHeader>
             <CardTitle>Total Bills</CardTitle>
@@ -136,9 +101,7 @@ function BillsPage() {
 
           <CardContent className="flex items-center justify-between">
             <DollarSign className="h-8 w-8 text-green-600" />
-            <span className="text-2xl font-bold">
-              {currency(totalMonthly)}
-            </span>
+            <span className="text-2xl font-bold">{currency(totalMonthly)}</span>
           </CardContent>
         </Card>
 
@@ -149,9 +112,7 @@ function BillsPage() {
 
           <CardContent className="flex items-center justify-between">
             <Calendar className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold">
-              {activeBills.length}
-            </span>
+            <span className="text-2xl font-bold">{activeBills.length}</span>
           </CardContent>
         </Card>
 
@@ -162,9 +123,7 @@ function BillsPage() {
 
           <CardContent className="flex items-center justify-between">
             <Clock3 className="h-8 w-8 text-amber-500" />
-            <span className="text-2xl font-bold">
-              {upcoming.length}
-            </span>
+            <span className="text-2xl font-bold">{upcoming.length}</span>
           </CardContent>
         </Card>
 
@@ -175,60 +134,35 @@ function BillsPage() {
 
           <CardContent className="flex items-center justify-between">
             <CheckCircle2 className="h-8 w-8 text-red-500" />
-            <span className="text-2xl font-bold">
-              {overdue.length}
-            </span>
+            <span className="text-2xl font-bold">{overdue.length}</span>
           </CardContent>
         </Card>
-
       </div>
-
       <Card>
-
         <CardHeader>
           <CardTitle>Your Bills</CardTitle>
         </CardHeader>
 
         <CardContent>
-
           {isLoading ? (
-
             <p>Loading...</p>
-
           ) : bills.length === 0 ? (
-
-            <p className="text-muted-foreground">
-              No bills found.
-            </p>
-
+            <p className="text-muted-foreground">No bills found.</p>
           ) : (
-
             <div className="space-y-3">
-
               {bills.map((bill) => (
-
                 <div
                   key={bill.id}
                   className="flex items-center justify-between rounded-xl border p-4"
                 >
-
                   <div>
+                    <h3 className="font-semibold">{bill.name}</h3>
 
-                    <h3 className="font-semibold">
-                      {bill.name}
-                    </h3>
-
-                    <p className="text-sm text-muted-foreground">
-                      {bill.due_date}
-                    </p>
-
+                    <p className="text-sm text-muted-foreground">{bill.due_date}</p>
                   </div>
 
                   <div className="flex items-center gap-3">
-
-                    <span className="font-bold">
-                      {currency(Number(bill.amount))}
-                    </span>
+                    <span className="font-bold">{currency(Number(bill.amount))}</span>
 
                     <Button
                       size="icon"
@@ -241,11 +175,7 @@ function BillsPage() {
                       <Edit className="h-4 w-4" />
                     </Button>
 
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => markPaid.mutate(bill)}
-                    >
+                    <Button size="icon" variant="outline" onClick={() => markPaid.mutate(bill)}>
                       <CheckCircle2 className="h-4 w-4" />
                     </Button>
 
@@ -256,25 +186,14 @@ function BillsPage() {
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
-
                   </div>
-
                 </div>
-
               ))}
-
             </div>
-
           )}
-
         </CardContent>
-
-      </Card>      <BillDialog
-        open={open}
-        onOpenChange={setOpen}
-        bill={editing}
-      />
-
+      </Card>{" "}
+      <BillDialog open={open} onOpenChange={setOpen} bill={editing} />
     </div>
   );
 }
@@ -285,11 +204,7 @@ interface BillDialogProps {
   bill: Bill | null;
 }
 
-function BillDialog({
-  open,
-  onOpenChange,
-  bill,
-}: BillDialogProps) {
+function BillDialog({ open, onOpenChange, bill }: BillDialogProps) {
   const saveBill = useSaveBill();
 
   const [form, setForm] = useState<BillInput>({
@@ -300,15 +215,11 @@ function BillDialog({
     category: bill?.category ?? "",
     account_id: bill?.account_id ?? null,
     notes: bill?.notes ?? "",
-    auto_create_transaction:
-      bill?.auto_create_transaction ?? false,
-    status: bill?.status ?? "pending",
+    auto_create_transaction: bill?.auto_create_transaction ?? false,
+    status: bill?.status ?? "active",
   });
 
-  function update<K extends keyof BillInput>(
-    key: K,
-    value: BillInput[K]
-  ) {
+  function update<K extends keyof BillInput>(key: K, value: BillInput[K]) {
     setForm((prev) => ({
       ...prev,
       [key]: value,
@@ -325,28 +236,16 @@ function BillDialog({
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-
         <DialogHeader>
-          <DialogTitle>
-            {bill ? "Edit Bill" : "Add Bill"}
-          </DialogTitle>
+          <DialogTitle>{bill ? "Edit Bill" : "Add Bill"}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
-
           <div>
             <Label>Name</Label>
-            <Input
-              value={form.name}
-              onChange={(e) =>
-                update("name", e.target.value)
-              }
-            />
+            <Input value={form.name} onChange={(e) => update("name", e.target.value)} />
           </div>
 
           <div>
@@ -354,12 +253,7 @@ function BillDialog({
             <Input
               type="number"
               value={form.amount}
-              onChange={(e) =>
-                update(
-                  "amount",
-                  Number(e.target.value)
-                )
-              }
+              onChange={(e) => update("amount", Number(e.target.value))}
             />
           </div>
 
@@ -368,12 +262,7 @@ function BillDialog({
             <Input
               type="date"
               value={form.due_date}
-              onChange={(e) =>
-                update(
-                  "due_date",
-                  e.target.value
-                )
-              }
+              onChange={(e) => update("due_date", e.target.value)}
             />
           </div>
 
@@ -382,12 +271,7 @@ function BillDialog({
 
             <Select
               value={form.frequency}
-              onValueChange={(v) =>
-                update(
-                  "frequency",
-                  v as BillFrequency
-                )
-              }
+              onValueChange={(v) => update("frequency", v as BillFrequency)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -395,27 +279,18 @@ function BillDialog({
 
               <SelectContent>
                 {frequencies.map((f) => (
-                  <SelectItem
-                    key={f}
-                    value={f}
-                  >
-                    {frequencyLabels[f]}
+                  <SelectItem key={f} value={f}>
+                    {f}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-
           </div>
 
-          <Button
-            className="w-full"
-            onClick={submit}
-          >
+          <Button className="w-full" onClick={submit}>
             {bill ? "Save Changes" : "Create Bill"}
           </Button>
-
         </div>
-
       </DialogContent>
     </Dialog>
   );

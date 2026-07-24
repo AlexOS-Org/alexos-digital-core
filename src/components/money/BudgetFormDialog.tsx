@@ -27,15 +27,10 @@ interface Props {
   editing?: Budget | null;
 }
 
-export function BudgetFormDialog({
-  open,
-  onOpenChange,
-  month,
-  editing,
-}: Props) {
+export function BudgetFormDialog({ open, onOpenChange, month, editing }: Props) {
   const save = useSaveBudget();
 
-const [category, setCategory] = useState<string>(EXPENSE_CATEGORIES[0]);
+  const [category, setCategory] = useState<string>(EXPENSE_CATEGORIES[0]);
   const [amount, setAmount] = useState("");
 
   useEffect(() => {
@@ -69,37 +64,25 @@ const [category, setCategory] = useState<string>(EXPENSE_CATEGORIES[0]);
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>
-            {editing ? "Edit Budget" : "Create Budget"}
-          </DialogTitle>
+          <DialogTitle>{editing ? "Edit Budget" : "Create Budget"}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-5">
           <div className="space-y-2">
             <Label>Month</Label>
-            <Input
-              value={monthLabel(month)}
-              disabled
-            />
+            <Input value={monthLabel(month)} disabled />
           </div>
 
           <div className="space-y-2">
             <Label>Expense Category</Label>
-            <Select
-              value={category}
-              onValueChange={setCategory}
-              disabled={!!editing}
-            >
+            <Select value={category} onValueChange={setCategory} disabled={!!editing}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
 
               <SelectContent>
                 {EXPENSE_CATEGORIES.map((item) => (
-                  <SelectItem
-                    key={item}
-                    value={item}
-                  >
+                  <SelectItem key={item} value={item}>
                     {item}
                   </SelectItem>
                 ))}
@@ -120,22 +103,12 @@ const [category, setCategory] = useState<string>(EXPENSE_CATEGORIES[0]);
         </div>
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
 
-          <Button
-            onClick={submit}
-            disabled={save.isPending}
-          >
-            {save.isPending
-              ? "Saving..."
-              : editing
-                ? "Update Budget"
-                : "Create Budget"}
+          <Button onClick={submit} disabled={save.isPending}>
+            {save.isPending ? "Saving..." : editing ? "Update Budget" : "Create Budget"}
           </Button>
         </DialogFooter>
       </DialogContent>

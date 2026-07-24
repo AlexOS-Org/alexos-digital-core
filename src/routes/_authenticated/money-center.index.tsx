@@ -53,9 +53,7 @@ function MoneyDashboard() {
     const diff = Math.round((d.getTime() - new Date(now.toDateString()).getTime()) / 86_400_000);
     return diff >= 0 && diff <= 7;
   });
-  const billsThisMonth = unpaidBills.filter(
-  (b) => b.due_date?.startsWith(monthKey)
-);
+  const billsThisMonth = unpaidBills.filter((b) => b.due_date?.startsWith(monthKey));
   const kpis = [
     { label: "Total Available", value: total, icon: Wallet, tone: "text-primary" },
     {

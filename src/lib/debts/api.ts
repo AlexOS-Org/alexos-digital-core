@@ -22,13 +22,18 @@ export interface Debt {
 
 async function uid() {
   const { data } = await supabase.auth.getUser();
-  if (!data.user) throw new Error("Not authenticated");
+
+  if (!data.user) {
+    throw new Error("Not authenticated");
+  }
+
   return data.user.id;
 }
 
 export function useDebts(includeArchived = false) {
   return useQuery({
     queryKey: ["debts", includeArchived],
+
     queryFn: async () => {
       let q = supabase
         .from("debts")
@@ -38,11 +43,15 @@ export function useDebts(includeArchived = false) {
         .order("due_date", { nullsFirst: false })
         .order("created_at");
 
-      if (!includeArchived) q = q.neq("status", "archived");
+      if (!includeArchived) {
+        q = q.neq("status", "archived");
+      }
 
       const { data, error } = await q;
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       return (data ?? []) as Debt[];
     },
@@ -68,7 +77,9 @@ export function useSaveDebt() {
             .eq("id", input.id)
         : await supabase.from("debts").insert(payload as never);
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
     },
 
     onSuccess: () => {
@@ -76,7 +87,9 @@ export function useSaveDebt() {
       toast.success("Debt saved");
     },
 
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      toast.error(e.message);
+    },
   });
 }
 
@@ -99,8 +112,8 @@ export function useRecordDebtPayment() {
     }) => {
       const user_id = await uid();
 
-      // Update debt
       const newPaid = Number(debt.amount_paid) + amount;
+
       const remaining = Number(debt.principal) - newPaid;
 
       const status = remaining <= 0 ? "paid" : debt.status;
@@ -113,9 +126,10 @@ export function useRecordDebtPayment() {
         })
         .eq("id", debt.id);
 
-      if (debtError) throw debtError;
+      if (debtError) {
+        throw debtError;
+      }
 
-      // Record transaction
       const { error: txError } = await supabase.from("transactions").insert({
         user_id,
         occurred_at: paymentDate,
@@ -127,7 +141,9 @@ export function useRecordDebtPayment() {
         status: "posted",
       });
 
-      if (txError) throw txError;
+      if (txError) {
+        throw txError;
+      }
     },
 
     onSuccess: () => {
@@ -139,7 +155,9 @@ export function useRecordDebtPayment() {
       toast.success("Debt payment recorded");
     },
 
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      toast.error(e.message);
+    },
   });
 }
 
@@ -150,10 +168,14 @@ export function useArchiveDebt() {
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("debts")
-        .update({ status: "archived" })
+        .update({
+          status: "archived",
+        })
         .eq("id", id);
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
     },
 
     onSuccess: () => {
@@ -161,7 +183,38 @@ export function useArchiveDebt() {
       toast.success("Debt archived");
     },
 
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      toast.error(e.message);
+    },
+  });
+}
+
+// Soft delete debt (AlexOS standard)
+export function useDeleteDebt() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("debts")
+        .update({
+          deleted_at: new Date().toISOString(),
+        })
+        .eq("id", id);
+
+      if (error) {
+        throw error;
+      }
+    },
+
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["debts"] });
+      toast.success("Debt deleted");
+    },
+
+    onError: (e: Error) => {
+      toast.error(e.message);
+    },
   });
 }
 
@@ -172,7 +225,9 @@ export function debtRemaining(d: Debt) {
 export function debtProgress(d: Debt) {
   const p = Number(d.principal);
 
-  if (p <= 0) return 0;
+  if (p <= 0) {
+    return 0;
+  }
 
   return Math.min(100, (Number(d.amount_paid) / p) * 100);
 }
