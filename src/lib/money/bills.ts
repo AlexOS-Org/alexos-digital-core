@@ -185,7 +185,7 @@ export function useMarkBillPaid() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: BILLS_KEY });
       qc.invalidateQueries({ queryKey: ["transactions"] });
-      qc.invalidateQueries({ queryKey: ["balances"] });
+      qc.invalidateQueries({ queryKey: ["account_balances"] });
     },
   });
 }
