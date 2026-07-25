@@ -150,22 +150,18 @@ export function useMarkBillPaid() {
         }
       }
 
-      if (
-        bill.frequency === "weekly" ||
-        bill.frequency === "monthly" ||
-        bill.
-        bill.frequency === "yearly"
-      ) {
+      if (bill.frequency === "weekly" || bill.frequency === "monthly") {
         const { error } = await supabase
           .from("bills")
           .update({
             status: "pending",
             last_paid_at: now,
-            due_date: bill.due_date ? advanceDueDate(bill.due_date, bill.frequency) : null,
+            due_date: advanceDueDate(bill.due_date, bill.frequency),
           })
           .eq("id", bill.id);
 
         if (error) throw error;
+
       } else {
         const { error } = await supabase
           .from("bills")
