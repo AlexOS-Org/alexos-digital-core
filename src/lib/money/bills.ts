@@ -45,11 +45,8 @@ function advanceDueDate(dueDate: string, frequency: BillFrequency): string {
     d.setDate(d.getDate() + 7);
   } else if (frequency === "monthly") {
     d.setMonth(d.getMonth() + 1);
-  } else if (frequency === "quarterly") {
-    d.setMonth(d.getMonth() + 3);
-  } else if (frequency === "yearly") {
-    d.setFullYear(d.getFullYear() + 1);
   }
+
 
   return d.toISOString().slice(0, 10);
 }
@@ -75,7 +72,7 @@ export function useSaveBill() {
         category: input.category ?? null,
         due_date: input.due_date,
         frequency: input.frequency,
-        status: input.status ?? "active",
+        status: (input.status ?? "pending") as BillStatus,
         account_id: input.account_id ?? null,
         notes: input.notes ?? null,
         auto_create_transaction: input.auto_create_transaction ?? false,
@@ -153,22 +150,18 @@ export function useMarkBillPaid() {
         }
       }
 
-      if (
-        bill.frequency === "weekly" ||
-        bill.frequency === "monthly" ||
-        bill.frequency === "quarterly" ||
-        bill.frequency === "yearly"
-      ) {
+      if (bill.frequency === "weekly" || bill.frequency === "monthly") {
         const { error } = await supabase
           .from("bills")
           .update({
-            status: "active",
+            status: "pending",
             last_paid_at: now,
-            due_date: bill.due_date ? advanceDueDate(bill.due_date, bill.frequency) : null,
+            due_date: advanceDueDate(bill.due_date, bill.frequency),
           })
           .eq("id", bill.id);
 
         if (error) throw error;
+
       } else {
         const { error } = await supabase
           .from("bills")

@@ -13,7 +13,7 @@ export default function TodaysMission() {
 
   const overdueBills = bills.filter(
     (bill) =>
-      bill.status === "active" &&
+      bill.status === "pending" &&
       bill.due_date &&
       bill.due_date < today
   ).length;

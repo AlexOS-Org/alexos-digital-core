@@ -9,88 +9,82 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedBankingRouteImport } from './routes/_authenticated/banking'
-import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedDebtManagementRouteImport } from './routes/_authenticated/debt-management'
-import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
-import { Route as AuthenticatedECommerceRouteImport } from './routes/_authenticated/e-commerce'
-import { Route as AuthenticatedGoalsRouteImport } from './routes/_authenticated/goals'
-import { Route as AuthenticatedMarketingRouteImport } from './routes/_authenticated/marketing'
-import { Route as AuthenticatedMoneyCenterRouteImport } from './routes/_authenticated/money-center'
-import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
-import { Route as AuthenticatedPeopleRouteImport } from './routes/_authenticated/people'
-import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
-import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
-import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedVehicleSalesRouteImport } from './routes/_authenticated/vehicle-sales'
+import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedPeopleRouteImport } from './routes/_authenticated/people'
+import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
+import { Route as AuthenticatedMoneyCenterRouteImport } from './routes/_authenticated/money-center'
+import { Route as AuthenticatedMarketingRouteImport } from './routes/_authenticated/marketing'
+import { Route as AuthenticatedGoalsRouteImport } from './routes/_authenticated/goals'
+import { Route as AuthenticatedECommerceRouteImport } from './routes/_authenticated/e-commerce'
+import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
+import { Route as AuthenticatedDebtManagementRouteImport } from './routes/_authenticated/debt-management'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
+import { Route as AuthenticatedBankingRouteImport } from './routes/_authenticated/banking'
+import { Route as AuthenticatedPeopleIndexRouteImport } from './routes/_authenticated/people.index'
 import { Route as AuthenticatedMoneyCenterIndexRouteImport } from './routes/_authenticated/money-center.index'
-import { Route as AuthenticatedMoneyCenterAccountsRouteImport } from './routes/_authenticated/money-center.accounts'
-import { Route as AuthenticatedMoneyCenterAnalyticsRouteImport } from './routes/_authenticated/money-center.analytics'
-import { Route as AuthenticatedMoneyCenterBillsRouteImport } from './routes/_authenticated/money-center.bills'
-import { Route as AuthenticatedMoneyCenterBudgetsRouteImport } from './routes/_authenticated/money-center.budgets'
-import { Route as AuthenticatedMoneyCenterExpectedRouteImport } from './routes/_authenticated/money-center.expected'
-import { Route as AuthenticatedMoneyCenterExpensesRouteImport } from './routes/_authenticated/money-center.expenses'
-import { Route as AuthenticatedMoneyCenterIncomeRouteImport } from './routes/_authenticated/money-center.income'
-import { Route as AuthenticatedMoneyCenterTransactionsRouteImport } from './routes/_authenticated/money-center.transactions'
+import { Route as AuthenticatedPeopleLeadsRouteImport } from './routes/_authenticated/people.leads'
 import { Route as AuthenticatedMoneyCenterTransfersRouteImport } from './routes/_authenticated/money-center.transfers'
+import { Route as AuthenticatedMoneyCenterTransactionsRouteImport } from './routes/_authenticated/money-center.transactions'
+import { Route as AuthenticatedMoneyCenterIncomeRouteImport } from './routes/_authenticated/money-center.income'
+import { Route as AuthenticatedMoneyCenterExpensesRouteImport } from './routes/_authenticated/money-center.expenses'
+import { Route as AuthenticatedMoneyCenterExpectedRouteImport } from './routes/_authenticated/money-center.expected'
+import { Route as AuthenticatedMoneyCenterBudgetsRouteImport } from './routes/_authenticated/money-center.budgets'
+import { Route as AuthenticatedMoneyCenterBillsRouteImport } from './routes/_authenticated/money-center.bills'
+import { Route as AuthenticatedMoneyCenterAnalyticsRouteImport } from './routes/_authenticated/money-center.analytics'
+import { Route as AuthenticatedMoneyCenterAccountsRouteImport } from './routes/_authenticated/money-center.accounts'
+import { Route as AuthenticatedPeopleLeadsIdRouteImport } from './routes/_authenticated/people.leads.$id'
+import { Route as AuthenticatedPeopleContactsIdRouteImport } from './routes/_authenticated/people.contacts.$id'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedBankingRoute = AuthenticatedBankingRouteImport.update({
-  id: '/banking',
-  path: '/banking',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
-  id: '/calendar',
-  path: '/calendar',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedDebtManagementRoute =
-  AuthenticatedDebtManagementRouteImport.update({
-    id: '/debt-management',
-    path: '/debt-management',
+const AuthenticatedVehicleSalesRoute =
+  AuthenticatedVehicleSalesRouteImport.update({
+    id: '/vehicle-sales',
+    path: '/vehicle-sales',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
-  id: '/documents',
-  path: '/documents',
+const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedECommerceRoute = AuthenticatedECommerceRouteImport.update({
-  id: '/e-commerce',
-  path: '/e-commerce',
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedGoalsRoute = AuthenticatedGoalsRouteImport.update({
-  id: '/goals',
-  path: '/goals',
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedMarketingRoute = AuthenticatedMarketingRouteImport.update({
-  id: '/marketing',
-  path: '/marketing',
+const AuthenticatedPeopleRoute = AuthenticatedPeopleRouteImport.update({
+  id: '/people',
+  path: '/people',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedNotesRoute = AuthenticatedNotesRouteImport.update({
+  id: '/notes',
+  path: '/notes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMoneyCenterRoute =
@@ -99,36 +93,52 @@ const AuthenticatedMoneyCenterRoute =
     path: '/money-center',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedNotesRoute = AuthenticatedNotesRouteImport.update({
-  id: '/notes',
-  path: '/notes',
+const AuthenticatedMarketingRoute = AuthenticatedMarketingRouteImport.update({
+  id: '/marketing',
+  path: '/marketing',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedPeopleRoute = AuthenticatedPeopleRouteImport.update({
-  id: '/people',
-  path: '/people',
+const AuthenticatedGoalsRoute = AuthenticatedGoalsRouteImport.update({
+  id: '/goals',
+  path: '/goals',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
+const AuthenticatedECommerceRoute = AuthenticatedECommerceRouteImport.update({
+  id: '/e-commerce',
+  path: '/e-commerce',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedVehicleSalesRoute =
-  AuthenticatedVehicleSalesRouteImport.update({
-    id: '/vehicle-sales',
-    path: '/vehicle-sales',
+const AuthenticatedDebtManagementRoute =
+  AuthenticatedDebtManagementRouteImport.update({
+    id: '/debt-management',
+    path: '/debt-management',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBankingRoute = AuthenticatedBankingRouteImport.update({
+  id: '/banking',
+  path: '/banking',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPeopleIndexRoute =
+  AuthenticatedPeopleIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPeopleRoute,
   } as any)
 const AuthenticatedMoneyCenterIndexRoute =
   AuthenticatedMoneyCenterIndexRouteImport.update({
@@ -136,46 +146,16 @@ const AuthenticatedMoneyCenterIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedMoneyCenterRoute,
   } as any)
-const AuthenticatedMoneyCenterAccountsRoute =
-  AuthenticatedMoneyCenterAccountsRouteImport.update({
-    id: '/accounts',
-    path: '/accounts',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+const AuthenticatedPeopleLeadsRoute =
+  AuthenticatedPeopleLeadsRouteImport.update({
+    id: '/leads',
+    path: '/leads',
+    getParentRoute: () => AuthenticatedPeopleRoute,
   } as any)
-const AuthenticatedMoneyCenterAnalyticsRoute =
-  AuthenticatedMoneyCenterAnalyticsRouteImport.update({
-    id: '/analytics',
-    path: '/analytics',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
-  } as any)
-const AuthenticatedMoneyCenterBillsRoute =
-  AuthenticatedMoneyCenterBillsRouteImport.update({
-    id: '/bills',
-    path: '/bills',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
-  } as any)
-const AuthenticatedMoneyCenterBudgetsRoute =
-  AuthenticatedMoneyCenterBudgetsRouteImport.update({
-    id: '/budgets',
-    path: '/budgets',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
-  } as any)
-const AuthenticatedMoneyCenterExpectedRoute =
-  AuthenticatedMoneyCenterExpectedRouteImport.update({
-    id: '/expected',
-    path: '/expected',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
-  } as any)
-const AuthenticatedMoneyCenterExpensesRoute =
-  AuthenticatedMoneyCenterExpensesRouteImport.update({
-    id: '/expenses',
-    path: '/expenses',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
-  } as any)
-const AuthenticatedMoneyCenterIncomeRoute =
-  AuthenticatedMoneyCenterIncomeRouteImport.update({
-    id: '/income',
-    path: '/income',
+const AuthenticatedMoneyCenterTransfersRoute =
+  AuthenticatedMoneyCenterTransfersRouteImport.update({
+    id: '/transfers',
+    path: '/transfers',
     getParentRoute: () => AuthenticatedMoneyCenterRoute,
   } as any)
 const AuthenticatedMoneyCenterTransactionsRoute =
@@ -184,11 +164,59 @@ const AuthenticatedMoneyCenterTransactionsRoute =
     path: '/transactions',
     getParentRoute: () => AuthenticatedMoneyCenterRoute,
   } as any)
-const AuthenticatedMoneyCenterTransfersRoute =
-  AuthenticatedMoneyCenterTransfersRouteImport.update({
-    id: '/transfers',
-    path: '/transfers',
+const AuthenticatedMoneyCenterIncomeRoute =
+  AuthenticatedMoneyCenterIncomeRouteImport.update({
+    id: '/income',
+    path: '/income',
     getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterExpensesRoute =
+  AuthenticatedMoneyCenterExpensesRouteImport.update({
+    id: '/expenses',
+    path: '/expenses',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterExpectedRoute =
+  AuthenticatedMoneyCenterExpectedRouteImport.update({
+    id: '/expected',
+    path: '/expected',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterBudgetsRoute =
+  AuthenticatedMoneyCenterBudgetsRouteImport.update({
+    id: '/budgets',
+    path: '/budgets',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterBillsRoute =
+  AuthenticatedMoneyCenterBillsRouteImport.update({
+    id: '/bills',
+    path: '/bills',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterAnalyticsRoute =
+  AuthenticatedMoneyCenterAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterAccountsRoute =
+  AuthenticatedMoneyCenterAccountsRouteImport.update({
+    id: '/accounts',
+    path: '/accounts',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedPeopleLeadsIdRoute =
+  AuthenticatedPeopleLeadsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedPeopleLeadsRoute,
+  } as any)
+const AuthenticatedPeopleContactsIdRoute =
+  AuthenticatedPeopleContactsIdRouteImport.update({
+    id: '/contacts/$id',
+    path: '/contacts/$id',
+    getParentRoute: () => AuthenticatedPeopleRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -204,7 +232,7 @@ export interface FileRoutesByFullPath {
   '/marketing': typeof AuthenticatedMarketingRoute
   '/money-center': typeof AuthenticatedMoneyCenterRouteWithChildren
   '/notes': typeof AuthenticatedNotesRoute
-  '/people': typeof AuthenticatedPeopleRoute
+  '/people': typeof AuthenticatedPeopleRouteWithChildren
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
@@ -218,7 +246,11 @@ export interface FileRoutesByFullPath {
   '/money-center/income': typeof AuthenticatedMoneyCenterIncomeRoute
   '/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
+  '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
   '/money-center/': typeof AuthenticatedMoneyCenterIndexRoute
+  '/people/': typeof AuthenticatedPeopleIndexRoute
+  '/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
+  '/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -232,7 +264,6 @@ export interface FileRoutesByTo {
   '/goals': typeof AuthenticatedGoalsRoute
   '/marketing': typeof AuthenticatedMarketingRoute
   '/notes': typeof AuthenticatedNotesRoute
-  '/people': typeof AuthenticatedPeopleRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
@@ -246,7 +277,11 @@ export interface FileRoutesByTo {
   '/money-center/income': typeof AuthenticatedMoneyCenterIncomeRoute
   '/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
+  '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
   '/money-center': typeof AuthenticatedMoneyCenterIndexRoute
+  '/people': typeof AuthenticatedPeopleIndexRoute
+  '/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
+  '/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -263,7 +298,7 @@ export interface FileRoutesById {
   '/_authenticated/marketing': typeof AuthenticatedMarketingRoute
   '/_authenticated/money-center': typeof AuthenticatedMoneyCenterRouteWithChildren
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
-  '/_authenticated/people': typeof AuthenticatedPeopleRoute
+  '/_authenticated/people': typeof AuthenticatedPeopleRouteWithChildren
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
@@ -277,7 +312,11 @@ export interface FileRoutesById {
   '/_authenticated/money-center/income': typeof AuthenticatedMoneyCenterIncomeRoute
   '/_authenticated/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/_authenticated/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
+  '/_authenticated/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
   '/_authenticated/money-center/': typeof AuthenticatedMoneyCenterIndexRoute
+  '/_authenticated/people/': typeof AuthenticatedPeopleIndexRoute
+  '/_authenticated/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
+  '/_authenticated/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -308,7 +347,11 @@ export interface FileRouteTypes {
     | '/money-center/income'
     | '/money-center/transactions'
     | '/money-center/transfers'
+    | '/people/leads'
     | '/money-center/'
+    | '/people/'
+    | '/people/contacts/$id'
+    | '/people/leads/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -322,7 +365,6 @@ export interface FileRouteTypes {
     | '/goals'
     | '/marketing'
     | '/notes'
-    | '/people'
     | '/reports'
     | '/settings'
     | '/tasks'
@@ -336,7 +378,11 @@ export interface FileRouteTypes {
     | '/money-center/income'
     | '/money-center/transactions'
     | '/money-center/transfers'
+    | '/people/leads'
     | '/money-center'
+    | '/people'
+    | '/people/contacts/$id'
+    | '/people/leads/$id'
   id:
     | '__root__'
     | '/'
@@ -366,7 +412,11 @@ export interface FileRouteTypes {
     | '/_authenticated/money-center/income'
     | '/_authenticated/money-center/transactions'
     | '/_authenticated/money-center/transfers'
+    | '/_authenticated/people/leads'
     | '/_authenticated/money-center/'
+    | '/_authenticated/people/'
+    | '/_authenticated/people/contacts/$id'
+    | '/_authenticated/people/leads/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -377,11 +427,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -391,102 +441,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/banking': {
-      id: '/_authenticated/banking'
-      path: '/banking'
-      fullPath: '/banking'
-      preLoaderRoute: typeof AuthenticatedBankingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/calendar': {
-      id: '/_authenticated/calendar'
-      path: '/calendar'
-      fullPath: '/calendar'
-      preLoaderRoute: typeof AuthenticatedCalendarRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/debt-management': {
-      id: '/_authenticated/debt-management'
-      path: '/debt-management'
-      fullPath: '/debt-management'
-      preLoaderRoute: typeof AuthenticatedDebtManagementRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/documents': {
-      id: '/_authenticated/documents'
-      path: '/documents'
-      fullPath: '/documents'
-      preLoaderRoute: typeof AuthenticatedDocumentsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/e-commerce': {
-      id: '/_authenticated/e-commerce'
-      path: '/e-commerce'
-      fullPath: '/e-commerce'
-      preLoaderRoute: typeof AuthenticatedECommerceRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/goals': {
-      id: '/_authenticated/goals'
-      path: '/goals'
-      fullPath: '/goals'
-      preLoaderRoute: typeof AuthenticatedGoalsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/marketing': {
-      id: '/_authenticated/marketing'
-      path: '/marketing'
-      fullPath: '/marketing'
-      preLoaderRoute: typeof AuthenticatedMarketingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/money-center': {
-      id: '/_authenticated/money-center'
-      path: '/money-center'
-      fullPath: '/money-center'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/notes': {
-      id: '/_authenticated/notes'
-      path: '/notes'
-      fullPath: '/notes'
-      preLoaderRoute: typeof AuthenticatedNotesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/people': {
-      id: '/_authenticated/people'
-      path: '/people'
-      fullPath: '/people'
-      preLoaderRoute: typeof AuthenticatedPeopleRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/reports': {
-      id: '/_authenticated/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof AuthenticatedReportsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+    '/_authenticated/vehicle-sales': {
+      id: '/_authenticated/vehicle-sales'
+      path: '/vehicle-sales'
+      fullPath: '/vehicle-sales'
+      preLoaderRoute: typeof AuthenticatedVehicleSalesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tasks': {
@@ -496,12 +462,103 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTasksRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/vehicle-sales': {
-      id: '/_authenticated/vehicle-sales'
-      path: '/vehicle-sales'
-      fullPath: '/vehicle-sales'
-      preLoaderRoute: typeof AuthenticatedVehicleSalesRouteImport
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/people': {
+      id: '/_authenticated/people'
+      path: '/people'
+      fullPath: '/people'
+      preLoaderRoute: typeof AuthenticatedPeopleRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notes': {
+      id: '/_authenticated/notes'
+      path: '/notes'
+      fullPath: '/notes'
+      preLoaderRoute: typeof AuthenticatedNotesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/money-center': {
+      id: '/_authenticated/money-center'
+      path: '/money-center'
+      fullPath: '/money-center'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/marketing': {
+      id: '/_authenticated/marketing'
+      path: '/marketing'
+      fullPath: '/marketing'
+      preLoaderRoute: typeof AuthenticatedMarketingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/goals': {
+      id: '/_authenticated/goals'
+      path: '/goals'
+      fullPath: '/goals'
+      preLoaderRoute: typeof AuthenticatedGoalsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/e-commerce': {
+      id: '/_authenticated/e-commerce'
+      path: '/e-commerce'
+      fullPath: '/e-commerce'
+      preLoaderRoute: typeof AuthenticatedECommerceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/documents': {
+      id: '/_authenticated/documents'
+      path: '/documents'
+      fullPath: '/documents'
+      preLoaderRoute: typeof AuthenticatedDocumentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/debt-management': {
+      id: '/_authenticated/debt-management'
+      path: '/debt-management'
+      fullPath: '/debt-management'
+      preLoaderRoute: typeof AuthenticatedDebtManagementRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/calendar': {
+      id: '/_authenticated/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof AuthenticatedCalendarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/banking': {
+      id: '/_authenticated/banking'
+      path: '/banking'
+      fullPath: '/banking'
+      preLoaderRoute: typeof AuthenticatedBankingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/people/': {
+      id: '/_authenticated/people/'
+      path: '/'
+      fullPath: '/people/'
+      preLoaderRoute: typeof AuthenticatedPeopleIndexRouteImport
+      parentRoute: typeof AuthenticatedPeopleRoute
     }
     '/_authenticated/money-center/': {
       id: '/_authenticated/money-center/'
@@ -510,53 +567,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMoneyCenterIndexRouteImport
       parentRoute: typeof AuthenticatedMoneyCenterRoute
     }
-    '/_authenticated/money-center/accounts': {
-      id: '/_authenticated/money-center/accounts'
-      path: '/accounts'
-      fullPath: '/money-center/accounts'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterAccountsRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    '/_authenticated/people/leads': {
+      id: '/_authenticated/people/leads'
+      path: '/leads'
+      fullPath: '/people/leads'
+      preLoaderRoute: typeof AuthenticatedPeopleLeadsRouteImport
+      parentRoute: typeof AuthenticatedPeopleRoute
     }
-    '/_authenticated/money-center/analytics': {
-      id: '/_authenticated/money-center/analytics'
-      path: '/analytics'
-      fullPath: '/money-center/analytics'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
-    }
-    '/_authenticated/money-center/bills': {
-      id: '/_authenticated/money-center/bills'
-      path: '/bills'
-      fullPath: '/money-center/bills'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterBillsRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
-    }
-    '/_authenticated/money-center/budgets': {
-      id: '/_authenticated/money-center/budgets'
-      path: '/budgets'
-      fullPath: '/money-center/budgets'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterBudgetsRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
-    }
-    '/_authenticated/money-center/expected': {
-      id: '/_authenticated/money-center/expected'
-      path: '/expected'
-      fullPath: '/money-center/expected'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterExpectedRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
-    }
-    '/_authenticated/money-center/expenses': {
-      id: '/_authenticated/money-center/expenses'
-      path: '/expenses'
-      fullPath: '/money-center/expenses'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterExpensesRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
-    }
-    '/_authenticated/money-center/income': {
-      id: '/_authenticated/money-center/income'
-      path: '/income'
-      fullPath: '/money-center/income'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterIncomeRouteImport
+    '/_authenticated/money-center/transfers': {
+      id: '/_authenticated/money-center/transfers'
+      path: '/transfers'
+      fullPath: '/money-center/transfers'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterTransfersRouteImport
       parentRoute: typeof AuthenticatedMoneyCenterRoute
     }
     '/_authenticated/money-center/transactions': {
@@ -566,12 +588,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMoneyCenterTransactionsRouteImport
       parentRoute: typeof AuthenticatedMoneyCenterRoute
     }
-    '/_authenticated/money-center/transfers': {
-      id: '/_authenticated/money-center/transfers'
-      path: '/transfers'
-      fullPath: '/money-center/transfers'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterTransfersRouteImport
+    '/_authenticated/money-center/income': {
+      id: '/_authenticated/money-center/income'
+      path: '/income'
+      fullPath: '/money-center/income'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterIncomeRouteImport
       parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/expenses': {
+      id: '/_authenticated/money-center/expenses'
+      path: '/expenses'
+      fullPath: '/money-center/expenses'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterExpensesRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/expected': {
+      id: '/_authenticated/money-center/expected'
+      path: '/expected'
+      fullPath: '/money-center/expected'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterExpectedRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/budgets': {
+      id: '/_authenticated/money-center/budgets'
+      path: '/budgets'
+      fullPath: '/money-center/budgets'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterBudgetsRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/bills': {
+      id: '/_authenticated/money-center/bills'
+      path: '/bills'
+      fullPath: '/money-center/bills'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterBillsRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/analytics': {
+      id: '/_authenticated/money-center/analytics'
+      path: '/analytics'
+      fullPath: '/money-center/analytics'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/accounts': {
+      id: '/_authenticated/money-center/accounts'
+      path: '/accounts'
+      fullPath: '/money-center/accounts'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterAccountsRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/people/leads/$id': {
+      id: '/_authenticated/people/leads/$id'
+      path: '/$id'
+      fullPath: '/people/leads/$id'
+      preLoaderRoute: typeof AuthenticatedPeopleLeadsIdRouteImport
+      parentRoute: typeof AuthenticatedPeopleLeadsRoute
+    }
+    '/_authenticated/people/contacts/$id': {
+      id: '/_authenticated/people/contacts/$id'
+      path: '/contacts/$id'
+      fullPath: '/people/contacts/$id'
+      preLoaderRoute: typeof AuthenticatedPeopleContactsIdRouteImport
+      parentRoute: typeof AuthenticatedPeopleRoute
     }
   }
 }
@@ -614,6 +692,35 @@ const AuthenticatedMoneyCenterRouteWithChildren =
     AuthenticatedMoneyCenterRouteChildren,
   )
 
+interface AuthenticatedPeopleLeadsRouteChildren {
+  AuthenticatedPeopleLeadsIdRoute: typeof AuthenticatedPeopleLeadsIdRoute
+}
+
+const AuthenticatedPeopleLeadsRouteChildren: AuthenticatedPeopleLeadsRouteChildren =
+  {
+    AuthenticatedPeopleLeadsIdRoute: AuthenticatedPeopleLeadsIdRoute,
+  }
+
+const AuthenticatedPeopleLeadsRouteWithChildren =
+  AuthenticatedPeopleLeadsRoute._addFileChildren(
+    AuthenticatedPeopleLeadsRouteChildren,
+  )
+
+interface AuthenticatedPeopleRouteChildren {
+  AuthenticatedPeopleLeadsRoute: typeof AuthenticatedPeopleLeadsRouteWithChildren
+  AuthenticatedPeopleIndexRoute: typeof AuthenticatedPeopleIndexRoute
+  AuthenticatedPeopleContactsIdRoute: typeof AuthenticatedPeopleContactsIdRoute
+}
+
+const AuthenticatedPeopleRouteChildren: AuthenticatedPeopleRouteChildren = {
+  AuthenticatedPeopleLeadsRoute: AuthenticatedPeopleLeadsRouteWithChildren,
+  AuthenticatedPeopleIndexRoute: AuthenticatedPeopleIndexRoute,
+  AuthenticatedPeopleContactsIdRoute: AuthenticatedPeopleContactsIdRoute,
+}
+
+const AuthenticatedPeopleRouteWithChildren =
+  AuthenticatedPeopleRoute._addFileChildren(AuthenticatedPeopleRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBankingRoute: typeof AuthenticatedBankingRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
@@ -625,7 +732,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMarketingRoute: typeof AuthenticatedMarketingRoute
   AuthenticatedMoneyCenterRoute: typeof AuthenticatedMoneyCenterRouteWithChildren
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
-  AuthenticatedPeopleRoute: typeof AuthenticatedPeopleRoute
+  AuthenticatedPeopleRoute: typeof AuthenticatedPeopleRouteWithChildren
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
@@ -643,7 +750,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMarketingRoute: AuthenticatedMarketingRoute,
   AuthenticatedMoneyCenterRoute: AuthenticatedMoneyCenterRouteWithChildren,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
-  AuthenticatedPeopleRoute: AuthenticatedPeopleRoute,
+  AuthenticatedPeopleRoute: AuthenticatedPeopleRouteWithChildren,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
@@ -661,13 +768,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
