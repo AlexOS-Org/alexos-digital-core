@@ -75,7 +75,7 @@ export function useSaveBill() {
         category: input.category ?? null,
         due_date: input.due_date,
         frequency: input.frequency,
-        status: input.status ?? "active",
+        status: input.status ?? "pending",
         account_id: input.account_id ?? null,
         notes: input.notes ?? null,
         auto_create_transaction: input.auto_create_transaction ?? false,
@@ -156,13 +156,13 @@ export function useMarkBillPaid() {
       if (
         bill.frequency === "weekly" ||
         bill.frequency === "monthly" ||
-        bill.frequency === "quarterly" ||
+        bill.
         bill.frequency === "yearly"
       ) {
         const { error } = await supabase
           .from("bills")
           .update({
-            status: "active",
+            status: "pending",
             last_paid_at: now,
             due_date: bill.due_date ? advanceDueDate(bill.due_date, bill.frequency) : null,
           })

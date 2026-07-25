@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/money-center/bills")({
   component: BillsPage,
 });
 
-const frequencies: BillFrequency[] = ["one_time", "weekly", "monthly", "quarterly", "yearly"];
+const frequencies: BillFrequency[] = ["one_time", "weekly", "monthly"];
 
 function currency(value: number) {
   return new Intl.NumberFormat("en-KE", {
@@ -48,7 +48,7 @@ function BillsPage() {
   const [editing, setEditing] = useState<Bill | null>(null);
   const [open, setOpen] = useState(false);
 
-  const activeBills = useMemo(() => bills.filter((b) => b.status === "active"), [bills]);
+  const activeBills = useMemo(() => bills.filter((b) => b.status === "pending"), [bills]);
 
   const totalMonthly = useMemo(
     () => activeBills.reduce((sum, bill) => sum + Number(bill.amount ?? 0), 0),
@@ -216,7 +216,7 @@ function BillDialog({ open, onOpenChange, bill }: BillDialogProps) {
     account_id: bill?.account_id ?? null,
     notes: bill?.notes ?? "",
     auto_create_transaction: bill?.auto_create_transaction ?? false,
-    status: bill?.status ?? "active",
+    status: bill?.status ?? "pending",
   });
 
   function update<K extends keyof BillInput>(key: K, value: BillInput[K]) {
