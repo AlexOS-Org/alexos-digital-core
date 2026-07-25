@@ -27,7 +27,9 @@ import { Route as AuthenticatedDebtManagementRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedBankingRouteImport } from './routes/_authenticated/banking'
+import { Route as AuthenticatedPeopleIndexRouteImport } from './routes/_authenticated/people.index'
 import { Route as AuthenticatedMoneyCenterIndexRouteImport } from './routes/_authenticated/money-center.index'
+import { Route as AuthenticatedPeopleLeadsRouteImport } from './routes/_authenticated/people.leads'
 import { Route as AuthenticatedMoneyCenterTransfersRouteImport } from './routes/_authenticated/money-center.transfers'
 import { Route as AuthenticatedMoneyCenterTransactionsRouteImport } from './routes/_authenticated/money-center.transactions'
 import { Route as AuthenticatedMoneyCenterIncomeRouteImport } from './routes/_authenticated/money-center.income'
@@ -37,6 +39,8 @@ import { Route as AuthenticatedMoneyCenterBudgetsRouteImport } from './routes/_a
 import { Route as AuthenticatedMoneyCenterBillsRouteImport } from './routes/_authenticated/money-center.bills'
 import { Route as AuthenticatedMoneyCenterAnalyticsRouteImport } from './routes/_authenticated/money-center.analytics'
 import { Route as AuthenticatedMoneyCenterAccountsRouteImport } from './routes/_authenticated/money-center.accounts'
+import { Route as AuthenticatedPeopleLeadsIdRouteImport } from './routes/_authenticated/people.leads.$id'
+import { Route as AuthenticatedPeopleContactsIdRouteImport } from './routes/_authenticated/people.contacts.$id'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -130,11 +134,23 @@ const AuthenticatedBankingRoute = AuthenticatedBankingRouteImport.update({
   path: '/banking',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPeopleIndexRoute =
+  AuthenticatedPeopleIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPeopleRoute,
+  } as any)
 const AuthenticatedMoneyCenterIndexRoute =
   AuthenticatedMoneyCenterIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedPeopleLeadsRoute =
+  AuthenticatedPeopleLeadsRouteImport.update({
+    id: '/leads',
+    path: '/leads',
+    getParentRoute: () => AuthenticatedPeopleRoute,
   } as any)
 const AuthenticatedMoneyCenterTransfersRoute =
   AuthenticatedMoneyCenterTransfersRouteImport.update({
@@ -190,6 +206,18 @@ const AuthenticatedMoneyCenterAccountsRoute =
     path: '/accounts',
     getParentRoute: () => AuthenticatedMoneyCenterRoute,
   } as any)
+const AuthenticatedPeopleLeadsIdRoute =
+  AuthenticatedPeopleLeadsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedPeopleLeadsRoute,
+  } as any)
+const AuthenticatedPeopleContactsIdRoute =
+  AuthenticatedPeopleContactsIdRouteImport.update({
+    id: '/contacts/$id',
+    path: '/contacts/$id',
+    getParentRoute: () => AuthenticatedPeopleRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -204,7 +232,7 @@ export interface FileRoutesByFullPath {
   '/marketing': typeof AuthenticatedMarketingRoute
   '/money-center': typeof AuthenticatedMoneyCenterRouteWithChildren
   '/notes': typeof AuthenticatedNotesRoute
-  '/people': typeof AuthenticatedPeopleRoute
+  '/people': typeof AuthenticatedPeopleRouteWithChildren
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
@@ -218,7 +246,11 @@ export interface FileRoutesByFullPath {
   '/money-center/income': typeof AuthenticatedMoneyCenterIncomeRoute
   '/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
+  '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
   '/money-center/': typeof AuthenticatedMoneyCenterIndexRoute
+  '/people/': typeof AuthenticatedPeopleIndexRoute
+  '/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
+  '/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -232,7 +264,6 @@ export interface FileRoutesByTo {
   '/goals': typeof AuthenticatedGoalsRoute
   '/marketing': typeof AuthenticatedMarketingRoute
   '/notes': typeof AuthenticatedNotesRoute
-  '/people': typeof AuthenticatedPeopleRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
@@ -246,7 +277,11 @@ export interface FileRoutesByTo {
   '/money-center/income': typeof AuthenticatedMoneyCenterIncomeRoute
   '/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
+  '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
   '/money-center': typeof AuthenticatedMoneyCenterIndexRoute
+  '/people': typeof AuthenticatedPeopleIndexRoute
+  '/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
+  '/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -263,7 +298,7 @@ export interface FileRoutesById {
   '/_authenticated/marketing': typeof AuthenticatedMarketingRoute
   '/_authenticated/money-center': typeof AuthenticatedMoneyCenterRouteWithChildren
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
-  '/_authenticated/people': typeof AuthenticatedPeopleRoute
+  '/_authenticated/people': typeof AuthenticatedPeopleRouteWithChildren
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
@@ -277,7 +312,11 @@ export interface FileRoutesById {
   '/_authenticated/money-center/income': typeof AuthenticatedMoneyCenterIncomeRoute
   '/_authenticated/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/_authenticated/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
+  '/_authenticated/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
   '/_authenticated/money-center/': typeof AuthenticatedMoneyCenterIndexRoute
+  '/_authenticated/people/': typeof AuthenticatedPeopleIndexRoute
+  '/_authenticated/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
+  '/_authenticated/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -308,7 +347,11 @@ export interface FileRouteTypes {
     | '/money-center/income'
     | '/money-center/transactions'
     | '/money-center/transfers'
+    | '/people/leads'
     | '/money-center/'
+    | '/people/'
+    | '/people/contacts/$id'
+    | '/people/leads/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -322,7 +365,6 @@ export interface FileRouteTypes {
     | '/goals'
     | '/marketing'
     | '/notes'
-    | '/people'
     | '/reports'
     | '/settings'
     | '/tasks'
@@ -336,7 +378,11 @@ export interface FileRouteTypes {
     | '/money-center/income'
     | '/money-center/transactions'
     | '/money-center/transfers'
+    | '/people/leads'
     | '/money-center'
+    | '/people'
+    | '/people/contacts/$id'
+    | '/people/leads/$id'
   id:
     | '__root__'
     | '/'
@@ -366,7 +412,11 @@ export interface FileRouteTypes {
     | '/_authenticated/money-center/income'
     | '/_authenticated/money-center/transactions'
     | '/_authenticated/money-center/transfers'
+    | '/_authenticated/people/leads'
     | '/_authenticated/money-center/'
+    | '/_authenticated/people/'
+    | '/_authenticated/people/contacts/$id'
+    | '/_authenticated/people/leads/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -503,12 +553,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBankingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/people/': {
+      id: '/_authenticated/people/'
+      path: '/'
+      fullPath: '/people/'
+      preLoaderRoute: typeof AuthenticatedPeopleIndexRouteImport
+      parentRoute: typeof AuthenticatedPeopleRoute
+    }
     '/_authenticated/money-center/': {
       id: '/_authenticated/money-center/'
       path: '/'
       fullPath: '/money-center/'
       preLoaderRoute: typeof AuthenticatedMoneyCenterIndexRouteImport
       parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/people/leads': {
+      id: '/_authenticated/people/leads'
+      path: '/leads'
+      fullPath: '/people/leads'
+      preLoaderRoute: typeof AuthenticatedPeopleLeadsRouteImport
+      parentRoute: typeof AuthenticatedPeopleRoute
     }
     '/_authenticated/money-center/transfers': {
       id: '/_authenticated/money-center/transfers'
@@ -573,6 +637,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMoneyCenterAccountsRouteImport
       parentRoute: typeof AuthenticatedMoneyCenterRoute
     }
+    '/_authenticated/people/leads/$id': {
+      id: '/_authenticated/people/leads/$id'
+      path: '/$id'
+      fullPath: '/people/leads/$id'
+      preLoaderRoute: typeof AuthenticatedPeopleLeadsIdRouteImport
+      parentRoute: typeof AuthenticatedPeopleLeadsRoute
+    }
+    '/_authenticated/people/contacts/$id': {
+      id: '/_authenticated/people/contacts/$id'
+      path: '/contacts/$id'
+      fullPath: '/people/contacts/$id'
+      preLoaderRoute: typeof AuthenticatedPeopleContactsIdRouteImport
+      parentRoute: typeof AuthenticatedPeopleRoute
+    }
   }
 }
 
@@ -614,6 +692,35 @@ const AuthenticatedMoneyCenterRouteWithChildren =
     AuthenticatedMoneyCenterRouteChildren,
   )
 
+interface AuthenticatedPeopleLeadsRouteChildren {
+  AuthenticatedPeopleLeadsIdRoute: typeof AuthenticatedPeopleLeadsIdRoute
+}
+
+const AuthenticatedPeopleLeadsRouteChildren: AuthenticatedPeopleLeadsRouteChildren =
+  {
+    AuthenticatedPeopleLeadsIdRoute: AuthenticatedPeopleLeadsIdRoute,
+  }
+
+const AuthenticatedPeopleLeadsRouteWithChildren =
+  AuthenticatedPeopleLeadsRoute._addFileChildren(
+    AuthenticatedPeopleLeadsRouteChildren,
+  )
+
+interface AuthenticatedPeopleRouteChildren {
+  AuthenticatedPeopleLeadsRoute: typeof AuthenticatedPeopleLeadsRouteWithChildren
+  AuthenticatedPeopleIndexRoute: typeof AuthenticatedPeopleIndexRoute
+  AuthenticatedPeopleContactsIdRoute: typeof AuthenticatedPeopleContactsIdRoute
+}
+
+const AuthenticatedPeopleRouteChildren: AuthenticatedPeopleRouteChildren = {
+  AuthenticatedPeopleLeadsRoute: AuthenticatedPeopleLeadsRouteWithChildren,
+  AuthenticatedPeopleIndexRoute: AuthenticatedPeopleIndexRoute,
+  AuthenticatedPeopleContactsIdRoute: AuthenticatedPeopleContactsIdRoute,
+}
+
+const AuthenticatedPeopleRouteWithChildren =
+  AuthenticatedPeopleRoute._addFileChildren(AuthenticatedPeopleRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBankingRoute: typeof AuthenticatedBankingRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
@@ -625,7 +732,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMarketingRoute: typeof AuthenticatedMarketingRoute
   AuthenticatedMoneyCenterRoute: typeof AuthenticatedMoneyCenterRouteWithChildren
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
-  AuthenticatedPeopleRoute: typeof AuthenticatedPeopleRoute
+  AuthenticatedPeopleRoute: typeof AuthenticatedPeopleRouteWithChildren
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
@@ -643,7 +750,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMarketingRoute: AuthenticatedMarketingRoute,
   AuthenticatedMoneyCenterRoute: AuthenticatedMoneyCenterRouteWithChildren,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
-  AuthenticatedPeopleRoute: AuthenticatedPeopleRoute,
+  AuthenticatedPeopleRoute: AuthenticatedPeopleRouteWithChildren,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
