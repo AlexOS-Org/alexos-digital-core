@@ -45,11 +45,8 @@ function advanceDueDate(dueDate: string, frequency: BillFrequency): string {
     d.setDate(d.getDate() + 7);
   } else if (frequency === "monthly") {
     d.setMonth(d.getMonth() + 1);
-  } else if (frequency === "quarterly") {
-    d.setMonth(d.getMonth() + 3);
-  } else if (frequency === "yearly") {
-    d.setFullYear(d.getFullYear() + 1);
   }
+
 
   return d.toISOString().slice(0, 10);
 }
