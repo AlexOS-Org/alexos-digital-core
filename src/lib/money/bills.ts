@@ -72,7 +72,7 @@ export function useSaveBill() {
         category: input.category ?? null,
         due_date: input.due_date,
         frequency: input.frequency,
-        status: input.status ?? "pending",
+        status: (input.status ?? "pending") as BillStatus,
         account_id: input.account_id ?? null,
         notes: input.notes ?? null,
         auto_create_transaction: input.auto_create_transaction ?? false,
