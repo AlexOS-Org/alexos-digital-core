@@ -164,6 +164,270 @@ export type Database = {
         }
         Relationships: []
       }
+      contacts: {
+        Row: {
+          avatar_url: string | null
+          company: string | null
+          created_at: string
+          deleted_at: string | null
+          email: string | null
+          first_name: string
+          id: string
+          job_title: string | null
+          last_name: string | null
+          notes: string | null
+          phone: string | null
+          sort_order: number
+          source: string | null
+          status: Database["public"]["Enums"]["contact_status"]
+          tags: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          company?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          email?: string | null
+          first_name: string
+          id?: string
+          job_title?: string | null
+          last_name?: string | null
+          notes?: string | null
+          phone?: string | null
+          sort_order?: number
+          source?: string | null
+          status?: Database["public"]["Enums"]["contact_status"]
+          tags?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          company?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          email?: string | null
+          first_name?: string
+          id?: string
+          job_title?: string | null
+          last_name?: string | null
+          notes?: string | null
+          phone?: string | null
+          sort_order?: number
+          source?: string | null
+          status?: Database["public"]["Enums"]["contact_status"]
+          tags?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      crm_activities: {
+        Row: {
+          body: string | null
+          contact_id: string | null
+          created_at: string
+          id: string
+          lead_id: string | null
+          occurred_at: string
+          subject: string
+          type: Database["public"]["Enums"]["crm_activity_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          contact_id?: string | null
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          occurred_at?: string
+          subject: string
+          type?: Database["public"]["Enums"]["crm_activity_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          contact_id?: string | null
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          occurred_at?: string
+          subject?: string
+          type?: Database["public"]["Enums"]["crm_activity_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_activities_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_attachments: {
+        Row: {
+          contact_id: string | null
+          created_at: string
+          id: string
+          lead_id: string | null
+          mime_type: string | null
+          name: string
+          size_bytes: number | null
+          url: string
+          user_id: string
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          mime_type?: string | null
+          name: string
+          size_bytes?: number | null
+          url: string
+          user_id: string
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          mime_type?: string | null
+          name?: string
+          size_bytes?: number | null
+          url?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_attachments_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_attachments_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_notes: {
+        Row: {
+          body: string
+          contact_id: string | null
+          created_at: string
+          id: string
+          lead_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          contact_id?: string | null
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          contact_id?: string | null
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_notes_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_notes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_tasks: {
+        Row: {
+          completed_at: string | null
+          contact_id: string | null
+          created_at: string
+          due_date: string | null
+          id: string
+          lead_id: string | null
+          status: Database["public"]["Enums"]["crm_task_status"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          lead_id?: string | null
+          status?: Database["public"]["Enums"]["crm_task_status"]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          lead_id?: string | null
+          status?: Database["public"]["Enums"]["crm_task_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_tasks_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_tasks_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       debts: {
         Row: {
           amount_paid: number
@@ -390,6 +654,100 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_stage_history: {
+        Row: {
+          changed_at: string
+          from_stage: Database["public"]["Enums"]["lead_stage"] | null
+          id: string
+          lead_id: string
+          to_stage: Database["public"]["Enums"]["lead_stage"]
+          user_id: string
+        }
+        Insert: {
+          changed_at?: string
+          from_stage?: Database["public"]["Enums"]["lead_stage"] | null
+          id?: string
+          lead_id: string
+          to_stage: Database["public"]["Enums"]["lead_stage"]
+          user_id: string
+        }
+        Update: {
+          changed_at?: string
+          from_stage?: Database["public"]["Enums"]["lead_stage"] | null
+          id?: string
+          lead_id?: string
+          to_stage?: Database["public"]["Enums"]["lead_stage"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_stage_history_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          contact_id: string | null
+          created_at: string
+          deleted_at: string | null
+          expected_close_date: string | null
+          id: string
+          notes: string | null
+          probability: number
+          sort_order: number
+          source: string | null
+          stage: Database["public"]["Enums"]["lead_stage"]
+          title: string
+          updated_at: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          expected_close_date?: string | null
+          id?: string
+          notes?: string | null
+          probability?: number
+          sort_order?: number
+          source?: string | null
+          stage?: Database["public"]["Enums"]["lead_stage"]
+          title: string
+          updated_at?: string
+          user_id: string
+          value?: number
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          expected_close_date?: string | null
+          id?: string
+          notes?: string | null
+          probability?: number
+          sort_order?: number
+          source?: string | null
+          stage?: Database["public"]["Enums"]["lead_stage"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transactions: {
         Row: {
           account_id: string
@@ -511,10 +869,21 @@ export type Database = {
         | "other"
       bill_frequency: "one_time" | "weekly" | "monthly"
       bill_status: "pending" | "paid"
+      contact_status: "lead" | "active" | "inactive" | "archived"
+      crm_activity_type: "call" | "email" | "meeting" | "note" | "other"
+      crm_task_status: "pending" | "done"
       debt_priority: "low" | "medium" | "high"
       debt_status: "active" | "paid" | "defaulted" | "archived"
       expected_status: "pending" | "received" | "cancelled"
       goal_status: "active" | "achieved" | "paused" | "archived"
+      lead_stage:
+        | "new"
+        | "contacted"
+        | "qualified"
+        | "proposal"
+        | "negotiation"
+        | "won"
+        | "lost"
       transaction_status: "posted" | "pending" | "void"
       transaction_type: "income" | "expense" | "transfer" | "adjustment"
     }
@@ -655,10 +1024,22 @@ export const Constants = {
       ],
       bill_frequency: ["one_time", "weekly", "monthly"],
       bill_status: ["pending", "paid"],
+      contact_status: ["lead", "active", "inactive", "archived"],
+      crm_activity_type: ["call", "email", "meeting", "note", "other"],
+      crm_task_status: ["pending", "done"],
       debt_priority: ["low", "medium", "high"],
       debt_status: ["active", "paid", "defaulted", "archived"],
       expected_status: ["pending", "received", "cancelled"],
       goal_status: ["active", "achieved", "paused", "archived"],
+      lead_stage: [
+        "new",
+        "contacted",
+        "qualified",
+        "proposal",
+        "negotiation",
+        "won",
+        "lost",
+      ],
       transaction_status: ["posted", "pending", "void"],
       transaction_type: ["income", "expense", "transfer", "adjustment"],
     },
