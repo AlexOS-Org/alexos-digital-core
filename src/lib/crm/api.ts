@@ -1,14 +1,7 @@
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
-import type {
-  Contact,
-  ContactFormInput,
-} from "@/lib/crm/types";
+import type { Contact, ContactFormInput } from "@/lib/crm/types";
 
 async function uid() {
   const { data, error } = await supabase.auth.getUser();
@@ -47,11 +40,7 @@ export function useContact(id: string) {
     queryKey: ["crm", "contacts", id],
     enabled: Boolean(id),
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("contacts")
-        .select("*")
-        .eq("id", id)
-        .single();
+      const { data, error } = await supabase.from("contacts").select("*").eq("id", id).single();
 
       if (error) {
         throw error;
@@ -76,11 +65,7 @@ export function useCreateContact() {
         status: input.status ?? "active",
       };
 
-      const { data, error } = await supabase
-        .from("contacts")
-        .insert(payload)
-        .select()
-        .single();
+      const { data, error } = await supabase.from("contacts").insert(payload).select().single();
 
       if (error) {
         throw error;
@@ -101,13 +86,7 @@ export function useUpdateContact() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      updates,
-    }: {
-      id: string;
-      updates: Partial<ContactFormInput>;
-    }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<ContactFormInput> }) => {
       const { data, error } = await supabase
         .from("contacts")
         .update(updates)
@@ -127,10 +106,7 @@ export function useUpdateContact() {
         queryKey: ["crm", "contacts"],
       });
 
-      queryClient.setQueryData(
-        ["crm", "contacts", contact.id],
-        contact,
-      );
+      queryClient.setQueryData(["crm", "contacts", contact.id], contact);
     },
   });
 }
@@ -140,10 +116,7 @@ export function useDeleteContact() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("contacts")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from("contacts").delete().eq("id", id);
 
       if (error) {
         throw error;

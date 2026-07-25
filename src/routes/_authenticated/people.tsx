@@ -1,14 +1,6 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  Users,
-  UserPlus,
-  Briefcase,
-  Phone,
-  Mail,
-  Building2,
-  Loader2,
-} from "lucide-react";
+import { Users, UserPlus, Briefcase, Phone, Mail, Building2, Loader2 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -60,9 +52,7 @@ function PeoplePage() {
         <div>
           <h1 className="text-3xl font-bold">CRM</h1>
 
-          <p className="text-muted-foreground">
-            Manage customers, leads and relationships.
-          </p>
+          <p className="text-muted-foreground">Manage customers, leads and relationships.</p>
         </div>
 
         <Button onClick={() => setAddContactOpen(true)}>
@@ -78,17 +68,13 @@ function PeoplePage() {
           return (
             <Card key={item.title}>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-sm">
-                  {item.title}
-                </CardTitle>
+                <CardTitle className="text-sm">{item.title}</CardTitle>
 
                 <Icon className="h-5 w-5 text-primary" />
               </CardHeader>
 
               <CardContent>
-                <p className="text-3xl font-bold">
-                  {item.value}
-                </p>
+                <p className="text-3xl font-bold">{item.value}</p>
               </CardContent>
             </Card>
           );
@@ -108,30 +94,21 @@ function PeoplePage() {
             </div>
           ) : error ? (
             <div className="py-16 text-center">
-              <p className="font-semibold text-destructive">
-                Could not load contacts.
-              </p>
+              <p className="font-semibold text-destructive">Could not load contacts.</p>
 
-              <p className="mt-2 text-sm text-muted-foreground">
-                {error.message}
-              </p>
+              <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
             </div>
           ) : contacts.length === 0 ? (
             <div className="py-16 text-center">
               <Users className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
 
-              <h2 className="text-xl font-semibold">
-                No contacts yet
-              </h2>
+              <h2 className="text-xl font-semibold">No contacts yet</h2>
 
               <p className="mt-2 text-muted-foreground">
                 Add your first customer, lead or prospect.
               </p>
 
-              <Button
-                className="mt-6"
-                onClick={() => setAddContactOpen(true)}
-              >
+              <Button className="mt-6" onClick={() => setAddContactOpen(true)}>
                 <UserPlus className="mr-2 h-4 w-4" />
                 Add Your First Contact
               </Button>
@@ -139,14 +116,9 @@ function PeoplePage() {
           ) : (
             <div className="divide-y">
               {contacts.map((contact) => (
-                <div
-                  key={contact.id}
-                  className="flex items-center justify-between gap-4 py-4"
-                >
+                <div key={contact.id} className="flex items-center justify-between gap-4 py-4">
                   <div className="min-w-0">
-                    <p className="font-semibold">
-                      {contact.display_name}
-                    </p>
+                    <p className="font-semibold">{contact.display_name}</p>
 
                     <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
                       {contact.company_name && (
@@ -192,9 +164,7 @@ function PeoplePage() {
             </DialogDescription>
           </DialogHeader>
 
-          <ContactForm
-            onSuccess={() => setAddContactOpen(false)}
-          />
+          <ContactForm onSuccess={() => setAddContactOpen(false)} />
         </DialogContent>
       </Dialog>
     </div>
