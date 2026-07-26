@@ -241,7 +241,22 @@ export type Database = {
           updated_at?: string;
           user_id?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "bills_account_id_fkey";
+            columns: ["account_id"];
+            isOneToOne: false;
+            referencedRelation: "account_balances";
+            referencedColumns: ["account_id"];
+          },
+          {
+            foreignKeyName: "bills_account_id_fkey";
+            columns: ["account_id"];
+            isOneToOne: false;
+            referencedRelation: "accounts";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       budgets: {
         Row: {
@@ -621,38 +636,59 @@ export type Database = {
       };
       leads: {
         Row: {
+          assigned_to: string | null;
+          company: string | null;
           contact_id: string | null;
           created_at: string | null;
           customer_id: string | null;
+          estimated_value: number | null;
+          expected_close_date: string | null;
           id: string;
           notes: string | null;
           probability: number | null;
+          source: string | null;
           stage: string | null;
+          status: string | null;
           title: string;
+          updated_at: string | null;
           user_id: string;
           value: number | null;
         };
         Insert: {
+          assigned_to?: string | null;
+          company?: string | null;
           contact_id?: string | null;
           created_at?: string | null;
           customer_id?: string | null;
+          estimated_value?: number | null;
+          expected_close_date?: string | null;
           id?: string;
           notes?: string | null;
           probability?: number | null;
+          source?: string | null;
           stage?: string | null;
+          status?: string | null;
           title: string;
+          updated_at?: string | null;
           user_id: string;
           value?: number | null;
         };
         Update: {
+          assigned_to?: string | null;
+          company?: string | null;
           contact_id?: string | null;
           created_at?: string | null;
           customer_id?: string | null;
+          estimated_value?: number | null;
+          expected_close_date?: string | null;
           id?: string;
           notes?: string | null;
           probability?: number | null;
+          source?: string | null;
           stage?: string | null;
+          status?: string | null;
           title?: string;
+          updated_at?: string | null;
           user_id?: string;
           value?: number | null;
         };
