@@ -28,17 +28,17 @@ export function DashboardHeader() {
     <div className="space-y-6">
       {/* ================= ORION HERO ================= */}
 
-      <div className="rounded-3xl overflow-hidden bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 shadow-2xl">
+      <div className="rounded-3xl overflow-hidden bg-gradient-to-r from-primary via-primary to-[oklch(0.32_0.10_275)] shadow-2xl">
         <div className="p-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>
-              <p className="text-sm text-blue-100">{today}</p>
+              <p className="text-sm text-primary-foreground/80">{today}</p>
 
               <h1 className="mt-2 text-4xl lg:text-5xl font-bold text-white">
                 {greeting()}, Alex 👋
               </h1>
 
-              <p className="mt-3 text-blue-100 max-w-2xl text-lg">
+              <p className="mt-3 text-primary-foreground/80 max-w-2xl text-lg">
                 Welcome to AlexOS Orion. Your intelligent operating system for money, business and
                 growth.
               </p>
@@ -52,7 +52,7 @@ export function DashboardHeader() {
                 <Bell className="h-5 w-5 text-white" />
               </Button>
 
-              <Button className="bg-white text-indigo-700 hover:bg-slate-100 font-semibold shadow-lg">
+              <Button className="bg-white text-primary hover:bg-slate-100 font-semibold shadow-lg">
                 <Sparkles className="mr-2 h-4 w-4" />
                 Ask Orion
               </Button>
@@ -66,7 +66,6 @@ export function DashboardHeader() {
 
             <Input
               placeholder="Ask Orion about your money, business or goals..."
-
               className="h-14 rounded-2xl border-0 bg-white/95 backdrop-blur pl-12 text-base shadow-xl"
             />
           </div>
@@ -75,7 +74,7 @@ export function DashboardHeader() {
 
       {/* ================= ORION STATUS ================= */}
 
-      <Card className="rounded-3xl border-0 bg-gradient-to-br from-slate-900 to-indigo-950 text-white shadow-xl">
+      <Card className="rounded-3xl border-0 bg-gradient-to-br from-sidebar to-primary text-white shadow-xl">
         <CardContent className="p-6">
           <div className="flex items-center gap-3 mb-3">
             <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center">

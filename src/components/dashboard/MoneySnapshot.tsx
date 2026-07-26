@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingDown, TrendingUp, Wallet, Landmark, ArrowDownCircle } from "lucide-react";
+import { ArrowDownCircle, Landmark, TrendingDown, TrendingUp, Wallet } from "lucide-react";
 
-import { useAccountBalances, useTransactions } from "@/lib/money/api";
 import { useDebts, debtRemaining } from "@/lib/debts/api";
+import { useAccountBalances, useTransactions } from "@/lib/money/api";
 import { formatMoney } from "@/lib/money/format";
 
 export default function MoneySnapshot() {
@@ -44,30 +44,30 @@ export default function MoneySnapshot() {
       title: "Cash Available",
       value: formatMoney(cashAvailable),
       icon: Wallet,
-      gradient: "from-blue-500 to-cyan-500",
-      bg: "bg-blue-50",
-      iconBg: "bg-blue-100",
-      iconColor: "text-blue-700",
+      gradient: "from-primary to-primary/80",
+      bg: "bg-primary/5",
+      iconBg: "bg-primary/10",
+      iconColor: "text-primary",
       subtitle: "Across All Accounts",
     },
     {
       title: "Net Worth",
       value: formatMoney(netWorth),
       icon: Landmark,
-      gradient: netWorth >= 0 ? "from-violet-500 to-purple-600" : "from-red-500 to-rose-600",
-      bg: netWorth >= 0 ? "bg-violet-50" : "bg-red-50",
-      iconBg: netWorth >= 0 ? "bg-violet-100" : "bg-red-100",
-      iconColor: netWorth >= 0 ? "text-violet-700" : "text-red-700",
+      gradient: netWorth >= 0 ? "from-primary to-primary/80" : "from-destructive to-destructive/80",
+      bg: netWorth >= 0 ? "bg-primary/5" : "bg-destructive/5",
+      iconBg: netWorth >= 0 ? "bg-primary/10" : "bg-destructive/10",
+      iconColor: netWorth >= 0 ? "text-primary" : "text-destructive",
       subtitle: "Cash - Debt",
     },
     {
       title: "Income",
       value: formatMoney(income),
       icon: TrendingUp,
-      gradient: "from-green-500 to-emerald-600",
-      bg: "bg-green-50",
-      iconBg: "bg-green-100",
-      iconColor: "text-green-700",
+      gradient: "from-primary to-primary/80",
+      bg: "bg-primary/5",
+      iconBg: "bg-primary/10",
+      iconColor: "text-primary",
       subtitle: "This Month",
     },
     {
@@ -100,12 +100,12 @@ export default function MoneySnapshot() {
         return (
           <Card
             key={card.title}
-            className={`overflow-hidden border-0 shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ${card.bg}`}
+            className={`overflow-hidden border-0 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${card.bg}`}
           >
             <div className={`h-2 w-full bg-gradient-to-r ${card.gradient}`} />
 
             <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-5">
+              <div className="mb-5 flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">{card.title}</p>
 
@@ -113,13 +113,13 @@ export default function MoneySnapshot() {
                 </div>
 
                 <div
-                  className={`h-14 w-14 rounded-2xl ${card.iconBg} flex items-center justify-center`}
+                  className={`flex h-14 w-14 items-center justify-center rounded-2xl ${card.iconBg}`}
                 >
                   <Icon className={`h-7 w-7 ${card.iconColor}`} />
                 </div>
               </div>
 
-              <div className="h-1.5 rounded-full bg-slate-200 overflow-hidden">
+              <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
                 <div
                   className={`h-full bg-gradient-to-r ${card.gradient}`}
                   style={{ width: "70%" }}
