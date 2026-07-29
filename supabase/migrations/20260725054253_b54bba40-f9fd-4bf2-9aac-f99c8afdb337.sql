@@ -1,64 +1,181 @@
+-- ============================================================
+-- AlexOS Orion - CRM V3 CANONICAL FOUNDATION
+--
+-- This migration is the canonical CRM schema contract.
+-- It reconciles the pre-existing contacts/leads tables instead of
+-- trying to recreate them, then creates the CRM support tables.
+-- Legacy columns are intentionally preserved for compatibility.
+-- ============================================================
 
--- Enums
-CREATE TYPE public.contact_status AS ENUM ('lead','active','inactive','archived');
-CREATE TYPE public.lead_stage AS ENUM ('new','contacted','qualified','proposal','negotiation','won','lost');
-CREATE TYPE public.crm_activity_type AS ENUM ('call','email','meeting','note','other');
-CREATE TYPE public.crm_task_status AS ENUM ('pending','done');
+DO $$ BEGIN
+  CREATE TYPE public.contact_status AS ENUM ('lead','active','inactive','archived');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- CONTACTS
-CREATE TABLE public.contacts (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  first_name text NOT NULL,
-  last_name text,
-  email text,
-  phone text,
-  company text,
-  job_title text,
-  source text,
-  status public.contact_status NOT NULL DEFAULT 'lead',
-  notes text,
-  avatar_url text,
-  tags text[] NOT NULL DEFAULT '{}',
-  sort_order integer NOT NULL DEFAULT 0,
-  deleted_at timestamptz,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
-);
+DO $$ BEGIN
+  CREATE TYPE public.lead_stage AS ENUM ('new','contacted','qualified','proposal','negotiation','won','lost');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE public.crm_activity_type AS ENUM ('call','email','meeting','note','other');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE public.crm_task_status AS ENUM ('pending','done');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+-- ============================================================
+-- CONTACTS: reconcile the existing contacts table
+-- ============================================================
+
+ALTER TABLE public.contacts ADD COLUMN IF NOT EXISTS first_name text;
+ALTER TABLE public.contacts ADD COLUMN IF NOT EXISTS last_name text;
+ALTER TABLE public.contacts ADD COLUMN IF NOT EXISTS company text;
+ALTER TABLE public.contacts ADD COLUMN IF NOT EXISTS job_title text;
+ALTER TABLE public.contacts ADD COLUMN IF NOT EXISTS source text;
+ALTER TABLE public.contacts ADD COLUMN IF NOT EXISTS status text;
+ALTER TABLE public.contacts ADD COLUMN IF NOT EXISTS notes text;
+ALTER TABLE public.contacts ADD COLUMN IF NOT EXISTS avatar_url text;
+ALTER TABLE public.contacts ADD COLUMN IF NOT EXISTS tags text[] NOT NULL DEFAULT '{}';
+ALTER TABLE public.contacts ADD COLUMN IF NOT EXISTS sort_order integer NOT NULL DEFAULT 0;
+ALTER TABLE public.contacts ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
+ALTER TABLE public.contacts ADD COLUMN IF NOT EXISTS created_at timestamptz NOT NULL DEFAULT now();
+ALTER TABLE public.contacts ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now();
+
+UPDATE public.contacts
+SET first_name = COALESCE(NULLIF(first_name, ''), NULLIF(split_part(display_name, ' ', 1), ''))
+WHERE first_name IS NULL OR first_name = '';
+
+UPDATE public.contacts
+SET company = COALESCE(company, company_name)
+WHERE company IS NULL;
+
+UPDATE public.contacts
+SET status = COALESCE(NULLIF(lower(status), ''), 'lead')
+WHERE status IS NULL OR status = '';
+
+ALTER TABLE public.contacts ALTER COLUMN status DROP DEFAULT;
+ALTER TABLE public.contacts ALTER COLUMN status TYPE public.contact_status
+USING CASE lower(status)
+  WHEN 'lead' THEN 'lead'::public.contact_status
+  WHEN 'inactive' THEN 'inactive'::public.contact_status
+  WHEN 'archived' THEN 'archived'::public.contact_status
+  ELSE 'active'::public.contact_status
+END;
+ALTER TABLE public.contacts ALTER COLUMN status SET DEFAULT 'lead'::public.contact_status;
+ALTER TABLE public.contacts ALTER COLUMN first_name SET NOT NULL;
+
+DROP POLICY IF EXISTS contacts_all ON public.contacts;
+DROP POLICY IF EXISTS "own contacts" ON public.contacts;
+CREATE POLICY "own contacts"
+ON public.contacts FOR ALL
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
+
+ALTER TABLE public.contacts ENABLE ROW LEVEL SECURITY;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.contacts TO authenticated;
 GRANT ALL ON public.contacts TO service_role;
-ALTER TABLE public.contacts ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "own contacts" ON public.contacts FOR ALL USING (auth.uid()=user_id) WITH CHECK (auth.uid()=user_id);
-CREATE INDEX contacts_user_idx ON public.contacts(user_id) WHERE deleted_at IS NULL;
-CREATE TRIGGER update_contacts_updated_at BEFORE UPDATE ON public.contacts FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
--- LEADS
-CREATE TABLE public.leads (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  contact_id uuid REFERENCES public.contacts(id) ON DELETE SET NULL,
-  title text NOT NULL,
-  stage public.lead_stage NOT NULL DEFAULT 'new',
-  value numeric(14,2) NOT NULL DEFAULT 0,
-  probability integer NOT NULL DEFAULT 20 CHECK (probability BETWEEN 0 AND 100),
-  expected_close_date date,
-  source text,
-  notes text,
-  sort_order integer NOT NULL DEFAULT 0,
-  deleted_at timestamptz,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
-);
+CREATE INDEX IF NOT EXISTS contacts_user_idx
+ON public.contacts(user_id) WHERE deleted_at IS NULL;
+
+DROP TRIGGER IF EXISTS update_contacts_updated_at ON public.contacts;
+CREATE TRIGGER update_contacts_updated_at
+BEFORE UPDATE ON public.contacts
+FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- ============================================================
+-- LEADS: reconcile the existing leads table
+-- ============================================================
+
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS contact_id uuid;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS title text;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS stage text DEFAULT 'new';
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS value numeric(14,2) DEFAULT 0;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS probability integer DEFAULT 20;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS expected_close_date date;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS source text;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS notes text;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS sort_order integer NOT NULL DEFAULT 0;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+
+UPDATE public.leads
+SET title = COALESCE(NULLIF(title, ''), COALESCE(company, 'Untitled Lead'))
+WHERE title IS NULL OR title = '';
+
+UPDATE public.leads
+SET stage = COALESCE(NULLIF(lower(stage), ''), 'new')
+WHERE stage IS NULL OR stage = '';
+
+UPDATE public.leads
+SET probability = LEAST(100, GREATEST(0, COALESCE(probability, 20)))
+WHERE probability IS NULL OR probability < 0 OR probability > 100;
+
+UPDATE public.leads
+SET value = COALESCE(value, estimated_value, 0)
+WHERE value IS NULL;
+
+ALTER TABLE public.leads ALTER COLUMN stage DROP DEFAULT;
+ALTER TABLE public.leads ALTER COLUMN stage TYPE public.lead_stage
+USING CASE lower(coalesce(stage,'new'))
+  WHEN 'contacted' THEN 'contacted'::public.lead_stage
+  WHEN 'qualified' THEN 'qualified'::public.lead_stage
+  WHEN 'proposal' THEN 'proposal'::public.lead_stage
+  WHEN 'negotiation' THEN 'negotiation'::public.lead_stage
+  WHEN 'won' THEN 'won'::public.lead_stage
+  WHEN 'lost' THEN 'lost'::public.lead_stage
+  ELSE 'new'::public.lead_stage
+END;
+ALTER TABLE public.leads ALTER COLUMN stage SET DEFAULT 'new'::public.lead_stage;
+ALTER TABLE public.leads ALTER COLUMN title SET NOT NULL;
+ALTER TABLE public.leads ALTER COLUMN probability SET DEFAULT 20;
+ALTER TABLE public.leads ALTER COLUMN probability SET NOT NULL;
+ALTER TABLE public.leads ALTER COLUMN value SET DEFAULT 0;
+ALTER TABLE public.leads ALTER COLUMN value SET NOT NULL;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'leads_contact_id_fkey'
+      AND conrelid = 'public.leads'::regclass
+  ) THEN
+    ALTER TABLE public.leads
+      ADD CONSTRAINT leads_contact_id_fkey
+      FOREIGN KEY (contact_id) REFERENCES public.contacts(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+
+DROP POLICY IF EXISTS leads_all ON public.leads;
+DROP POLICY IF EXISTS "own leads" ON public.leads;
+CREATE POLICY "own leads"
+ON public.leads FOR ALL
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
+
+ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.leads TO authenticated;
 GRANT ALL ON public.leads TO service_role;
-ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "own leads" ON public.leads FOR ALL USING (auth.uid()=user_id) WITH CHECK (auth.uid()=user_id);
-CREATE INDEX leads_user_stage_idx ON public.leads(user_id, stage) WHERE deleted_at IS NULL;
-CREATE INDEX leads_contact_idx ON public.leads(contact_id);
-CREATE TRIGGER update_leads_updated_at BEFORE UPDATE ON public.leads FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+CREATE INDEX IF NOT EXISTS leads_user_stage_idx
+ON public.leads(user_id, stage) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS leads_contact_idx
+ON public.leads(contact_id);
+
+DROP TRIGGER IF EXISTS update_leads_updated_at ON public.leads;
+CREATE TRIGGER update_leads_updated_at
+BEFORE UPDATE ON public.leads
+FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- ============================================================
 -- LEAD STAGE HISTORY
-CREATE TABLE public.lead_stage_history (
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS public.lead_stage_history (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   lead_id uuid NOT NULL REFERENCES public.leads(id) ON DELETE CASCADE,
@@ -66,15 +183,24 @@ CREATE TABLE public.lead_stage_history (
   to_stage public.lead_stage NOT NULL,
   changed_at timestamptz NOT NULL DEFAULT now()
 );
+
+ALTER TABLE public.lead_stage_history ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "own stage history" ON public.lead_stage_history;
+CREATE POLICY "own stage history"
+ON public.lead_stage_history FOR ALL
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
 GRANT SELECT, INSERT ON public.lead_stage_history TO authenticated;
 GRANT ALL ON public.lead_stage_history TO service_role;
-ALTER TABLE public.lead_stage_history ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "own stage history" ON public.lead_stage_history FOR ALL USING (auth.uid()=user_id) WITH CHECK (auth.uid()=user_id);
-CREATE INDEX lead_stage_history_lead_idx ON public.lead_stage_history(lead_id, changed_at DESC);
+CREATE INDEX IF NOT EXISTS lead_stage_history_lead_idx
+ON public.lead_stage_history(lead_id, changed_at DESC);
 
--- Auto-log stage changes
-CREATE OR REPLACE FUNCTION public.log_lead_stage_change() RETURNS TRIGGER
-LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+CREATE OR REPLACE FUNCTION public.log_lead_stage_change()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
   IF TG_OP = 'INSERT' THEN
     INSERT INTO public.lead_stage_history(user_id, lead_id, from_stage, to_stage)
@@ -86,11 +212,17 @@ BEGIN
   RETURN NEW;
 END;
 $$;
-CREATE TRIGGER leads_log_stage_change AFTER INSERT OR UPDATE OF stage ON public.leads
-  FOR EACH ROW EXECUTE FUNCTION public.log_lead_stage_change();
 
--- ACTIVITIES
-CREATE TABLE public.crm_activities (
+DROP TRIGGER IF EXISTS leads_log_stage_change ON public.leads;
+CREATE TRIGGER leads_log_stage_change
+AFTER INSERT OR UPDATE OF stage ON public.leads
+FOR EACH ROW EXECUTE FUNCTION public.log_lead_stage_change();
+
+-- ============================================================
+-- CRM ACTIVITIES
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS public.crm_activities (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   contact_id uuid REFERENCES public.contacts(id) ON DELETE CASCADE,
@@ -102,16 +234,21 @@ CREATE TABLE public.crm_activities (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE public.crm_activities ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "own crm activities" ON public.crm_activities;
+CREATE POLICY "own crm activities" ON public.crm_activities FOR ALL USING (auth.uid()=user_id) WITH CHECK (auth.uid()=user_id);
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.crm_activities TO authenticated;
 GRANT ALL ON public.crm_activities TO service_role;
-ALTER TABLE public.crm_activities ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "own crm activities" ON public.crm_activities FOR ALL USING (auth.uid()=user_id) WITH CHECK (auth.uid()=user_id);
-CREATE INDEX crm_activities_contact_idx ON public.crm_activities(contact_id, occurred_at DESC);
-CREATE INDEX crm_activities_lead_idx ON public.crm_activities(lead_id, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS crm_activities_contact_idx ON public.crm_activities(contact_id, occurred_at DESC);
+CREATE INDEX IF NOT EXISTS crm_activities_lead_idx ON public.crm_activities(lead_id, occurred_at DESC);
+DROP TRIGGER IF EXISTS update_crm_activities_updated_at ON public.crm_activities;
 CREATE TRIGGER update_crm_activities_updated_at BEFORE UPDATE ON public.crm_activities FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
--- TASKS
-CREATE TABLE public.crm_tasks (
+-- ============================================================
+-- CRM TASKS
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS public.crm_tasks (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   contact_id uuid REFERENCES public.contacts(id) ON DELETE CASCADE,
@@ -123,16 +260,21 @@ CREATE TABLE public.crm_tasks (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE public.crm_tasks ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "own crm tasks" ON public.crm_tasks;
+CREATE POLICY "own crm tasks" ON public.crm_tasks FOR ALL USING (auth.uid()=user_id) WITH CHECK (auth.uid()=user_id);
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.crm_tasks TO authenticated;
 GRANT ALL ON public.crm_tasks TO service_role;
-ALTER TABLE public.crm_tasks ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "own crm tasks" ON public.crm_tasks FOR ALL USING (auth.uid()=user_id) WITH CHECK (auth.uid()=user_id);
-CREATE INDEX crm_tasks_contact_idx ON public.crm_tasks(contact_id);
-CREATE INDEX crm_tasks_lead_idx ON public.crm_tasks(lead_id);
+CREATE INDEX IF NOT EXISTS crm_tasks_contact_idx ON public.crm_tasks(contact_id);
+CREATE INDEX IF NOT EXISTS crm_tasks_lead_idx ON public.crm_tasks(lead_id);
+DROP TRIGGER IF EXISTS update_crm_tasks_updated_at ON public.crm_tasks;
 CREATE TRIGGER update_crm_tasks_updated_at BEFORE UPDATE ON public.crm_tasks FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
--- NOTES
-CREATE TABLE public.crm_notes (
+-- ============================================================
+-- CRM NOTES
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS public.crm_notes (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   contact_id uuid REFERENCES public.contacts(id) ON DELETE CASCADE,
@@ -141,16 +283,21 @@ CREATE TABLE public.crm_notes (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE public.crm_notes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "own crm notes" ON public.crm_notes;
+CREATE POLICY "own crm notes" ON public.crm_notes FOR ALL USING (auth.uid()=user_id) WITH CHECK (auth.uid()=user_id);
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.crm_notes TO authenticated;
 GRANT ALL ON public.crm_notes TO service_role;
-ALTER TABLE public.crm_notes ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "own crm notes" ON public.crm_notes FOR ALL USING (auth.uid()=user_id) WITH CHECK (auth.uid()=user_id);
-CREATE INDEX crm_notes_contact_idx ON public.crm_notes(contact_id, created_at DESC);
-CREATE INDEX crm_notes_lead_idx ON public.crm_notes(lead_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS crm_notes_contact_idx ON public.crm_notes(contact_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS crm_notes_lead_idx ON public.crm_notes(lead_id, created_at DESC);
+DROP TRIGGER IF EXISTS update_crm_notes_updated_at ON public.crm_notes;
 CREATE TRIGGER update_crm_notes_updated_at BEFORE UPDATE ON public.crm_notes FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
--- ATTACHMENTS
-CREATE TABLE public.crm_attachments (
+-- ============================================================
+-- CRM ATTACHMENTS
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS public.crm_attachments (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   contact_id uuid REFERENCES public.contacts(id) ON DELETE CASCADE,
@@ -161,9 +308,10 @@ CREATE TABLE public.crm_attachments (
   mime_type text,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE public.crm_attachments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "own crm attachments" ON public.crm_attachments;
+CREATE POLICY "own crm attachments" ON public.crm_attachments FOR ALL USING (auth.uid()=user_id) WITH CHECK (auth.uid()=user_id);
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.crm_attachments TO authenticated;
 GRANT ALL ON public.crm_attachments TO service_role;
-ALTER TABLE public.crm_attachments ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "own crm attachments" ON public.crm_attachments FOR ALL USING (auth.uid()=user_id) WITH CHECK (auth.uid()=user_id);
-CREATE INDEX crm_attachments_contact_idx ON public.crm_attachments(contact_id);
-CREATE INDEX crm_attachments_lead_idx ON public.crm_attachments(lead_id);
+CREATE INDEX IF NOT EXISTS crm_attachments_contact_idx ON public.crm_attachments(contact_id);
+CREATE INDEX IF NOT EXISTS crm_attachments_lead_idx ON public.crm_attachments(lead_id);
