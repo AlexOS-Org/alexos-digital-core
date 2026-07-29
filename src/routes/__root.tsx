@@ -79,46 +79,32 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Alex OS Professional — Personal & Business Operating System" },
+      { title: "AlexOS Orion — Personal & Business Operating System" },
       {
         name: "description",
         content:
-          "Alex OS Professional is a premium personal and business operating system for banking, sales, marketing, goals and operations.",
+          "AlexOS Orion is an intelligent personal and business operating system for money, sales, goals and operations.",
       },
       {
         property: "og:title",
-        content: "Alex OS Professional — Personal & Business Operating System",
+        content: "AlexOS Orion — Personal & Business Operating System",
       },
       {
         property: "og:description",
         content:
-          "Alex OS Professional is a premium personal and business operating system for banking, sales, marketing, goals and operations.",
+          "An intelligent operating system for money, people, goals and business operations.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      {
-        name: "twitter:title",
-        content: "Alex OS Professional — Personal & Business Operating System",
-      },
+      { name: "twitter:title", content: "AlexOS Orion" },
       {
         name: "twitter:description",
-        content:
-          "Alex OS Professional is a premium personal and business operating system for banking, sales, marketing, goals and operations.",
-      },
-      {
-        property: "og:image",
-        content:
-          "https://storage.googleapis.com/gpt-engineer-file-uploads/8AgQfbMhT6OfaUQEcPk0zxD57P82/social-images/social-1784566793609-image_49e48eb1.webp",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://storage.googleapis.com/gpt-engineer-file-uploads/8AgQfbMhT6OfaUQEcPk0zxD57P82/social-images/social-1784566793609-image_49e48eb1.webp",
+        content: "Your personal & business operating system, powered by Orion AI.",
       },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
     ],
   }),
   shellComponent: RootShell,
