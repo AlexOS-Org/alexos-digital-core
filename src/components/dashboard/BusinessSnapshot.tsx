@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, Car, Megaphone, ShoppingBag, Sparkles, TrendingUp, Users } from "lucide-react";
+import { ArrowUpRight, Car, Megaphone, ShoppingBag, Sparkles, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useContacts, useLeads } from "@/lib/crm/api";
 import { formatMoney } from "@/lib/money/format";
