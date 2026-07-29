@@ -22,18 +22,13 @@ export interface Debt {
 
 async function uid() {
   const { data } = await supabase.auth.getUser();
-
-  if (!data.user) {
-    throw new Error("Not authenticated");
-  }
-
+  if (!data.user) throw new Error("Not authenticated");
   return data.user.id;
 }
 
 export function useDebts(includeArchived = false) {
   return useQuery({
     queryKey: ["debts", includeArchived],
-
     queryFn: async () => {
       let q = supabase
         .from("debts")
@@ -43,15 +38,10 @@ export function useDebts(includeArchived = false) {
         .order("due_date", { nullsFirst: false })
         .order("created_at");
 
-      if (!includeArchived) {
-        q = q.neq("status", "archived");
-      }
+      if (!includeArchived) q = q.neq("status", "archived");
 
       const { data, error } = await q;
-
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       return (data ?? []) as Debt[];
     },
@@ -64,11 +54,7 @@ export function useSaveDebt() {
   return useMutation({
     mutationFn: async (input: Partial<Debt> & { id?: string }) => {
       const user_id = await uid();
-
-      const payload = {
-        ...input,
-        user_id,
-      };
+      const payload = { ...input, user_id };
 
       const { error } = input.id
         ? await supabase
@@ -77,19 +63,13 @@ export function useSaveDebt() {
             .eq("id", input.id)
         : await supabase.from("debts").insert(payload as never);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
     },
-
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["debts"] });
       toast.success("Debt saved");
     },
-
-    onError: (e: Error) => {
-      toast.error(e.message);
-    },
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
@@ -111,24 +91,16 @@ export function useRecordDebtPayment() {
       description?: string;
     }) => {
       const user_id = await uid();
-
       const newPaid = Number(debt.amount_paid) + amount;
-
       const remaining = Number(debt.principal) - newPaid;
-
       const status = remaining <= 0 ? "paid" : debt.status;
 
       const { error: debtError } = await supabase
         .from("debts")
-        .update({
-          amount_paid: newPaid,
-          status,
-        })
+        .update({ amount_paid: newPaid, status })
         .eq("id", debt.id);
 
-      if (debtError) {
-        throw debtError;
-      }
+      if (debtError) throw debtError;
 
       const { error: txError } = await supabase.from("transactions").insert({
         user_id,
@@ -141,23 +113,16 @@ export function useRecordDebtPayment() {
         status: "posted",
       });
 
-      if (txError) {
-        throw txError;
-      }
+      if (txError) throw txError;
     },
-
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["debts"] });
       qc.invalidateQueries({ queryKey: ["transactions"] });
       qc.invalidateQueries({ queryKey: ["account_balances"] });
       qc.invalidateQueries({ queryKey: ["budgets"] });
-
       toast.success("Debt payment recorded");
     },
-
-    onError: (e: Error) => {
-      toast.error(e.message);
-    },
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
@@ -168,28 +133,19 @@ export function useArchiveDebt() {
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("debts")
-        .update({
-          status: "archived",
-        })
+        .update({ status: "archived" })
         .eq("id", id);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
     },
-
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["debts"] });
       toast.success("Debt archived");
     },
-
-    onError: (e: Error) => {
-      toast.error(e.message);
-    },
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
-// Soft delete debt (AlexOS standard)
 export function useDeleteDebt() {
   const qc = useQueryClient();
 
@@ -197,24 +153,16 @@ export function useDeleteDebt() {
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("debts")
-        .update({
-          deleted_at: new Date().toISOString(),
-        })
+        .update({ deleted_at: new Date().toISOString() })
         .eq("id", id);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
     },
-
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["debts"] });
-      toast.success("Debt deleted");
+      toast.success("Debt removed");
     },
-
-    onError: (e: Error) => {
-      toast.error(e.message);
-    },
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
@@ -223,11 +171,7 @@ export function debtRemaining(d: Debt) {
 }
 
 export function debtProgress(d: Debt) {
-  const p = Number(d.principal);
-
-  if (p <= 0) {
-    return 0;
-  }
-
-  return Math.min(100, (Number(d.amount_paid) / p) * 100);
+  const principal = Number(d.principal);
+  if (principal <= 0) return 0;
+  return Math.min(100, (Number(d.amount_paid) / principal) * 100);
 }
