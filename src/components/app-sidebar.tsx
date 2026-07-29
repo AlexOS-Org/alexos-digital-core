@@ -13,13 +13,13 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { modules, moduleGroups } from "@/lib/modules";
+import { OrionLogo } from "@/components/orion-logo";
 import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export function AppSidebar() {
   const { state, setOpenMobile } = useSidebar();
-
   const collapsed = state === "collapsed";
 
   const currentPath = useRouterState({
@@ -31,9 +31,7 @@ export function AppSidebar() {
   const isActive = (path: string) =>
     currentPath === path || (path !== "/dashboard" && currentPath.startsWith(path + "/"));
 
-  const closeSidebar = () => {
-    setOpenMobile(false);
-  };
+  const closeSidebar = () => setOpenMobile(false);
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -50,32 +48,18 @@ export function AppSidebar() {
           onClick={closeSidebar}
           className="flex items-center gap-2 px-2 py-2 text-sidebar-foreground"
         >
-          <div className="h-8 w-8 shrink-0 rounded-md bg-sidebar-primary grid place-items-center text-sidebar-primary-foreground font-bold">
-            A
-          </div>
-
-          {!collapsed && (
-            <div className="min-w-0">
-              <div className="text-sm font-semibold truncate">Alex OS</div>
-
-              <div className="text-[10px] uppercase tracking-widest text-sidebar-foreground/60">
-                Professional
-              </div>
-            </div>
-          )}
+          <OrionLogo compact showWordmark={!collapsed} />
         </Link>
       </SidebarHeader>
 
       <SidebarContent>
         {moduleGroups.map((group) => {
           const items = modules.filter((module) => module.group === group);
-
           if (!items.length) return null;
 
           return (
             <SidebarGroup key={group}>
               {!collapsed && <SidebarGroupLabel>{group}</SidebarGroupLabel>}
-
               <SidebarGroupContent>
                 <SidebarMenu>
                   {items.map((item) => (
