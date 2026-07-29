@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getDailyInspiration } from "@/lib/dashboard/inspiration";
+import { DashboardWeather } from "@/components/dashboard/DashboardWeather";
 
 type Atmosphere = "auto" | "morning" | "day" | "evening" | "night";
 type TimeFormat = "12h" | "24h";
@@ -66,8 +67,8 @@ export function DashboardHeader() {
     return saved === "morning" || saved === "day" || saved === "evening" || saved === "night" ? saved : "auto";
   });
   const [timeFormat, setTimeFormat] = useState<TimeFormat>(() => {
-    if (typeof window === "undefined") return "12h";
-    return window.localStorage.getItem(TIME_FORMAT_KEY) === "24h" ? "24h" : "12h";
+    if (typeof window === "undefined") return "24h";
+    return window.localStorage.getItem(TIME_FORMAT_KEY) === "12h" ? "12h" : "24h";
   });
   const [showAtmosphereMenu, setShowAtmosphereMenu] = useState(false);
 
@@ -174,6 +175,7 @@ export function DashboardHeader() {
             <p className="mt-3 max-w-2xl text-[15px] leading-6 text-white/90 sm:mt-4 sm:text-lg sm:leading-7">
               You know what matters. Now let’s move it forward.
             </p>
+            <DashboardWeather />
             <div className="mt-5 flex gap-2">
               <Button className="bg-white text-slate-950 shadow-lg hover:bg-slate-100">
                 <Sparkles className="mr-2 h-4 w-4 text-[var(--orion-purple)]" />
