@@ -7,7 +7,6 @@ import {
   Target,
   Wallet,
   FileText,
-  Mail,
 } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -55,12 +54,6 @@ const actions = [
     to: "/documents",
     color: "bg-slate-100 text-slate-700",
   },
-  {
-    title: "Compose Email",
-    icon: Mail,
-    to: "/email",
-    color: "bg-cyan-100 text-cyan-700",
-  },
 ];
 
 export function QuickActions() {
@@ -71,18 +64,15 @@ export function QuickActions() {
         <p className="text-sm text-muted-foreground">Frequently used shortcuts across AlexOS.</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
         {actions.map((action) => (
           <Link key={action.title} to={action.to}>
-            <Card className="hover:shadow-lg transition-all cursor-pointer rounded-2xl">
-              <CardContent className="flex flex-col items-center justify-center py-6 gap-4">
-                <div
-                  className={`h-14 w-14 rounded-2xl flex items-center justify-center ${action.color}`}
-                >
+            <Card className="cursor-pointer rounded-2xl transition-all hover:shadow-lg">
+              <CardContent className="flex flex-col items-center justify-center gap-4 py-6">
+                <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${action.color}`}>
                   <action.icon className="h-6 w-6" />
                 </div>
-
-                <span className="text-sm font-medium text-center">{action.title}</span>
+                <span className="text-center text-sm font-medium">{action.title}</span>
               </CardContent>
             </Card>
           </Link>
