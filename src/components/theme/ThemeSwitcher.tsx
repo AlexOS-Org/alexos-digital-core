@@ -9,16 +9,10 @@ const options = [
 ];
 
 export function ThemeSwitcher({ compact = false }: { compact?: boolean }) {
-  const { theme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   return (
-    <div
-      className={cn(
-        "inline-flex items-center rounded-2xl border border-border/70 bg-card/90 p-1 shadow-sm backdrop-blur-md",
-        compact ? "gap-0.5" : "gap-1",
-      )}
-      aria-label="Appearance mode"
-    >
+    <div className={cn("inline-flex items-center rounded-2xl border border-border/70 bg-card/90 p-1 shadow-sm backdrop-blur-md", compact ? "gap-0.5" : "gap-1")} aria-label="Appearance mode">
       {options.map(({ value, label, icon: Icon }) => {
         const active = theme === value;
         return (
@@ -28,13 +22,10 @@ export function ThemeSwitcher({ compact = false }: { compact?: boolean }) {
             aria-pressed={active}
             aria-label={`${label} appearance`}
             title={label}
-            onClick={() => useTheme().setTheme(value)}
+            onClick={() => setTheme(value)}
             className={cn(
-              "inline-flex items-center justify-center gap-1.5 rounded-xl px-2.5 py-2 text-xs font-medium transition-all duration-200",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              active
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              "inline-flex items-center justify-center gap-1.5 rounded-xl px-2.5 py-2 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              active ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted hover:text-foreground",
               compact ? "min-w-9 px-2" : "min-w-16",
             )}
           >
