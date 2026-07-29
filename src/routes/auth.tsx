@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { ShieldCheck } from "lucide-react";
+import { OrionLogo } from "@/components/orion-logo";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -51,44 +52,41 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
-      {/* Brand panel */}
       <div className="hidden lg:flex flex-col justify-between bg-sidebar text-sidebar-foreground p-12">
-        <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          <div className="h-9 w-9 rounded-md bg-sidebar-primary grid place-items-center text-sidebar-primary-foreground font-bold">
-            A
-          </div>
-          <span className="text-lg">Alex OS Professional</span>
+        <Link to="/" className="w-fit">
+          <OrionLogo showWordmark />
         </Link>
-        <div className="space-y-6">
-          <h1 className="text-4xl font-semibold leading-tight">
+
+        <div className="space-y-6 max-w-xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-sidebar-border bg-sidebar-accent/50 px-3 py-1 text-xs font-medium text-sidebar-foreground/80">
+            <span className="h-1.5 w-1.5 rounded-full bg-sidebar-primary shadow-[0_0_10px_var(--orion-glow)]" />
+            Powered by Orion AI
+          </div>
+          <h1 className="text-4xl font-semibold leading-tight tracking-tight">
             Your personal & business operating system.
           </h1>
           <p className="text-sidebar-foreground/70 max-w-md">
-            Command your money, people, goals and operations from one elegant, banking-grade
-            workspace.
+            Command your money, people, goals and operations from one intelligent, banking-grade workspace.
           </p>
           <div className="flex items-center gap-2 text-sm text-sidebar-foreground/60">
             <ShieldCheck className="h-4 w-4" />
             Bank-level security · Encrypted at rest
           </div>
         </div>
+
         <p className="text-xs text-sidebar-foreground/50">
-          © {new Date().getFullYear()} Alex OS Professional
+          © {new Date().getFullYear()} AlexOS · Powered by Orion
         </p>
       </div>
 
-      {/* Form panel */}
       <div className="flex items-center justify-center p-6 sm:p-12">
         <Card className="w-full max-w-md border-border/60 shadow-sm">
           <CardHeader className="space-y-2">
-            <div className="lg:hidden flex items-center gap-2 mb-2">
-              <div className="h-8 w-8 rounded-md bg-primary grid place-items-center text-primary-foreground font-bold">
-                A
-              </div>
-              <span className="font-semibold">Alex OS Professional</span>
+            <div className="lg:hidden mb-2">
+              <OrionLogo showWordmark />
             </div>
             <CardTitle className="text-2xl">Welcome</CardTitle>
-            <CardDescription>Sign in to your operating system.</CardDescription>
+            <CardDescription>Sign in to your AlexOS Orion workspace.</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin">
