@@ -1,4 +1,5 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { FormEvent } from "react";
 import {
   BarChart3, CalendarDays, Car, CheckCircle2, Megaphone,
   Plus, Search, ShoppingBag, Trash2, Wallet,
