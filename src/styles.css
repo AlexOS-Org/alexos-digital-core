@@ -10,7 +10,6 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
-
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -45,8 +44,6 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-
-  /* AlexOS Orion brand tokens */
   --color-orion-blue: var(--orion-blue);
   --color-orion-blue-dark: var(--orion-blue-dark);
   --color-orion-purple: var(--orion-purple);
@@ -56,15 +53,8 @@
   --color-orion-green-dark: var(--orion-green-dark);
 }
 
-/*
- * AlexOS Orion Design System
- * Direction: brighter, confident emerald primary with Orion blue/purple reserved
- * for intelligence, navigation accents, and supporting visual hierarchy.
- */
 :root {
-  --radius: 0.6rem;
-
-  /* Brand palette */
+  --radius: 0.7rem;
   --orion-blue: oklch(0.55 0.20 255);
   --orion-blue-dark: oklch(0.35 0.15 258);
   --orion-purple: oklch(0.58 0.22 292);
@@ -72,47 +62,32 @@
   --orion-glow: oklch(0.68 0.19 280 / 22%);
   --orion-green: oklch(0.59 0.17 155);
   --orion-green-dark: oklch(0.46 0.14 155);
-
-  /* Core surfaces */
   --background: oklch(0.985 0.006 155);
   --foreground: oklch(0.19 0.025 160);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.19 0.025 160);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.19 0.025 160);
-
-  /* Primary = fresh emerald */
   --primary: var(--orion-green);
   --primary-foreground: oklch(0.99 0 0);
-
-  /* Supporting surfaces */
   --secondary: oklch(0.955 0.018 155);
   --secondary-foreground: oklch(0.25 0.035 160);
   --muted: oklch(0.955 0.012 155);
   --muted-foreground: oklch(0.47 0.025 160);
-
-  /* Accent = soft Orion blue/purple family */
   --accent: oklch(0.94 0.035 255);
   --accent-foreground: oklch(0.32 0.08 255);
-
-  /* Semantic states */
   --success: oklch(0.59 0.17 155);
   --success-foreground: oklch(0.99 0 0);
   --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(0.99 0 0);
-
   --border: oklch(0.89 0.018 155);
   --input: oklch(0.91 0.015 155);
   --ring: var(--orion-green);
-
-  /* Data visualization: green first, then Orion blue/purple */
   --chart-1: var(--orion-green);
   --chart-2: var(--orion-blue);
   --chart-3: var(--orion-purple);
   --chart-4: oklch(0.72 0.14 85);
   --chart-5: oklch(0.58 0.12 220);
-
-  /* Sidebar remains deep Orion navy for contrast */
   --sidebar: oklch(0.18 0.045 265);
   --sidebar-foreground: oklch(0.94 0.01 155);
   --sidebar-primary: var(--orion-green);
@@ -131,7 +106,6 @@
   --orion-glow: oklch(0.72 0.19 280 / 25%);
   --orion-green: oklch(0.72 0.17 155);
   --orion-green-dark: oklch(0.54 0.15 155);
-
   --background: oklch(0.13 0.025 160);
   --foreground: oklch(0.97 0.005 155);
   --card: oklch(0.18 0.035 160);
@@ -170,9 +144,30 @@
 
 @layer base {
   * { border-color: var(--color-border); }
+  html { background: var(--color-background); }
   body {
-    background-color: var(--color-background);
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 8% 4%, color-mix(in oklch, var(--orion-green) 8%, transparent), transparent 28rem),
+      radial-gradient(circle at 92% 10%, color-mix(in oklch, var(--orion-blue) 6%, transparent), transparent 26rem),
+      radial-gradient(circle at 55% 96%, color-mix(in oklch, var(--orion-purple) 5%, transparent), transparent 30rem),
+      var(--color-background);
     color: var(--color-foreground);
     font-feature-settings: "cv11", "ss01";
+  }
+}
+
+@layer utilities {
+  .alexos-surface {
+    background: linear-gradient(135deg, color-mix(in oklch, var(--color-card) 96%, var(--orion-green) 4%), var(--color-card));
+    border-color: color-mix(in oklch, var(--color-border) 80%, var(--orion-green) 20%);
+  }
+
+  .alexos-visual-strip {
+    background: linear-gradient(90deg, var(--orion-green), var(--orion-blue), var(--orion-purple));
+  }
+
+  .alexos-glow {
+    box-shadow: 0 18px 55px -32px var(--orion-glow);
   }
 }
