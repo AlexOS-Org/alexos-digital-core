@@ -18,7 +18,14 @@ export function formatDate(d: string | Date) {
 
 export function formatTime(d: string | Date) {
   const date = typeof d === "string" ? new Date(d) : d;
-  return date.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  const preference = typeof window !== "undefined"
+    ? window.localStorage.getItem("alexos-dashboard-time-format")
+    : null;
+  return date.toLocaleTimeString("en-KE", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: preference === "12h" ? true : false,
+  });
 }
 
 export function monthKey(d = new Date()) {
