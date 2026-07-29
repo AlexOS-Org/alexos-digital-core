@@ -52,12 +52,14 @@
   --color-orion-purple: var(--orion-purple);
   --color-orion-purple-dark: var(--orion-purple-dark);
   --color-orion-glow: var(--orion-glow);
+  --color-orion-green: var(--orion-green);
+  --color-orion-green-dark: var(--orion-green-dark);
 }
 
 /*
  * AlexOS Orion Design System
- * Brand direction: deep navy + electric blue + Orion purple.
- * Semantic colors remain independent so financial and system states stay clear.
+ * Direction: brighter, confident emerald primary with Orion blue/purple reserved
+ * for intelligence, navigation accents, and supporting visual hierarchy.
  */
 :root {
   --radius: 0.6rem;
@@ -68,121 +70,106 @@
   --orion-purple: oklch(0.58 0.22 292);
   --orion-purple-dark: oklch(0.40 0.16 292);
   --orion-glow: oklch(0.68 0.19 280 / 22%);
+  --orion-green: oklch(0.59 0.17 155);
+  --orion-green-dark: oklch(0.46 0.14 155);
 
   /* Core surfaces */
-  --background: oklch(0.985 0.006 260);
-  --foreground: oklch(0.19 0.025 265);
-
+  --background: oklch(0.985 0.006 155);
+  --foreground: oklch(0.19 0.025 160);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.19 0.025 265);
-
+  --card-foreground: oklch(0.19 0.025 160);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.19 0.025 265);
+  --popover-foreground: oklch(0.19 0.025 160);
 
-  /* Primary = Orion blue */
-  --primary: var(--orion-blue);
+  /* Primary = fresh emerald */
+  --primary: var(--orion-green);
   --primary-foreground: oklch(0.99 0 0);
 
-  /* Secondary = cool blue-grey */
-  --secondary: oklch(0.95 0.015 260);
-  --secondary-foreground: oklch(0.25 0.035 265);
+  /* Supporting surfaces */
+  --secondary: oklch(0.955 0.018 155);
+  --secondary-foreground: oklch(0.25 0.035 160);
+  --muted: oklch(0.955 0.012 155);
+  --muted-foreground: oklch(0.47 0.025 160);
 
-  --muted: oklch(0.955 0.01 260);
-  --muted-foreground: oklch(0.49 0.025 265);
-
-  /* Accent = Orion purple */
-  --accent: oklch(0.94 0.035 292);
-  --accent-foreground: oklch(0.32 0.08 292);
+  /* Accent = soft Orion blue/purple family */
+  --accent: oklch(0.94 0.035 255);
+  --accent-foreground: oklch(0.32 0.08 255);
 
   /* Semantic states */
-  --success: oklch(0.62 0.16 155);
+  --success: oklch(0.59 0.17 155);
   --success-foreground: oklch(0.99 0 0);
-
   --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(0.99 0 0);
 
-  --border: oklch(0.89 0.015 260);
-  --input: oklch(0.91 0.015 260);
-  --ring: var(--orion-blue);
+  --border: oklch(0.89 0.018 155);
+  --input: oklch(0.91 0.015 155);
+  --ring: var(--orion-green);
 
-  /* Data visualization */
-  --chart-1: var(--orion-blue);
-  --chart-2: var(--orion-purple);
-  --chart-3: oklch(0.58 0.12 220);
+  /* Data visualization: green first, then Orion blue/purple */
+  --chart-1: var(--orion-green);
+  --chart-2: var(--orion-blue);
+  --chart-3: var(--orion-purple);
   --chart-4: oklch(0.72 0.14 85);
-  --chart-5: oklch(0.62 0.16 155);
+  --chart-5: oklch(0.58 0.12 220);
 
-  /* Sidebar = Orion deep navy */
+  /* Sidebar remains deep Orion navy for contrast */
   --sidebar: oklch(0.18 0.045 265);
-  --sidebar-foreground: oklch(0.94 0.01 260);
-  --sidebar-primary: oklch(0.68 0.18 280);
+  --sidebar-foreground: oklch(0.94 0.01 155);
+  --sidebar-primary: var(--orion-green);
   --sidebar-primary-foreground: oklch(0.99 0 0);
   --sidebar-accent: oklch(0.25 0.055 275);
   --sidebar-accent-foreground: oklch(0.98 0 0);
   --sidebar-border: oklch(0.3 0.04 270);
-  --sidebar-ring: oklch(0.68 0.18 280);
+  --sidebar-ring: var(--orion-green);
 }
 
 .dark {
-  /* Brand palette remains consistent across themes */
   --orion-blue: oklch(0.68 0.18 255);
   --orion-blue-dark: oklch(0.42 0.16 258);
   --orion-purple: oklch(0.70 0.19 292);
   --orion-purple-dark: oklch(0.48 0.17 292);
   --orion-glow: oklch(0.72 0.19 280 / 25%);
+  --orion-green: oklch(0.72 0.17 155);
+  --orion-green-dark: oklch(0.54 0.15 155);
 
-  --background: oklch(0.13 0.025 265);
-  --foreground: oklch(0.97 0.005 260);
-
-  --card: oklch(0.18 0.035 265);
-  --card-foreground: oklch(0.97 0.005 260);
-
-  --popover: oklch(0.18 0.035 265);
-  --popover-foreground: oklch(0.97 0.005 260);
-
-  --primary: var(--orion-blue);
-  --primary-foreground: oklch(0.12 0.025 265);
-
-  --secondary: oklch(0.24 0.035 265);
-  --secondary-foreground: oklch(0.97 0.005 260);
-
-  --muted: oklch(0.23 0.035 265);
-  --muted-foreground: oklch(0.72 0.025 265);
-
-  --accent: oklch(0.29 0.07 292);
-  --accent-foreground: oklch(0.97 0.005 260);
-
-  --success: oklch(0.70 0.16 155);
-  --success-foreground: oklch(0.12 0.025 265);
-
+  --background: oklch(0.13 0.025 160);
+  --foreground: oklch(0.97 0.005 155);
+  --card: oklch(0.18 0.035 160);
+  --card-foreground: oklch(0.97 0.005 155);
+  --popover: oklch(0.18 0.035 160);
+  --popover-foreground: oklch(0.97 0.005 155);
+  --primary: var(--orion-green);
+  --primary-foreground: oklch(0.12 0.025 160);
+  --secondary: oklch(0.24 0.035 160);
+  --secondary-foreground: oklch(0.97 0.005 155);
+  --muted: oklch(0.23 0.035 160);
+  --muted-foreground: oklch(0.72 0.025 160);
+  --accent: oklch(0.29 0.07 255);
+  --accent-foreground: oklch(0.97 0.005 155);
+  --success: var(--orion-green);
+  --success-foreground: oklch(0.12 0.025 160);
   --destructive: oklch(0.65 0.20 27);
   --destructive-foreground: oklch(0.99 0 0);
-
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 14%);
-  --ring: var(--orion-blue);
-
-  --chart-1: var(--orion-blue);
-  --chart-2: var(--orion-purple);
-  --chart-3: oklch(0.68 0.12 220);
+  --ring: var(--orion-green);
+  --chart-1: var(--orion-green);
+  --chart-2: var(--orion-blue);
+  --chart-3: var(--orion-purple);
   --chart-4: oklch(0.76 0.14 85);
-  --chart-5: oklch(0.70 0.16 155);
-
+  --chart-5: oklch(0.68 0.12 220);
   --sidebar: oklch(0.10 0.03 265);
-  --sidebar-foreground: oklch(0.92 0.01 260);
-  --sidebar-primary: var(--orion-purple);
+  --sidebar-foreground: oklch(0.92 0.01 155);
+  --sidebar-primary: var(--orion-green);
   --sidebar-primary-foreground: oklch(0.99 0 0);
   --sidebar-accent: oklch(0.19 0.045 275);
-  --sidebar-accent-foreground: oklch(0.97 0.005 260);
+  --sidebar-accent-foreground: oklch(0.97 0.005 155);
   --sidebar-border: oklch(1 0 0 / 9%);
-  --sidebar-ring: var(--orion-purple);
+  --sidebar-ring: var(--orion-green);
 }
 
 @layer base {
-  * {
-    border-color: var(--color-border);
-  }
-
+  * { border-color: var(--color-border); }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
