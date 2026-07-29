@@ -11,6 +11,7 @@ import BusinessSnapshot from "@/components/dashboard/BusinessSnapshot";
 import TodaysMission from "@/components/dashboard/TodaysMission";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import IntelligenceFeed from "@/components/dashboard/IntelligenceFeed";
+import RevenueCommandCenter from "@/components/dashboard/RevenueCommandCenter";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: Dashboard });
 
@@ -32,6 +33,7 @@ function Dashboard() {
       <SafePanel><DashboardHeader /></SafePanel>
       <SafePanel><TodaysMission /></SafePanel>
       <SafePanel><section className="space-y-3"><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-600 dark:text-violet-300">Orion Intelligence</p><h2 className="mt-1 text-2xl font-semibold tracking-tight">What deserves your attention?</h2><p className="text-sm text-muted-foreground">Signals first. Noise later.</p></div><IntelligenceFeed /></section></SafePanel>
+      <SafePanel><RevenueCommandCenter /></SafePanel>
       <SafePanel><section className="space-y-4"><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Money</p><h2 className="text-2xl font-semibold tracking-tight">Know where you stand.</h2><p className="text-sm text-muted-foreground">Cash, commitments and financial momentum — without the noise.</p></div><MoneySnapshot /></section></SafePanel>
       <SafePanel><QuickActions /></SafePanel>
       <SafePanel><section className="space-y-4"><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--orion-purple)]">Business</p><h2 className="text-2xl font-semibold tracking-tight">Build what moves you forward.</h2><p className="text-sm text-muted-foreground">See the signals behind customers, sales, revenue and growth.</p></div><BusinessSnapshot /></section></SafePanel>
