@@ -1,6 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingDown, TrendingUp, Wallet, Landmark, ArrowDownCircle } from "lucide-react";
-
+import { TrendingDown, TrendingUp, Wallet, Landmark, ArrowDownCircle, ArrowUpRight } from "lucide-react";
 import { useAccountBalances, useTransactions } from "@/lib/money/api";
 import { useDebts, debtRemaining } from "@/lib/debts/api";
 import { formatMoney } from "@/lib/money/format";
@@ -11,122 +10,47 @@ export default function MoneySnapshot() {
   const { data: debts = [] } = useDebts();
 
   const cashAvailable = balances.reduce((total, account) => total + Number(account.balance), 0);
-
-  const totalDebt = debts
-    .filter((d) => d.status !== "paid")
-    .reduce((sum, debt) => sum + debtRemaining(debt), 0);
-
+  const totalDebt = debts.filter((d) => d.status !== "paid").reduce((sum, debt) => sum + debtRemaining(debt), 0);
   const netWorth = cashAvailable - totalDebt;
-
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
-
   const monthTransactions = transactions.filter((t) => {
     const date = new Date(t.occurred_at);
-
-    return (
-      date.getMonth() === currentMonth &&
-      date.getFullYear() === currentYear &&
-      t.status === "posted"
-    );
+    return date.getMonth() === currentMonth && date.getFullYear() === currentYear && t.status === "posted";
   });
-
-  const income = monthTransactions
-    .filter((t) => t.type === "income")
-    .reduce((sum, t) => sum + Number(t.amount), 0);
-
-  const expenses = monthTransactions
-    .filter((t) => t.type === "expense")
-    .reduce((sum, t) => sum + Number(t.amount), 0);
+  const income = monthTransactions.filter((t) => t.type === "income").reduce((sum, t) => sum + Number(t.amount), 0);
+  const expenses = monthTransactions.filter((t) => t.type === "expense").reduce((sum, t) => sum + Number(t.amount), 0);
 
   const cards = [
-    {
-      title: "Cash Available",
-      value: formatMoney(cashAvailable),
-      icon: Wallet,
-      gradient: "from-blue-500 to-cyan-500",
-      bg: "bg-blue-50",
-      iconBg: "bg-blue-100",
-      iconColor: "text-blue-700",
-      subtitle: "Across All Accounts",
-    },
-    {
-      title: "Net Worth",
-      value: formatMoney(netWorth),
-      icon: Landmark,
-      gradient: netWorth >= 0 ? "from-violet-500 to-purple-600" : "from-red-500 to-rose-600",
-      bg: netWorth >= 0 ? "bg-violet-50" : "bg-red-50",
-      iconBg: netWorth >= 0 ? "bg-violet-100" : "bg-red-100",
-      iconColor: netWorth >= 0 ? "text-violet-700" : "text-red-700",
-      subtitle: "Cash - Debt",
-    },
-    {
-      title: "Income",
-      value: formatMoney(income),
-      icon: TrendingUp,
-      gradient: "from-green-500 to-emerald-600",
-      bg: "bg-green-50",
-      iconBg: "bg-green-100",
-      iconColor: "text-green-700",
-      subtitle: "This Month",
-    },
-    {
-      title: "Expenses",
-      value: formatMoney(expenses),
-      icon: TrendingDown,
-      gradient: "from-orange-500 to-red-500",
-      bg: "bg-orange-50",
-      iconBg: "bg-orange-100",
-      iconColor: "text-orange-700",
-      subtitle: "This Month",
-    },
-    {
-      title: "Outstanding Debt",
-      value: formatMoney(totalDebt),
-      icon: ArrowDownCircle,
-      gradient: "from-amber-500 to-orange-600",
-      bg: "bg-amber-50",
-      iconBg: "bg-amber-100",
-      iconColor: "text-amber-700",
-      subtitle: `${debts.filter((d) => d.status !== "paid").length} Active Debt(s)`,
-    },
+    { title: "Cash Available", value: formatMoney(cashAvailable), icon: Wallet, accent: "from-blue-400 to-cyan-300", subtitle: "Across all accounts" },
+    { title: "Net Worth", value: formatMoney(netWorth), icon: Landmark, accent: netWorth >= 0 ? "from-violet-400 to-fuchsia-300" : "from-red-400 to-rose-300", subtitle: "Cash less outstanding debt" },
+    { title: "Income", value: formatMoney(income), icon: TrendingUp, accent: "from-emerald-400 to-teal-300", subtitle: "This month" },
+    { title: "Expenses", value: formatMoney(expenses), icon: TrendingDown, accent: "from-amber-400 to-orange-300", subtitle: "This month" },
+    { title: "Outstanding Debt", value: formatMoney(totalDebt), icon: ArrowDownCircle, accent: "from-orange-400 to-red-300", subtitle: `${debts.filter((d) => d.status !== "paid").length} active debt(s)` },
   ];
 
   return (
-    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
-      {cards.map((card) => {
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      {cards.map((card, index) => {
         const Icon = card.icon;
-
         return (
-          <Card
-            key={card.title}
-            className={`overflow-hidden border-0 shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ${card.bg}`}
-          >
-            <div className={`h-2 w-full bg-gradient-to-r ${card.gradient}`} />
-
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-5">
+          <Card key={card.title} className={`group relative overflow-hidden rounded-[1.6rem] border ${index === 0 ? "border-blue-400/20 bg-[#0a1730] text-white shadow-[0_20px_55px_-30px_rgba(37,99,235,.7)]" : "border-border/60 bg-card/80 shadow-sm"} transition-all duration-300 hover:-translate-y-1 hover:shadow-xl`}>
+            <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${card.accent}`} />
+            {index === 0 && <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-blue-500/15 blur-2xl" />}
+            <CardContent className="relative p-5">
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm text-muted-foreground">{card.title}</p>
-
-                  <h2 className="mt-2 text-2xl font-bold tracking-tight">{card.value}</h2>
+                  <p className={`text-xs font-semibold uppercase tracking-[0.14em] ${index === 0 ? "text-blue-200/80" : "text-muted-foreground"}`}>{card.title}</p>
+                  <p className="mt-3 text-2xl font-bold tracking-tight sm:text-[1.65rem]">{card.value}</p>
                 </div>
-
-                <div
-                  className={`h-14 w-14 rounded-2xl ${card.iconBg} flex items-center justify-center`}
-                >
-                  <Icon className={`h-7 w-7 ${card.iconColor}`} />
+                <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${index === 0 ? "bg-white/10 text-blue-200" : "bg-primary/[0.07] text-primary"}`}>
+                  <Icon className="h-5 w-5" />
                 </div>
               </div>
-
-              <div className="h-1.5 rounded-full bg-slate-200 overflow-hidden">
-                <div
-                  className={`h-full bg-gradient-to-r ${card.gradient}`}
-                  style={{ width: "70%" }}
-                />
+              <div className={`mt-6 flex items-center justify-between text-xs ${index === 0 ? "text-slate-400" : "text-muted-foreground"}`}>
+                <span>{card.subtitle}</span>
+                <ArrowUpRight className="h-3.5 w-3.5 opacity-60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
               </div>
-
-              <p className="mt-4 text-xs font-medium text-muted-foreground">{card.subtitle}</p>
             </CardContent>
           </Card>
         );
