@@ -4,9 +4,9 @@ import {
   DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors,
   useDraggable, useDroppable,
 } from "@dnd-kit/core";
-import { Plus, KanbanSquare, Calendar, Percent, DollarSign } from "lucide-react";
+import { Plus, KanbanSquare, Calendar, Percent, DollarSign, Target, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useContacts, useLeads, useUpdateLeadStage } from "@/lib/crm/api";
@@ -19,8 +19,8 @@ export const Route = createFileRoute("/_authenticated/people/leads")({
   component: LeadsPipelinePage,
   head: () => ({
     meta: [
-      { title: "Leads Pipeline · Alex OS" },
-      { name: "description", content: "Drag-and-drop sales pipeline from New through Won and Lost with expected value and probability." },
+      { title: "Revenue Pipeline · Alex OS" },
+      { name: "description", content: "Track revenue opportunities from lead through follow-up, negotiation and sale with expected value and probability." },
     ],
   }),
 });
@@ -51,6 +51,22 @@ function LeadsPipelinePage() {
     return t;
   }, [leads]);
 
+  const pipelineSummary = useMemo(() => {
+    const openStages: LeadStage[] = ["new", "contacted", "qualified", "proposal", "negotiation"];
+    const openLeads = leads.filter((lead) => openStages.includes(lead.stage));
+    const openValue = openLeads.reduce((sum, lead) => sum + Number(lead.value ?? 0), 0);
+    const weightedValue = openLeads.reduce(
+      (sum, lead) => sum + (Number(lead.value ?? 0) * Number(lead.probability ?? 0)) / 100,
+      0,
+    );
+    return {
+      openCount: openLeads.length,
+      openValue,
+      weightedValue,
+      wonValue: totals.won,
+    };
+  }, [leads, totals.won]);
+
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
   const onDragStart = (e: DragStartEvent) => {
@@ -71,13 +87,26 @@ function LeadsPipelinePage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Leads Pipeline</h1>
-          <p className="text-muted-foreground">Drag leads across stages to update your pipeline in real time.</p>
+          <h1 className="text-3xl font-bold">Revenue Pipeline</h1>
+          <p className="text-muted-foreground">Move opportunities from first contact to follow-up, negotiation and sale.</p>
         </div>
         <Button onClick={() => { setDefaultStage(undefined); setDialogOpen(true); }}>
-          <Plus className="mr-2 h-4 w-4" /> New Lead
+          <Plus className="mr-2 h-4 w-4" /> New Opportunity
         </Button>
       </div>
+
+      {isLoading ? (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <PipelineStat icon={Target} label="Open opportunities" value={String(pipelineSummary.openCount)} />
+          <PipelineStat icon={DollarSign} label="Open pipeline" value={formatCurrency(pipelineSummary.openValue)} />
+          <PipelineStat icon={Percent} label="Weighted pipeline" value={formatCurrency(pipelineSummary.weightedValue)} />
+          <PipelineStat icon={Trophy} label="Won revenue" value={formatCurrency(pipelineSummary.wonValue)} />
+        </div>
+      )}
 
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
@@ -87,10 +116,10 @@ function LeadsPipelinePage() {
         <Card>
           <CardContent className="py-16 text-center">
             <KanbanSquare className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h2 className="text-lg font-semibold">No leads yet</h2>
-            <p className="text-muted-foreground mt-1 mb-4">Track opportunities from first touch to close.</p>
+            <h2 className="text-lg font-semibold">No opportunities yet</h2>
+            <p className="text-muted-foreground mt-1 mb-4">Track revenue opportunities from first touch to close.</p>
             <Button onClick={() => { setDefaultStage("new"); setDialogOpen(true); }}>
-              <Plus className="mr-2 h-4 w-4" /> Create your first lead
+              <Plus className="mr-2 h-4 w-4" /> Create your first opportunity
             </Button>
           </CardContent>
         </Card>
@@ -120,6 +149,19 @@ function LeadsPipelinePage() {
 
       <LeadFormDialog open={dialogOpen} onOpenChange={setDialogOpen} defaultStage={defaultStage} />
     </div>
+  );
+}
+
+function PipelineStat({ icon: Icon, label, value }: { icon: typeof Target; label: string; value: string }) {
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+          <Icon className="h-3.5 w-3.5" /> {label}
+        </div>
+        <p className="text-lg sm:text-xl font-semibold truncate">{value}</p>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -162,7 +204,7 @@ function StageColumn({
           return <DraggableLead key={lead.id} lead={lead} contactName={c ? contactDisplayName(c) : undefined} />;
         })}
         {leads.length === 0 ? (
-          <p className="text-xs text-muted-foreground text-center py-6">Drop leads here</p>
+          <p className="text-xs text-muted-foreground text-center py-6">Drop opportunities here</p>
         ) : null}
       </div>
     </div>
