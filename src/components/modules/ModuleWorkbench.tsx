@@ -172,7 +172,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
               <Icon className="h-6 w-6" />
             </div>
             <div>
-              <div className="mb-1 flex items-center gap-2">
+              <div className="mb-1 flex flex-wrap items-center gap-2">
                 <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
                   {config.title}
                 </h1>
@@ -184,7 +184,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
             </div>
           </div>
           <div className="rounded-xl border bg-background/70 px-3 py-2 text-xs text-muted-foreground">
-            Ready for real-world testing
+            Ready for Phase 3 validation
           </div>
         </div>
       </div>
@@ -202,9 +202,9 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Card className="border-border/60">
-          <CardHeader className="flex flex-row items-center justify-between gap-3">
+          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle className="text-base">Workspace activity</CardTitle>
-            <div className="relative w-48">
+            <div className="relative w-full sm:w-48">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={search}
@@ -221,7 +221,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
                 <p className="mt-3 font-medium">Nothing here yet</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Add your first item on the right. This workspace is intentionally
-                  simple for the pre-Phase-3 test cycle.
+                  simple for the Phase 3 validation cycle.
                 </p>
               </div>
             ) : (
@@ -298,7 +298,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
               </Button>
             </form>
             <p className="mt-4 text-xs leading-5 text-muted-foreground">
-              Entries are kept on this device during the test cycle. Core financial
+              Entries are kept on this device during the validation cycle. Core financial
               data remains in Supabase; this V1 workspace does not alter Money Center data.
             </p>
           </CardContent>
