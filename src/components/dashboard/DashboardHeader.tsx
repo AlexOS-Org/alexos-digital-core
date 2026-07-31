@@ -219,7 +219,9 @@ export function DashboardHeader() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="font-semibold tracking-tight">Intelligence brings what matters into focus.</h2>
+                  <h2 className="font-semibold tracking-tight">
+                    Intelligence brings what matters into focus.
+                  </h2>
                   <span className="rounded-full bg-violet-400/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-violet-200">
                     Live
                   </span>
@@ -272,4 +274,3 @@ export function DashboardHeader() {
     </div>
   );
 }
-
