@@ -28,9 +28,9 @@ class DashboardPanelBoundary extends Component<{ children: ReactNode }, { hasErr
       return (
         <Card className="rounded-3xl border-amber-500/20 bg-amber-500/5">
           <CardContent className="p-5">
-            <p className="text-sm font-semibold">Orion is still bringing this panel into focus.</p>
+            <p className="text-sm font-semibold">AlexOS is still bringing this panel into focus.</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              The rest of your command center is available.
+              The rest of Your Command Center is available.
             </p>
           </CardContent>
         </Card>
@@ -50,19 +50,19 @@ function Dashboard() {
         <DashboardHeader />
       </SafePanel>
       <SafePanel>
-        <section className="relative overflow-hidden rounded-3xl border border-primary/15 bg-gradient-to-r from-primary/[0.07] via-background to-[var(--orion-purple)]/[0.07] p-5 sm:p-6">
+        <section className="relative overflow-hidden rounded-3xl border border-primary/15 bg-gradient-to-r from-primary/[0.07] via-background to-[var(--AlexOS-purple)]/[0.07] p-5 sm:p-6">
           <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
           <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
                 <Sparkles className="h-3.5 w-3.5" />
-                Your command center
+                Your Command Center
               </div>
               <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
                 Know what matters. Act on it.
               </h2>
               <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Orion brings your priorities, mission, money and business signals into one clear
+                AlexOS brings your priorities, mission, money and business signals into one clear
                 view.
               </p>
             </div>
@@ -79,7 +79,7 @@ function Dashboard() {
         <section className="space-y-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-600 dark:text-violet-300">
-              Orion Intelligence
+              Intelligence
             </p>
             <h2 className="mt-1 text-2xl font-semibold tracking-tight">
               What deserves your attention?
@@ -107,7 +107,7 @@ function Dashboard() {
       <SafePanel>
         <section className="space-y-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--orion-purple)]">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--AlexOS-purple)]">
               Business
             </p>
             <h2 className="text-2xl font-semibold tracking-tight">Build what moves you forward.</h2>
@@ -154,7 +154,7 @@ function Dashboard() {
                         <Card className="h-full rounded-3xl border-border/60 bg-card/80 transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5">
                           <CardContent className="space-y-4 p-5">
                             <div className="flex items-center justify-between">
-                              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-[var(--orion-purple)]/15 text-primary ring-1 ring-primary/10">
+                              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-[var(--AlexOS-purple)]/15 text-primary ring-1 ring-primary/10">
                                 <m.icon className="h-5 w-5" />
                               </div>
                               <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
@@ -181,3 +181,4 @@ function Dashboard() {
     </div>
   );
 }
+
