@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="orion" x1="8" y1="56" x2="56" y2="8" gradientUnits="userSpaceOnUse">
+    <linearGradient id="alexos" x1="8" y1="56" x2="56" y2="8" gradientUnits="userSpaceOnUse">
       <stop stop-color="#3B82F6"/>
       <stop offset="1" stop-color="#8B5CF6"/>
     </linearGradient>
@@ -10,11 +10,11 @@
     </filter>
   </defs>
   <rect width="64" height="64" rx="16" fill="#0F172A"/>
-  <path d="M15 48 28 16h8l13 32h-8l-3.2-8H24.2L21 48h-6Zm12-14h5.6L30 26.8 27 34Z" fill="url(#orion)"/>
-  <g fill="url(#orion)" filter="url(#glow)">
+  <path d="M15 48 28 16h8l13 32h-8l-3.2-8H24.2L21 48h-6Zm12-14h5.6L30 26.8 27 34Z" fill="url(#alexos)"/>
+  <g fill="url(#alexos)" filter="url(#glow)">
     <circle cx="46" cy="14" r="2.2"/>
     <circle cx="52" cy="22" r="1.5"/>
     <circle cx="43" cy="27" r="1.3"/>
   </g>
-  <path d="M46 14 52 22 43 27" fill="none" stroke="url(#orion)" stroke-width="1.2" opacity=".8"/>
+  <path d="M46 14 52 22 43 27" fill="none" stroke="url(#alexos)" stroke-width="1.2" opacity=".8"/>
 </svg>
