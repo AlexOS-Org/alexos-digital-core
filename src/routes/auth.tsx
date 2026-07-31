@@ -66,7 +66,8 @@ function AuthPage() {
             Your personal & business operating system.
           </h1>
           <p className="text-sidebar-foreground/70 max-w-md">
-            Command your money, people, goals and operations from one intelligent, banking-grade workspace.
+            Command your money, people, goals and operations from one intelligent, banking-grade
+            workspace.
           </p>
           <div className="flex items-center gap-2 text-sm text-sidebar-foreground/60">
             <ShieldCheck className="h-4 w-4" />

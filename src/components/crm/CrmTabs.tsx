@@ -1,18 +1,42 @@
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { Phone, Mail, MessageSquare, Calendar as CalendarIcon, StickyNote, Paperclip, CheckCircle2, Circle, Plus, ExternalLink } from "lucide-react";
+import {
+  Phone,
+  Mail,
+  MessageSquare,
+  Calendar as CalendarIcon,
+  StickyNote,
+  Paperclip,
+  CheckCircle2,
+  Circle,
+  Plus,
+  ExternalLink,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import {
-  useActivities, useAddActivity, useAddCrmAttachment, useAddCrmNote, useAddCrmTask,
-  useCrmAttachments, useCrmNotes, useCrmTasks, useToggleCrmTask,
+  useActivities,
+  useAddActivity,
+  useAddCrmAttachment,
+  useAddCrmNote,
+  useAddCrmTask,
+  useCrmAttachments,
+  useCrmNotes,
+  useCrmTasks,
+  useToggleCrmTask,
 } from "@/lib/crm/api";
 import { ACTIVITY_TYPES } from "@/lib/crm/constants";
 import type { CrmActivityType } from "@/lib/crm/types";
@@ -20,7 +44,11 @@ import type { CrmActivityType } from "@/lib/crm/types";
 type Scope = { contactId?: string; leadId?: string };
 
 const ACTIVITY_ICON: Record<CrmActivityType, typeof Phone> = {
-  call: Phone, email: Mail, meeting: CalendarIcon, note: StickyNote, other: MessageSquare,
+  call: Phone,
+  email: Mail,
+  meeting: CalendarIcon,
+  note: StickyNote,
+  other: MessageSquare,
 };
 
 export function ActivitiesTab({ scope }: { scope: Scope }) {
@@ -33,7 +61,8 @@ export function ActivitiesTab({ scope }: { scope: Scope }) {
   const submit = async () => {
     if (!subject.trim()) return;
     await add.mutateAsync({ type, subject, body });
-    setSubject(""); setBody("");
+    setSubject("");
+    setBody("");
   };
 
   return (
@@ -44,20 +73,35 @@ export function ActivitiesTab({ scope }: { scope: Scope }) {
             <div className="space-y-1.5">
               <Label>Type</Label>
               <Select value={type} onValueChange={(v) => setType(v as CrmActivityType)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {ACTIVITY_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                  {ACTIVITY_TYPES.map((t) => (
+                    <SelectItem key={t.value} value={t.value}>
+                      {t.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
               <Label>Subject</Label>
-              <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Discovery call, follow-up email..." />
+              <Input
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="Discovery call, follow-up email..."
+              />
             </div>
           </div>
           <div className="space-y-1.5">
             <Label>Details</Label>
-            <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={2} placeholder="Notes on the interaction" />
+            <Textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              rows={2}
+              placeholder="Notes on the interaction"
+            />
           </div>
           <div className="flex justify-end">
             <Button onClick={submit} disabled={add.isPending || !subject.trim()}>
@@ -67,7 +111,9 @@ export function ActivitiesTab({ scope }: { scope: Scope }) {
         </CardContent>
       </Card>
 
-      {isLoading ? <Skeleton className="h-32 w-full" /> : activities.length === 0 ? (
+      {isLoading ? (
+        <Skeleton className="h-32 w-full" />
+      ) : activities.length === 0 ? (
         <EmptyBlock icon={MessageSquare} text="No activities logged yet." />
       ) : (
         <div className="space-y-3">
@@ -85,7 +131,11 @@ export function ActivitiesTab({ scope }: { scope: Scope }) {
                       {formatDistanceToNow(new Date(a.occurred_at), { addSuffix: true })}
                     </span>
                   </div>
-                  {a.body ? <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{a.body}</p> : null}
+                  {a.body ? (
+                    <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
+                      {a.body}
+                    </p>
+                  ) : null}
                 </div>
               </div>
             );
@@ -106,19 +156,33 @@ export function TasksTab({ scope }: { scope: Scope }) {
   const submit = async () => {
     if (!title.trim()) return;
     await add.mutateAsync({ title, due_date: due || null });
-    setTitle(""); setDue("");
+    setTitle("");
+    setDue("");
   };
 
   return (
     <div className="space-y-4">
       <Card>
         <CardContent className="pt-6 flex flex-col sm:flex-row gap-2">
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="What needs to happen next?" />
-          <Input type="date" value={due} onChange={(e) => setDue(e.target.value)} className="sm:w-40" />
-          <Button onClick={submit} disabled={add.isPending || !title.trim()}>Add task</Button>
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="What needs to happen next?"
+          />
+          <Input
+            type="date"
+            value={due}
+            onChange={(e) => setDue(e.target.value)}
+            className="sm:w-40"
+          />
+          <Button onClick={submit} disabled={add.isPending || !title.trim()}>
+            Add task
+          </Button>
         </CardContent>
       </Card>
-      {isLoading ? <Skeleton className="h-24 w-full" /> : tasks.length === 0 ? (
+      {isLoading ? (
+        <Skeleton className="h-24 w-full" />
+      ) : tasks.length === 0 ? (
         <EmptyBlock icon={CheckCircle2} text="No tasks yet." />
       ) : (
         <div className="space-y-2">
@@ -130,10 +194,18 @@ export function TasksTab({ scope }: { scope: Scope }) {
                 onClick={() => toggle.mutate(t)}
                 className="w-full flex items-center gap-3 rounded-xl border bg-card p-3 text-left hover:bg-accent/40 transition-colors"
               >
-                {done ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <Circle className="h-4 w-4 text-muted-foreground" />}
+                {done ? (
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                ) : (
+                  <Circle className="h-4 w-4 text-muted-foreground" />
+                )}
                 <div className="flex-1">
-                  <p className={cn("text-sm", done && "line-through text-muted-foreground")}>{t.title}</p>
-                  {t.due_date ? <p className="text-xs text-muted-foreground">Due {t.due_date}</p> : null}
+                  <p className={cn("text-sm", done && "line-through text-muted-foreground")}>
+                    {t.title}
+                  </p>
+                  {t.due_date ? (
+                    <p className="text-xs text-muted-foreground">Due {t.due_date}</p>
+                  ) : null}
                 </div>
               </button>
             );
@@ -159,13 +231,22 @@ export function NotesTab({ scope }: { scope: Scope }) {
     <div className="space-y-4">
       <Card>
         <CardContent className="pt-6 space-y-2">
-          <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={3} placeholder="Capture something worth remembering..." />
+          <Textarea
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            rows={3}
+            placeholder="Capture something worth remembering..."
+          />
           <div className="flex justify-end">
-            <Button onClick={submit} disabled={add.isPending || !body.trim()}>Save note</Button>
+            <Button onClick={submit} disabled={add.isPending || !body.trim()}>
+              Save note
+            </Button>
           </div>
         </CardContent>
       </Card>
-      {isLoading ? <Skeleton className="h-24 w-full" /> : notes.length === 0 ? (
+      {isLoading ? (
+        <Skeleton className="h-24 w-full" />
+      ) : notes.length === 0 ? (
         <EmptyBlock icon={StickyNote} text="No notes yet." />
       ) : (
         <div className="space-y-3">
@@ -192,7 +273,8 @@ export function AttachmentsTab({ scope }: { scope: Scope }) {
   const submit = async () => {
     if (!name.trim() || !url.trim()) return;
     await add.mutateAsync({ name, url });
-    setName(""); setUrl("");
+    setName("");
+    setUrl("");
   };
 
   return (
@@ -201,10 +283,14 @@ export function AttachmentsTab({ scope }: { scope: Scope }) {
         <CardContent className="pt-6 grid grid-cols-1 sm:grid-cols-[1fr_2fr_auto] gap-2">
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="File name" />
           <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://..." />
-          <Button onClick={submit} disabled={add.isPending || !name.trim() || !url.trim()}>Attach</Button>
+          <Button onClick={submit} disabled={add.isPending || !name.trim() || !url.trim()}>
+            Attach
+          </Button>
         </CardContent>
       </Card>
-      {isLoading ? <Skeleton className="h-24 w-full" /> : items.length === 0 ? (
+      {isLoading ? (
+        <Skeleton className="h-24 w-full" />
+      ) : items.length === 0 ? (
         <EmptyBlock icon={Paperclip} text="No attachments." />
       ) : (
         <div className="space-y-2">

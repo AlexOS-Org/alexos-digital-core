@@ -2,12 +2,24 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useContacts, useSaveLead } from "@/lib/crm/api";
 import { LEAD_STAGES } from "@/lib/crm/constants";
 import { contactDisplayName } from "@/lib/crm/utils";
@@ -33,7 +45,13 @@ interface Props {
   defaultStage?: LeadStage;
 }
 
-export function LeadFormDialog({ open, onOpenChange, lead, defaultContactId, defaultStage }: Props) {
+export function LeadFormDialog({
+  open,
+  onOpenChange,
+  lead,
+  defaultContactId,
+  defaultStage,
+}: Props) {
   const save = useSaveLead();
   const { data: contacts = [] } = useContacts();
   const {
@@ -90,27 +108,46 @@ export function LeadFormDialog({ open, onOpenChange, lead, defaultContactId, def
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <Field label="Title" className="col-span-2" error={errors.title?.message}>
-              <Input {...register("title")} autoFocus placeholder="e.g. Corporate account onboarding" />
+              <Input
+                {...register("title")}
+                autoFocus
+                placeholder="e.g. Corporate account onboarding"
+              />
             </Field>
             <Field label="Contact" className="col-span-2">
-              <Select value={contact_id || "__none"} onValueChange={(v) => setValue("contact_id", v === "__none" ? "" : v, { shouldDirty: true })}>
-                <SelectTrigger><SelectValue placeholder="Select contact" /></SelectTrigger>
+              <Select
+                value={contact_id || "__none"}
+                onValueChange={(v) =>
+                  setValue("contact_id", v === "__none" ? "" : v, { shouldDirty: true })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select contact" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__none">— No contact —</SelectItem>
                   {contacts.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
-                      {contactDisplayName(c)}{c.company ? ` · ${c.company}` : ""}
+                      {contactDisplayName(c)}
+                      {c.company ? ` · ${c.company}` : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </Field>
             <Field label="Stage">
-              <Select value={stage} onValueChange={(v) => setValue("stage", v as LeadStage, { shouldDirty: true })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={stage}
+                onValueChange={(v) => setValue("stage", v as LeadStage, { shouldDirty: true })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {LEAD_STAGES.map((s) => (
-                    <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                    <SelectItem key={s.value} value={s.value}>
+                      {s.label}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -132,8 +169,12 @@ export function LeadFormDialog({ open, onOpenChange, lead, defaultContactId, def
             </Field>
           </div>
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={save.isPending}>{save.isPending ? "Saving..." : "Save Lead"}</Button>
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={save.isPending}>
+              {save.isPending ? "Saving..." : "Save Lead"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

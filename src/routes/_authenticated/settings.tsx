@@ -1,7 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Bell, Palette, Lock, Database, Globe, Save, Check, Sun, Moon, Smartphone } from "lucide-react";
+import {
+  ArrowLeft,
+  Bell,
+  Palette,
+  Lock,
+  Database,
+  Globe,
+  Save,
+  Check,
+  Sun,
+  Moon,
+  Smartphone,
+} from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/components/theme/ThemeProvider";
 
@@ -10,53 +22,261 @@ export const Route = createFileRoute("/_authenticated/settings")({ component: Se
 function Settings() {
   const [saved, setSaved] = useState(false);
   const { theme, resolvedTheme, setTheme } = useTheme();
-  const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
+  const handleSave = () => {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 animate-in fade-in duration-500">
-      <div className="flex items-center gap-4"><Button asChild variant="ghost" size="icon"><Link to="/dashboard"><ArrowLeft className="h-4 w-4" /></Link></Button><div><h1 className="text-3xl font-bold tracking-tight">Settings</h1><p className="text-sm text-muted-foreground">Customize your AlexOS experience</p></div></div>
+      <div className="flex items-center gap-4">
+        <Button asChild variant="ghost" size="icon">
+          <Link to="/dashboard">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        </Button>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+          <p className="text-sm text-muted-foreground">Customize your AlexOS experience</p>
+        </div>
+      </div>
 
-      <Card className="rounded-2xl"><CardHeader><CardTitle className="flex items-center gap-2"><Globe className="h-4 w-4" />General Settings</CardTitle></CardHeader><CardContent className="space-y-4">
-        <div className="space-y-2"><label className="text-sm font-medium">Currency</label><div className="flex items-center justify-between rounded-lg bg-muted p-3"><span>Kenya Shilling (KES)</span><span className="text-xl font-bold text-primary">KSh</span></div><p className="text-xs text-muted-foreground">All monetary values are displayed in Kenya Shillings</p></div>
-        <div className="space-y-2"><label className="text-sm font-medium">Timezone</label><div className="rounded-lg bg-muted p-3"><span>East Africa Time (EAT) UTC+3</span></div><p className="text-xs text-muted-foreground">Used for scheduling and reporting</p></div>
-        <div className="space-y-2"><label className="text-sm font-medium">Date Format</label><div className="rounded-lg bg-muted p-3"><span>DD/MM/YYYY (Kenya Standard)</span></div><p className="text-xs text-muted-foreground">Used throughout the application</p></div>
-        <div className="space-y-2"><label className="text-sm font-medium">Language</label><div className="rounded-lg bg-muted p-3"><span>English</span></div><p className="text-xs text-muted-foreground">Application language</p></div>
-      </CardContent></Card>
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Globe className="h-4 w-4" />
+            General Settings
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Currency</label>
+            <div className="flex items-center justify-between rounded-lg bg-muted p-3">
+              <span>Kenya Shilling (KES)</span>
+              <span className="text-xl font-bold text-primary">KSh</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              All monetary values are displayed in Kenya Shillings
+            </p>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Timezone</label>
+            <div className="rounded-lg bg-muted p-3">
+              <span>East Africa Time (EAT) UTC+3</span>
+            </div>
+            <p className="text-xs text-muted-foreground">Used for scheduling and reporting</p>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Date Format</label>
+            <div className="rounded-lg bg-muted p-3">
+              <span>DD/MM/YYYY (Kenya Standard)</span>
+            </div>
+            <p className="text-xs text-muted-foreground">Used throughout the application</p>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Language</label>
+            <div className="rounded-lg bg-muted p-3">
+              <span>English</span>
+            </div>
+            <p className="text-xs text-muted-foreground">Application language</p>
+          </div>
+        </CardContent>
+      </Card>
 
-      <Card className="rounded-2xl"><CardHeader><CardTitle className="flex items-center gap-2"><Bell className="h-4 w-4" />Notifications</CardTitle></CardHeader><CardContent className="space-y-3">
-        <SettingsToggle title="Payment Reminders" description="Get notified about upcoming payments" defaultChecked />
-        <SettingsToggle title="Goal Milestones" description="Celebrate goal achievements" defaultChecked />
-        <SettingsToggle title="Transaction Alerts" description="Notify on large transactions" defaultChecked />
-        <SettingsToggle title="Weekly Summary" description="Get your weekly financial summary" defaultChecked />
-        <SettingsToggle title="Debt Due Dates" description="Reminder for debt payment due dates" defaultChecked />
-      </CardContent></Card>
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-4 w-4" />
+            Notifications
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <SettingsToggle
+            title="Payment Reminders"
+            description="Get notified about upcoming payments"
+            defaultChecked
+          />
+          <SettingsToggle
+            title="Goal Milestones"
+            description="Celebrate goal achievements"
+            defaultChecked
+          />
+          <SettingsToggle
+            title="Transaction Alerts"
+            description="Notify on large transactions"
+            defaultChecked
+          />
+          <SettingsToggle
+            title="Weekly Summary"
+            description="Get your weekly financial summary"
+            defaultChecked
+          />
+          <SettingsToggle
+            title="Debt Due Dates"
+            description="Reminder for debt payment due dates"
+            defaultChecked
+          />
+        </CardContent>
+      </Card>
 
-      <Card className="rounded-2xl"><CardHeader><CardTitle className="flex items-center gap-2"><Palette className="h-4 w-4" />Appearance</CardTitle></CardHeader><CardContent className="space-y-5">
-        <div className="space-y-2"><label className="text-sm font-medium">Theme</label><div className="grid grid-cols-3 gap-2">
-          <ThemeOption active={theme === "system"} onClick={() => setTheme("system")} icon={Smartphone} title="System" />
-          <ThemeOption active={theme === "light"} onClick={() => setTheme("light")} icon={Sun} title="Light" />
-          <ThemeOption active={theme === "dark"} onClick={() => setTheme("dark")} icon={Moon} title="Dark" />
-        </div><p className="text-xs text-muted-foreground">System is recommended. AlexOS follows your phone or device appearance and changes automatically when your device changes.</p><p className="text-xs font-medium text-primary">Currently showing {resolvedTheme === "dark" ? "Dark" : "Light"} mode.</p></div>
-      </CardContent></Card>
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="h-4 w-4" />
+            Appearance
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Theme</label>
+            <div className="grid grid-cols-3 gap-2">
+              <ThemeOption
+                active={theme === "system"}
+                onClick={() => setTheme("system")}
+                icon={Smartphone}
+                title="System"
+              />
+              <ThemeOption
+                active={theme === "light"}
+                onClick={() => setTheme("light")}
+                icon={Sun}
+                title="Light"
+              />
+              <ThemeOption
+                active={theme === "dark"}
+                onClick={() => setTheme("dark")}
+                icon={Moon}
+                title="Dark"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              System is recommended. AlexOS follows your phone or device appearance and changes
+              automatically when your device changes.
+            </p>
+            <p className="text-xs font-medium text-primary">
+              Currently showing {resolvedTheme === "dark" ? "Dark" : "Light"} mode.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
-      <Card className="rounded-2xl"><CardHeader><CardTitle className="flex items-center gap-2"><Lock className="h-4 w-4" />Privacy & Security</CardTitle></CardHeader><CardContent className="space-y-3">
-        <div className="flex items-center justify-between rounded-lg bg-muted p-3"><div><p className="text-sm font-medium">Two-Factor Authentication</p><p className="text-xs text-muted-foreground">Secure your account with 2FA</p></div><Button variant="outline" size="sm">Enable</Button></div>
-        <div className="flex items-center justify-between rounded-lg bg-muted p-3"><div><p className="text-sm font-medium">Data Encryption</p><p className="text-xs text-muted-foreground">Bank-grade encryption enabled</p></div><span className="flex items-center gap-1 text-xs font-semibold text-green-600"><Check className="h-4 w-4" /> Active</span></div>
-        <div className="flex items-center justify-between rounded-lg bg-muted p-3"><div><p className="text-sm font-medium">Session Timeout</p><p className="text-xs text-muted-foreground">Auto logout after 30 minutes</p></div><Button variant="outline" size="sm">Configure</Button></div>
-      </CardContent></Card>
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lock className="h-4 w-4" />
+            Privacy & Security
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-center justify-between rounded-lg bg-muted p-3">
+            <div>
+              <p className="text-sm font-medium">Two-Factor Authentication</p>
+              <p className="text-xs text-muted-foreground">Secure your account with 2FA</p>
+            </div>
+            <Button variant="outline" size="sm">
+              Enable
+            </Button>
+          </div>
+          <div className="flex items-center justify-between rounded-lg bg-muted p-3">
+            <div>
+              <p className="text-sm font-medium">Data Encryption</p>
+              <p className="text-xs text-muted-foreground">Bank-grade encryption enabled</p>
+            </div>
+            <span className="flex items-center gap-1 text-xs font-semibold text-green-600">
+              <Check className="h-4 w-4" /> Active
+            </span>
+          </div>
+          <div className="flex items-center justify-between rounded-lg bg-muted p-3">
+            <div>
+              <p className="text-sm font-medium">Session Timeout</p>
+              <p className="text-xs text-muted-foreground">Auto logout after 30 minutes</p>
+            </div>
+            <Button variant="outline" size="sm">
+              Configure
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-      <Card className="rounded-2xl"><CardHeader><CardTitle className="flex items-center gap-2"><Database className="h-4 w-4" />Data Management</CardTitle></CardHeader><CardContent className="space-y-3"><Button variant="outline" className="w-full justify-start gap-2">📊 Export All Data</Button><Button variant="outline" className="w-full justify-start gap-2">🗑️ Clear Cache</Button><Button variant="outline" className="w-full justify-start gap-2">🔄 Sync Now</Button></CardContent></Card>
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Database className="h-4 w-4" />
+            Data Management
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Button variant="outline" className="w-full justify-start gap-2">
+            📊 Export All Data
+          </Button>
+          <Button variant="outline" className="w-full justify-start gap-2">
+            🗑️ Clear Cache
+          </Button>
+          <Button variant="outline" className="w-full justify-start gap-2">
+            🔄 Sync Now
+          </Button>
+        </CardContent>
+      </Card>
 
-      <div className="sticky bottom-4 flex gap-2"><Button asChild variant="outline"><Link to="/dashboard">Cancel</Link></Button><Button className="flex-1 gap-2" onClick={handleSave}><Save className="h-4 w-4" />{saved ? "Settings Saved!" : "Save Settings"}</Button></div>
+      <div className="sticky bottom-4 flex gap-2">
+        <Button asChild variant="outline">
+          <Link to="/dashboard">Cancel</Link>
+        </Button>
+        <Button className="flex-1 gap-2" onClick={handleSave}>
+          <Save className="h-4 w-4" />
+          {saved ? "Settings Saved!" : "Save Settings"}
+        </Button>
+      </div>
     </div>
   );
 }
 
-function ThemeOption({ active, onClick, icon: Icon, title }: { active: boolean; onClick: () => void; icon: typeof Smartphone; title: string }) {
-  return <button type="button" onClick={onClick} aria-pressed={active} className={`flex flex-col items-center gap-2 rounded-xl border p-3 text-sm font-medium transition-all ${active ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/20" : "border-border bg-background text-foreground hover:border-primary/40"}`}><Icon className="h-5 w-5" /><span>{title}</span></button>;
+function ThemeOption({
+  active,
+  onClick,
+  icon: Icon,
+  title,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: typeof Smartphone;
+  title: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`flex flex-col items-center gap-2 rounded-xl border p-3 text-sm font-medium transition-all ${active ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/20" : "border-border bg-background text-foreground hover:border-primary/40"}`}
+    >
+      <Icon className="h-5 w-5" />
+      <span>{title}</span>
+    </button>
+  );
 }
 
-function SettingsToggle({ title, description, defaultChecked = false }: { title: string; description: string; defaultChecked?: boolean }) {
+function SettingsToggle({
+  title,
+  description,
+  defaultChecked = false,
+}: {
+  title: string;
+  description: string;
+  defaultChecked?: boolean;
+}) {
   const [checked, setChecked] = useState(defaultChecked);
-  return <div className="flex items-center justify-between rounded-lg bg-muted p-3"><div><p className="text-sm font-medium">{title}</p><p className="text-xs text-muted-foreground">{description}</p></div><input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} className="h-4 w-4 cursor-pointer rounded accent-primary" /></div>;
+  return (
+    <div className="flex items-center justify-between rounded-lg bg-muted p-3">
+      <div>
+        <p className="text-sm font-medium">{title}</p>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </div>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => setChecked(e.target.checked)}
+        className="h-4 w-4 cursor-pointer rounded accent-primary"
+      />
+    </div>
+  );
 }

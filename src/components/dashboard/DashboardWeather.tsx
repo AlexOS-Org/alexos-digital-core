@@ -35,7 +35,11 @@ function WeatherIcon({ code, night }: { code: number; night: boolean }) {
 }
 
 function formatClock(value: string) {
-  return new Date(value).toLocaleTimeString("en-KE", { hour: "2-digit", minute: "2-digit", hour12: false });
+  return new Date(value).toLocaleTimeString("en-KE", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
 }
 
 export function DashboardWeather() {
@@ -45,7 +49,12 @@ export function DashboardWeather() {
   useEffect(() => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) => setLocation({ latitude: coords.latitude, longitude: coords.longitude, label: "Your location" }),
+      ({ coords }) =>
+        setLocation({
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          label: "Your location",
+        }),
       () => undefined,
       { enableHighAccuracy: false, timeout: 5000, maximumAge: 30 * 60 * 1000 },
     );
@@ -57,24 +66,29 @@ export function DashboardWeather() {
     url.search = new URLSearchParams({
       latitude: String(location.latitude),
       longitude: String(location.longitude),
-      current: "temperature_2m,apparent_temperature,weather_code,cloud_cover,wind_speed_10m,precipitation",
+      current:
+        "temperature_2m,apparent_temperature,weather_code,cloud_cover,wind_speed_10m,precipitation",
       daily: "sunrise,sunset",
       timezone: "auto",
       forecast_days: "1",
     }).toString();
 
     fetch(url, { signal: controller.signal })
-      .then((response) => response.ok ? response.json() : Promise.reject(new Error("Weather unavailable")))
-      .then((data) => setWeather({
-        temperature: data.current.temperature_2m,
-        apparentTemperature: data.current.apparent_temperature,
-        weatherCode: data.current.weather_code,
-        cloudCover: data.current.cloud_cover,
-        windSpeed: data.current.wind_speed_10m,
-        precipitation: data.current.precipitation,
-        sunrise: data.daily.sunrise[0],
-        sunset: data.daily.sunset[0],
-      }))
+      .then((response) =>
+        response.ok ? response.json() : Promise.reject(new Error("Weather unavailable")),
+      )
+      .then((data) =>
+        setWeather({
+          temperature: data.current.temperature_2m,
+          apparentTemperature: data.current.apparent_temperature,
+          weatherCode: data.current.weather_code,
+          cloudCover: data.current.cloud_cover,
+          windSpeed: data.current.wind_speed_10m,
+          precipitation: data.current.precipitation,
+          sunrise: data.daily.sunrise[0],
+          sunset: data.daily.sunset[0],
+        }),
+      )
       .catch(() => undefined);
 
     return () => controller.abort();
@@ -98,14 +112,31 @@ export function DashboardWeather() {
         <span>{daylight.night ? "Night sky" : weatherLabel(weather.weatherCode)}</span>
       </div>
       <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 backdrop-blur-md">
-        {weather.cloudCover >= 60 ? <Cloud className="h-3.5 w-3.5" /> : <Wind className="h-3.5 w-3.5" />}
-        <span>{weather.cloudCover}% clouds</span><span>·</span><span>{Math.round(weather.windSpeed)} km/h wind</span>
+        {weather.cloudCover >= 60 ? (
+          <Cloud className="h-3.5 w-3.5" />
+        ) : (
+          <Wind className="h-3.5 w-3.5" />
+        )}
+        <span>{weather.cloudCover}% clouds</span>
+        <span>·</span>
+        <span>{Math.round(weather.windSpeed)} km/h wind</span>
       </div>
       <div className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 backdrop-blur-md">
-        <span className="inline-flex items-center gap-1"><Sunrise className="h-3.5 w-3.5 text-amber-200" />{formatClock(weather.sunrise)}</span>
-        <span className="inline-flex items-center gap-1"><Sunset className="h-3.5 w-3.5 text-orange-200" />{formatClock(weather.sunset)}</span>
+        <span className="inline-flex items-center gap-1">
+          <Sunrise className="h-3.5 w-3.5 text-amber-200" />
+          {formatClock(weather.sunrise)}
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <Sunset className="h-3.5 w-3.5 text-orange-200" />
+          {formatClock(weather.sunset)}
+        </span>
       </div>
-      {weather.precipitation > 0 && <span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 backdrop-blur-md"><Droplets className="h-3.5 w-3.5 text-sky-200" />{weather.precipitation.toFixed(1)} mm now</span>}
+      {weather.precipitation > 0 && (
+        <span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 backdrop-blur-md">
+          <Droplets className="h-3.5 w-3.5 text-sky-200" />
+          {weather.precipitation.toFixed(1)} mm now
+        </span>
+      )}
     </div>
   );
 }

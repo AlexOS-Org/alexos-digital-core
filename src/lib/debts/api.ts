@@ -131,10 +131,7 @@ export function useArchiveDebt() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("debts")
-        .update({ status: "archived" })
-        .eq("id", id);
+      const { error } = await supabase.from("debts").update({ status: "archived" }).eq("id", id);
 
       if (error) throw error;
     },

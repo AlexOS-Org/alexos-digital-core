@@ -2,12 +2,24 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useSaveContact } from "@/lib/crm/api";
 import { CONTACT_STATUSES, CONTACT_SOURCES } from "@/lib/crm/constants";
 import type { Contact, ContactStatus } from "@/lib/crm/types";
@@ -107,21 +119,35 @@ export function ContactFormDialog({ open, onOpenChange, contact }: Props) {
               <Input {...register("job_title")} />
             </Field>
             <Field label="Status">
-              <Select value={status} onValueChange={(v) => setValue("status", v as ContactStatus, { shouldDirty: true })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={status}
+                onValueChange={(v) => setValue("status", v as ContactStatus, { shouldDirty: true })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {CONTACT_STATUSES.map((s) => (
-                    <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                    <SelectItem key={s.value} value={s.value}>
+                      {s.label}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </Field>
             <Field label="Source">
-              <Select value={source || ""} onValueChange={(v) => setValue("source", v, { shouldDirty: true })}>
-                <SelectTrigger><SelectValue placeholder="Select source" /></SelectTrigger>
+              <Select
+                value={source || ""}
+                onValueChange={(v) => setValue("source", v, { shouldDirty: true })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select source" />
+                </SelectTrigger>
                 <SelectContent>
                   {CONTACT_SOURCES.map((s) => (
-                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -131,8 +157,12 @@ export function ContactFormDialog({ open, onOpenChange, contact }: Props) {
             </Field>
           </div>
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={save.isPending}>{save.isPending ? "Saving..." : "Save Contact"}</Button>
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={save.isPending}>
+              {save.isPending ? "Saving..." : "Save Contact"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

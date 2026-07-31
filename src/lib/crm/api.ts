@@ -66,7 +66,11 @@ export function useContact(id: string | undefined) {
     queryKey: contactKey(id ?? "none"),
     enabled: !!id,
     queryFn: async (): Promise<Contact | null> => {
-      const { data, error } = await supabase.from("contacts").select("*").eq("id", id!).maybeSingle();
+      const { data, error } = await supabase
+        .from("contacts")
+        .select("*")
+        .eq("id", id!)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -283,7 +287,10 @@ export function useActivities(scope: Scope) {
     queryKey: activitiesKey(scope),
     enabled: !!(scope.contactId || scope.leadId),
     queryFn: async (): Promise<CrmActivity[]> => {
-      let q = supabase.from("crm_activities").select("*").order("occurred_at", { ascending: false });
+      let q = supabase
+        .from("crm_activities")
+        .select("*")
+        .order("occurred_at", { ascending: false });
       if (scope.contactId) q = q.eq("contact_id", scope.contactId);
       if (scope.leadId) q = q.eq("lead_id", scope.leadId);
       const { data, error } = await q;
@@ -431,7 +438,10 @@ export function useCrmAttachments(scope: Scope) {
     queryKey: attachmentsKey(scope),
     enabled: !!(scope.contactId || scope.leadId),
     queryFn: async (): Promise<CrmAttachment[]> => {
-      let q = supabase.from("crm_attachments").select("*").order("created_at", { ascending: false });
+      let q = supabase
+        .from("crm_attachments")
+        .select("*")
+        .order("created_at", { ascending: false });
       if (scope.contactId) q = q.eq("contact_id", scope.contactId);
       if (scope.leadId) q = q.eq("lead_id", scope.leadId);
       const { data, error } = await q;

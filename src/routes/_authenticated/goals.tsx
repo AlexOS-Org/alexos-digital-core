@@ -31,9 +31,18 @@ function GoalsPage() {
   const achieved = goals.filter((g) => g.status === "achieved").length;
   const overall = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0;
 
-  const openNew = () => { setEditing(null); setFormOpen(true); };
-  const openEdit = (g: Goal) => { setEditing(g); setFormOpen(true); };
-  const openContribute = (g: Goal) => { setContributing(g); setContribOpen(true); };
+  const openNew = () => {
+    setEditing(null);
+    setFormOpen(true);
+  };
+  const openEdit = (g: Goal) => {
+    setEditing(g);
+    setFormOpen(true);
+  };
+  const openContribute = (g: Goal) => {
+    setContributing(g);
+    setContribOpen(true);
+  };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -43,10 +52,16 @@ function GoalsPage() {
             <div>
               <div className="text-[11px] uppercase tracking-widest text-white/70">Goals</div>
               <div className="mt-1 text-sm text-white/75">Total Saved</div>
-              <div className="text-3xl sm:text-4xl font-semibold tracking-tight mt-1">{formatMoney(totalSaved)}</div>
+              <div className="text-3xl sm:text-4xl font-semibold tracking-tight mt-1">
+                {formatMoney(totalSaved)}
+              </div>
               <div className="text-xs text-white/70 mt-1">of {formatMoney(totalTarget)} target</div>
             </div>
-            <Button onClick={openNew} variant="secondary" className="rounded-xl bg-white/95 text-emerald-700 hover:bg-white">
+            <Button
+              onClick={openNew}
+              variant="secondary"
+              className="rounded-xl bg-white/95 text-emerald-700 hover:bg-white"
+            >
               <Plus className="h-4 w-4 mr-1" /> New Goal
             </Button>
           </div>
@@ -62,16 +77,35 @@ function GoalsPage() {
 
       <section className="grid gap-3 grid-cols-3">
         {[
-          { label: "Active Goals", value: goals.filter((g) => g.status === "active").length, icon: Target, tone: "text-emerald-600 dark:text-emerald-400" },
-          { label: "Achieved", value: achieved, icon: CheckCircle2, tone: "text-[color:var(--success)]" },
-          { label: "In Progress", value: `${overall.toFixed(0)}%`, icon: TrendingUp, tone: "text-amber-600 dark:text-amber-400" },
+          {
+            label: "Active Goals",
+            value: goals.filter((g) => g.status === "active").length,
+            icon: Target,
+            tone: "text-emerald-600 dark:text-emerald-400",
+          },
+          {
+            label: "Achieved",
+            value: achieved,
+            icon: CheckCircle2,
+            tone: "text-[color:var(--success)]",
+          },
+          {
+            label: "In Progress",
+            value: `${overall.toFixed(0)}%`,
+            icon: TrendingUp,
+            tone: "text-amber-600 dark:text-amber-400",
+          },
         ].map((k) => (
           <Card key={k.label} className="rounded-2xl">
             <CardHeader className="pb-1 flex flex-row items-center justify-between space-y-0">
-              <CardTitle className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">{k.label}</CardTitle>
+              <CardTitle className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+                {k.label}
+              </CardTitle>
               <k.icon className={cn("h-4 w-4", k.tone)} />
             </CardHeader>
-            <CardContent><div className="text-lg font-semibold tracking-tight">{k.value}</div></CardContent>
+            <CardContent>
+              <div className="text-lg font-semibold tracking-tight">{k.value}</div>
+            </CardContent>
           </Card>
         ))}
       </section>
@@ -80,12 +114,15 @@ function GoalsPage() {
         <h2 className="text-lg font-semibold tracking-tight">Your Goals</h2>
         {isLoading && (
           <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-48 rounded-2xl" />)}
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-48 rounded-2xl" />
+            ))}
           </div>
         )}
         {!isLoading && goals.length === 0 && (
           <div className="rounded-2xl border border-dashed p-10 text-center text-sm text-muted-foreground">
-            No goals yet. Add your first goal — Audi Fund, Emergency Fund, School Fees, or anything else.
+            No goals yet. Add your first goal — Audi Fund, Emergency Fund, School Fees, or anything
+            else.
           </div>
         )}
         <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -107,29 +144,52 @@ function GoalsPage() {
                         <div className="font-medium truncate">{g.name}</div>
                         <div className="text-xs text-muted-foreground flex gap-2 items-center">
                           <span>{g.category ?? "—"}</span>
-                          {g.status !== "active" && <Badge variant="secondary" className="capitalize text-[10px]">{g.status}</Badge>}
+                          {g.status !== "active" && (
+                            <Badge variant="secondary" className="capitalize text-[10px]">
+                              {g.status}
+                            </Badge>
+                          )}
                         </div>
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      <Button size="icon" variant="ghost" onClick={() => openEdit(g)}><Pencil className="h-4 w-4" /></Button>
-                      <Button size="icon" variant="ghost" onClick={() => archive.mutate(g.id)}><Archive className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" onClick={() => openEdit(g)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button size="icon" variant="ghost" onClick={() => archive.mutate(g.id)}>
+                        <Archive className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
 
                   <div>
                     <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                      <span>{formatMoney(current)}</span><span>{formatMoney(target)}</span>
+                      <span>{formatMoney(current)}</span>
+                      <span>{formatMoney(target)}</span>
                     </div>
-                    <Progress value={pct} className="h-2 bg-emerald-100 dark:bg-emerald-950 [&>div]:bg-emerald-500" />
+                    <Progress
+                      value={pct}
+                      className="h-2 bg-emerald-100 dark:bg-emerald-950 [&>div]:bg-emerald-500"
+                    />
                     <div className="flex justify-between text-xs mt-1">
-                      <span className="font-medium text-emerald-700 dark:text-emerald-400">{pct.toFixed(1)}%</span>
+                      <span className="font-medium text-emerald-700 dark:text-emerald-400">
+                        {pct.toFixed(1)}%
+                      </span>
                       <span className="text-muted-foreground">{formatMoney(remaining)} to go</span>
                     </div>
                   </div>
 
-                  {g.target_date && <div className="text-xs text-muted-foreground">Target: {formatDate(g.target_date)}</div>}
-                  <Button size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => openContribute(g)} disabled={g.status !== "active"}>
+                  {g.target_date && (
+                    <div className="text-xs text-muted-foreground">
+                      Target: {formatDate(g.target_date)}
+                    </div>
+                  )}
+                  <Button
+                    size="sm"
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                    onClick={() => openContribute(g)}
+                    disabled={g.status !== "active"}
+                  >
                     <Plus className="h-4 w-4 mr-1" /> Add Contribution
                   </Button>
                 </CardContent>

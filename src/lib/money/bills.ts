@@ -47,7 +47,6 @@ function advanceDueDate(dueDate: string, frequency: BillFrequency): string {
     d.setMonth(d.getMonth() + 1);
   }
 
-
   return d.toISOString().slice(0, 10);
 }
 
@@ -161,7 +160,6 @@ export function useMarkBillPaid() {
           .eq("id", bill.id);
 
         if (error) throw error;
-
       } else {
         const { error } = await supabase
           .from("bills")

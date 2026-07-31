@@ -64,7 +64,9 @@ export function DashboardHeader() {
   const [atmosphere, setAtmosphere] = useState<Atmosphere>(() => {
     if (typeof window === "undefined") return "auto";
     const saved = window.localStorage.getItem(ATMOSPHERE_KEY);
-    return saved === "morning" || saved === "day" || saved === "evening" || saved === "night" ? saved : "auto";
+    return saved === "morning" || saved === "day" || saved === "evening" || saved === "night"
+      ? saved
+      : "auto";
   });
   const [timeFormat, setTimeFormat] = useState<TimeFormat>(() => {
     if (typeof window === "undefined") return "24h";
@@ -114,7 +116,10 @@ export function DashboardHeader() {
           className="pointer-events-none absolute right-[12%] top-[13%] h-20 w-20 rounded-full opacity-90 blur-[1px] transition-all duration-[1800ms] sm:h-28 sm:w-28"
           style={{ background: visual.sun, boxShadow: `0 0 70px 18px ${visual.sun}` }}
         />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2" style={{ background: visual.horizon }} />
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
+          style={{ background: visual.horizon }}
+        />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_20%,rgba(139,92,246,0.22),transparent_30%),radial-gradient(circle_at_35%_100%,rgba(16,185,129,0.18),transparent_34%)]" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#061126]/80 via-[#071329]/15 to-transparent" />
 
@@ -153,25 +158,35 @@ export function DashboardHeader() {
               </Button>
               {showAtmosphereMenu && (
                 <div className="absolute right-0 top-12 z-40 w-44 rounded-2xl border border-white/10 bg-[#09152d]/95 p-2 shadow-2xl backdrop-blur-xl">
-                  <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-white/45">Atmosphere</p>
-                  {(["auto", "morning", "day", "evening", "night"] as Atmosphere[]).map((option) => (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => setAtmospherePreference(option)}
-                      className={`w-full rounded-xl px-2 py-2 text-left text-xs transition-colors ${atmosphere === option ? "bg-white/10 text-white" : "text-white/65 hover:bg-white/5 hover:text-white"}`}
-                    >
-                      {option === "auto" ? "Auto · Follow time" : option[0].toUpperCase() + option.slice(1)}
-                    </button>
-                  ))}
+                  <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-white/45">
+                    Atmosphere
+                  </p>
+                  {(["auto", "morning", "day", "evening", "night"] as Atmosphere[]).map(
+                    (option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => setAtmospherePreference(option)}
+                        className={`w-full rounded-xl px-2 py-2 text-left text-xs transition-colors ${atmosphere === option ? "bg-white/10 text-white" : "text-white/65 hover:bg-white/5 hover:text-white"}`}
+                      >
+                        {option === "auto"
+                          ? "Auto · Follow time"
+                          : option[0].toUpperCase() + option.slice(1)}
+                      </button>
+                    ),
+                  )}
                 </div>
               )}
             </div>
           </div>
 
           <div className="max-w-3xl pb-2 sm:pb-0">
-            <p className="text-xs font-medium text-white/65 sm:text-sm">{today} · {formatTime(now, timeFormat)}</p>
-            <h1 className="mt-2 text-[2rem] font-semibold leading-tight tracking-tight sm:text-4xl lg:text-5xl">{greeting}, Alex.</h1>
+            <p className="text-xs font-medium text-white/65 sm:text-sm">
+              {today} · {formatTime(now, timeFormat)}
+            </p>
+            <h1 className="mt-2 text-[2rem] font-semibold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+              {greeting}, Alex.
+            </h1>
             <p className="mt-3 max-w-2xl text-[15px] leading-6 text-white/90 sm:mt-4 sm:text-lg sm:leading-7">
               You know what matters. Now let’s move it forward.
             </p>
@@ -181,7 +196,12 @@ export function DashboardHeader() {
                 <Sparkles className="mr-2 h-4 w-4 text-[var(--orion-purple)]" />
                 Ask Orion
               </Button>
-              <Button size="icon" variant="ghost" className="border border-white/15 bg-black/20 text-white backdrop-blur-md hover:bg-white/10 hover:text-white" aria-label="Notifications">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="border border-white/15 bg-black/20 text-white backdrop-blur-md hover:bg-white/10 hover:text-white"
+                aria-label="Notifications"
+              >
                 <Bell className="h-5 w-5" />
               </Button>
             </div>
@@ -194,16 +214,29 @@ export function DashboardHeader() {
         <CardContent className="relative p-5 sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.07]"><Bot className="h-5 w-5 text-violet-300" /></div>
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.07]">
+                <Bot className="h-5 w-5 text-violet-300" />
+              </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="font-semibold tracking-tight">Orion sees what matters.</h2>
-                  <span className="rounded-full bg-violet-400/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-violet-200">Live</span>
+                  <span className="rounded-full bg-violet-400/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-violet-200">
+                    Live
+                  </span>
                 </div>
-                <p className="mt-1 text-sm leading-6 text-slate-300">Your financial position, business activity and priorities are being brought into focus.</p>
+                <p className="mt-1 text-sm leading-6 text-slate-300">
+                  Your financial position, business activity and priorities are being brought into
+                  focus.
+                </p>
               </div>
             </div>
-            <Button variant="ghost" className="w-fit text-violet-200 hover:bg-white/5 hover:text-white">Open intelligence<ArrowUpRight className="ml-2 h-4 w-4" /></Button>
+            <Button
+              variant="ghost"
+              className="w-fit text-violet-200 hover:bg-white/5 hover:text-white"
+            >
+              Open intelligence
+              <ArrowUpRight className="ml-2 h-4 w-4" />
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -211,16 +244,28 @@ export function DashboardHeader() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="rounded-3xl border-border/60 bg-gradient-to-br from-emerald-50/90 to-background shadow-sm">
           <CardContent className="p-5 sm:p-6">
-            <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-emerald-700"><BookOpen className="h-4 w-4" /><span>Today’s anchor</span></div>
+            <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-emerald-700">
+              <BookOpen className="h-4 w-4" />
+              <span>Today’s anchor</span>
+            </div>
             <p className="text-[15px] leading-7 text-foreground/80">{inspiration.verse.text}</p>
-            <p className="mt-4 text-sm font-semibold text-emerald-700">{inspiration.verse.reference}</p>
+            <p className="mt-4 text-sm font-semibold text-emerald-700">
+              {inspiration.verse.reference}
+            </p>
           </CardContent>
         </Card>
         <Card className="rounded-3xl border-border/60 bg-gradient-to-br from-violet-50/80 to-background shadow-sm">
           <CardContent className="p-5 sm:p-6">
-            <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-violet-700"><Quote className="h-4 w-4" /><span>One thought worth carrying</span></div>
-            <p className="text-[15px] italic leading-7 text-foreground/80">“{inspiration.quote.text}”</p>
-            <p className="mt-4 text-sm font-semibold text-violet-700">— {inspiration.quote.author}</p>
+            <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-violet-700">
+              <Quote className="h-4 w-4" />
+              <span>One thought worth carrying</span>
+            </div>
+            <p className="text-[15px] italic leading-7 text-foreground/80">
+              “{inspiration.quote.text}”
+            </p>
+            <p className="mt-4 text-sm font-semibold text-violet-700">
+              — {inspiration.quote.author}
+            </p>
           </CardContent>
         </Card>
       </div>
