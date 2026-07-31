@@ -1,7 +1,7 @@
 {
-  "name": "AlexOS Orion",
+  "name": "AlexOS",
   "short_name": "AlexOS",
-  "description": "Your personal and business operating system, powered by Orion AI.",
+  "description": "Your personal and business operating system, powered by AlexOS Intelligence.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#071329",
