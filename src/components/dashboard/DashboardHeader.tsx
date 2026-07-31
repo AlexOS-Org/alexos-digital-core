@@ -128,7 +128,7 @@ export function DashboardHeader() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-xs font-medium text-emerald-50 backdrop-blur-md">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.9)]" />
-                Orion is online
+                AlexOS is online
               </span>
               <span className="rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-xs font-medium text-white/80 backdrop-blur-md">
                 {activeAtmosphere[0].toUpperCase() + activeAtmosphere.slice(1)}
@@ -193,8 +193,8 @@ export function DashboardHeader() {
             <DashboardWeather />
             <div className="mt-5 flex gap-2">
               <Button className="bg-white text-slate-950 shadow-lg hover:bg-slate-100">
-                <Sparkles className="mr-2 h-4 w-4 text-[var(--orion-purple)]" />
-                Ask Orion
+                <Sparkles className="mr-2 h-4 w-4 text-[var(--alexos-purple)]" />
+                Open Intelligence
               </Button>
               <Button
                 size="icon"
@@ -209,8 +209,8 @@ export function DashboardHeader() {
         </div>
       </section>
 
-      <Card className="relative overflow-hidden rounded-3xl border border-[var(--orion-purple)]/20 bg-gradient-to-br from-[#0b1730] via-[#101b3c] to-[#18133a] text-white shadow-[0_18px_50px_-28px_rgba(124,58,237,0.65)]">
-        <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[var(--orion-purple)]/15 blur-3xl" />
+      <Card className="relative overflow-hidden rounded-3xl border border-[var(--alexos-purple)]/20 bg-gradient-to-br from-[#0b1730] via-[#101b3c] to-[#18133a] text-white shadow-[0_18px_50px_-28px_rgba(124,58,237,0.65)]">
+        <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[var(--alexos-purple)]/15 blur-3xl" />
         <CardContent className="relative p-5 sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
@@ -219,7 +219,7 @@ export function DashboardHeader() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="font-semibold tracking-tight">Orion sees what matters.</h2>
+                  <h2 className="font-semibold tracking-tight">Intelligence brings what matters into focus.</h2>
                   <span className="rounded-full bg-violet-400/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-violet-200">
                     Live
                   </span>
@@ -272,3 +272,4 @@ export function DashboardHeader() {
     </div>
   );
 }
+
