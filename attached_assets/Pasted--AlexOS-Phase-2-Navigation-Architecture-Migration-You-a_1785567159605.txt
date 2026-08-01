@@ -1,0 +1,220 @@
+# AlexOS Phase 2 — Navigation Architecture Migration
+
+You are continuing from the completed AlexOS branding migration.
+
+Phase 1 is complete:
+
+* Orion branding removed
+* AlexOS identity established
+* Auren Intelligence terminology applied
+
+Your task is now to update the application navigation architecture.
+
+## Rules
+
+Do not:
+
+* rebuild existing modules
+* delete working routes
+* change Supabase schema
+* modify working Money Center or CRM logic
+* redesign dashboard components
+
+This phase is ONLY navigation structure and information architecture.
+
+---
+
+# Target AlexOS Navigation
+
+## Desktop Sidebar
+
+Structure:
+
+AlexOS
+
+---
+
+Home
+
+---
+
+Businesses
+
+Children:
+
+* CarBar Motion
+* DailyGear
+* Nuvora
+
+---
+
+Money
+
+---
+
+Auren Intelligence
+
+---
+
+Growth
+
+---
+
+Library
+
+---
+
+Missions
+
+---
+
+Notifications
+
+---
+
+Settings
+
+---
+
+# Mobile Navigation
+
+Bottom navigation should contain:
+
+1. Home
+
+2. Businesses
+
+3. Auren
+
+4. Money
+
+5. Library
+
+Other sections remain accessible through the mobile drawer.
+
+---
+
+# Current Code
+
+Inspect:
+
+src/lib/modules.ts
+
+src/components/app-sidebar.tsx
+
+Update the module registry and navigation rendering.
+
+---
+
+# Existing Routes To Preserve
+
+Keep:
+
+/dashboard
+
+/money-center
+
+/people
+
+/vehicle-sales
+
+/goals
+
+/debt-management
+
+Do not remove them.
+
+Map them into the new information architecture.
+
+Example:
+
+People/CRM becomes part of:
+
+Businesses → CRM
+
+Vehicle Sales becomes:
+
+Businesses → CarBar Motion
+
+Money Center becomes:
+
+Money
+
+---
+
+# New Route Stubs
+
+Create only if missing:
+
+/businesses
+
+/auren
+
+/library
+
+/missions
+
+/notifications
+
+These should use a premium AlexOS empty state.
+
+Do not use:
+
+"Coming Soon"
+
+"Build in Progress"
+
+Use language like:
+
+"Workspace preparing"
+
+"Module foundation ready"
+
+"Intelligence layer expanding"
+
+---
+
+# Sidebar Requirements
+
+Preserve:
+
+* collapsible desktop behavior
+* active state styling
+* icons
+* responsive behavior
+
+Improve only:
+
+* labels
+* grouping
+* hierarchy
+
+---
+
+# Mobile Validation
+
+Test:
+
+* sidebar opening
+* navigation selection
+* bottom navigation
+* route transitions
+
+---
+
+# Validation
+
+Run:
+
+npm run build
+
+Return:
+
+1. Files changed
+2. New navigation structure
+3. Routes created
+4. Existing routes preserved
+5. Build result
+
+Stop after Phase 2.
+Wait for approval before dashboard work.

@@ -1,136 +1,198 @@
 import {
   LayoutDashboard,
-  Users,
-  Wallet,
-  Landmark,
+  Building2,
   Car,
   ShoppingBag,
-  Megaphone,
-  Target,
+  Gem,
+  Users,
+  Wallet,
   TrendingDown,
-  CheckSquare,
-  Calendar,
+  Landmark,
+  Brain,
+  Target,
+  Megaphone,
   BarChart3,
+  BookOpen,
   FileText,
   StickyNote,
+  Rocket,
+  CheckSquare,
+  Calendar,
+  Bell,
   Settings,
   type LucideIcon,
 } from "lucide-react";
+
+export type ModuleGroup =
+  | "Home"
+  | "Businesses"
+  | "Money"
+  | "Intelligence"
+  | "Growth"
+  | "Library"
+  | "Missions"
+  | "Notifications"
+  | "System";
 
 export interface ModuleDef {
   title: string;
   url: string;
   icon: LucideIcon;
   description: string;
-  group: "Overview" | "Operations" | "Growth" | "Productivity" | "System";
+  group: ModuleGroup;
 }
 
 export const modules: ModuleDef[] = [
+  // ── Home ─────────────────────────────────────────────
   {
-    title: "Dashboard",
+    title: "Home",
     url: "/dashboard",
     icon: LayoutDashboard,
-    description: "Executive overview and key performance indicators.",
-    group: "Overview",
+    description: "Command center — priorities, money and business signals.",
+    group: "Home",
+  },
+
+  // ── Businesses ───────────────────────────────────────
+  {
+    title: "CarBar Motion",
+    url: "/vehicle-sales",
+    icon: Car,
+    description: "Vehicle inventory, financing and sales pipeline.",
+    group: "Businesses",
+  },
+  {
+    title: "DailyGear",
+    url: "/e-commerce",
+    icon: ShoppingBag,
+    description: "Products, inventory, orders and online sales.",
+    group: "Businesses",
+  },
+  {
+    title: "Nuvora",
+    url: "/businesses",
+    icon: Gem,
+    description: "Business operations and growth for Nuvora.",
+    group: "Businesses",
   },
   {
     title: "People",
     url: "/people",
     icon: Users,
-    description:
-      "AI-powered CRM for customers, prospects, leads, follow-ups and relationships.",
-    group: "Operations",
+    description: "Customers, contacts, leads and relationship management.",
+    group: "Businesses",
   },
+
+  // ── Money ────────────────────────────────────────────
   {
     title: "Money Center",
     url: "/money-center",
     icon: Wallet,
     description: "Cash flow, income and expenses across accounts.",
-    group: "Operations",
-  },
-  {
-    title: "Banking",
-    url: "/banking",
-    icon: Landmark,
-    description:
-      "Sales pipeline, customer onboarding, loans, deposits and relationship management.",
-    group: "Operations",
-  },
-  {
-    title: "Vehicle Sales",
-    url: "/vehicle-sales",
-    icon: Car,
-    description:
-      "Manage inventory, customers, quotations, financing and vehicle sales.",
-    group: "Operations",
-  },
-  {
-    title: "E-Commerce",
-    url: "/e-commerce",
-    icon: ShoppingBag,
-    description:
-      "Products, inventory, orders, suppliers, customers and online sales.",
-    group: "Growth",
-  },
-  {
-    title: "Marketing",
-    url: "/marketing",
-    icon: Megaphone,
-    description:
-      "Campaigns, social media, copywriting, ads and AI marketing automation.",
-    group: "Growth",
-  },
-  {
-    title: "Goals",
-    url: "/goals",
-    icon: Target,
-    description:
-      "Personal, business and financial goals with intelligent progress tracking.",
-    group: "Growth",
+    group: "Money",
   },
   {
     title: "Debt Management",
     url: "/debt-management",
     icon: TrendingDown,
     description: "Liabilities, payoff plans and interest tracking.",
-    group: "Operations",
+    group: "Money",
   },
   {
-    title: "Tasks",
-    url: "/tasks",
-    icon: CheckSquare,
-    description: "Actions, priorities and daily execution.",
-    group: "Productivity",
+    title: "Banking",
+    url: "/banking",
+    icon: Landmark,
+    description: "Loans, deposits and banking relationships.",
+    group: "Money",
+  },
+
+  // ── Intelligence ─────────────────────────────────────
+  {
+    title: "Auren Intelligence",
+    url: "/auren",
+    icon: Brain,
+    description: "Business signals, recommendations and intelligence.",
+    group: "Intelligence",
+  },
+
+  // ── Growth ───────────────────────────────────────────
+  {
+    title: "Goals",
+    url: "/goals",
+    icon: Target,
+    description: "Personal, business and financial goals.",
+    group: "Growth",
   },
   {
-    title: "Calendar",
-    url: "/calendar",
-    icon: Calendar,
-    description: "Meetings, events and schedule.",
-    group: "Productivity",
+    title: "Marketing",
+    url: "/marketing",
+    icon: Megaphone,
+    description: "Campaigns, social media and growth automation.",
+    group: "Growth",
   },
   {
     title: "Reports",
     url: "/reports",
     icon: BarChart3,
-    description:
-      "Business intelligence, dashboards, KPIs and executive reporting.",
+    description: "KPIs, dashboards and executive reporting.",
     group: "Growth",
+  },
+
+  // ── Library ──────────────────────────────────────────
+  {
+    title: "Library",
+    url: "/library",
+    icon: BookOpen,
+    description: "Documents, files, contracts and knowledge base.",
+    group: "Library",
   },
   {
     title: "Documents",
     url: "/documents",
     icon: FileText,
     description: "Files, contracts and paperwork.",
-    group: "Productivity",
+    group: "Library",
   },
   {
     title: "Notes",
     url: "/notes",
     icon: StickyNote,
-    description: "Ideas, meeting notes and knowledge base.",
-    group: "Productivity",
+    description: "Ideas, meeting notes and knowledge.",
+    group: "Library",
   },
+
+  // ── Missions ─────────────────────────────────────────
+  {
+    title: "Missions",
+    url: "/missions",
+    icon: Rocket,
+    description: "Strategic priorities and mission execution.",
+    group: "Missions",
+  },
+  {
+    title: "Tasks",
+    url: "/tasks",
+    icon: CheckSquare,
+    description: "Actions, priorities and daily execution.",
+    group: "Missions",
+  },
+  {
+    title: "Calendar",
+    url: "/calendar",
+    icon: Calendar,
+    description: "Meetings, events and schedule.",
+    group: "Missions",
+  },
+
+  // ── Notifications ────────────────────────────────────
+  {
+    title: "Notifications",
+    url: "/notifications",
+    icon: Bell,
+    description: "Alerts, updates and system signals.",
+    group: "Notifications",
+  },
+
+  // ── System ───────────────────────────────────────────
   {
     title: "Settings",
     url: "/settings",
@@ -140,10 +202,23 @@ export const modules: ModuleDef[] = [
   },
 ];
 
-export const moduleGroups = [
-  "Overview",
-  "Operations",
+export const moduleGroups: ModuleGroup[] = [
+  "Home",
+  "Businesses",
+  "Money",
+  "Intelligence",
   "Growth",
-  "Productivity",
+  "Library",
+  "Missions",
+  "Notifications",
   "System",
+];
+
+/** Five items pinned to the mobile bottom navigation bar. */
+export const bottomNavItems = [
+  { title: "Home",       url: "/dashboard",   icon: LayoutDashboard },
+  { title: "Businesses", url: "/businesses",  icon: Building2 },
+  { title: "Auren",      url: "/auren",       icon: Brain },
+  { title: "Money",      url: "/money-center",icon: Wallet },
+  { title: "Library",    url: "/library",     icon: BookOpen },
 ] as const;

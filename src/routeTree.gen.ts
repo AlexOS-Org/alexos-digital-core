@@ -12,16 +12,21 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAurenRouteImport } from './routes/_authenticated/auren'
 import { Route as AuthenticatedBankingRouteImport } from './routes/_authenticated/banking'
+import { Route as AuthenticatedBusinessesRouteImport } from './routes/_authenticated/businesses'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDebtManagementRouteImport } from './routes/_authenticated/debt-management'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedECommerceRouteImport } from './routes/_authenticated/e-commerce'
 import { Route as AuthenticatedGoalsRouteImport } from './routes/_authenticated/goals'
+import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedMarketingRouteImport } from './routes/_authenticated/marketing'
+import { Route as AuthenticatedMissionsRouteImport } from './routes/_authenticated/missions'
 import { Route as AuthenticatedMoneyCenterRouteImport } from './routes/_authenticated/money-center'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedPeopleRouteImport } from './routes/_authenticated/people'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -56,9 +61,19 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAurenRoute = AuthenticatedAurenRouteImport.update({
+  id: '/auren',
+  path: '/auren',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBankingRoute = AuthenticatedBankingRouteImport.update({
   id: '/banking',
   path: '/banking',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBusinessesRoute = AuthenticatedBusinessesRouteImport.update({
+  id: '/businesses',
+  path: '/businesses',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
@@ -92,9 +107,19 @@ const AuthenticatedGoalsRoute = AuthenticatedGoalsRouteImport.update({
   path: '/goals',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMarketingRoute = AuthenticatedMarketingRouteImport.update({
   id: '/marketing',
   path: '/marketing',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMissionsRoute = AuthenticatedMissionsRouteImport.update({
+  id: '/missions',
+  path: '/missions',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMoneyCenterRoute =
@@ -108,6 +133,12 @@ const AuthenticatedNotesRoute = AuthenticatedNotesRouteImport.update({
   path: '/notes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPeopleRoute = AuthenticatedPeopleRouteImport.update({
   id: '/people',
   path: '/people',
@@ -222,16 +253,21 @@ const AuthenticatedPeopleLeadsIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/auren': typeof AuthenticatedAurenRoute
   '/banking': typeof AuthenticatedBankingRoute
+  '/businesses': typeof AuthenticatedBusinessesRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/debt-management': typeof AuthenticatedDebtManagementRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/e-commerce': typeof AuthenticatedECommerceRoute
   '/goals': typeof AuthenticatedGoalsRoute
+  '/library': typeof AuthenticatedLibraryRoute
   '/marketing': typeof AuthenticatedMarketingRoute
+  '/missions': typeof AuthenticatedMissionsRoute
   '/money-center': typeof AuthenticatedMoneyCenterRouteWithChildren
   '/notes': typeof AuthenticatedNotesRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/people': typeof AuthenticatedPeopleRouteWithChildren
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -255,15 +291,20 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/auren': typeof AuthenticatedAurenRoute
   '/banking': typeof AuthenticatedBankingRoute
+  '/businesses': typeof AuthenticatedBusinessesRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/debt-management': typeof AuthenticatedDebtManagementRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/e-commerce': typeof AuthenticatedECommerceRoute
   '/goals': typeof AuthenticatedGoalsRoute
+  '/library': typeof AuthenticatedLibraryRoute
   '/marketing': typeof AuthenticatedMarketingRoute
+  '/missions': typeof AuthenticatedMissionsRoute
   '/notes': typeof AuthenticatedNotesRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
@@ -288,16 +329,21 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/auren': typeof AuthenticatedAurenRoute
   '/_authenticated/banking': typeof AuthenticatedBankingRoute
+  '/_authenticated/businesses': typeof AuthenticatedBusinessesRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/debt-management': typeof AuthenticatedDebtManagementRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
   '/_authenticated/e-commerce': typeof AuthenticatedECommerceRoute
   '/_authenticated/goals': typeof AuthenticatedGoalsRoute
+  '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/marketing': typeof AuthenticatedMarketingRoute
+  '/_authenticated/missions': typeof AuthenticatedMissionsRoute
   '/_authenticated/money-center': typeof AuthenticatedMoneyCenterRouteWithChildren
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/people': typeof AuthenticatedPeopleRouteWithChildren
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -323,16 +369,21 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/auren'
     | '/banking'
+    | '/businesses'
     | '/calendar'
     | '/dashboard'
     | '/debt-management'
     | '/documents'
     | '/e-commerce'
     | '/goals'
+    | '/library'
     | '/marketing'
+    | '/missions'
     | '/money-center'
     | '/notes'
+    | '/notifications'
     | '/people'
     | '/reports'
     | '/settings'
@@ -356,15 +407,20 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/auren'
     | '/banking'
+    | '/businesses'
     | '/calendar'
     | '/dashboard'
     | '/debt-management'
     | '/documents'
     | '/e-commerce'
     | '/goals'
+    | '/library'
     | '/marketing'
+    | '/missions'
     | '/notes'
+    | '/notifications'
     | '/reports'
     | '/settings'
     | '/tasks'
@@ -388,16 +444,21 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/auren'
     | '/_authenticated/banking'
+    | '/_authenticated/businesses'
     | '/_authenticated/calendar'
     | '/_authenticated/dashboard'
     | '/_authenticated/debt-management'
     | '/_authenticated/documents'
     | '/_authenticated/e-commerce'
     | '/_authenticated/goals'
+    | '/_authenticated/library'
     | '/_authenticated/marketing'
+    | '/_authenticated/missions'
     | '/_authenticated/money-center'
     | '/_authenticated/notes'
+    | '/_authenticated/notifications'
     | '/_authenticated/people'
     | '/_authenticated/reports'
     | '/_authenticated/settings'
@@ -448,11 +509,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/auren': {
+      id: '/_authenticated/auren'
+      path: '/auren'
+      fullPath: '/auren'
+      preLoaderRoute: typeof AuthenticatedAurenRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/banking': {
       id: '/_authenticated/banking'
       path: '/banking'
       fullPath: '/banking'
       preLoaderRoute: typeof AuthenticatedBankingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/businesses': {
+      id: '/_authenticated/businesses'
+      path: '/businesses'
+      fullPath: '/businesses'
+      preLoaderRoute: typeof AuthenticatedBusinessesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/calendar': {
@@ -497,11 +572,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGoalsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/library': {
+      id: '/_authenticated/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof AuthenticatedLibraryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/marketing': {
       id: '/_authenticated/marketing'
       path: '/marketing'
       fullPath: '/marketing'
       preLoaderRoute: typeof AuthenticatedMarketingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/missions': {
+      id: '/_authenticated/missions'
+      path: '/missions'
+      fullPath: '/missions'
+      preLoaderRoute: typeof AuthenticatedMissionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/money-center': {
@@ -516,6 +605,13 @@ declare module '@tanstack/react-router' {
       path: '/notes'
       fullPath: '/notes'
       preLoaderRoute: typeof AuthenticatedNotesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/people': {
@@ -722,16 +818,21 @@ const AuthenticatedPeopleRouteWithChildren =
   AuthenticatedPeopleRoute._addFileChildren(AuthenticatedPeopleRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAurenRoute: typeof AuthenticatedAurenRoute
   AuthenticatedBankingRoute: typeof AuthenticatedBankingRoute
+  AuthenticatedBusinessesRoute: typeof AuthenticatedBusinessesRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDebtManagementRoute: typeof AuthenticatedDebtManagementRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
   AuthenticatedECommerceRoute: typeof AuthenticatedECommerceRoute
   AuthenticatedGoalsRoute: typeof AuthenticatedGoalsRoute
+  AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
   AuthenticatedMarketingRoute: typeof AuthenticatedMarketingRoute
+  AuthenticatedMissionsRoute: typeof AuthenticatedMissionsRoute
   AuthenticatedMoneyCenterRoute: typeof AuthenticatedMoneyCenterRouteWithChildren
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedPeopleRoute: typeof AuthenticatedPeopleRouteWithChildren
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
@@ -740,16 +841,21 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAurenRoute: AuthenticatedAurenRoute,
   AuthenticatedBankingRoute: AuthenticatedBankingRoute,
+  AuthenticatedBusinessesRoute: AuthenticatedBusinessesRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDebtManagementRoute: AuthenticatedDebtManagementRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
   AuthenticatedECommerceRoute: AuthenticatedECommerceRoute,
   AuthenticatedGoalsRoute: AuthenticatedGoalsRoute,
+  AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedMarketingRoute: AuthenticatedMarketingRoute,
+  AuthenticatedMissionsRoute: AuthenticatedMissionsRoute,
   AuthenticatedMoneyCenterRoute: AuthenticatedMoneyCenterRouteWithChildren,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedPeopleRoute: AuthenticatedPeopleRouteWithChildren,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
