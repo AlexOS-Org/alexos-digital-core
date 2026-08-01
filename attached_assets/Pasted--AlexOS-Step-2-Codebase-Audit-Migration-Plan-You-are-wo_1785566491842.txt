@@ -1,0 +1,292 @@
+# AlexOS — Step 2: Codebase Audit & Migration Plan
+
+You are working as a senior frontend architect and product engineer.
+
+You have access to the AlexOS GitHub repository.
+
+Your task is NOT to redesign or code yet.
+
+Your first responsibility is to understand the existing codebase, identify what already works, and create a safe migration plan toward the approved AlexOS design system.
+
+## Product Context
+
+Application:
+
+AlexOS
+
+Purpose:
+
+A business operating system that combines:
+
+* Business management
+* Money management
+* Commerce operations
+* Customer relationships
+* Intelligence
+* Productivity
+
+## Brand Rules
+
+Current approved naming:
+
+AlexOS
+
+Auren Intelligence
+
+Nuvora
+
+Do not introduce:
+
+Orion
+
+BF Sima
+
+AI assistant/persona language
+
+Auren is intelligence infrastructure, not a chatbot character.
+
+---
+
+# Existing Product Architecture
+
+Expected business structure:
+
+AlexOS
+
+├── Home / Command Center
+
+├── Businesses
+│     ├── CarBar Motion
+│     ├── DailyGear
+│     └── Nuvora
+
+├── Money Center
+
+├── Auren Intelligence
+
+├── Growth
+
+├── Library
+
+├── Missions
+
+├── Notifications
+
+└── Settings
+
+---
+
+# Your Audit Tasks
+
+## 1. Repository Overview
+
+Analyze:
+
+* Framework
+* Language
+* Build tools
+* Folder structure
+* Package dependencies
+* Styling system
+* Component library
+* State management
+* Routing system
+
+Report:
+
+* Current architecture
+* Strengths
+* Technical risks
+
+---
+
+## 2. Frontend Analysis
+
+Identify:
+
+* Existing layouts
+* Pages/routes
+* Components
+* Shared UI components
+* Dashboard components
+* Navigation components
+* Mobile components
+
+Create a map:
+
+Example:
+
+src/
+├ routes/
+├ components/
+├ features/
+├ hooks/
+└ services/
+
+Explain what each important section does.
+
+---
+
+## 3. Current Feature Audit
+
+Check existing implementation of:
+
+### Dashboard
+
+What exists?
+
+What works?
+
+What needs improvement?
+
+### Money Center
+
+Check:
+
+* Accounts
+* Transactions
+* Income
+* Expenses
+* Transfers
+* Budgets
+* Debts
+* Analytics
+
+Identify completed vs incomplete.
+
+### Business Modules
+
+Check:
+
+* CRM
+* DailyGear
+* Nuvora
+* Vehicle Sales
+
+### Intelligence
+
+Find:
+
+* AI-related components
+* Old naming references
+* Intelligence widgets
+
+---
+
+## 4. Database / Backend Audit
+
+Review:
+
+* Supabase integration
+* Database schema
+* Tables
+* Relationships
+* Authentication
+* Storage
+* API calls
+
+Report:
+
+* What is production ready
+* What requires changes
+
+---
+
+## 5. Branding Audit
+
+Search the entire repository for:
+
+* Orion
+* BF Sima
+* old logos
+* old names
+* outdated text
+
+Create a replacement list.
+
+Do not change files yet.
+
+---
+
+## 6. UI/UX Gap Analysis
+
+Compare the current application against the approved AlexOS Design System:
+
+Evaluate:
+
+Navigation
+
+Desktop sidebar
+
+Mobile navigation
+
+Dashboard layout
+
+Cards
+
+Typography
+
+Colors
+
+Spacing
+
+Components
+
+Identify:
+
+Keep
+
+Improve
+
+Replace
+
+---
+
+## 7. Migration Strategy
+
+Create a phased implementation plan.
+
+The plan should minimize risk.
+
+Structure:
+
+Phase 1:
+Foundation
+
+Phase 2:
+Navigation
+
+Phase 3:
+Dashboard
+
+Phase 4:
+Business modules
+
+Phase 5:
+Mobile optimization
+
+Phase 6:
+Production polish
+
+For each phase include:
+
+* Files affected
+* Components affected
+* Risk level
+* Expected outcome
+
+---
+
+## Important Rules
+
+Do NOT:
+
+* Rewrite the application
+* Delete working features
+* Change database structure without approval
+* Create duplicate components
+* Start coding
+
+First provide the audit report and migration plan.
+
+The goal is a controlled transformation of the existing AlexOS codebase into the final production version.
