@@ -13,7 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { modules, moduleGroups } from "@/lib/modules";
-import { OrionLogo } from "@/components/orion-logo";
+import { AlexOSLogo } from "@/components/alexos-logo";
 import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -48,7 +48,7 @@ export function AppSidebar() {
           onClick={closeSidebar}
           className="flex items-center gap-2 px-2 py-2 text-sidebar-foreground"
         >
-          <OrionLogo compact showWordmark={!collapsed} />
+          <AlexOSLogo compact showWordmark={!collapsed} />
         </Link>
       </SidebarHeader>
 

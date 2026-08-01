@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { ShieldCheck } from "lucide-react";
-import { OrionLogo } from "@/components/orion-logo";
+import { AlexOSLogo } from "@/components/alexos-logo";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -54,13 +54,13 @@ function AuthPage() {
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
       <div className="hidden lg:flex flex-col justify-between bg-sidebar text-sidebar-foreground p-12">
         <Link to="/" className="w-fit">
-          <OrionLogo showWordmark />
+          <AlexOSLogo showWordmark />
         </Link>
 
         <div className="space-y-6 max-w-xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-sidebar-border bg-sidebar-accent/50 px-3 py-1 text-xs font-medium text-sidebar-foreground/80">
             <span className="h-1.5 w-1.5 rounded-full bg-sidebar-primary shadow-[0_0_10px_var(--orion-glow)]" />
-            Powered by Orion AI
+            Powered by Auren Intelligence
           </div>
           <h1 className="text-4xl font-semibold leading-tight tracking-tight">
             Your personal & business operating system.
@@ -75,7 +75,7 @@ function AuthPage() {
         </div>
 
         <p className="text-xs text-sidebar-foreground/50">
-          © {new Date().getFullYear()} AlexOS · Powered by Orion
+          © {new Date().getFullYear()} AlexOS · Powered by Auren Intelligence
         </p>
       </div>
 
@@ -83,10 +83,10 @@ function AuthPage() {
         <Card className="w-full max-w-md border-border/60 shadow-sm">
           <CardHeader className="space-y-2">
             <div className="lg:hidden mb-2">
-              <OrionLogo showWordmark />
+              <AlexOSLogo showWordmark />
             </div>
             <CardTitle className="text-2xl">Welcome</CardTitle>
-            <CardDescription>Sign in to your AlexOS Orion workspace.</CardDescription>
+            <CardDescription>Sign in to your AlexOS workspace.</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin">

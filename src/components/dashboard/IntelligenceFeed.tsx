@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Brain, TrendingUp, Car, ShoppingBag, Landmark, Target, ArrowUpRight, Sparkles } from "lucide-react";
 
 const insights = [
-  { icon: TrendingUp, title: "Cash Flow", message: "Record every income and expense to sharpen Orion's financial picture." },
+  { icon: TrendingUp, title: "Cash Flow", message: "Record every income and expense to sharpen your financial picture." },
   { icon: Car, title: "Vehicle Sales", message: "Follow up financing leads daily to keep your strongest opportunities moving." },
   { icon: ShoppingBag, title: "DailyGear", message: "Stay consistent with products that show the clearest demand signals." },
   { icon: Landmark, title: "Banking", message: "Turn customer conversations into scheduled follow-ups before they go cold." },
@@ -13,7 +13,7 @@ export default function IntelligenceFeed() {
   return (
     <Card className="h-full overflow-hidden rounded-[1.8rem] border-[var(--orion-purple)]/20 bg-gradient-to-br from-[#0a1530] via-[#101a38] to-[#171333] text-white shadow-[0_22px_60px_-35px_rgba(124,58,237,.7)]">
       <CardHeader className="relative flex flex-row items-center justify-between gap-3 border-b border-white/10 pb-5">
-        <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl border border-violet-300/15 bg-violet-400/10 text-violet-200"><Brain className="h-5 w-5" /></div><div><CardTitle className="text-base text-white">Orion Intelligence Feed</CardTitle><p className="mt-0.5 text-xs text-slate-400">Signals worth acting on next</p></div></div>
+        <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl border border-violet-300/15 bg-violet-400/10 text-violet-200"><Brain className="h-5 w-5" /></div><div><CardTitle className="text-base text-white">Auren Intelligence Feed</CardTitle><p className="mt-0.5 text-xs text-slate-400">Signals worth acting on next</p></div></div>
         <span className="flex items-center gap-1.5 rounded-full border border-violet-300/15 bg-violet-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-violet-200"><Sparkles className="h-3 w-3" /> Live</span>
       </CardHeader>
       <CardContent className="relative space-y-2 p-4 sm:p-5">

@@ -29,7 +29,7 @@ export default function TodaysMission() {
               <Target className="h-3.5 w-3.5" /> Today's mission
             </div>
             <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Clear the blockers. Protect the momentum.</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">Orion is surfacing the few things most likely to matter today.</p>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">Auren Intelligence is surfacing the few things most likely to matter today.</p>
           </div>
           <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs text-slate-300">
             <Zap className="h-3.5 w-3.5 text-violet-300" /> {tasks.filter((t) => t.value > 0).length} active priorities

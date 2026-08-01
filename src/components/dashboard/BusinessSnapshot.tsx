@@ -33,7 +33,7 @@ export default function BusinessSnapshot() {
                   <p className="text-2xl font-bold tracking-tight">{item.value}</p>
                 </div>
                 <div className="mt-5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                  <Sparkles className="h-3 w-3 text-primary" /> Orion connected
+                  <Sparkles className="h-3 w-3 text-primary" /> Auren Intelligence
                 </div>
               </CardContent>
             </Card>
