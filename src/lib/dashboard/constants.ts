@@ -23,6 +23,12 @@ export const SPEND_SPIKE_PCT = 15;
 /** Healthy monthly savings-rate floor, in percent. */
 export const HEALTHY_SAVINGS_RATE = 15;
 
-export const OPEN_LEAD_STAGES = ["new", "contacted", "qualified", "proposal", "negotiation"] as const;
+export const OPEN_LEAD_STAGES = [
+  "new",
+  "contacted",
+  "qualified",
+  "proposal",
+  "negotiation",
+] as const;
 
 export const DAY_MS = 86_400_000;

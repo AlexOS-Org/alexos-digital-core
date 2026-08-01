@@ -24,8 +24,15 @@ type Draft = Omit<IntelligenceSignal, "categoryLabel" | "timestamp">;
 
 function build(drafts: Draft[], now: Date): IntelligenceSignal[] {
   return drafts
-    .map((d) => ({ ...d, categoryLabel: CATEGORY_LABELS[d.category as SignalCategory], timestamp: now.toISOString() }))
-    .sort((a, b) => PRIORITY_ORDER[a.priority as SignalPriority] - PRIORITY_ORDER[b.priority as SignalPriority]);
+    .map((d) => ({
+      ...d,
+      categoryLabel: CATEGORY_LABELS[d.category as SignalCategory],
+      timestamp: now.toISOString(),
+    }))
+    .sort(
+      (a, b) =>
+        PRIORITY_ORDER[a.priority as SignalPriority] - PRIORITY_ORDER[b.priority as SignalPriority],
+    );
 }
 
 /** Derives operational signals from computed dashboard metrics. */
@@ -228,7 +235,9 @@ export function generatePriorities(metrics: DashboardMetrics): Priority[] {
     {
       id: "overdue-bills",
       title: "Clear overdue bills",
-      detail: money.overdueBills.length ? formatAmount(money.overdueBills.reduce((s, b) => s + Number(b.amount), 0)) : "Nothing overdue",
+      detail: money.overdueBills.length
+        ? formatAmount(money.overdueBills.reduce((s, b) => s + Number(b.amount), 0))
+        : "Nothing overdue",
       count: money.overdueBills.length,
       tone: "amber",
       to: "/money-center/bills",
@@ -246,7 +255,9 @@ export function generatePriorities(metrics: DashboardMetrics): Priority[] {
     {
       id: "closing-soon",
       title: "Close deals due soon",
-      detail: business.closingSoon.length ? formatAmount(business.closingSoon.reduce((s, l) => s + Number(l.value), 0)) : "No deals closing",
+      detail: business.closingSoon.length
+        ? formatAmount(business.closingSoon.reduce((s, l) => s + Number(l.value), 0))
+        : "No deals closing",
       count: business.closingSoon.length,
       tone: "emerald",
       to: "/people/leads",
@@ -255,7 +266,9 @@ export function generatePriorities(metrics: DashboardMetrics): Priority[] {
     {
       id: "bills-due",
       title: "Fund bills due this week",
-      detail: money.billsDueSoon.length ? formatAmount(money.billsDueSoon.reduce((s, b) => s + Number(b.amount), 0)) : "Nothing due",
+      detail: money.billsDueSoon.length
+        ? formatAmount(money.billsDueSoon.reduce((s, b) => s + Number(b.amount), 0))
+        : "Nothing due",
       count: money.billsDueSoon.length,
       tone: "amber",
       to: "/money-center/bills",
@@ -273,7 +286,9 @@ export function generatePriorities(metrics: DashboardMetrics): Priority[] {
     {
       id: "goals",
       title: "Fund goals behind target",
-      detail: goals.behindSchedule.length ? goals.behindSchedule.map((g) => g.name).join(", ") : "Goals on track",
+      detail: goals.behindSchedule.length
+        ? goals.behindSchedule.map((g) => g.name).join(", ")
+        : "Goals on track",
       count: goals.behindSchedule.length,
       tone: "violet",
       to: "/goals",

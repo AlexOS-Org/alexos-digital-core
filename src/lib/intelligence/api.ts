@@ -11,7 +11,9 @@ export interface IntelligenceResult<T> {
   isEmpty: boolean;
 }
 
-export function useIntelligenceSignals(limit = MAX_FEED_SIGNALS): IntelligenceResult<IntelligenceSignal[]> {
+export function useIntelligenceSignals(
+  limit = MAX_FEED_SIGNALS,
+): IntelligenceResult<IntelligenceSignal[]> {
   const { metrics, isLoading, isError } = useDashboardData();
   const signals = useMemo(() => generateSignals(metrics).slice(0, limit), [metrics, limit]);
   return { data: signals, isLoading, isError, isEmpty: !isLoading && signals.length === 0 };

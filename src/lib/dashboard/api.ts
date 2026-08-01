@@ -31,7 +31,18 @@ export function useDashboardData(): DashboardQueryResult {
   const contacts = useContacts();
   const leads = useLeads();
 
-  const queries = [accounts, balances, transactions, expected, bills, debts, goals, goalProgress, contacts, leads];
+  const queries = [
+    accounts,
+    balances,
+    transactions,
+    expected,
+    bills,
+    debts,
+    goals,
+    goalProgress,
+    contacts,
+    leads,
+  ];
   const isLoading = queries.some((q) => q.isLoading);
   const isError = queries.some((q) => q.isError);
 
