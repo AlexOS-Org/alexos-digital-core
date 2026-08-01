@@ -30,7 +30,7 @@ function AuthenticatedLayout() {
                 {current?.group ?? "Workspace"}
               </div>
               <div className="text-sm font-semibold truncate">
-                {current?.title ?? "Alex OS Professional"}
+                {current?.title ?? "AlexOS Professional"}
               </div>
             </div>
           </header>

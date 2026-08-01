@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { modules, moduleGroups } from "@/lib/modules";
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import AskAlexBar from "@/components/dashboard/AskAlexBar";
+import IntelligenceSearch from "@/components/dashboard/IntelligenceSearch";
 import MoneySnapshot from "@/components/dashboard/MoneySnapshot";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import BusinessSnapshot from "@/components/dashboard/BusinessSnapshot";
@@ -67,7 +67,7 @@ function Dashboard() {
               </p>
             </div>
             <div className="w-full lg:max-w-xl">
-              <AskAlexBar />
+              <IntelligenceSearch />
             </div>
           </div>
         </section>

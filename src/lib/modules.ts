@@ -27,7 +27,7 @@ export interface ModuleDef {
 
 export const modules: ModuleDef[] = [
   {
-    title: "Dashboard",
+    title: "Command Center",
     url: "/dashboard",
     icon: LayoutDashboard,
     description: "Executive overview and key performance indicators.",
@@ -37,7 +37,7 @@ export const modules: ModuleDef[] = [
     title: "People",
     url: "/people",
     icon: Users,
-    description: "AI-powered CRM for customers, prospects, leads, follow-ups and relationships.",
+    description: " CRM for customers, prospects, leads, follow-ups and relationships.",
     group: "Operations",
   },
   {

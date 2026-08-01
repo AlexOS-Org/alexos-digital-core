@@ -58,7 +58,7 @@ export const Route = createFileRoute("/_authenticated/people/")({
   component: ContactsPage,
   head: () => ({
     meta: [
-      { title: "Contacts · Alex OS" },
+      { title: "Contacts · AlexOS" },
       {
         name: "description",
         content: "Search, filter, and manage every customer, lead, and partner in one unified CRM.",

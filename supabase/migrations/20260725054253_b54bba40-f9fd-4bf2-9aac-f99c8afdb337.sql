@@ -1,5 +1,5 @@
 -- ============================================================
--- AlexOS Orion - CRM V3 CANONICAL FOUNDATION
+-- AlexOS - CRM V3 CANONICAL FOUNDATION
 --
 -- This migration is the canonical CRM schema contract.
 -- It is intentionally safe against both:

@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/people/leads/$id")({
   component: LeadDetailPage,
   head: () => ({
     meta: [
-      { title: "Lead · Alex OS" },
+      { title: "Lead · AlexOS" },
       {
         name: "description",
         content: "Lead timeline, activities, tasks, notes and stage history in one view.",

@@ -93,7 +93,7 @@ export function AIBriefing() {
         <div>
           <CardTitle>AlexOS AI Briefing</CardTitle>
 
-          <p className="text-sm text-muted-foreground">Your intelligent business assistant.</p>
+          <p className="text-sm text-muted-foreground">Your business intelligence overview.</p>
         </div>
       </CardHeader>
 

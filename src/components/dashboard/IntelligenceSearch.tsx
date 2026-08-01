@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
 
-export default function AskAlexBar() {
+export default function IntelligenceSearch() {
   return (
     <div className="rounded-xl border bg-card p-4">
       <div className="flex items-center gap-3">
@@ -8,7 +8,7 @@ export default function AskAlexBar() {
 
         <input
           type="text"
-          placeholder='Ask AlexOS... e.g. "Can I afford this car?"'
+          placeholder="Search your business signals, priorities and insights..."
           className="w-full bg-transparent outline-none"
         />
       </div>
