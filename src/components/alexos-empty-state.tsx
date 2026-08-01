@@ -42,7 +42,7 @@ export function AlexOSEmptyState({
         <div className="grid gap-3 sm:grid-cols-3 pt-2">
           {[
             { label: "Integration", detail: "Connected to workspace" },
-            { label: "Intelligence", detail: "Auren-powered signals" },
+            { label: "Intelligence", detail: "Live operational signals" },
             { label: "Status", detail: statusLabel },
           ].map((item) => (
             <div

@@ -34,14 +34,14 @@ export function ModulePlaceholder({
         <CardHeader>
           <CardTitle className="flex items-center gap-3">
             <Brain className="h-6 w-6 text-primary" />
-            Auren Intelligence Preview
+            Intelligence Preview
           </CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-6">
           <p className="text-muted-foreground leading-7">
             This module is currently under active development.
-            When completed, Auren Intelligence will help you make smarter
+            When completed, the intelligence layer will help you make smarter
             business decisions, automate repetitive work and
             generate more revenue from this area of your business.
           </p>
@@ -62,7 +62,7 @@ export function ModulePlaceholder({
                 <Brain className="h-6 w-6 text-primary" />
                 <h3 className="font-semibold">AI Intelligence</h3>
                 <p className="text-sm text-muted-foreground">
-                  Receive intelligent recommendations from Auren Intelligence.
+                  Receive intelligent recommendations from the intelligence layer.
                 </p>
               </CardContent>
             </Card>
