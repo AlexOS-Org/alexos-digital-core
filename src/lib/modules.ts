@@ -107,7 +107,7 @@ export const modules: ModuleDef[] = [
 
   // ── Intelligence ─────────────────────────────────────
   {
-    title: "Auren Intelligence",
+    title: "Intelligence",
     url: "/auren",
     icon: Brain,
     description: "Business signals, recommendations and intelligence.",
@@ -218,7 +218,7 @@ export const moduleGroups: ModuleGroup[] = [
 export const bottomNavItems = [
   { title: "Home",       url: "/dashboard",   icon: LayoutDashboard },
   { title: "Businesses", url: "/businesses",  icon: Building2 },
-  { title: "Auren",      url: "/auren",       icon: Brain },
+  { title: "Intelligence",      url: "/auren",       icon: Brain },
   { title: "Money",      url: "/money-center",icon: Wallet },
   { title: "Library",    url: "/library",     icon: BookOpen },
 ] as const;

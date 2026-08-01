@@ -16,8 +16,8 @@ export function AlexOSLogo({ showWordmark = false, compact = false, className, .
       >
         <defs>
           <linearGradient id="alexosLogoGradient" x1="6" y1="42" x2="42" y2="6" gradientUnits="userSpaceOnUse">
-            <stop stopColor="var(--orion-blue)" />
-            <stop offset="1" stopColor="var(--orion-purple)" />
+            <stop stopColor="var(--alexos-blue)" />
+            <stop offset="1" stopColor="var(--alexos-purple)" />
           </linearGradient>
           <filter id="alexosLogoGlow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="1.6" result="blur" />
