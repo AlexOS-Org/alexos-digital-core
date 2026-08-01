@@ -178,7 +178,7 @@ export function DashboardHeader() {
             <DashboardWeather />
             <div className="mt-5 flex gap-2">
               <Button className="bg-white text-slate-950 shadow-lg hover:bg-slate-100">
-                <Sparkles className="mr-2 h-4 w-4 text-[var(--orion-purple)]" />
+                <Sparkles className="mr-2 h-4 w-4 text-[var(--alexos-purple)]" />
                 Intelligence
               </Button>
               <Button size="icon" variant="ghost" className="border border-white/15 bg-black/20 text-white backdrop-blur-md hover:bg-white/10 hover:text-white" aria-label="Notifications">
@@ -189,8 +189,8 @@ export function DashboardHeader() {
         </div>
       </section>
 
-      <Card className="relative overflow-hidden rounded-3xl border border-[var(--orion-purple)]/20 bg-gradient-to-br from-[#0b1730] via-[#101b3c] to-[#18133a] text-white shadow-[0_18px_50px_-28px_rgba(124,58,237,0.65)]">
-        <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[var(--orion-purple)]/15 blur-3xl" />
+      <Card className="relative overflow-hidden rounded-3xl border border-[var(--alexos-purple)]/20 bg-gradient-to-br from-[#0b1730] via-[#101b3c] to-[#18133a] text-white shadow-[0_18px_50px_-28px_rgba(124,58,237,0.65)]">
+        <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[var(--alexos-purple)]/15 blur-3xl" />
         <CardContent className="relative p-5 sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">

@@ -59,7 +59,7 @@ function AuthPage() {
 
         <div className="space-y-6 max-w-xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-sidebar-border bg-sidebar-accent/50 px-3 py-1 text-xs font-medium text-sidebar-foreground/80">
-            <span className="h-1.5 w-1.5 rounded-full bg-sidebar-primary shadow-[0_0_10px_var(--orion-glow)]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-sidebar-primary shadow-[0_0_10px_var(--alexos-glow)]" />
             Powered by Auren Intelligence
           </div>
           <h1 className="text-4xl font-semibold leading-tight tracking-tight">

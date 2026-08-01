@@ -20,7 +20,7 @@ export function AlexOSEmptyState({
   return (
     <div className="max-w-2xl mx-auto py-16 space-y-10 animate-in fade-in duration-500">
       <div className="flex items-start gap-5">
-        <div className="h-14 w-14 shrink-0 rounded-2xl bg-gradient-to-br from-primary/15 to-[var(--orion-purple)]/15 text-primary flex items-center justify-center ring-1 ring-primary/10">
+        <div className="h-14 w-14 shrink-0 rounded-2xl bg-gradient-to-br from-primary/15 to-[var(--alexos-purple)]/15 text-primary flex items-center justify-center ring-1 ring-primary/10">
           <Icon className="h-7 w-7" />
         </div>
         <div>
@@ -29,7 +29,7 @@ export function AlexOSEmptyState({
         </div>
       </div>
 
-      <div className="rounded-3xl border border-primary/15 bg-gradient-to-br from-primary/[0.04] via-background to-[var(--orion-purple)]/[0.04] p-8 space-y-5">
+      <div className="rounded-3xl border border-primary/15 bg-gradient-to-br from-primary/[0.04] via-background to-[var(--alexos-purple)]/[0.04] p-8 space-y-5">
         <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/[0.08] px-3 py-1.5 text-xs font-semibold text-primary">
           <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
           {statusLabel}
