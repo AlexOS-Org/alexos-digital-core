@@ -479,6 +479,653 @@ export type Database = {
         };
         Relationships: [];
       };
+      dg_brands: {
+        Row: {
+          created_at: string;
+          deleted_at: string | null;
+          id: string;
+          logo_url: string | null;
+          name: string;
+          notes: string | null;
+          updated_at: string;
+          user_id: string;
+          website: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          logo_url?: string | null;
+          name: string;
+          notes?: string | null;
+          updated_at?: string;
+          user_id: string;
+          website?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          logo_url?: string | null;
+          name?: string;
+          notes?: string | null;
+          updated_at?: string;
+          user_id?: string;
+          website?: string | null;
+        };
+        Relationships: [];
+      };
+      dg_categories: {
+        Row: {
+          created_at: string;
+          deleted_at: string | null;
+          description: string | null;
+          id: string;
+          name: string;
+          parent_id: string | null;
+          slug: string | null;
+          sort_order: number;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          deleted_at?: string | null;
+          description?: string | null;
+          id?: string;
+          name: string;
+          parent_id?: string | null;
+          slug?: string | null;
+          sort_order?: number;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          deleted_at?: string | null;
+          description?: string | null;
+          id?: string;
+          name?: string;
+          parent_id?: string | null;
+          slug?: string | null;
+          sort_order?: number;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "dg_categories_parent_id_fkey";
+            columns: ["parent_id"];
+            isOneToOne: false;
+            referencedRelation: "dg_categories";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      dg_customers: {
+        Row: {
+          address: string | null;
+          attributes: Json;
+          city: string | null;
+          country: string | null;
+          created_at: string;
+          deleted_at: string | null;
+          email: string | null;
+          first_name: string;
+          id: string;
+          last_name: string | null;
+          notes: string | null;
+          phone: string | null;
+          tags: string[];
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          address?: string | null;
+          attributes?: Json;
+          city?: string | null;
+          country?: string | null;
+          created_at?: string;
+          deleted_at?: string | null;
+          email?: string | null;
+          first_name: string;
+          id?: string;
+          last_name?: string | null;
+          notes?: string | null;
+          phone?: string | null;
+          tags?: string[];
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          address?: string | null;
+          attributes?: Json;
+          city?: string | null;
+          country?: string | null;
+          created_at?: string;
+          deleted_at?: string | null;
+          email?: string | null;
+          first_name?: string;
+          id?: string;
+          last_name?: string | null;
+          notes?: string | null;
+          phone?: string | null;
+          tags?: string[];
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      dg_order_events: {
+        Row: {
+          body: string | null;
+          created_at: string;
+          id: string;
+          occurred_at: string;
+          order_id: string;
+          title: string;
+          type: string;
+          user_id: string;
+        };
+        Insert: {
+          body?: string | null;
+          created_at?: string;
+          id?: string;
+          occurred_at?: string;
+          order_id: string;
+          title: string;
+          type?: string;
+          user_id: string;
+        };
+        Update: {
+          body?: string | null;
+          created_at?: string;
+          id?: string;
+          occurred_at?: string;
+          order_id?: string;
+          title?: string;
+          type?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "dg_order_events_order_id_fkey";
+            columns: ["order_id"];
+            isOneToOne: false;
+            referencedRelation: "dg_orders";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      dg_order_items: {
+        Row: {
+          created_at: string;
+          discount: number;
+          id: string;
+          name: string;
+          order_id: string;
+          product_id: string | null;
+          quantity: number;
+          sku: string | null;
+          total: number;
+          unit_cost: number;
+          unit_price: number;
+          user_id: string;
+          variant_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          discount?: number;
+          id?: string;
+          name: string;
+          order_id: string;
+          product_id?: string | null;
+          quantity?: number;
+          sku?: string | null;
+          total?: number;
+          unit_cost?: number;
+          unit_price?: number;
+          user_id: string;
+          variant_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          discount?: number;
+          id?: string;
+          name?: string;
+          order_id?: string;
+          product_id?: string | null;
+          quantity?: number;
+          sku?: string | null;
+          total?: number;
+          unit_cost?: number;
+          unit_price?: number;
+          user_id?: string;
+          variant_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "dg_order_items_order_id_fkey";
+            columns: ["order_id"];
+            isOneToOne: false;
+            referencedRelation: "dg_orders";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "dg_order_items_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "dg_products";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "dg_order_items_variant_id_fkey";
+            columns: ["variant_id"];
+            isOneToOne: false;
+            referencedRelation: "dg_product_variants";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      dg_orders: {
+        Row: {
+          channel: string;
+          created_at: string;
+          currency: string;
+          customer_id: string | null;
+          deleted_at: string | null;
+          delivered_at: string | null;
+          discount: number;
+          id: string;
+          internal_notes: string | null;
+          notes: string | null;
+          order_number: string;
+          payment_method: string | null;
+          payment_status: Database["public"]["Enums"]["dg_payment_status"];
+          placed_at: string;
+          shipping_address: string | null;
+          shipping_fee: number;
+          shipping_method: string | null;
+          status: Database["public"]["Enums"]["dg_order_status"];
+          subtotal: number;
+          tax: number;
+          total: number;
+          tracking_number: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          channel?: string;
+          created_at?: string;
+          currency?: string;
+          customer_id?: string | null;
+          deleted_at?: string | null;
+          delivered_at?: string | null;
+          discount?: number;
+          id?: string;
+          internal_notes?: string | null;
+          notes?: string | null;
+          order_number: string;
+          payment_method?: string | null;
+          payment_status?: Database["public"]["Enums"]["dg_payment_status"];
+          placed_at?: string;
+          shipping_address?: string | null;
+          shipping_fee?: number;
+          shipping_method?: string | null;
+          status?: Database["public"]["Enums"]["dg_order_status"];
+          subtotal?: number;
+          tax?: number;
+          total?: number;
+          tracking_number?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          channel?: string;
+          created_at?: string;
+          currency?: string;
+          customer_id?: string | null;
+          deleted_at?: string | null;
+          delivered_at?: string | null;
+          discount?: number;
+          id?: string;
+          internal_notes?: string | null;
+          notes?: string | null;
+          order_number?: string;
+          payment_method?: string | null;
+          payment_status?: Database["public"]["Enums"]["dg_payment_status"];
+          placed_at?: string;
+          shipping_address?: string | null;
+          shipping_fee?: number;
+          shipping_method?: string | null;
+          status?: Database["public"]["Enums"]["dg_order_status"];
+          subtotal?: number;
+          tax?: number;
+          total?: number;
+          tracking_number?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "dg_orders_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "dg_customers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      dg_product_variants: {
+        Row: {
+          barcode: string | null;
+          cost_price: number | null;
+          created_at: string;
+          deleted_at: string | null;
+          id: string;
+          image_url: string | null;
+          name: string;
+          options: Json;
+          price: number | null;
+          product_id: string;
+          sale_price: number | null;
+          sku: string | null;
+          sort_order: number;
+          stock_quantity: number;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          barcode?: string | null;
+          cost_price?: number | null;
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          image_url?: string | null;
+          name: string;
+          options?: Json;
+          price?: number | null;
+          product_id: string;
+          sale_price?: number | null;
+          sku?: string | null;
+          sort_order?: number;
+          stock_quantity?: number;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          barcode?: string | null;
+          cost_price?: number | null;
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          image_url?: string | null;
+          name?: string;
+          options?: Json;
+          price?: number | null;
+          product_id?: string;
+          sale_price?: number | null;
+          sku?: string | null;
+          sort_order?: number;
+          stock_quantity?: number;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "dg_product_variants_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "dg_products";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      dg_products: {
+        Row: {
+          attributes: Json;
+          barcode: string | null;
+          brand_id: string | null;
+          category_id: string | null;
+          cost_price: number;
+          created_at: string;
+          currency: string;
+          deleted_at: string | null;
+          description: string | null;
+          id: string;
+          images: string[];
+          low_stock_threshold: number;
+          name: string;
+          price: number;
+          sale_price: number | null;
+          sku: string | null;
+          sort_order: number;
+          status: Database["public"]["Enums"]["dg_product_status"];
+          stock_quantity: number;
+          supplier_id: string | null;
+          tags: string[];
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          attributes?: Json;
+          barcode?: string | null;
+          brand_id?: string | null;
+          category_id?: string | null;
+          cost_price?: number;
+          created_at?: string;
+          currency?: string;
+          deleted_at?: string | null;
+          description?: string | null;
+          id?: string;
+          images?: string[];
+          low_stock_threshold?: number;
+          name: string;
+          price?: number;
+          sale_price?: number | null;
+          sku?: string | null;
+          sort_order?: number;
+          status?: Database["public"]["Enums"]["dg_product_status"];
+          stock_quantity?: number;
+          supplier_id?: string | null;
+          tags?: string[];
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          attributes?: Json;
+          barcode?: string | null;
+          brand_id?: string | null;
+          category_id?: string | null;
+          cost_price?: number;
+          created_at?: string;
+          currency?: string;
+          deleted_at?: string | null;
+          description?: string | null;
+          id?: string;
+          images?: string[];
+          low_stock_threshold?: number;
+          name?: string;
+          price?: number;
+          sale_price?: number | null;
+          sku?: string | null;
+          sort_order?: number;
+          status?: Database["public"]["Enums"]["dg_product_status"];
+          stock_quantity?: number;
+          supplier_id?: string | null;
+          tags?: string[];
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "dg_products_brand_id_fkey";
+            columns: ["brand_id"];
+            isOneToOne: false;
+            referencedRelation: "dg_brands";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "dg_products_category_id_fkey";
+            columns: ["category_id"];
+            isOneToOne: false;
+            referencedRelation: "dg_categories";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "dg_products_supplier_id_fkey";
+            columns: ["supplier_id"];
+            isOneToOne: false;
+            referencedRelation: "dg_suppliers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      dg_stock_movements: {
+        Row: {
+          created_at: string;
+          id: string;
+          notes: string | null;
+          occurred_at: string;
+          product_id: string | null;
+          quantity: number;
+          reference: string | null;
+          type: Database["public"]["Enums"]["dg_stock_movement_type"];
+          unit_cost: number | null;
+          user_id: string;
+          variant_id: string | null;
+          warehouse_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          notes?: string | null;
+          occurred_at?: string;
+          product_id?: string | null;
+          quantity: number;
+          reference?: string | null;
+          type?: Database["public"]["Enums"]["dg_stock_movement_type"];
+          unit_cost?: number | null;
+          user_id: string;
+          variant_id?: string | null;
+          warehouse_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          notes?: string | null;
+          occurred_at?: string;
+          product_id?: string | null;
+          quantity?: number;
+          reference?: string | null;
+          type?: Database["public"]["Enums"]["dg_stock_movement_type"];
+          unit_cost?: number | null;
+          user_id?: string;
+          variant_id?: string | null;
+          warehouse_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "dg_stock_movements_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "dg_products";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "dg_stock_movements_variant_id_fkey";
+            columns: ["variant_id"];
+            isOneToOne: false;
+            referencedRelation: "dg_product_variants";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "dg_stock_movements_warehouse_id_fkey";
+            columns: ["warehouse_id"];
+            isOneToOne: false;
+            referencedRelation: "dg_warehouses";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      dg_suppliers: {
+        Row: {
+          address: string | null;
+          contact_name: string | null;
+          created_at: string;
+          deleted_at: string | null;
+          email: string | null;
+          id: string;
+          lead_time_days: number;
+          name: string;
+          notes: string | null;
+          phone: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          address?: string | null;
+          contact_name?: string | null;
+          created_at?: string;
+          deleted_at?: string | null;
+          email?: string | null;
+          id?: string;
+          lead_time_days?: number;
+          name: string;
+          notes?: string | null;
+          phone?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          address?: string | null;
+          contact_name?: string | null;
+          created_at?: string;
+          deleted_at?: string | null;
+          email?: string | null;
+          id?: string;
+          lead_time_days?: number;
+          name?: string;
+          notes?: string | null;
+          phone?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      dg_warehouses: {
+        Row: {
+          created_at: string;
+          deleted_at: string | null;
+          id: string;
+          is_default: boolean;
+          location: string | null;
+          name: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          is_default?: boolean;
+          location?: string | null;
+          name: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          is_default?: boolean;
+          location?: string | null;
+          name?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       expected_money: {
         Row: {
           account_id: string | null;
@@ -862,6 +1509,12 @@ export type Database = {
       crm_task_status: "pending" | "done";
       debt_priority: "low" | "medium" | "high";
       debt_status: "active" | "paid" | "defaulted" | "archived";
+      dg_order_status:
+        "new" | "processing" | "packed" | "shipped" | "delivered" | "cancelled" | "returned";
+      dg_payment_status: "unpaid" | "partial" | "paid" | "refunded";
+      dg_product_status: "draft" | "active" | "archived" | "out_of_stock";
+      dg_stock_movement_type:
+        "purchase" | "sale" | "adjustment" | "transfer_in" | "transfer_out" | "return" | "damage";
       expected_status: "pending" | "received" | "cancelled";
       goal_status: "active" | "achieved" | "paused" | "archived";
       lead_stage: "new" | "contacted" | "qualified" | "proposal" | "negotiation" | "won" | "lost";
@@ -997,6 +1650,26 @@ export const Constants = {
       crm_task_status: ["pending", "done"],
       debt_priority: ["low", "medium", "high"],
       debt_status: ["active", "paid", "defaulted", "archived"],
+      dg_order_status: [
+        "new",
+        "processing",
+        "packed",
+        "shipped",
+        "delivered",
+        "cancelled",
+        "returned",
+      ],
+      dg_payment_status: ["unpaid", "partial", "paid", "refunded"],
+      dg_product_status: ["draft", "active", "archived", "out_of_stock"],
+      dg_stock_movement_type: [
+        "purchase",
+        "sale",
+        "adjustment",
+        "transfer_in",
+        "transfer_out",
+        "return",
+        "damage",
+      ],
       expected_status: ["pending", "received", "cancelled"],
       goal_status: ["active", "achieved", "paused", "archived"],
       lead_stage: ["new", "contacted", "qualified", "proposal", "negotiation", "won", "lost"],

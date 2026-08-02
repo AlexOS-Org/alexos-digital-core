@@ -39,9 +39,11 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
@@ -51,6 +53,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <p className="mt-2 text-sm text-muted-foreground">
           Something went wrong on our end. You can try refreshing or head back home.
         </p>
+
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
@@ -61,6 +64,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           >
             Try again
           </button>
+
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
@@ -73,31 +77,67 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "AlexOS — Personal & Business Operating System" },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1, viewport-fit=cover",
+      },
+      {
+        title: "AlexOS — Personal & Business Operating System",
+      },
       {
         name: "description",
         content:
           "AlexOS is an intelligent personal and business operating system for money, sales, goals and operations.",
       },
-      { name: "theme-color", content: "#071329", media: "(prefers-color-scheme: dark)" },
-      { name: "theme-color", content: "#f8f9fc", media: "(prefers-color-scheme: light)" },
-      { name: "mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-title", content: "AlexOS" },
-      { property: "og:title", content: "AlexOS — Personal & Business Operating System" },
+      {
+        name: "theme-color",
+        content: "#071329",
+        media: "(prefers-color-scheme: dark)",
+      },
+      {
+        name: "theme-color",
+        content: "#f8f9fc",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        name: "mobile-web-app-capable",
+        content: "yes",
+      },
+      {
+        name: "apple-mobile-web-app-capable",
+        content: "yes",
+      },
+      {
+        name: "apple-mobile-web-app-title",
+        content: "AlexOS",
+      },
+      {
+        property: "og:title",
+        content: "AlexOS — Personal & Business Operating System",
+      },
       {
         property: "og:description",
         content:
           "An intelligent operating system for money, people, goals and business operations.",
       },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "AlexOS" },
+      {
+        property: "og:type",
+        content: "website",
+      },
+      {
+        name: "twitter:card",
+        content: "summary_large_image",
+      },
+      {
+        name: "twitter:title",
+        content: "AlexOS",
+      },
       {
         name: "twitter:description",
         content: "Your personal & business operating system, powered by AlexOS Intelligence.",
@@ -133,14 +173,23 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") {
+        return;
+      }
+
       router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+
+      if (event !== "SIGNED_OUT") {
+        queryClient.invalidateQueries();
+      }
     });
+
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>

@@ -1,0 +1,246 @@
+# AlexOS Phase 1 — Branding Migration
+
+You are working inside the AlexOS production codebase.
+
+Your task is ONLY to complete the branding migration.
+
+Do not redesign.
+Do not refactor architecture.
+Do not add features.
+Do not modify database schema.
+Do not change routing.
+
+This phase is strictly a visible identity cleanup.
+
+---
+
+## Product Naming Rules
+
+The final product names are:
+
+Platform:
+AlexOS
+
+Intelligence Layer:
+Auren Intelligence
+
+Businesses:
+Nuvora
+DailyGear
+CarBar Motion
+
+Remove all visible references to:
+
+Orion
+
+AlexOS Orion
+
+Orion AI
+
+Orion Intelligence
+
+BF Sima
+
+Important:
+
+Auren is NOT a chatbot, assistant, or character.
+
+Do not introduce:
+
+"Ask Auren"
+
+"Auren says"
+
+"Talk to Auren"
+
+Use:
+
+Auren Intelligence
+
+Insights
+
+Signals
+
+Recommendations
+
+Business Intelligence
+
+---
+
+# Tasks
+
+## 1. Logo Migration
+
+Find:
+
+src/components/orion-logo.tsx
+
+Create:
+
+src/components/alexos-logo.tsx
+
+Requirements:
+
+* Rename component from OrionLogo to AlexOSLogo
+* Remove Orion wordmark
+* Display AlexOS branding only
+* Preserve SVG/design quality
+* Do not change layout behavior
+
+Update all imports.
+
+---
+
+## 2. Authentication Page
+
+File:
+
+src/routes/auth.tsx
+
+Replace:
+
+"Powered by Orion AI"
+
+with:
+
+"Powered by Auren Intelligence"
+
+Replace:
+
+"AlexOS Orion workspace"
+
+with:
+
+"AlexOS workspace"
+
+---
+
+## 3. Root Metadata
+
+File:
+
+src/routes/__root.tsx
+
+Update:
+
+title:
+
+AlexOS — Business Operating System
+
+Description:
+
+Remove Orion references.
+
+Use:
+
+AlexOS is a business operating system powered by Auren Intelligence.
+
+Update:
+
+OpenGraph titles
+
+Twitter titles
+
+Any metadata strings.
+
+---
+
+## 4. Dashboard Branding
+
+Audit:
+
+src/routes/_authenticated/dashboard.tsx
+
+src/components/dashboard/
+
+Replace visible Orion references.
+
+Examples:
+
+"Orion Intelligence Feed"
+
+→
+
+"Auren Intelligence Feed"
+
+"Orion brings your priorities"
+
+→
+
+"Auren Intelligence helps surface priorities"
+
+"Orion is online"
+
+→
+
+"Auren Intelligence active"
+
+---
+
+## 5. Component Names
+
+Where appropriate:
+
+Rename:
+
+OrionLogo
+
+to:
+
+AlexOSLogo
+
+Rename files only if safe.
+
+Do not break imports.
+
+---
+
+## 6. CSS Variables
+
+IMPORTANT:
+
+Do NOT rename CSS variables yet.
+
+Keep:
+
+--orion-purple
+--orion-green
+--orion-blue
+
+They are internal implementation details.
+
+CSS migration will happen later.
+
+---
+
+## 7. Validation
+
+After changes:
+
+Run:
+
+npm run build
+
+Confirm:
+
+* No TypeScript errors
+* No broken imports
+* No visible Orion references
+
+Search repository:
+
+Orion
+
+AlexOS Orion
+
+Orion AI
+
+Return:
+
+1. Files changed
+2. Branding changes completed
+3. Build result
+4. Any remaining references
+
+Do not continue to Phase 2.
+Wait for approval.
