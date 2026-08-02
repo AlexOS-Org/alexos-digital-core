@@ -201,8 +201,10 @@ export function useUpdateOrderStatus() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ order, status }: { order: Order; status: Order["status"] }) => {
-      const patch: Record<string, unknown> = { status };
-      if (status === "delivered") patch.delivered_at = new Date().toISOString();
+      const patch = {
+        status,
+        ...(status === "delivered" ? { delivered_at: new Date().toISOString() } : {}),
+      };
       const { error } = await supabase.from("dg_orders").update(patch).eq("id", order.id);
       if (error) throw error;
       await supabase.from("dg_order_events").insert({
