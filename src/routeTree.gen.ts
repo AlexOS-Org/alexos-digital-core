@@ -34,6 +34,7 @@ import { Route as AuthenticatedBankingRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAurenRouteImport } from './routes/_authenticated/auren'
 import { Route as AuthenticatedPeopleIndexRouteImport } from './routes/_authenticated/people.index'
 import { Route as AuthenticatedMoneyCenterIndexRouteImport } from './routes/_authenticated/money-center.index'
+import { Route as AuthenticatedECommerceIndexRouteImport } from './routes/_authenticated/e-commerce.index'
 import { Route as AuthenticatedPeopleLeadsRouteImport } from './routes/_authenticated/people.leads'
 import { Route as AuthenticatedMoneyCenterTransfersRouteImport } from './routes/_authenticated/money-center.transfers'
 import { Route as AuthenticatedMoneyCenterTransactionsRouteImport } from './routes/_authenticated/money-center.transactions'
@@ -177,6 +178,12 @@ const AuthenticatedMoneyCenterIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedMoneyCenterRoute,
   } as any)
+const AuthenticatedECommerceIndexRoute =
+  AuthenticatedECommerceIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
 const AuthenticatedPeopleLeadsRoute =
   AuthenticatedPeopleLeadsRouteImport.update({
     id: '/leads',
@@ -260,7 +267,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/debt-management': typeof AuthenticatedDebtManagementRoute
   '/documents': typeof AuthenticatedDocumentsRoute
-  '/e-commerce': typeof AuthenticatedECommerceRoute
+  '/e-commerce': typeof AuthenticatedECommerceRouteWithChildren
   '/goals': typeof AuthenticatedGoalsRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/marketing': typeof AuthenticatedMarketingRoute
@@ -283,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/e-commerce/': typeof AuthenticatedECommerceIndexRoute
   '/money-center/': typeof AuthenticatedMoneyCenterIndexRoute
   '/people/': typeof AuthenticatedPeopleIndexRoute
   '/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
@@ -298,7 +306,6 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/debt-management': typeof AuthenticatedDebtManagementRoute
   '/documents': typeof AuthenticatedDocumentsRoute
-  '/e-commerce': typeof AuthenticatedECommerceRoute
   '/goals': typeof AuthenticatedGoalsRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/marketing': typeof AuthenticatedMarketingRoute
@@ -319,6 +326,7 @@ export interface FileRoutesByTo {
   '/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/e-commerce': typeof AuthenticatedECommerceIndexRoute
   '/money-center': typeof AuthenticatedMoneyCenterIndexRoute
   '/people': typeof AuthenticatedPeopleIndexRoute
   '/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
@@ -336,7 +344,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/debt-management': typeof AuthenticatedDebtManagementRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
-  '/_authenticated/e-commerce': typeof AuthenticatedECommerceRoute
+  '/_authenticated/e-commerce': typeof AuthenticatedECommerceRouteWithChildren
   '/_authenticated/goals': typeof AuthenticatedGoalsRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/marketing': typeof AuthenticatedMarketingRoute
@@ -359,6 +367,7 @@ export interface FileRoutesById {
   '/_authenticated/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/_authenticated/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/_authenticated/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/_authenticated/e-commerce/': typeof AuthenticatedECommerceIndexRoute
   '/_authenticated/money-center/': typeof AuthenticatedMoneyCenterIndexRoute
   '/_authenticated/people/': typeof AuthenticatedPeopleIndexRoute
   '/_authenticated/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
@@ -399,6 +408,7 @@ export interface FileRouteTypes {
     | '/money-center/transactions'
     | '/money-center/transfers'
     | '/people/leads'
+    | '/e-commerce/'
     | '/money-center/'
     | '/people/'
     | '/people/contacts/$id'
@@ -414,7 +424,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/debt-management'
     | '/documents'
-    | '/e-commerce'
     | '/goals'
     | '/library'
     | '/marketing'
@@ -435,6 +444,7 @@ export interface FileRouteTypes {
     | '/money-center/transactions'
     | '/money-center/transfers'
     | '/people/leads'
+    | '/e-commerce'
     | '/money-center'
     | '/people'
     | '/people/contacts/$id'
@@ -474,6 +484,7 @@ export interface FileRouteTypes {
     | '/_authenticated/money-center/transactions'
     | '/_authenticated/money-center/transfers'
     | '/_authenticated/people/leads'
+    | '/_authenticated/e-commerce/'
     | '/_authenticated/money-center/'
     | '/_authenticated/people/'
     | '/_authenticated/people/contacts/$id'
@@ -663,6 +674,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMoneyCenterIndexRouteImport
       parentRoute: typeof AuthenticatedMoneyCenterRoute
     }
+    '/_authenticated/e-commerce/': {
+      id: '/_authenticated/e-commerce/'
+      path: '/'
+      fullPath: '/e-commerce/'
+      preLoaderRoute: typeof AuthenticatedECommerceIndexRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
     '/_authenticated/people/leads': {
       id: '/_authenticated/people/leads'
       path: '/leads'
@@ -750,6 +768,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedECommerceRouteChildren {
+  AuthenticatedECommerceIndexRoute: typeof AuthenticatedECommerceIndexRoute
+}
+
+const AuthenticatedECommerceRouteChildren: AuthenticatedECommerceRouteChildren =
+  {
+    AuthenticatedECommerceIndexRoute: AuthenticatedECommerceIndexRoute,
+  }
+
+const AuthenticatedECommerceRouteWithChildren =
+  AuthenticatedECommerceRoute._addFileChildren(
+    AuthenticatedECommerceRouteChildren,
+  )
+
 interface AuthenticatedMoneyCenterRouteChildren {
   AuthenticatedMoneyCenterAccountsRoute: typeof AuthenticatedMoneyCenterAccountsRoute
   AuthenticatedMoneyCenterAnalyticsRoute: typeof AuthenticatedMoneyCenterAnalyticsRoute
@@ -825,7 +857,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDebtManagementRoute: typeof AuthenticatedDebtManagementRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
-  AuthenticatedECommerceRoute: typeof AuthenticatedECommerceRoute
+  AuthenticatedECommerceRoute: typeof AuthenticatedECommerceRouteWithChildren
   AuthenticatedGoalsRoute: typeof AuthenticatedGoalsRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
   AuthenticatedMarketingRoute: typeof AuthenticatedMarketingRoute
@@ -848,7 +880,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDebtManagementRoute: AuthenticatedDebtManagementRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
-  AuthenticatedECommerceRoute: AuthenticatedECommerceRoute,
+  AuthenticatedECommerceRoute: AuthenticatedECommerceRouteWithChildren,
   AuthenticatedGoalsRoute: AuthenticatedGoalsRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedMarketingRoute: AuthenticatedMarketingRoute,
