@@ -223,3 +223,129 @@ export function useUpdateOrderStatus() {
     onError: (e: Error) => toast.error(e.message),
   });
 }
+
+/* ── Composite operations ─────────────────────────────────────── */
+
+export interface DraftOrderItem {
+  product_id: string | null;
+  name: string;
+  sku: string | null;
+  quantity: number;
+  unit_price: number;
+  unit_cost: number;
+}
+
+export interface DraftOrder {
+  id?: string;
+  customer_id: string | null;
+  channel: string;
+  status: Order["status"];
+  payment_status: Order["payment_status"];
+  payment_method: string | null;
+  shipping_fee: number;
+  discount: number;
+  tax: number;
+  shipping_address: string | null;
+  notes: string | null;
+  items: DraftOrderItem[];
+}
+
+function orderNumber() {
+  const d = new Date();
+  const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+  return `DG-${stamp}-${Math.floor(Math.random() * 9000 + 1000)}`;
+}
+
+/**
+ * Creates or updates an order together with its line items, timeline entry
+ * and stock movements. Keeping this in one mutation guarantees the order,
+ * its items and inventory never drift apart.
+ */
+export function useSaveOrderWithItems() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (draft: DraftOrder) => {
+      const user_id = await requireUserId();
+      const subtotal = draft.items.reduce((s, i) => s + i.unit_price * i.quantity, 0);
+      const total = subtotal + draft.shipping_fee + draft.tax - draft.discount;
+
+      const payload = {
+        user_id,
+        customer_id: draft.customer_id,
+        channel: draft.channel,
+        status: draft.status,
+        payment_status: draft.payment_status,
+        payment_method: draft.payment_method,
+        shipping_fee: draft.shipping_fee,
+        discount: draft.discount,
+        tax: draft.tax,
+        shipping_address: draft.shipping_address,
+        notes: draft.notes,
+        subtotal,
+        total,
+      };
+
+      let orderId = draft.id ?? "";
+
+      if (draft.id) {
+        const { error } = await supabase.from("dg_orders").update(payload).eq("id", draft.id);
+        if (error) throw error;
+        await supabase.from("dg_order_items").delete().eq("order_id", draft.id);
+      } else {
+        const { data, error } = await supabase
+          .from("dg_orders")
+          .insert({ ...payload, order_number: orderNumber() })
+          .select("id")
+          .single();
+        if (error) throw error;
+        orderId = data.id;
+        await supabase.from("dg_order_events").insert({
+          user_id,
+          order_id: orderId,
+          type: "created",
+          title: "Order created",
+        });
+      }
+
+      if (draft.items.length) {
+        const { error } = await supabase.from("dg_order_items").insert(
+          draft.items.map((i) => ({
+            user_id,
+            order_id: orderId,
+            product_id: i.product_id,
+            name: i.name,
+            sku: i.sku,
+            quantity: i.quantity,
+            unit_price: i.unit_price,
+            unit_cost: i.unit_cost,
+            total: i.unit_price * i.quantity,
+          })),
+        );
+        if (error) throw error;
+      }
+
+      if (!draft.id) {
+        const sales = draft.items.filter((i) => i.product_id);
+        if (sales.length) {
+          await supabase.from("dg_stock_movements").insert(
+            sales.map((i) => ({
+              user_id,
+              product_id: i.product_id,
+              type: "sale" as const,
+              quantity: -i.quantity,
+              unit_cost: i.unit_cost,
+              reference: orderId,
+            })),
+          );
+        }
+      }
+
+      return orderId;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["dailygear"] });
+      toast.success("Order saved");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
