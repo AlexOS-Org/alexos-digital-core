@@ -191,7 +191,7 @@ function CheckoutPage() {
       const result = await saveOrder.mutateAsync(draft);
       cart.clear();
       navigate({
-        to: "/_authenticated/e-commerce/thank-you",
+        to: "/e-commerce/thank-you",
         search: (old) => ({
           ...old,
           orderId: result.orderId,
@@ -405,7 +405,7 @@ function CheckoutPage() {
                 </p>
                 <Button
                   variant="outline"
-                  onClick={() => navigate({ to: "/_authenticated/e-commerce/store" })}
+                  onClick={() => navigate({ to: "/e-commerce/store" })}
                 >
                   Go to store preview
                 </Button>

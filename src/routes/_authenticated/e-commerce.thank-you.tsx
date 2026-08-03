@@ -118,12 +118,12 @@ function ThankYouPage() {
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Button onClick={() => navigate({ to: "/_authenticated/e-commerce/orders" })}>
+        <Button onClick={() => navigate({ to: "/e-commerce/orders" })}>
           View orders
         </Button>
         <Button
           variant="outline"
-          onClick={() => navigate({ to: "/_authenticated/e-commerce/store" })}
+          onClick={() => navigate({ to: "/e-commerce/store" })}
         >
           Back to store preview
         </Button>

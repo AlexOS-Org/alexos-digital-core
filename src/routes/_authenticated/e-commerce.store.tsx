@@ -52,7 +52,7 @@ function StorePage() {
         description="Browse your catalogue, add products to an order and continue to checkout with shipping, payment and customer details."
         actions={
           <Button
-            onClick={() => navigate({ to: "/_authenticated/e-commerce/checkout" })}
+            onClick={() => navigate({ to: "/e-commerce/checkout" })}
             disabled={cart.items.length === 0}
           >
             <CreditCard className="mr-2 h-4 w-4" />
@@ -104,7 +104,7 @@ function StorePage() {
               <div className="mt-3 grid gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => navigate({ to: "/_authenticated/e-commerce/checkout" })}
+                  onClick={() => navigate({ to: "/e-commerce/checkout" })}
                   disabled={cart.items.length === 0}
                 >
                   Continue to checkout
@@ -160,13 +160,13 @@ function StorePage() {
             <CardContent className="space-y-3">
               <Button
                 variant="outline"
-                onClick={() => navigate({ to: "/_authenticated/e-commerce/products" })}
+                onClick={() => navigate({ to: "/e-commerce/products" })}
               >
                 Manage catalogue
               </Button>
               <Button
                 variant="outline"
-                onClick={() => navigate({ to: "/_authenticated/e-commerce/orders" })}
+                onClick={() => navigate({ to: "/e-commerce/orders" })}
               >
                 Review orders
               </Button>
@@ -241,7 +241,7 @@ function StorePage() {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => navigate({ to: "/_authenticated/e-commerce/checkout" })}
+                    onClick={() => navigate({ to: "/e-commerce/checkout" })}
                   >
                     Buy now
                   </Button>

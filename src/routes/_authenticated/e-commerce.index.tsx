@@ -49,7 +49,7 @@ function CommerceOverview() {
         title="DailyGear Commerce"
         description="Executive view of revenue, profitability, fulfilment and inventory health."
         actions={
-          <Button onClick={() => navigate({ to: "/_authenticated/e-commerce/store" })}>
+          <Button onClick={() => navigate({ to: "/e-commerce/store" })}>
             Store preview
           </Button>
         }

@@ -35,7 +35,7 @@ function LandingPagesPage() {
         actions={
           <Button
             variant="outline"
-            onClick={() => navigate({ to: "/_authenticated/e-commerce/store" })}
+            onClick={() => navigate({ to: "/e-commerce/store" })}
           >
             Store preview
           </Button>
@@ -78,13 +78,13 @@ function LandingPagesPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => navigate({ to: "/_authenticated/e-commerce/store" })}
+                      onClick={() => navigate({ to: "/e-commerce/store" })}
                     >
                       Preview in store
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => navigate({ to: "/_authenticated/e-commerce/checkout" })}
+                      onClick={() => navigate({ to: "/e-commerce/checkout" })}
                     >
                       Sell now
                     </Button>
