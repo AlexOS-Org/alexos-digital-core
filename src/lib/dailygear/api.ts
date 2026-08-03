@@ -195,6 +195,7 @@ export const useOrderEvents = orderEventsResource.useList;
 
 export const useStockMovements = stockMovementsResource.useList;
 export const useSaveStockMovement = () => stockMovementsResource.useSave("Stock movement");
+export const useVariants = variantsResource.useList;
 
 /** Order status change + timeline entry, kept out of the components. */
 export function useUpdateOrderStatus() {
@@ -228,6 +229,7 @@ export function useUpdateOrderStatus() {
 
 export interface DraftOrderItem {
   product_id: string | null;
+  variant_id?: string | null;
   name: string;
   sku: string | null;
   quantity: number;
@@ -242,6 +244,7 @@ export interface DraftOrder {
   status: Order["status"];
   payment_status: Order["payment_status"];
   payment_method: string | null;
+  shipping_method: string | null;
   shipping_fee: number;
   discount: number;
   tax: number;
@@ -276,6 +279,7 @@ export function useSaveOrderWithItems() {
         status: draft.status,
         payment_status: draft.payment_status,
         payment_method: draft.payment_method,
+        shipping_method: draft.shipping_method,
         shipping_fee: draft.shipping_fee,
         discount: draft.discount,
         tax: draft.tax,
@@ -286,6 +290,7 @@ export function useSaveOrderWithItems() {
       };
 
       let orderId = draft.id ?? "";
+      let orderNumber = "";
 
       if (draft.id) {
         const { error } = await supabase.from("dg_orders").update(payload).eq("id", draft.id);
@@ -295,10 +300,11 @@ export function useSaveOrderWithItems() {
         const { data, error } = await supabase
           .from("dg_orders")
           .insert({ ...payload, order_number: orderNumber() })
-          .select("id")
+          .select("id, order_number")
           .single();
         if (error) throw error;
         orderId = data.id;
+        orderNumber = data.order_number;
         await supabase.from("dg_order_events").insert({
           user_id,
           order_id: orderId,
@@ -313,6 +319,7 @@ export function useSaveOrderWithItems() {
             user_id,
             order_id: orderId,
             product_id: i.product_id,
+            variant_id: i.variant_id,
             name: i.name,
             sku: i.sku,
             quantity: i.quantity,
@@ -327,18 +334,56 @@ export function useSaveOrderWithItems() {
       if (!draft.id) {
         const sales = draft.items.filter((i) => i.product_id);
         if (sales.length) {
-          await supabase.from("dg_stock_movements").insert(
+          for (const item of sales) {
+            if (item.variant_id) {
+              const { data: variant, error: variantError } = await supabase
+                .from("dg_product_variants")
+                .select("stock_quantity")
+                .eq("id", item.variant_id)
+                .single();
+              if (variantError) throw variantError;
+              if (variant == null || Number(variant.stock_quantity) < item.quantity) {
+                throw new Error(`Insufficient stock for variant ${item.name}`);
+              }
+              const { error: variantUpdateError } = await supabase
+                .from("dg_product_variants")
+                .update({ stock_quantity: Number(variant.stock_quantity) - item.quantity })
+                .eq("id", item.variant_id);
+              if (variantUpdateError) throw variantUpdateError;
+            }
+
+            const { data: product, error: productError } = await supabase
+              .from("dg_products")
+              .select("stock_quantity")
+              .eq("id", item.product_id)
+              .single();
+            if (productError) throw productError;
+            if (product == null || Number(product.stock_quantity) < item.quantity) {
+              throw new Error(`Insufficient stock for ${item.name}`);
+            }
+            const { error: productUpdateError } = await supabase
+              .from("dg_products")
+              .update({ stock_quantity: Number(product.stock_quantity) - item.quantity })
+              .eq("id", item.product_id);
+            if (productUpdateError) throw productUpdateError;
+          }
+
+          const { error } = await supabase.from("dg_stock_movements").insert(
             sales.map((i) => ({
               user_id,
               product_id: i.product_id,
+              variant_id: i.variant_id,
               type: "sale" as const,
               quantity: -i.quantity,
               unit_cost: i.unit_cost,
               reference: orderId,
             })),
           );
+          if (error) throw error;
         }
       }
+
+      return { orderId, orderNumber };
 
       return orderId;
     },

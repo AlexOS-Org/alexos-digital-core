@@ -11,6 +11,8 @@ import {
   Sparkles,
   BarChart3,
   Settings,
+  Truck,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 
@@ -54,6 +56,20 @@ export const DAILYGEAR_SECTIONS: DailyGearSection[] = [
     label: "Orders",
     icon: ShoppingCart,
     description: "Fulfilment pipeline, payments, shipping and timelines.",
+    group: "Operations",
+  },
+  {
+    to: "/e-commerce/store",
+    label: "Store preview",
+    icon: Truck,
+    description: "Browse your catalogue and build checkout-ready orders.",
+    group: "Operations",
+  },
+  {
+    to: "/e-commerce/checkout",
+    label: "Checkout",
+    icon: Wallet,
+    description: "Complete orders with shipping, payment and customer details.",
     group: "Operations",
   },
   {

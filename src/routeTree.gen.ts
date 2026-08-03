@@ -9,141 +9,96 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedVehicleSalesRouteImport } from './routes/_authenticated/vehicle-sales'
-import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
-import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
-import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
-import { Route as AuthenticatedPeopleRouteImport } from './routes/_authenticated/people'
-import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
-import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
-import { Route as AuthenticatedMoneyCenterRouteImport } from './routes/_authenticated/money-center'
-import { Route as AuthenticatedMissionsRouteImport } from './routes/_authenticated/missions'
-import { Route as AuthenticatedMarketingRouteImport } from './routes/_authenticated/marketing'
-import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
-import { Route as AuthenticatedGoalsRouteImport } from './routes/_authenticated/goals'
-import { Route as AuthenticatedECommerceRouteImport } from './routes/_authenticated/e-commerce'
-import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
-import { Route as AuthenticatedDebtManagementRouteImport } from './routes/_authenticated/debt-management'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
-import { Route as AuthenticatedBusinessesRouteImport } from './routes/_authenticated/businesses'
-import { Route as AuthenticatedBankingRouteImport } from './routes/_authenticated/banking'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAurenRouteImport } from './routes/_authenticated/auren'
-import { Route as AuthenticatedPeopleIndexRouteImport } from './routes/_authenticated/people.index'
-import { Route as AuthenticatedMoneyCenterIndexRouteImport } from './routes/_authenticated/money-center.index'
+import { Route as AuthenticatedBankingRouteImport } from './routes/_authenticated/banking'
+import { Route as AuthenticatedBusinessesRouteImport } from './routes/_authenticated/businesses'
+import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDebtManagementRouteImport } from './routes/_authenticated/debt-management'
+import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
+import { Route as AuthenticatedECommerceRouteImport } from './routes/_authenticated/e-commerce'
+import { Route as AuthenticatedGoalsRouteImport } from './routes/_authenticated/goals'
+import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as AuthenticatedMarketingRouteImport } from './routes/_authenticated/marketing'
+import { Route as AuthenticatedMissionsRouteImport } from './routes/_authenticated/missions'
+import { Route as AuthenticatedMoneyCenterRouteImport } from './routes/_authenticated/money-center'
+import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
+import { Route as AuthenticatedPeopleRouteImport } from './routes/_authenticated/people'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
+import { Route as AuthenticatedVehicleSalesRouteImport } from './routes/_authenticated/vehicle-sales'
 import { Route as AuthenticatedECommerceIndexRouteImport } from './routes/_authenticated/e-commerce.index'
-import { Route as AuthenticatedPeopleLeadsRouteImport } from './routes/_authenticated/people.leads'
-import { Route as AuthenticatedMoneyCenterTransfersRouteImport } from './routes/_authenticated/money-center.transfers'
-import { Route as AuthenticatedMoneyCenterTransactionsRouteImport } from './routes/_authenticated/money-center.transactions'
-import { Route as AuthenticatedMoneyCenterIncomeRouteImport } from './routes/_authenticated/money-center.income'
-import { Route as AuthenticatedMoneyCenterExpensesRouteImport } from './routes/_authenticated/money-center.expenses'
-import { Route as AuthenticatedMoneyCenterExpectedRouteImport } from './routes/_authenticated/money-center.expected'
-import { Route as AuthenticatedMoneyCenterBudgetsRouteImport } from './routes/_authenticated/money-center.budgets'
-import { Route as AuthenticatedMoneyCenterBillsRouteImport } from './routes/_authenticated/money-center.bills'
-import { Route as AuthenticatedMoneyCenterAnalyticsRouteImport } from './routes/_authenticated/money-center.analytics'
-import { Route as AuthenticatedMoneyCenterAccountsRouteImport } from './routes/_authenticated/money-center.accounts'
-import { Route as AuthenticatedECommerceSettingsRouteImport } from './routes/_authenticated/e-commerce.settings'
-import { Route as AuthenticatedECommerceReportsRouteImport } from './routes/_authenticated/e-commerce.reports'
-import { Route as AuthenticatedECommerceProductsRouteImport } from './routes/_authenticated/e-commerce.products'
-import { Route as AuthenticatedECommerceOrdersRouteImport } from './routes/_authenticated/e-commerce.orders'
-import { Route as AuthenticatedECommerceMarketingRouteImport } from './routes/_authenticated/e-commerce.marketing'
-import { Route as AuthenticatedECommerceMarketRouteImport } from './routes/_authenticated/e-commerce.market'
-import { Route as AuthenticatedECommerceLandingPagesRouteImport } from './routes/_authenticated/e-commerce.landing-pages'
-import { Route as AuthenticatedECommerceInventoryRouteImport } from './routes/_authenticated/e-commerce.inventory'
-import { Route as AuthenticatedECommerceCustomersRouteImport } from './routes/_authenticated/e-commerce.customers'
-import { Route as AuthenticatedECommerceCompetitorsRouteImport } from './routes/_authenticated/e-commerce.competitors'
 import { Route as AuthenticatedECommerceAdsRouteImport } from './routes/_authenticated/e-commerce.ads'
-import { Route as AuthenticatedPeopleLeadsIdRouteImport } from './routes/_authenticated/people.leads.$id'
+import { Route as AuthenticatedECommerceCheckoutRouteImport } from './routes/_authenticated/e-commerce.checkout'
+import { Route as AuthenticatedECommerceCompetitorsRouteImport } from './routes/_authenticated/e-commerce.competitors'
+import { Route as AuthenticatedECommerceCustomersRouteImport } from './routes/_authenticated/e-commerce.customers'
+import { Route as AuthenticatedECommerceInventoryRouteImport } from './routes/_authenticated/e-commerce.inventory'
+import { Route as AuthenticatedECommerceLandingPagesRouteImport } from './routes/_authenticated/e-commerce.landing-pages'
+import { Route as AuthenticatedECommerceMarketRouteImport } from './routes/_authenticated/e-commerce.market'
+import { Route as AuthenticatedECommerceMarketingRouteImport } from './routes/_authenticated/e-commerce.marketing'
+import { Route as AuthenticatedECommerceOrdersRouteImport } from './routes/_authenticated/e-commerce.orders'
+import { Route as AuthenticatedECommerceProductsRouteImport } from './routes/_authenticated/e-commerce.products'
+import { Route as AuthenticatedECommerceReportsRouteImport } from './routes/_authenticated/e-commerce.reports'
+import { Route as AuthenticatedECommerceSettingsRouteImport } from './routes/_authenticated/e-commerce.settings'
+import { Route as AuthenticatedECommerceStoreRouteImport } from './routes/_authenticated/e-commerce.store'
+import { Route as AuthenticatedECommerceThankYouRouteImport } from './routes/_authenticated/e-commerce.thank-you'
+import { Route as AuthenticatedMoneyCenterIndexRouteImport } from './routes/_authenticated/money-center.index'
+import { Route as AuthenticatedMoneyCenterAccountsRouteImport } from './routes/_authenticated/money-center.accounts'
+import { Route as AuthenticatedMoneyCenterAnalyticsRouteImport } from './routes/_authenticated/money-center.analytics'
+import { Route as AuthenticatedMoneyCenterBillsRouteImport } from './routes/_authenticated/money-center.bills'
+import { Route as AuthenticatedMoneyCenterBudgetsRouteImport } from './routes/_authenticated/money-center.budgets'
+import { Route as AuthenticatedMoneyCenterExpectedRouteImport } from './routes/_authenticated/money-center.expected'
+import { Route as AuthenticatedMoneyCenterExpensesRouteImport } from './routes/_authenticated/money-center.expenses'
+import { Route as AuthenticatedMoneyCenterIncomeRouteImport } from './routes/_authenticated/money-center.income'
+import { Route as AuthenticatedMoneyCenterTransactionsRouteImport } from './routes/_authenticated/money-center.transactions'
+import { Route as AuthenticatedMoneyCenterTransfersRouteImport } from './routes/_authenticated/money-center.transfers'
+import { Route as AuthenticatedPeopleIndexRouteImport } from './routes/_authenticated/people.index'
+import { Route as AuthenticatedPeopleLeadsRouteImport } from './routes/_authenticated/people.leads'
 import { Route as AuthenticatedPeopleContactsIdRouteImport } from './routes/_authenticated/people.contacts.$id'
+import { Route as AuthenticatedPeopleLeadsIdRouteImport } from './routes/_authenticated/people.leads.$id'
 
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedVehicleSalesRoute =
-  AuthenticatedVehicleSalesRouteImport.update({
-    id: '/vehicle-sales',
-    path: '/vehicle-sales',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
+const AuthenticatedAurenRoute = AuthenticatedAurenRouteImport.update({
+  id: '/auren',
+  path: '/auren',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const AuthenticatedBankingRoute = AuthenticatedBankingRouteImport.update({
+  id: '/banking',
+  path: '/banking',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
+const AuthenticatedBusinessesRoute = AuthenticatedBusinessesRouteImport.update({
+  id: '/businesses',
+  path: '/businesses',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedPeopleRoute = AuthenticatedPeopleRouteImport.update({
-  id: '/people',
-  path: '/people',
+const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedNotificationsRoute =
-  AuthenticatedNotificationsRouteImport.update({
-    id: '/notifications',
-    path: '/notifications',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedNotesRoute = AuthenticatedNotesRouteImport.update({
-  id: '/notes',
-  path: '/notes',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedMoneyCenterRoute =
-  AuthenticatedMoneyCenterRouteImport.update({
-    id: '/money-center',
-    path: '/money-center',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedMissionsRoute = AuthenticatedMissionsRouteImport.update({
-  id: '/missions',
-  path: '/missions',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedMarketingRoute = AuthenticatedMarketingRouteImport.update({
-  id: '/marketing',
-  path: '/marketing',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
-  id: '/library',
-  path: '/library',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedGoalsRoute = AuthenticatedGoalsRouteImport.update({
-  id: '/goals',
-  path: '/goals',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedECommerceRoute = AuthenticatedECommerceRouteImport.update({
-  id: '/e-commerce',
-  path: '/e-commerce',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
-  id: '/documents',
-  path: '/documents',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDebtManagementRoute =
@@ -152,167 +107,83 @@ const AuthenticatedDebtManagementRoute =
     path: '/debt-management',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
-  id: '/calendar',
-  path: '/calendar',
+const AuthenticatedECommerceRoute = AuthenticatedECommerceRouteImport.update({
+  id: '/e-commerce',
+  path: '/e-commerce',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedBusinessesRoute = AuthenticatedBusinessesRouteImport.update({
-  id: '/businesses',
-  path: '/businesses',
+const AuthenticatedGoalsRoute = AuthenticatedGoalsRouteImport.update({
+  id: '/goals',
+  path: '/goals',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedBankingRoute = AuthenticatedBankingRouteImport.update({
-  id: '/banking',
-  path: '/banking',
+const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAurenRoute = AuthenticatedAurenRouteImport.update({
-  id: '/auren',
-  path: '/auren',
+const AuthenticatedMarketingRoute = AuthenticatedMarketingRouteImport.update({
+  id: '/marketing',
+  path: '/marketing',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedPeopleIndexRoute =
-  AuthenticatedPeopleIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedPeopleRoute,
+const AuthenticatedMissionsRoute = AuthenticatedMissionsRouteImport.update({
+  id: '/missions',
+  path: '/missions',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMoneyCenterRoute =
+  AuthenticatedMoneyCenterRouteImport.update({
+    id: '/money-center',
+    path: '/money-center',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedMoneyCenterIndexRoute =
-  AuthenticatedMoneyCenterIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+const AuthenticatedNotesRoute = AuthenticatedNotesRouteImport.update({
+  id: '/notes',
+  path: '/notes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPeopleRoute = AuthenticatedPeopleRouteImport.update({
+  id: '/people',
+  path: '/people',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedVehicleSalesRoute =
+  AuthenticatedVehicleSalesRouteImport.update({
+    id: '/vehicle-sales',
+    path: '/vehicle-sales',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedECommerceIndexRoute =
   AuthenticatedECommerceIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthenticatedECommerceRoute,
-  } as any)
-const AuthenticatedPeopleLeadsRoute =
-  AuthenticatedPeopleLeadsRouteImport.update({
-    id: '/leads',
-    path: '/leads',
-    getParentRoute: () => AuthenticatedPeopleRoute,
-  } as any)
-const AuthenticatedMoneyCenterTransfersRoute =
-  AuthenticatedMoneyCenterTransfersRouteImport.update({
-    id: '/transfers',
-    path: '/transfers',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
-  } as any)
-const AuthenticatedMoneyCenterTransactionsRoute =
-  AuthenticatedMoneyCenterTransactionsRouteImport.update({
-    id: '/transactions',
-    path: '/transactions',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
-  } as any)
-const AuthenticatedMoneyCenterIncomeRoute =
-  AuthenticatedMoneyCenterIncomeRouteImport.update({
-    id: '/income',
-    path: '/income',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
-  } as any)
-const AuthenticatedMoneyCenterExpensesRoute =
-  AuthenticatedMoneyCenterExpensesRouteImport.update({
-    id: '/expenses',
-    path: '/expenses',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
-  } as any)
-const AuthenticatedMoneyCenterExpectedRoute =
-  AuthenticatedMoneyCenterExpectedRouteImport.update({
-    id: '/expected',
-    path: '/expected',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
-  } as any)
-const AuthenticatedMoneyCenterBudgetsRoute =
-  AuthenticatedMoneyCenterBudgetsRouteImport.update({
-    id: '/budgets',
-    path: '/budgets',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
-  } as any)
-const AuthenticatedMoneyCenterBillsRoute =
-  AuthenticatedMoneyCenterBillsRouteImport.update({
-    id: '/bills',
-    path: '/bills',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
-  } as any)
-const AuthenticatedMoneyCenterAnalyticsRoute =
-  AuthenticatedMoneyCenterAnalyticsRouteImport.update({
-    id: '/analytics',
-    path: '/analytics',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
-  } as any)
-const AuthenticatedMoneyCenterAccountsRoute =
-  AuthenticatedMoneyCenterAccountsRouteImport.update({
-    id: '/accounts',
-    path: '/accounts',
-    getParentRoute: () => AuthenticatedMoneyCenterRoute,
-  } as any)
-const AuthenticatedECommerceSettingsRoute =
-  AuthenticatedECommerceSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedECommerceRoute,
-  } as any)
-const AuthenticatedECommerceReportsRoute =
-  AuthenticatedECommerceReportsRouteImport.update({
-    id: '/reports',
-    path: '/reports',
-    getParentRoute: () => AuthenticatedECommerceRoute,
-  } as any)
-const AuthenticatedECommerceProductsRoute =
-  AuthenticatedECommerceProductsRouteImport.update({
-    id: '/products',
-    path: '/products',
-    getParentRoute: () => AuthenticatedECommerceRoute,
-  } as any)
-const AuthenticatedECommerceOrdersRoute =
-  AuthenticatedECommerceOrdersRouteImport.update({
-    id: '/orders',
-    path: '/orders',
-    getParentRoute: () => AuthenticatedECommerceRoute,
-  } as any)
-const AuthenticatedECommerceMarketingRoute =
-  AuthenticatedECommerceMarketingRouteImport.update({
-    id: '/marketing',
-    path: '/marketing',
-    getParentRoute: () => AuthenticatedECommerceRoute,
-  } as any)
-const AuthenticatedECommerceMarketRoute =
-  AuthenticatedECommerceMarketRouteImport.update({
-    id: '/market',
-    path: '/market',
-    getParentRoute: () => AuthenticatedECommerceRoute,
-  } as any)
-const AuthenticatedECommerceLandingPagesRoute =
-  AuthenticatedECommerceLandingPagesRouteImport.update({
-    id: '/landing-pages',
-    path: '/landing-pages',
-    getParentRoute: () => AuthenticatedECommerceRoute,
-  } as any)
-const AuthenticatedECommerceInventoryRoute =
-  AuthenticatedECommerceInventoryRouteImport.update({
-    id: '/inventory',
-    path: '/inventory',
-    getParentRoute: () => AuthenticatedECommerceRoute,
-  } as any)
-const AuthenticatedECommerceCustomersRoute =
-  AuthenticatedECommerceCustomersRouteImport.update({
-    id: '/customers',
-    path: '/customers',
-    getParentRoute: () => AuthenticatedECommerceRoute,
-  } as any)
-const AuthenticatedECommerceCompetitorsRoute =
-  AuthenticatedECommerceCompetitorsRouteImport.update({
-    id: '/competitors',
-    path: '/competitors',
     getParentRoute: () => AuthenticatedECommerceRoute,
   } as any)
 const AuthenticatedECommerceAdsRoute =
@@ -321,17 +192,167 @@ const AuthenticatedECommerceAdsRoute =
     path: '/ads',
     getParentRoute: () => AuthenticatedECommerceRoute,
   } as any)
-const AuthenticatedPeopleLeadsIdRoute =
-  AuthenticatedPeopleLeadsIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedPeopleLeadsRoute,
+const AuthenticatedECommerceCheckoutRoute =
+  AuthenticatedECommerceCheckoutRouteImport.update({
+    id: '/checkout',
+    path: '/checkout',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
+const AuthenticatedECommerceCompetitorsRoute =
+  AuthenticatedECommerceCompetitorsRouteImport.update({
+    id: '/competitors',
+    path: '/competitors',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
+const AuthenticatedECommerceCustomersRoute =
+  AuthenticatedECommerceCustomersRouteImport.update({
+    id: '/customers',
+    path: '/customers',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
+const AuthenticatedECommerceInventoryRoute =
+  AuthenticatedECommerceInventoryRouteImport.update({
+    id: '/inventory',
+    path: '/inventory',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
+const AuthenticatedECommerceLandingPagesRoute =
+  AuthenticatedECommerceLandingPagesRouteImport.update({
+    id: '/landing-pages',
+    path: '/landing-pages',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
+const AuthenticatedECommerceMarketRoute =
+  AuthenticatedECommerceMarketRouteImport.update({
+    id: '/market',
+    path: '/market',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
+const AuthenticatedECommerceMarketingRoute =
+  AuthenticatedECommerceMarketingRouteImport.update({
+    id: '/marketing',
+    path: '/marketing',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
+const AuthenticatedECommerceOrdersRoute =
+  AuthenticatedECommerceOrdersRouteImport.update({
+    id: '/orders',
+    path: '/orders',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
+const AuthenticatedECommerceProductsRoute =
+  AuthenticatedECommerceProductsRouteImport.update({
+    id: '/products',
+    path: '/products',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
+const AuthenticatedECommerceReportsRoute =
+  AuthenticatedECommerceReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
+const AuthenticatedECommerceSettingsRoute =
+  AuthenticatedECommerceSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
+const AuthenticatedECommerceStoreRoute =
+  AuthenticatedECommerceStoreRouteImport.update({
+    id: '/store',
+    path: '/store',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
+const AuthenticatedECommerceThankYouRoute =
+  AuthenticatedECommerceThankYouRouteImport.update({
+    id: '/thank-you',
+    path: '/thank-you',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
+const AuthenticatedMoneyCenterIndexRoute =
+  AuthenticatedMoneyCenterIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterAccountsRoute =
+  AuthenticatedMoneyCenterAccountsRouteImport.update({
+    id: '/accounts',
+    path: '/accounts',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterAnalyticsRoute =
+  AuthenticatedMoneyCenterAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterBillsRoute =
+  AuthenticatedMoneyCenterBillsRouteImport.update({
+    id: '/bills',
+    path: '/bills',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterBudgetsRoute =
+  AuthenticatedMoneyCenterBudgetsRouteImport.update({
+    id: '/budgets',
+    path: '/budgets',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterExpectedRoute =
+  AuthenticatedMoneyCenterExpectedRouteImport.update({
+    id: '/expected',
+    path: '/expected',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterExpensesRoute =
+  AuthenticatedMoneyCenterExpensesRouteImport.update({
+    id: '/expenses',
+    path: '/expenses',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterIncomeRoute =
+  AuthenticatedMoneyCenterIncomeRouteImport.update({
+    id: '/income',
+    path: '/income',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterTransactionsRoute =
+  AuthenticatedMoneyCenterTransactionsRouteImport.update({
+    id: '/transactions',
+    path: '/transactions',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedMoneyCenterTransfersRoute =
+  AuthenticatedMoneyCenterTransfersRouteImport.update({
+    id: '/transfers',
+    path: '/transfers',
+    getParentRoute: () => AuthenticatedMoneyCenterRoute,
+  } as any)
+const AuthenticatedPeopleIndexRoute =
+  AuthenticatedPeopleIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPeopleRoute,
+  } as any)
+const AuthenticatedPeopleLeadsRoute =
+  AuthenticatedPeopleLeadsRouteImport.update({
+    id: '/leads',
+    path: '/leads',
+    getParentRoute: () => AuthenticatedPeopleRoute,
   } as any)
 const AuthenticatedPeopleContactsIdRoute =
   AuthenticatedPeopleContactsIdRouteImport.update({
     id: '/contacts/$id',
     path: '/contacts/$id',
     getParentRoute: () => AuthenticatedPeopleRoute,
+  } as any)
+const AuthenticatedPeopleLeadsIdRoute =
+  AuthenticatedPeopleLeadsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedPeopleLeadsRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -358,6 +379,7 @@ export interface FileRoutesByFullPath {
   '/tasks': typeof AuthenticatedTasksRoute
   '/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
   '/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
+  '/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
   '/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
   '/e-commerce/customers': typeof AuthenticatedECommerceCustomersRoute
   '/e-commerce/inventory': typeof AuthenticatedECommerceInventoryRoute
@@ -368,6 +390,8 @@ export interface FileRoutesByFullPath {
   '/e-commerce/products': typeof AuthenticatedECommerceProductsRoute
   '/e-commerce/reports': typeof AuthenticatedECommerceReportsRoute
   '/e-commerce/settings': typeof AuthenticatedECommerceSettingsRoute
+  '/e-commerce/store': typeof AuthenticatedECommerceStoreRoute
+  '/e-commerce/thank-you': typeof AuthenticatedECommerceThankYouRoute
   '/money-center/accounts': typeof AuthenticatedMoneyCenterAccountsRoute
   '/money-center/analytics': typeof AuthenticatedMoneyCenterAnalyticsRoute
   '/money-center/bills': typeof AuthenticatedMoneyCenterBillsRoute
@@ -405,6 +429,7 @@ export interface FileRoutesByTo {
   '/tasks': typeof AuthenticatedTasksRoute
   '/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
   '/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
+  '/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
   '/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
   '/e-commerce/customers': typeof AuthenticatedECommerceCustomersRoute
   '/e-commerce/inventory': typeof AuthenticatedECommerceInventoryRoute
@@ -415,6 +440,8 @@ export interface FileRoutesByTo {
   '/e-commerce/products': typeof AuthenticatedECommerceProductsRoute
   '/e-commerce/reports': typeof AuthenticatedECommerceReportsRoute
   '/e-commerce/settings': typeof AuthenticatedECommerceSettingsRoute
+  '/e-commerce/store': typeof AuthenticatedECommerceStoreRoute
+  '/e-commerce/thank-you': typeof AuthenticatedECommerceThankYouRoute
   '/money-center/accounts': typeof AuthenticatedMoneyCenterAccountsRoute
   '/money-center/analytics': typeof AuthenticatedMoneyCenterAnalyticsRoute
   '/money-center/bills': typeof AuthenticatedMoneyCenterBillsRoute
@@ -457,6 +484,7 @@ export interface FileRoutesById {
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
   '/_authenticated/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
+  '/_authenticated/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
   '/_authenticated/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
   '/_authenticated/e-commerce/customers': typeof AuthenticatedECommerceCustomersRoute
   '/_authenticated/e-commerce/inventory': typeof AuthenticatedECommerceInventoryRoute
@@ -467,6 +495,8 @@ export interface FileRoutesById {
   '/_authenticated/e-commerce/products': typeof AuthenticatedECommerceProductsRoute
   '/_authenticated/e-commerce/reports': typeof AuthenticatedECommerceReportsRoute
   '/_authenticated/e-commerce/settings': typeof AuthenticatedECommerceSettingsRoute
+  '/_authenticated/e-commerce/store': typeof AuthenticatedECommerceStoreRoute
+  '/_authenticated/e-commerce/thank-you': typeof AuthenticatedECommerceThankYouRoute
   '/_authenticated/money-center/accounts': typeof AuthenticatedMoneyCenterAccountsRoute
   '/_authenticated/money-center/analytics': typeof AuthenticatedMoneyCenterAnalyticsRoute
   '/_authenticated/money-center/bills': typeof AuthenticatedMoneyCenterBillsRoute
@@ -509,6 +539,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/vehicle-sales'
     | '/e-commerce/ads'
+    | '/e-commerce/checkout'
     | '/e-commerce/competitors'
     | '/e-commerce/customers'
     | '/e-commerce/inventory'
@@ -519,6 +550,8 @@ export interface FileRouteTypes {
     | '/e-commerce/products'
     | '/e-commerce/reports'
     | '/e-commerce/settings'
+    | '/e-commerce/store'
+    | '/e-commerce/thank-you'
     | '/money-center/accounts'
     | '/money-center/analytics'
     | '/money-center/bills'
@@ -556,6 +589,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/vehicle-sales'
     | '/e-commerce/ads'
+    | '/e-commerce/checkout'
     | '/e-commerce/competitors'
     | '/e-commerce/customers'
     | '/e-commerce/inventory'
@@ -566,6 +600,8 @@ export interface FileRouteTypes {
     | '/e-commerce/products'
     | '/e-commerce/reports'
     | '/e-commerce/settings'
+    | '/e-commerce/store'
+    | '/e-commerce/thank-you'
     | '/money-center/accounts'
     | '/money-center/analytics'
     | '/money-center/bills'
@@ -607,6 +643,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tasks'
     | '/_authenticated/vehicle-sales'
     | '/_authenticated/e-commerce/ads'
+    | '/_authenticated/e-commerce/checkout'
     | '/_authenticated/e-commerce/competitors'
     | '/_authenticated/e-commerce/customers'
     | '/_authenticated/e-commerce/inventory'
@@ -617,6 +654,8 @@ export interface FileRouteTypes {
     | '/_authenticated/e-commerce/products'
     | '/_authenticated/e-commerce/reports'
     | '/_authenticated/e-commerce/settings'
+    | '/_authenticated/e-commerce/store'
+    | '/_authenticated/e-commerce/thank-you'
     | '/_authenticated/money-center/accounts'
     | '/_authenticated/money-center/analytics'
     | '/_authenticated/money-center/bills'
@@ -642,11 +681,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -656,137 +695,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/vehicle-sales': {
-      id: '/_authenticated/vehicle-sales'
-      path: '/vehicle-sales'
-      fullPath: '/vehicle-sales'
-      preLoaderRoute: typeof AuthenticatedVehicleSalesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/tasks': {
-      id: '/_authenticated/tasks'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof AuthenticatedTasksRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/reports': {
-      id: '/_authenticated/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof AuthenticatedReportsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/people': {
-      id: '/_authenticated/people'
-      path: '/people'
-      fullPath: '/people'
-      preLoaderRoute: typeof AuthenticatedPeopleRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/notifications': {
-      id: '/_authenticated/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/notes': {
-      id: '/_authenticated/notes'
-      path: '/notes'
-      fullPath: '/notes'
-      preLoaderRoute: typeof AuthenticatedNotesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/money-center': {
-      id: '/_authenticated/money-center'
-      path: '/money-center'
-      fullPath: '/money-center'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/missions': {
-      id: '/_authenticated/missions'
-      path: '/missions'
-      fullPath: '/missions'
-      preLoaderRoute: typeof AuthenticatedMissionsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/marketing': {
-      id: '/_authenticated/marketing'
-      path: '/marketing'
-      fullPath: '/marketing'
-      preLoaderRoute: typeof AuthenticatedMarketingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/library': {
-      id: '/_authenticated/library'
-      path: '/library'
-      fullPath: '/library'
-      preLoaderRoute: typeof AuthenticatedLibraryRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/goals': {
-      id: '/_authenticated/goals'
-      path: '/goals'
-      fullPath: '/goals'
-      preLoaderRoute: typeof AuthenticatedGoalsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/e-commerce': {
-      id: '/_authenticated/e-commerce'
-      path: '/e-commerce'
-      fullPath: '/e-commerce'
-      preLoaderRoute: typeof AuthenticatedECommerceRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/documents': {
-      id: '/_authenticated/documents'
-      path: '/documents'
-      fullPath: '/documents'
-      preLoaderRoute: typeof AuthenticatedDocumentsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/debt-management': {
-      id: '/_authenticated/debt-management'
-      path: '/debt-management'
-      fullPath: '/debt-management'
-      preLoaderRoute: typeof AuthenticatedDebtManagementRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/calendar': {
-      id: '/_authenticated/calendar'
-      path: '/calendar'
-      fullPath: '/calendar'
-      preLoaderRoute: typeof AuthenticatedCalendarRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/businesses': {
-      id: '/_authenticated/businesses'
-      path: '/businesses'
-      fullPath: '/businesses'
-      preLoaderRoute: typeof AuthenticatedBusinessesRouteImport
+    '/_authenticated/auren': {
+      id: '/_authenticated/auren'
+      path: '/auren'
+      fullPath: '/auren'
+      preLoaderRoute: typeof AuthenticatedAurenRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/banking': {
@@ -796,172 +716,137 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBankingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/auren': {
-      id: '/_authenticated/auren'
-      path: '/auren'
-      fullPath: '/auren'
-      preLoaderRoute: typeof AuthenticatedAurenRouteImport
+    '/_authenticated/businesses': {
+      id: '/_authenticated/businesses'
+      path: '/businesses'
+      fullPath: '/businesses'
+      preLoaderRoute: typeof AuthenticatedBusinessesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/people/': {
-      id: '/_authenticated/people/'
-      path: '/'
-      fullPath: '/people/'
-      preLoaderRoute: typeof AuthenticatedPeopleIndexRouteImport
-      parentRoute: typeof AuthenticatedPeopleRoute
+    '/_authenticated/calendar': {
+      id: '/_authenticated/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof AuthenticatedCalendarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/money-center/': {
-      id: '/_authenticated/money-center/'
-      path: '/'
-      fullPath: '/money-center/'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterIndexRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/debt-management': {
+      id: '/_authenticated/debt-management'
+      path: '/debt-management'
+      fullPath: '/debt-management'
+      preLoaderRoute: typeof AuthenticatedDebtManagementRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/documents': {
+      id: '/_authenticated/documents'
+      path: '/documents'
+      fullPath: '/documents'
+      preLoaderRoute: typeof AuthenticatedDocumentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/e-commerce': {
+      id: '/_authenticated/e-commerce'
+      path: '/e-commerce'
+      fullPath: '/e-commerce'
+      preLoaderRoute: typeof AuthenticatedECommerceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/goals': {
+      id: '/_authenticated/goals'
+      path: '/goals'
+      fullPath: '/goals'
+      preLoaderRoute: typeof AuthenticatedGoalsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/library': {
+      id: '/_authenticated/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof AuthenticatedLibraryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/marketing': {
+      id: '/_authenticated/marketing'
+      path: '/marketing'
+      fullPath: '/marketing'
+      preLoaderRoute: typeof AuthenticatedMarketingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/missions': {
+      id: '/_authenticated/missions'
+      path: '/missions'
+      fullPath: '/missions'
+      preLoaderRoute: typeof AuthenticatedMissionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/money-center': {
+      id: '/_authenticated/money-center'
+      path: '/money-center'
+      fullPath: '/money-center'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notes': {
+      id: '/_authenticated/notes'
+      path: '/notes'
+      fullPath: '/notes'
+      preLoaderRoute: typeof AuthenticatedNotesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/people': {
+      id: '/_authenticated/people'
+      path: '/people'
+      fullPath: '/people'
+      preLoaderRoute: typeof AuthenticatedPeopleRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tasks': {
+      id: '/_authenticated/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof AuthenticatedTasksRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/vehicle-sales': {
+      id: '/_authenticated/vehicle-sales'
+      path: '/vehicle-sales'
+      fullPath: '/vehicle-sales'
+      preLoaderRoute: typeof AuthenticatedVehicleSalesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/e-commerce/': {
       id: '/_authenticated/e-commerce/'
       path: '/'
       fullPath: '/e-commerce/'
       preLoaderRoute: typeof AuthenticatedECommerceIndexRouteImport
-      parentRoute: typeof AuthenticatedECommerceRoute
-    }
-    '/_authenticated/people/leads': {
-      id: '/_authenticated/people/leads'
-      path: '/leads'
-      fullPath: '/people/leads'
-      preLoaderRoute: typeof AuthenticatedPeopleLeadsRouteImport
-      parentRoute: typeof AuthenticatedPeopleRoute
-    }
-    '/_authenticated/money-center/transfers': {
-      id: '/_authenticated/money-center/transfers'
-      path: '/transfers'
-      fullPath: '/money-center/transfers'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterTransfersRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
-    }
-    '/_authenticated/money-center/transactions': {
-      id: '/_authenticated/money-center/transactions'
-      path: '/transactions'
-      fullPath: '/money-center/transactions'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterTransactionsRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
-    }
-    '/_authenticated/money-center/income': {
-      id: '/_authenticated/money-center/income'
-      path: '/income'
-      fullPath: '/money-center/income'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterIncomeRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
-    }
-    '/_authenticated/money-center/expenses': {
-      id: '/_authenticated/money-center/expenses'
-      path: '/expenses'
-      fullPath: '/money-center/expenses'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterExpensesRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
-    }
-    '/_authenticated/money-center/expected': {
-      id: '/_authenticated/money-center/expected'
-      path: '/expected'
-      fullPath: '/money-center/expected'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterExpectedRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
-    }
-    '/_authenticated/money-center/budgets': {
-      id: '/_authenticated/money-center/budgets'
-      path: '/budgets'
-      fullPath: '/money-center/budgets'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterBudgetsRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
-    }
-    '/_authenticated/money-center/bills': {
-      id: '/_authenticated/money-center/bills'
-      path: '/bills'
-      fullPath: '/money-center/bills'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterBillsRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
-    }
-    '/_authenticated/money-center/analytics': {
-      id: '/_authenticated/money-center/analytics'
-      path: '/analytics'
-      fullPath: '/money-center/analytics'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
-    }
-    '/_authenticated/money-center/accounts': {
-      id: '/_authenticated/money-center/accounts'
-      path: '/accounts'
-      fullPath: '/money-center/accounts'
-      preLoaderRoute: typeof AuthenticatedMoneyCenterAccountsRouteImport
-      parentRoute: typeof AuthenticatedMoneyCenterRoute
-    }
-    '/_authenticated/e-commerce/settings': {
-      id: '/_authenticated/e-commerce/settings'
-      path: '/settings'
-      fullPath: '/e-commerce/settings'
-      preLoaderRoute: typeof AuthenticatedECommerceSettingsRouteImport
-      parentRoute: typeof AuthenticatedECommerceRoute
-    }
-    '/_authenticated/e-commerce/reports': {
-      id: '/_authenticated/e-commerce/reports'
-      path: '/reports'
-      fullPath: '/e-commerce/reports'
-      preLoaderRoute: typeof AuthenticatedECommerceReportsRouteImport
-      parentRoute: typeof AuthenticatedECommerceRoute
-    }
-    '/_authenticated/e-commerce/products': {
-      id: '/_authenticated/e-commerce/products'
-      path: '/products'
-      fullPath: '/e-commerce/products'
-      preLoaderRoute: typeof AuthenticatedECommerceProductsRouteImport
-      parentRoute: typeof AuthenticatedECommerceRoute
-    }
-    '/_authenticated/e-commerce/orders': {
-      id: '/_authenticated/e-commerce/orders'
-      path: '/orders'
-      fullPath: '/e-commerce/orders'
-      preLoaderRoute: typeof AuthenticatedECommerceOrdersRouteImport
-      parentRoute: typeof AuthenticatedECommerceRoute
-    }
-    '/_authenticated/e-commerce/marketing': {
-      id: '/_authenticated/e-commerce/marketing'
-      path: '/marketing'
-      fullPath: '/e-commerce/marketing'
-      preLoaderRoute: typeof AuthenticatedECommerceMarketingRouteImport
-      parentRoute: typeof AuthenticatedECommerceRoute
-    }
-    '/_authenticated/e-commerce/market': {
-      id: '/_authenticated/e-commerce/market'
-      path: '/market'
-      fullPath: '/e-commerce/market'
-      preLoaderRoute: typeof AuthenticatedECommerceMarketRouteImport
-      parentRoute: typeof AuthenticatedECommerceRoute
-    }
-    '/_authenticated/e-commerce/landing-pages': {
-      id: '/_authenticated/e-commerce/landing-pages'
-      path: '/landing-pages'
-      fullPath: '/e-commerce/landing-pages'
-      preLoaderRoute: typeof AuthenticatedECommerceLandingPagesRouteImport
-      parentRoute: typeof AuthenticatedECommerceRoute
-    }
-    '/_authenticated/e-commerce/inventory': {
-      id: '/_authenticated/e-commerce/inventory'
-      path: '/inventory'
-      fullPath: '/e-commerce/inventory'
-      preLoaderRoute: typeof AuthenticatedECommerceInventoryRouteImport
-      parentRoute: typeof AuthenticatedECommerceRoute
-    }
-    '/_authenticated/e-commerce/customers': {
-      id: '/_authenticated/e-commerce/customers'
-      path: '/customers'
-      fullPath: '/e-commerce/customers'
-      preLoaderRoute: typeof AuthenticatedECommerceCustomersRouteImport
-      parentRoute: typeof AuthenticatedECommerceRoute
-    }
-    '/_authenticated/e-commerce/competitors': {
-      id: '/_authenticated/e-commerce/competitors'
-      path: '/competitors'
-      fullPath: '/e-commerce/competitors'
-      preLoaderRoute: typeof AuthenticatedECommerceCompetitorsRouteImport
       parentRoute: typeof AuthenticatedECommerceRoute
     }
     '/_authenticated/e-commerce/ads': {
@@ -971,12 +856,180 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedECommerceAdsRouteImport
       parentRoute: typeof AuthenticatedECommerceRoute
     }
-    '/_authenticated/people/leads/$id': {
-      id: '/_authenticated/people/leads/$id'
-      path: '/$id'
-      fullPath: '/people/leads/$id'
-      preLoaderRoute: typeof AuthenticatedPeopleLeadsIdRouteImport
-      parentRoute: typeof AuthenticatedPeopleLeadsRoute
+    '/_authenticated/e-commerce/checkout': {
+      id: '/_authenticated/e-commerce/checkout'
+      path: '/checkout'
+      fullPath: '/e-commerce/checkout'
+      preLoaderRoute: typeof AuthenticatedECommerceCheckoutRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/_authenticated/e-commerce/competitors': {
+      id: '/_authenticated/e-commerce/competitors'
+      path: '/competitors'
+      fullPath: '/e-commerce/competitors'
+      preLoaderRoute: typeof AuthenticatedECommerceCompetitorsRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/_authenticated/e-commerce/customers': {
+      id: '/_authenticated/e-commerce/customers'
+      path: '/customers'
+      fullPath: '/e-commerce/customers'
+      preLoaderRoute: typeof AuthenticatedECommerceCustomersRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/_authenticated/e-commerce/inventory': {
+      id: '/_authenticated/e-commerce/inventory'
+      path: '/inventory'
+      fullPath: '/e-commerce/inventory'
+      preLoaderRoute: typeof AuthenticatedECommerceInventoryRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/_authenticated/e-commerce/landing-pages': {
+      id: '/_authenticated/e-commerce/landing-pages'
+      path: '/landing-pages'
+      fullPath: '/e-commerce/landing-pages'
+      preLoaderRoute: typeof AuthenticatedECommerceLandingPagesRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/_authenticated/e-commerce/market': {
+      id: '/_authenticated/e-commerce/market'
+      path: '/market'
+      fullPath: '/e-commerce/market'
+      preLoaderRoute: typeof AuthenticatedECommerceMarketRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/_authenticated/e-commerce/marketing': {
+      id: '/_authenticated/e-commerce/marketing'
+      path: '/marketing'
+      fullPath: '/e-commerce/marketing'
+      preLoaderRoute: typeof AuthenticatedECommerceMarketingRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/_authenticated/e-commerce/orders': {
+      id: '/_authenticated/e-commerce/orders'
+      path: '/orders'
+      fullPath: '/e-commerce/orders'
+      preLoaderRoute: typeof AuthenticatedECommerceOrdersRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/_authenticated/e-commerce/products': {
+      id: '/_authenticated/e-commerce/products'
+      path: '/products'
+      fullPath: '/e-commerce/products'
+      preLoaderRoute: typeof AuthenticatedECommerceProductsRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/_authenticated/e-commerce/reports': {
+      id: '/_authenticated/e-commerce/reports'
+      path: '/reports'
+      fullPath: '/e-commerce/reports'
+      preLoaderRoute: typeof AuthenticatedECommerceReportsRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/_authenticated/e-commerce/settings': {
+      id: '/_authenticated/e-commerce/settings'
+      path: '/settings'
+      fullPath: '/e-commerce/settings'
+      preLoaderRoute: typeof AuthenticatedECommerceSettingsRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/_authenticated/e-commerce/store': {
+      id: '/_authenticated/e-commerce/store'
+      path: '/store'
+      fullPath: '/e-commerce/store'
+      preLoaderRoute: typeof AuthenticatedECommerceStoreRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/_authenticated/e-commerce/thank-you': {
+      id: '/_authenticated/e-commerce/thank-you'
+      path: '/thank-you'
+      fullPath: '/e-commerce/thank-you'
+      preLoaderRoute: typeof AuthenticatedECommerceThankYouRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/_authenticated/money-center/': {
+      id: '/_authenticated/money-center/'
+      path: '/'
+      fullPath: '/money-center/'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterIndexRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/accounts': {
+      id: '/_authenticated/money-center/accounts'
+      path: '/accounts'
+      fullPath: '/money-center/accounts'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterAccountsRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/analytics': {
+      id: '/_authenticated/money-center/analytics'
+      path: '/analytics'
+      fullPath: '/money-center/analytics'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/bills': {
+      id: '/_authenticated/money-center/bills'
+      path: '/bills'
+      fullPath: '/money-center/bills'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterBillsRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/budgets': {
+      id: '/_authenticated/money-center/budgets'
+      path: '/budgets'
+      fullPath: '/money-center/budgets'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterBudgetsRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/expected': {
+      id: '/_authenticated/money-center/expected'
+      path: '/expected'
+      fullPath: '/money-center/expected'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterExpectedRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/expenses': {
+      id: '/_authenticated/money-center/expenses'
+      path: '/expenses'
+      fullPath: '/money-center/expenses'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterExpensesRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/income': {
+      id: '/_authenticated/money-center/income'
+      path: '/income'
+      fullPath: '/money-center/income'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterIncomeRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/transactions': {
+      id: '/_authenticated/money-center/transactions'
+      path: '/transactions'
+      fullPath: '/money-center/transactions'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterTransactionsRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/money-center/transfers': {
+      id: '/_authenticated/money-center/transfers'
+      path: '/transfers'
+      fullPath: '/money-center/transfers'
+      preLoaderRoute: typeof AuthenticatedMoneyCenterTransfersRouteImport
+      parentRoute: typeof AuthenticatedMoneyCenterRoute
+    }
+    '/_authenticated/people/': {
+      id: '/_authenticated/people/'
+      path: '/'
+      fullPath: '/people/'
+      preLoaderRoute: typeof AuthenticatedPeopleIndexRouteImport
+      parentRoute: typeof AuthenticatedPeopleRoute
+    }
+    '/_authenticated/people/leads': {
+      id: '/_authenticated/people/leads'
+      path: '/leads'
+      fullPath: '/people/leads'
+      preLoaderRoute: typeof AuthenticatedPeopleLeadsRouteImport
+      parentRoute: typeof AuthenticatedPeopleRoute
     }
     '/_authenticated/people/contacts/$id': {
       id: '/_authenticated/people/contacts/$id'
@@ -985,11 +1038,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPeopleContactsIdRouteImport
       parentRoute: typeof AuthenticatedPeopleRoute
     }
+    '/_authenticated/people/leads/$id': {
+      id: '/_authenticated/people/leads/$id'
+      path: '/$id'
+      fullPath: '/people/leads/$id'
+      preLoaderRoute: typeof AuthenticatedPeopleLeadsIdRouteImport
+      parentRoute: typeof AuthenticatedPeopleLeadsRoute
+    }
   }
 }
 
 interface AuthenticatedECommerceRouteChildren {
   AuthenticatedECommerceAdsRoute: typeof AuthenticatedECommerceAdsRoute
+  AuthenticatedECommerceCheckoutRoute: typeof AuthenticatedECommerceCheckoutRoute
   AuthenticatedECommerceCompetitorsRoute: typeof AuthenticatedECommerceCompetitorsRoute
   AuthenticatedECommerceCustomersRoute: typeof AuthenticatedECommerceCustomersRoute
   AuthenticatedECommerceInventoryRoute: typeof AuthenticatedECommerceInventoryRoute
@@ -1000,12 +1061,15 @@ interface AuthenticatedECommerceRouteChildren {
   AuthenticatedECommerceProductsRoute: typeof AuthenticatedECommerceProductsRoute
   AuthenticatedECommerceReportsRoute: typeof AuthenticatedECommerceReportsRoute
   AuthenticatedECommerceSettingsRoute: typeof AuthenticatedECommerceSettingsRoute
+  AuthenticatedECommerceStoreRoute: typeof AuthenticatedECommerceStoreRoute
+  AuthenticatedECommerceThankYouRoute: typeof AuthenticatedECommerceThankYouRoute
   AuthenticatedECommerceIndexRoute: typeof AuthenticatedECommerceIndexRoute
 }
 
 const AuthenticatedECommerceRouteChildren: AuthenticatedECommerceRouteChildren =
   {
     AuthenticatedECommerceAdsRoute: AuthenticatedECommerceAdsRoute,
+    AuthenticatedECommerceCheckoutRoute: AuthenticatedECommerceCheckoutRoute,
     AuthenticatedECommerceCompetitorsRoute:
       AuthenticatedECommerceCompetitorsRoute,
     AuthenticatedECommerceCustomersRoute: AuthenticatedECommerceCustomersRoute,
@@ -1018,6 +1082,8 @@ const AuthenticatedECommerceRouteChildren: AuthenticatedECommerceRouteChildren =
     AuthenticatedECommerceProductsRoute: AuthenticatedECommerceProductsRoute,
     AuthenticatedECommerceReportsRoute: AuthenticatedECommerceReportsRoute,
     AuthenticatedECommerceSettingsRoute: AuthenticatedECommerceSettingsRoute,
+    AuthenticatedECommerceStoreRoute: AuthenticatedECommerceStoreRoute,
+    AuthenticatedECommerceThankYouRoute: AuthenticatedECommerceThankYouRoute,
     AuthenticatedECommerceIndexRoute: AuthenticatedECommerceIndexRoute,
   }
 
