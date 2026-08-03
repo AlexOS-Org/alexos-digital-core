@@ -11,6 +11,7 @@ import { useOrderCart } from "@/lib/dailygear/useOrderCart";
 import { DG_CURRENCY } from "@/lib/dailygear/constants";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/store")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Store preview | DailyGear" },
