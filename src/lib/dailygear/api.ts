@@ -290,7 +290,7 @@ export function useSaveOrderWithItems() {
       };
 
       let orderId = draft.id ?? "";
-      let orderNumber = "";
+      let createdOrderNumber = "";
 
       if (draft.id) {
         const { error } = await supabase.from("dg_orders").update(payload).eq("id", draft.id);
@@ -304,7 +304,7 @@ export function useSaveOrderWithItems() {
           .single();
         if (error) throw error;
         orderId = data.id;
-        orderNumber = data.order_number;
+        createdOrderNumber = data.order_number;
         await supabase.from("dg_order_events").insert({
           user_id,
           order_id: orderId,
