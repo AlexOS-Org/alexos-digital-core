@@ -192,11 +192,10 @@ function CheckoutPage() {
       cart.clear();
       navigate({
         to: "/e-commerce/thank-you",
-        search: (old) => ({
-          ...old,
+        search: {
           orderId: result.orderId,
           orderNumber: result.orderNumber ?? "",
-        }),
+        },
       });
     } catch {
       // toast handled by hook
