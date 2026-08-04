@@ -9,9 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShopIndexRouteImport } from './routes/shop.index'
+import { Route as ShopTrackRouteImport } from './routes/shop.track'
+import { Route as ShopThankYouRouteImport } from './routes/shop.thank-you'
+import { Route as ShopProductsRouteImport } from './routes/shop.products'
+import { Route as ShopFaqRouteImport } from './routes/shop.faq'
+import { Route as ShopContactRouteImport } from './routes/shop.contact'
+import { Route as ShopCheckoutRouteImport } from './routes/shop.checkout'
+import { Route as ShopCartRouteImport } from './routes/shop.cart'
+import { Route as ShopAboutRouteImport } from './routes/shop.about'
 import { Route as AuthenticatedVehicleSalesRouteImport } from './routes/_authenticated/vehicle-sales'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -35,6 +45,8 @@ import { Route as AuthenticatedAurenRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedPeopleIndexRouteImport } from './routes/_authenticated/people.index'
 import { Route as AuthenticatedMoneyCenterIndexRouteImport } from './routes/_authenticated/money-center.index'
 import { Route as AuthenticatedECommerceIndexRouteImport } from './routes/_authenticated/e-commerce.index'
+import { Route as ShopProductIdRouteImport } from './routes/shop.product.$id'
+import { Route as ShopPoliciesSlugRouteImport } from './routes/shop.policies.$slug'
 import { Route as AuthenticatedPeopleLeadsRouteImport } from './routes/_authenticated/people.leads'
 import { Route as AuthenticatedMoneyCenterTransfersRouteImport } from './routes/_authenticated/money-center.transfers'
 import { Route as AuthenticatedMoneyCenterTransactionsRouteImport } from './routes/_authenticated/money-center.transactions'
@@ -62,6 +74,11 @@ import { Route as AuthenticatedECommerceAdsRouteImport } from './routes/_authent
 import { Route as AuthenticatedPeopleLeadsIdRouteImport } from './routes/_authenticated/people.leads.$id'
 import { Route as AuthenticatedPeopleContactsIdRouteImport } from './routes/_authenticated/people.contacts.$id'
 
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -75,6 +92,51 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ShopIndexRoute = ShopIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopTrackRoute = ShopTrackRouteImport.update({
+  id: '/track',
+  path: '/track',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopThankYouRoute = ShopThankYouRouteImport.update({
+  id: '/thank-you',
+  path: '/thank-you',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopProductsRoute = ShopProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopFaqRoute = ShopFaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopContactRoute = ShopContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopCheckoutRoute = ShopCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopCartRoute = ShopCartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopAboutRoute = ShopAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => ShopRoute,
 } as any)
 const AuthenticatedVehicleSalesRoute =
   AuthenticatedVehicleSalesRouteImport.update({
@@ -198,6 +260,16 @@ const AuthenticatedECommerceIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedECommerceRoute,
   } as any)
+const ShopProductIdRoute = ShopProductIdRouteImport.update({
+  id: '/product/$id',
+  path: '/product/$id',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopPoliciesSlugRoute = ShopPoliciesSlugRouteImport.update({
+  id: '/policies/$slug',
+  path: '/policies/$slug',
+  getParentRoute: () => ShopRoute,
+} as any)
 const AuthenticatedPeopleLeadsRoute =
   AuthenticatedPeopleLeadsRouteImport.update({
     id: '/leads',
@@ -358,6 +430,7 @@ const AuthenticatedPeopleContactsIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/shop': typeof ShopRouteWithChildren
   '/auren': typeof AuthenticatedAurenRoute
   '/banking': typeof AuthenticatedBankingRoute
   '/businesses': typeof AuthenticatedBusinessesRoute
@@ -378,6 +451,15 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/shop/about': typeof ShopAboutRoute
+  '/shop/cart': typeof ShopCartRoute
+  '/shop/checkout': typeof ShopCheckoutRoute
+  '/shop/contact': typeof ShopContactRoute
+  '/shop/faq': typeof ShopFaqRoute
+  '/shop/products': typeof ShopProductsRoute
+  '/shop/thank-you': typeof ShopThankYouRoute
+  '/shop/track': typeof ShopTrackRoute
+  '/shop/': typeof ShopIndexRoute
   '/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
   '/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
   '/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
@@ -402,6 +484,8 @@ export interface FileRoutesByFullPath {
   '/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
+  '/shop/product/$id': typeof ShopProductIdRoute
   '/e-commerce/': typeof AuthenticatedECommerceIndexRoute
   '/money-center/': typeof AuthenticatedMoneyCenterIndexRoute
   '/people/': typeof AuthenticatedPeopleIndexRoute
@@ -428,6 +512,15 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/shop/about': typeof ShopAboutRoute
+  '/shop/cart': typeof ShopCartRoute
+  '/shop/checkout': typeof ShopCheckoutRoute
+  '/shop/contact': typeof ShopContactRoute
+  '/shop/faq': typeof ShopFaqRoute
+  '/shop/products': typeof ShopProductsRoute
+  '/shop/thank-you': typeof ShopThankYouRoute
+  '/shop/track': typeof ShopTrackRoute
+  '/shop': typeof ShopIndexRoute
   '/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
   '/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
   '/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
@@ -452,6 +545,8 @@ export interface FileRoutesByTo {
   '/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
+  '/shop/product/$id': typeof ShopProductIdRoute
   '/e-commerce': typeof AuthenticatedECommerceIndexRoute
   '/money-center': typeof AuthenticatedMoneyCenterIndexRoute
   '/people': typeof AuthenticatedPeopleIndexRoute
@@ -463,6 +558,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/shop': typeof ShopRouteWithChildren
   '/_authenticated/auren': typeof AuthenticatedAurenRoute
   '/_authenticated/banking': typeof AuthenticatedBankingRoute
   '/_authenticated/businesses': typeof AuthenticatedBusinessesRoute
@@ -483,6 +579,15 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/shop/about': typeof ShopAboutRoute
+  '/shop/cart': typeof ShopCartRoute
+  '/shop/checkout': typeof ShopCheckoutRoute
+  '/shop/contact': typeof ShopContactRoute
+  '/shop/faq': typeof ShopFaqRoute
+  '/shop/products': typeof ShopProductsRoute
+  '/shop/thank-you': typeof ShopThankYouRoute
+  '/shop/track': typeof ShopTrackRoute
+  '/shop/': typeof ShopIndexRoute
   '/_authenticated/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
   '/_authenticated/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
   '/_authenticated/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
@@ -507,6 +612,8 @@ export interface FileRoutesById {
   '/_authenticated/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/_authenticated/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/_authenticated/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
+  '/shop/product/$id': typeof ShopProductIdRoute
   '/_authenticated/e-commerce/': typeof AuthenticatedECommerceIndexRoute
   '/_authenticated/money-center/': typeof AuthenticatedMoneyCenterIndexRoute
   '/_authenticated/people/': typeof AuthenticatedPeopleIndexRoute
@@ -518,6 +625,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/shop'
     | '/auren'
     | '/banking'
     | '/businesses'
@@ -538,6 +646,15 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/vehicle-sales'
+    | '/shop/about'
+    | '/shop/cart'
+    | '/shop/checkout'
+    | '/shop/contact'
+    | '/shop/faq'
+    | '/shop/products'
+    | '/shop/thank-you'
+    | '/shop/track'
+    | '/shop/'
     | '/e-commerce/ads'
     | '/e-commerce/checkout'
     | '/e-commerce/competitors'
@@ -562,6 +679,8 @@ export interface FileRouteTypes {
     | '/money-center/transactions'
     | '/money-center/transfers'
     | '/people/leads'
+    | '/shop/policies/$slug'
+    | '/shop/product/$id'
     | '/e-commerce/'
     | '/money-center/'
     | '/people/'
@@ -588,6 +707,15 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/vehicle-sales'
+    | '/shop/about'
+    | '/shop/cart'
+    | '/shop/checkout'
+    | '/shop/contact'
+    | '/shop/faq'
+    | '/shop/products'
+    | '/shop/thank-you'
+    | '/shop/track'
+    | '/shop'
     | '/e-commerce/ads'
     | '/e-commerce/checkout'
     | '/e-commerce/competitors'
@@ -612,6 +740,8 @@ export interface FileRouteTypes {
     | '/money-center/transactions'
     | '/money-center/transfers'
     | '/people/leads'
+    | '/shop/policies/$slug'
+    | '/shop/product/$id'
     | '/e-commerce'
     | '/money-center'
     | '/people'
@@ -622,6 +752,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/shop'
     | '/_authenticated/auren'
     | '/_authenticated/banking'
     | '/_authenticated/businesses'
@@ -642,6 +773,15 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/tasks'
     | '/_authenticated/vehicle-sales'
+    | '/shop/about'
+    | '/shop/cart'
+    | '/shop/checkout'
+    | '/shop/contact'
+    | '/shop/faq'
+    | '/shop/products'
+    | '/shop/thank-you'
+    | '/shop/track'
+    | '/shop/'
     | '/_authenticated/e-commerce/ads'
     | '/_authenticated/e-commerce/checkout'
     | '/_authenticated/e-commerce/competitors'
@@ -666,6 +806,8 @@ export interface FileRouteTypes {
     | '/_authenticated/money-center/transactions'
     | '/_authenticated/money-center/transfers'
     | '/_authenticated/people/leads'
+    | '/shop/policies/$slug'
+    | '/shop/product/$id'
     | '/_authenticated/e-commerce/'
     | '/_authenticated/money-center/'
     | '/_authenticated/people/'
@@ -677,10 +819,18 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ShopRoute: typeof ShopRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -701,6 +851,69 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/shop/': {
+      id: '/shop/'
+      path: '/'
+      fullPath: '/shop/'
+      preLoaderRoute: typeof ShopIndexRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/track': {
+      id: '/shop/track'
+      path: '/track'
+      fullPath: '/shop/track'
+      preLoaderRoute: typeof ShopTrackRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/thank-you': {
+      id: '/shop/thank-you'
+      path: '/thank-you'
+      fullPath: '/shop/thank-you'
+      preLoaderRoute: typeof ShopThankYouRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/products': {
+      id: '/shop/products'
+      path: '/products'
+      fullPath: '/shop/products'
+      preLoaderRoute: typeof ShopProductsRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/faq': {
+      id: '/shop/faq'
+      path: '/faq'
+      fullPath: '/shop/faq'
+      preLoaderRoute: typeof ShopFaqRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/contact': {
+      id: '/shop/contact'
+      path: '/contact'
+      fullPath: '/shop/contact'
+      preLoaderRoute: typeof ShopContactRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/checkout': {
+      id: '/shop/checkout'
+      path: '/checkout'
+      fullPath: '/shop/checkout'
+      preLoaderRoute: typeof ShopCheckoutRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/cart': {
+      id: '/shop/cart'
+      path: '/cart'
+      fullPath: '/shop/cart'
+      preLoaderRoute: typeof ShopCartRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/about': {
+      id: '/shop/about'
+      path: '/about'
+      fullPath: '/shop/about'
+      preLoaderRoute: typeof ShopAboutRouteImport
+      parentRoute: typeof ShopRoute
     }
     '/_authenticated/vehicle-sales': {
       id: '/_authenticated/vehicle-sales'
@@ -862,6 +1075,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/e-commerce/'
       preLoaderRoute: typeof AuthenticatedECommerceIndexRouteImport
       parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/shop/product/$id': {
+      id: '/shop/product/$id'
+      path: '/product/$id'
+      fullPath: '/shop/product/$id'
+      preLoaderRoute: typeof ShopProductIdRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/policies/$slug': {
+      id: '/shop/policies/$slug'
+      path: '/policies/$slug'
+      fullPath: '/shop/policies/$slug'
+      preLoaderRoute: typeof ShopPoliciesSlugRouteImport
+      parentRoute: typeof ShopRoute
     }
     '/_authenticated/people/leads': {
       id: '/_authenticated/people/leads'
@@ -1208,21 +1435,42 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface ShopRouteChildren {
+  ShopAboutRoute: typeof ShopAboutRoute
+  ShopCartRoute: typeof ShopCartRoute
+  ShopCheckoutRoute: typeof ShopCheckoutRoute
+  ShopContactRoute: typeof ShopContactRoute
+  ShopFaqRoute: typeof ShopFaqRoute
+  ShopProductsRoute: typeof ShopProductsRoute
+  ShopThankYouRoute: typeof ShopThankYouRoute
+  ShopTrackRoute: typeof ShopTrackRoute
+  ShopIndexRoute: typeof ShopIndexRoute
+  ShopPoliciesSlugRoute: typeof ShopPoliciesSlugRoute
+  ShopProductIdRoute: typeof ShopProductIdRoute
+}
+
+const ShopRouteChildren: ShopRouteChildren = {
+  ShopAboutRoute: ShopAboutRoute,
+  ShopCartRoute: ShopCartRoute,
+  ShopCheckoutRoute: ShopCheckoutRoute,
+  ShopContactRoute: ShopContactRoute,
+  ShopFaqRoute: ShopFaqRoute,
+  ShopProductsRoute: ShopProductsRoute,
+  ShopThankYouRoute: ShopThankYouRoute,
+  ShopTrackRoute: ShopTrackRoute,
+  ShopIndexRoute: ShopIndexRoute,
+  ShopPoliciesSlugRoute: ShopPoliciesSlugRoute,
+  ShopProductIdRoute: ShopProductIdRoute,
+}
+
+const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ShopRoute: ShopRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

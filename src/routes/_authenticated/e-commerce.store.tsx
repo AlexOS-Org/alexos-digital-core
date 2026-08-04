@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { CreditCard, Package, ShoppingCart, Truck, Zap } from "lucide-react";
+import { CreditCard, Package, Plus, ShoppingCart, Truck, Zap } from "lucide-react";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

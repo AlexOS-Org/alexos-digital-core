@@ -290,7 +290,7 @@ export function useSaveOrderWithItems() {
       };
 
       let orderId = draft.id ?? "";
-      let orderNumber = "";
+      let createdOrderNumber = "";
 
       if (draft.id) {
         const { error } = await supabase.from("dg_orders").update(payload).eq("id", draft.id);
@@ -304,7 +304,7 @@ export function useSaveOrderWithItems() {
           .single();
         if (error) throw error;
         orderId = data.id;
-        orderNumber = data.order_number;
+        createdOrderNumber = data.order_number;
         await supabase.from("dg_order_events").insert({
           user_id,
           order_id: orderId,
@@ -355,7 +355,7 @@ export function useSaveOrderWithItems() {
             const { data: product, error: productError } = await supabase
               .from("dg_products")
               .select("stock_quantity")
-              .eq("id", item.product_id)
+              .eq("id", item.product_id!)
               .single();
             if (productError) throw productError;
             if (product == null || Number(product.stock_quantity) < item.quantity) {
@@ -364,7 +364,7 @@ export function useSaveOrderWithItems() {
             const { error: productUpdateError } = await supabase
               .from("dg_products")
               .update({ stock_quantity: Number(product.stock_quantity) - item.quantity })
-              .eq("id", item.product_id);
+              .eq("id", item.product_id!);
             if (productUpdateError) throw productUpdateError;
           }
 
@@ -383,9 +383,7 @@ export function useSaveOrderWithItems() {
         }
       }
 
-      return { orderId, orderNumber };
-
-      return orderId;
+      return { orderId, orderNumber: createdOrderNumber };
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["dailygear"] });
