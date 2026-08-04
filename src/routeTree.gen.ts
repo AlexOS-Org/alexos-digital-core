@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as ShopProductsRouteImport } from './routes/shop.products'
+import { Route as ShopCartRouteImport } from './routes/shop.cart'
 import { Route as AuthenticatedVehicleSalesRouteImport } from './routes/_authenticated/vehicle-sales'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -38,6 +39,7 @@ import { Route as AuthenticatedAurenRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedPeopleIndexRouteImport } from './routes/_authenticated/people.index'
 import { Route as AuthenticatedMoneyCenterIndexRouteImport } from './routes/_authenticated/money-center.index'
 import { Route as AuthenticatedECommerceIndexRouteImport } from './routes/_authenticated/e-commerce.index'
+import { Route as ShopProductIdRouteImport } from './routes/shop.product.$id'
 import { Route as AuthenticatedPeopleLeadsRouteImport } from './routes/_authenticated/people.leads'
 import { Route as AuthenticatedMoneyCenterTransfersRouteImport } from './routes/_authenticated/money-center.transfers'
 import { Route as AuthenticatedMoneyCenterTransactionsRouteImport } from './routes/_authenticated/money-center.transactions'
@@ -92,6 +94,11 @@ const ShopIndexRoute = ShopIndexRouteImport.update({
 const ShopProductsRoute = ShopProductsRouteImport.update({
   id: '/products',
   path: '/products',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopCartRoute = ShopCartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
   getParentRoute: () => ShopRoute,
 } as any)
 const AuthenticatedVehicleSalesRoute =
@@ -216,6 +223,11 @@ const AuthenticatedECommerceIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedECommerceRoute,
   } as any)
+const ShopProductIdRoute = ShopProductIdRouteImport.update({
+  id: '/product/$id',
+  path: '/product/$id',
+  getParentRoute: () => ShopRoute,
+} as any)
 const AuthenticatedPeopleLeadsRoute =
   AuthenticatedPeopleLeadsRouteImport.update({
     id: '/leads',
@@ -397,6 +409,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/shop/cart': typeof ShopCartRoute
   '/shop/products': typeof ShopProductsRoute
   '/shop/': typeof ShopIndexRoute
   '/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
@@ -423,6 +436,7 @@ export interface FileRoutesByFullPath {
   '/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/shop/product/$id': typeof ShopProductIdRoute
   '/e-commerce/': typeof AuthenticatedECommerceIndexRoute
   '/money-center/': typeof AuthenticatedMoneyCenterIndexRoute
   '/people/': typeof AuthenticatedPeopleIndexRoute
@@ -449,6 +463,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/shop/cart': typeof ShopCartRoute
   '/shop/products': typeof ShopProductsRoute
   '/shop': typeof ShopIndexRoute
   '/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
@@ -475,6 +490,7 @@ export interface FileRoutesByTo {
   '/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/shop/product/$id': typeof ShopProductIdRoute
   '/e-commerce': typeof AuthenticatedECommerceIndexRoute
   '/money-center': typeof AuthenticatedMoneyCenterIndexRoute
   '/people': typeof AuthenticatedPeopleIndexRoute
@@ -507,6 +523,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/shop/cart': typeof ShopCartRoute
   '/shop/products': typeof ShopProductsRoute
   '/shop/': typeof ShopIndexRoute
   '/_authenticated/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
@@ -533,6 +550,7 @@ export interface FileRoutesById {
   '/_authenticated/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/_authenticated/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/_authenticated/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/shop/product/$id': typeof ShopProductIdRoute
   '/_authenticated/e-commerce/': typeof AuthenticatedECommerceIndexRoute
   '/_authenticated/money-center/': typeof AuthenticatedMoneyCenterIndexRoute
   '/_authenticated/people/': typeof AuthenticatedPeopleIndexRoute
@@ -565,6 +583,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/vehicle-sales'
+    | '/shop/cart'
     | '/shop/products'
     | '/shop/'
     | '/e-commerce/ads'
@@ -591,6 +610,7 @@ export interface FileRouteTypes {
     | '/money-center/transactions'
     | '/money-center/transfers'
     | '/people/leads'
+    | '/shop/product/$id'
     | '/e-commerce/'
     | '/money-center/'
     | '/people/'
@@ -617,6 +637,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/vehicle-sales'
+    | '/shop/cart'
     | '/shop/products'
     | '/shop'
     | '/e-commerce/ads'
@@ -643,6 +664,7 @@ export interface FileRouteTypes {
     | '/money-center/transactions'
     | '/money-center/transfers'
     | '/people/leads'
+    | '/shop/product/$id'
     | '/e-commerce'
     | '/money-center'
     | '/people'
@@ -674,6 +696,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/tasks'
     | '/_authenticated/vehicle-sales'
+    | '/shop/cart'
     | '/shop/products'
     | '/shop/'
     | '/_authenticated/e-commerce/ads'
@@ -700,6 +723,7 @@ export interface FileRouteTypes {
     | '/_authenticated/money-center/transactions'
     | '/_authenticated/money-center/transfers'
     | '/_authenticated/people/leads'
+    | '/shop/product/$id'
     | '/_authenticated/e-commerce/'
     | '/_authenticated/money-center/'
     | '/_authenticated/people/'
@@ -756,6 +780,13 @@ declare module '@tanstack/react-router' {
       path: '/products'
       fullPath: '/shop/products'
       preLoaderRoute: typeof ShopProductsRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/cart': {
+      id: '/shop/cart'
+      path: '/cart'
+      fullPath: '/shop/cart'
+      preLoaderRoute: typeof ShopCartRouteImport
       parentRoute: typeof ShopRoute
     }
     '/_authenticated/vehicle-sales': {
@@ -918,6 +949,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/e-commerce/'
       preLoaderRoute: typeof AuthenticatedECommerceIndexRouteImport
       parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/shop/product/$id': {
+      id: '/shop/product/$id'
+      path: '/product/$id'
+      fullPath: '/shop/product/$id'
+      preLoaderRoute: typeof ShopProductIdRouteImport
+      parentRoute: typeof ShopRoute
     }
     '/_authenticated/people/leads': {
       id: '/_authenticated/people/leads'
@@ -1265,13 +1303,17 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface ShopRouteChildren {
+  ShopCartRoute: typeof ShopCartRoute
   ShopProductsRoute: typeof ShopProductsRoute
   ShopIndexRoute: typeof ShopIndexRoute
+  ShopProductIdRoute: typeof ShopProductIdRoute
 }
 
 const ShopRouteChildren: ShopRouteChildren = {
+  ShopCartRoute: ShopCartRoute,
   ShopProductsRoute: ShopProductsRoute,
   ShopIndexRoute: ShopIndexRoute,
+  ShopProductIdRoute: ShopProductIdRoute,
 }
 
 const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
