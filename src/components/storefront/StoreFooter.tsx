@@ -71,19 +71,19 @@ export function StoreFooter({ store }: { store: Storefront | null }) {
 
           <div className="space-y-2 text-sm">
             <p className="font-semibold">Get in touch</p>
-            {store?.contact_phone ? (
+            {store?.support_phone ? (
               <p className="flex items-center gap-2 text-muted-foreground">
-                <Phone className="h-3.5 w-3.5" /> {store.contact_phone}
+                <Phone className="h-3.5 w-3.5" /> {store.support_phone}
               </p>
             ) : null}
-            {store?.contact_email ? (
+            {store?.support_email ? (
               <p className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="h-3.5 w-3.5" /> {store.contact_email}
+                <Mail className="h-3.5 w-3.5" /> {store.support_email}
               </p>
             ) : null}
-            {store?.address ? (
+            {store?.whatsapp ? (
               <p className="flex items-start gap-2 text-muted-foreground">
-                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {store.address}
+                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" /> WhatsApp {store.whatsapp}
               </p>
             ) : null}
           </div>
