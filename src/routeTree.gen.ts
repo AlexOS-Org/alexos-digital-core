@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
+import { Route as ShopProductsRouteImport } from './routes/shop.products'
 import { Route as AuthenticatedVehicleSalesRouteImport } from './routes/_authenticated/vehicle-sales'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -86,6 +87,11 @@ const IndexRoute = IndexRouteImport.update({
 const ShopIndexRoute = ShopIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ShopProductsRoute = ShopProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
   getParentRoute: () => ShopRoute,
 } as any)
 const AuthenticatedVehicleSalesRoute =
@@ -391,6 +397,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/shop/products': typeof ShopProductsRoute
   '/shop/': typeof ShopIndexRoute
   '/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
   '/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
@@ -442,6 +449,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/shop/products': typeof ShopProductsRoute
   '/shop': typeof ShopIndexRoute
   '/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
   '/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
@@ -499,6 +507,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/shop/products': typeof ShopProductsRoute
   '/shop/': typeof ShopIndexRoute
   '/_authenticated/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
   '/_authenticated/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
@@ -556,6 +565,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/vehicle-sales'
+    | '/shop/products'
     | '/shop/'
     | '/e-commerce/ads'
     | '/e-commerce/checkout'
@@ -607,6 +617,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/vehicle-sales'
+    | '/shop/products'
     | '/shop'
     | '/e-commerce/ads'
     | '/e-commerce/checkout'
@@ -663,6 +674,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/tasks'
     | '/_authenticated/vehicle-sales'
+    | '/shop/products'
     | '/shop/'
     | '/_authenticated/e-commerce/ads'
     | '/_authenticated/e-commerce/checkout'
@@ -737,6 +749,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/shop/'
       preLoaderRoute: typeof ShopIndexRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/shop/products': {
+      id: '/shop/products'
+      path: '/products'
+      fullPath: '/shop/products'
+      preLoaderRoute: typeof ShopProductsRouteImport
       parentRoute: typeof ShopRoute
     }
     '/_authenticated/vehicle-sales': {
@@ -1246,10 +1265,12 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface ShopRouteChildren {
+  ShopProductsRoute: typeof ShopProductsRoute
   ShopIndexRoute: typeof ShopIndexRoute
 }
 
 const ShopRouteChildren: ShopRouteChildren = {
+  ShopProductsRoute: ShopProductsRoute,
   ShopIndexRoute: ShopIndexRoute,
 }
 

@@ -65,7 +65,7 @@ function ProductsPage() {
   const currency = store?.currency ?? "KES";
 
   function update(patch: Partial<ProductSearch>) {
-    navigate({ search: (prev) => ({ ...prev, ...patch }) });
+    navigate({ search: (prev: ProductSearch) => ({ ...prev, ...patch }) });
   }
 
   const hasFilters = Boolean(search.q || search.category || search.brand || search.sort);
