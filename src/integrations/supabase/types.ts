@@ -1054,6 +1054,72 @@ export type Database = {
           },
         ]
       }
+      dg_storefronts: {
+        Row: {
+          announcement: string | null
+          created_at: string
+          currency: string
+          flat_shipping_fee: number
+          free_shipping_threshold: number
+          hero_headline: string | null
+          hero_image_url: string | null
+          hero_subheadline: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          published: boolean
+          slug: string
+          support_email: string | null
+          support_phone: string | null
+          tagline: string | null
+          updated_at: string
+          user_id: string
+          whatsapp: string | null
+        }
+        Insert: {
+          announcement?: string | null
+          created_at?: string
+          currency?: string
+          flat_shipping_fee?: number
+          free_shipping_threshold?: number
+          hero_headline?: string | null
+          hero_image_url?: string | null
+          hero_subheadline?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          published?: boolean
+          slug: string
+          support_email?: string | null
+          support_phone?: string | null
+          tagline?: string | null
+          updated_at?: string
+          user_id: string
+          whatsapp?: string | null
+        }
+        Update: {
+          announcement?: string | null
+          created_at?: string
+          currency?: string
+          flat_shipping_fee?: number
+          free_shipping_threshold?: number
+          hero_headline?: string | null
+          hero_image_url?: string | null
+          hero_subheadline?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          published?: boolean
+          slug?: string
+          support_email?: string | null
+          support_phone?: string | null
+          tagline?: string | null
+          updated_at?: string
+          user_id?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       dg_suppliers: {
         Row: {
           address: string | null
@@ -1503,7 +1569,7 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      dg_is_published_store: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       account_status: "active" | "archived"
