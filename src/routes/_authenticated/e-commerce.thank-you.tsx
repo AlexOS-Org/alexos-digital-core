@@ -30,7 +30,7 @@ function formatMoney(value: number) {
 
 function ThankYouPage() {
   const navigate = useNavigate();
-  const search = useRouterState({ select: (r) => r.location.search }) as Record<string, string | undefined>;
+  const search = useRouterState({ select: (r) => r.location.search }) as unknown as Record<string, string | undefined>;
   const { orders, customers, isLoading } = useCommerceData();
   const orderId = search["orderId"] ?? null;
   const orderNumber = search["orderNumber"] ?? null;
