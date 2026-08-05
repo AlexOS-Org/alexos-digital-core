@@ -164,6 +164,24 @@ export type Database = {
         }
         Relationships: []
       }
+      businesses: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+        }
+        Relationships: []
+      }
       contacts: {
         Row: {
           avatar_url: string | null
@@ -1457,6 +1475,862 @@ export type Database = {
             columns: ["contact_id"]
             isOneToOne: false
             referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_asset_associations: {
+        Row: {
+          asset_id: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          role: string | null
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          role?: string | null
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          role?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_asset_associations_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_asset_versions: {
+        Row: {
+          asset_id: string
+          change_note: string | null
+          changed_by: string | null
+          created_at: string
+          id: string
+          storage_path: string
+          version_number: number
+        }
+        Insert: {
+          asset_id: string
+          change_note?: string | null
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          storage_path: string
+          version_number: number
+        }
+        Update: {
+          asset_id?: string
+          change_note?: string | null
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          storage_path?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_asset_versions_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_assets: {
+        Row: {
+          alt_text: string | null
+          business_id: string
+          category: string | null
+          compression_status: string
+          created_at: string
+          file_hash: string
+          file_name: string
+          height: number | null
+          id: string
+          mime_type: string
+          optimized_path: string | null
+          size_bytes: number | null
+          source: string
+          storage_path: string
+          tags: string[] | null
+          thumbnail_path: string | null
+          updated_at: string
+          uploaded_by: string | null
+          user_id: string
+          width: number | null
+        }
+        Insert: {
+          alt_text?: string | null
+          business_id: string
+          category?: string | null
+          compression_status?: string
+          created_at?: string
+          file_hash: string
+          file_name: string
+          height?: number | null
+          id?: string
+          mime_type: string
+          optimized_path?: string | null
+          size_bytes?: number | null
+          source?: string
+          storage_path: string
+          tags?: string[] | null
+          thumbnail_path?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+          user_id: string
+          width?: number | null
+        }
+        Update: {
+          alt_text?: string | null
+          business_id?: string
+          category?: string | null
+          compression_status?: string
+          created_at?: string
+          file_hash?: string
+          file_name?: string
+          height?: number | null
+          id?: string
+          mime_type?: string
+          optimized_path?: string | null
+          size_bytes?: number | null
+          source?: string
+          storage_path?: string
+          tags?: string[] | null
+          thumbnail_path?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+          user_id?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_assets_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_collection_items: {
+        Row: {
+          added_at: string
+          asset_id: string
+          collection_id: string
+        }
+        Insert: {
+          added_at?: string
+          asset_id: string
+          collection_id: string
+        }
+        Update: {
+          added_at?: string
+          asset_id?: string
+          collection_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_collection_items_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_collection_items_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "media_collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_collections: {
+        Row: {
+          business_id: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_collections_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_ad_accounts: {
+        Row: {
+          account_status: string | null
+          business_id: string
+          created_at: string
+          currency: string | null
+          id: string
+          is_queryable: boolean
+          meta_ad_account_id: string
+          meta_business_id: string | null
+          name: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_status?: string | null
+          business_id: string
+          created_at?: string
+          currency?: string | null
+          id?: string
+          is_queryable?: boolean
+          meta_ad_account_id: string
+          meta_business_id?: string | null
+          name?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_status?: string | null
+          business_id?: string
+          created_at?: string
+          currency?: string | null
+          id?: string
+          is_queryable?: boolean
+          meta_ad_account_id?: string
+          meta_business_id?: string | null
+          name?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_ad_accounts_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_ad_sets: {
+        Row: {
+          billing_event: string | null
+          business_id: string
+          created_at: string
+          daily_budget: number | null
+          id: string
+          meta_ad_set_id: string
+          meta_campaign_id: string
+          name: string | null
+          optimization_goal: string | null
+          status: string | null
+          targeting: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          billing_event?: string | null
+          business_id: string
+          created_at?: string
+          daily_budget?: number | null
+          id?: string
+          meta_ad_set_id: string
+          meta_campaign_id: string
+          name?: string | null
+          optimization_goal?: string | null
+          status?: string | null
+          targeting?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          billing_event?: string | null
+          business_id?: string
+          created_at?: string
+          daily_budget?: number | null
+          id?: string
+          meta_ad_set_id?: string
+          meta_campaign_id?: string
+          name?: string | null
+          optimization_goal?: string | null
+          status?: string | null
+          targeting?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_ad_sets_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_ads: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          meta_ad_id: string
+          meta_ad_set_id: string
+          meta_creative_id: string | null
+          name: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          meta_ad_id: string
+          meta_ad_set_id: string
+          meta_creative_id?: string | null
+          name?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          meta_ad_id?: string
+          meta_ad_set_id?: string
+          meta_creative_id?: string | null
+          name?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_ads_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_business_connections: {
+        Row: {
+          business_id: string
+          connected_at: string
+          id: string
+          last_synced_at: string | null
+          meta_business_id: string
+          meta_business_name: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          connected_at?: string
+          id?: string
+          last_synced_at?: string | null
+          meta_business_id: string
+          meta_business_name?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          connected_at?: string
+          id?: string
+          last_synced_at?: string | null
+          meta_business_id?: string
+          meta_business_name?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_business_connections_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_campaigns: {
+        Row: {
+          bid_strategy: string | null
+          business_id: string
+          created_at: string
+          daily_budget: number | null
+          id: string
+          lifetime_budget: number | null
+          meta_ad_account_id: string
+          meta_campaign_id: string
+          name: string | null
+          objective: string | null
+          start_time: string | null
+          status: string | null
+          stop_time: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bid_strategy?: string | null
+          business_id: string
+          created_at?: string
+          daily_budget?: number | null
+          id?: string
+          lifetime_budget?: number | null
+          meta_ad_account_id: string
+          meta_campaign_id: string
+          name?: string | null
+          objective?: string | null
+          start_time?: string | null
+          status?: string | null
+          stop_time?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bid_strategy?: string | null
+          business_id?: string
+          created_at?: string
+          daily_budget?: number | null
+          id?: string
+          lifetime_budget?: number | null
+          meta_ad_account_id?: string
+          meta_campaign_id?: string
+          name?: string | null
+          objective?: string | null
+          start_time?: string | null
+          status?: string | null
+          stop_time?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_campaigns_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_catalogs: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          meta_business_id: string | null
+          meta_catalog_id: string
+          name: string | null
+          product_count: number | null
+          product_set_count: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          meta_business_id?: string | null
+          meta_catalog_id: string
+          name?: string | null
+          product_count?: number | null
+          product_set_count?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          meta_business_id?: string | null
+          meta_catalog_id?: string
+          name?: string | null
+          product_count?: number | null
+          product_set_count?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_catalogs_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_insights_daily: {
+        Row: {
+          business_id: string
+          clicks: number
+          conversion_value: number | null
+          conversions: number
+          cost_per_conversion: number | null
+          cpc: number | null
+          cpm: number | null
+          ctr: number | null
+          currency: string | null
+          date: string
+          entity_level: string
+          frequency: number | null
+          id: string
+          impressions: number
+          meta_ad_account_id: string
+          meta_entity_id: string
+          reach: number | null
+          roas: number | null
+          spend: number
+          synced_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          clicks?: number
+          conversion_value?: number | null
+          conversions?: number
+          cost_per_conversion?: number | null
+          cpc?: number | null
+          cpm?: number | null
+          ctr?: number | null
+          currency?: string | null
+          date: string
+          entity_level: string
+          frequency?: number | null
+          id?: string
+          impressions?: number
+          meta_ad_account_id: string
+          meta_entity_id: string
+          reach?: number | null
+          roas?: number | null
+          spend?: number
+          synced_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          clicks?: number
+          conversion_value?: number | null
+          conversions?: number
+          cost_per_conversion?: number | null
+          cpc?: number | null
+          cpm?: number | null
+          ctr?: number | null
+          currency?: string | null
+          date?: string
+          entity_level?: string
+          frequency?: number | null
+          id?: string
+          impressions?: number
+          meta_ad_account_id?: string
+          meta_entity_id?: string
+          reach?: number | null
+          roas?: number | null
+          spend?: number
+          synced_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_insights_daily_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_instagram_accounts: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          meta_ig_account_id: string
+          meta_page_id: string | null
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          meta_ig_account_id: string
+          meta_page_id?: string | null
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          meta_ig_account_id?: string
+          meta_page_id?: string | null
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_instagram_accounts_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_leads: {
+        Row: {
+          business_id: string
+          field_data: Json | null
+          form_id: string | null
+          id: string
+          meta_lead_id: string
+          meta_page_id: string | null
+          received_at: string | null
+          synced_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          field_data?: Json | null
+          form_id?: string | null
+          id?: string
+          meta_lead_id: string
+          meta_page_id?: string | null
+          received_at?: string | null
+          synced_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          field_data?: Json | null
+          form_id?: string | null
+          id?: string
+          meta_lead_id?: string
+          meta_page_id?: string | null
+          received_at?: string | null
+          synced_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_leads_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_pages: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          leadgen_tos_accepted: boolean | null
+          meta_page_id: string
+          name: string | null
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          leadgen_tos_accepted?: boolean | null
+          meta_page_id: string
+          name?: string | null
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          leadgen_tos_accepted?: boolean | null
+          meta_page_id?: string
+          name?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_pages_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_pixel_event_daily: {
+        Row: {
+          business_id: string
+          date: string
+          event_count: number
+          event_name: string
+          event_source: string | null
+          id: string
+          meta_pixel_id: string
+          synced_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          date: string
+          event_count?: number
+          event_name: string
+          event_source?: string | null
+          id?: string
+          meta_pixel_id: string
+          synced_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          date?: string
+          event_count?: number
+          event_name?: string
+          event_source?: string | null
+          id?: string
+          meta_pixel_id?: string
+          synced_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_pixel_event_daily_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_pixels: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          last_fired_at: string | null
+          meta_business_id: string | null
+          meta_pixel_id: string
+          name: string | null
+          server_last_fired_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_fired_at?: string | null
+          meta_business_id?: string | null
+          meta_pixel_id: string
+          name?: string | null
+          server_last_fired_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_fired_at?: string | null
+          meta_business_id?: string | null
+          meta_pixel_id?: string
+          name?: string | null
+          server_last_fired_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_pixels_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_sync_runs: {
+        Row: {
+          business_id: string | null
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          rows_synced: number | null
+          started_at: string
+          status: string
+          sync_type: string
+        }
+        Insert: {
+          business_id?: string | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          rows_synced?: number | null
+          started_at?: string
+          status?: string
+          sync_type: string
+        }
+        Update: {
+          business_id?: string | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          rows_synced?: number | null
+          started_at?: string
+          status?: string
+          sync_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_sync_runs_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
         ]
