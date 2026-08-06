@@ -19,7 +19,7 @@ import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/dailygear/StatusBadge";
 import { computeCustomerInsights, reorderSuggestions } from "@/lib/dailygear/calculations";
 import type { Customer, Order, Product, StockMovement } from "@/lib/dailygear/types";
-import { DG_CURRENCY } from "@/lib/dailygear/constants";
+import { DG_CURRENCY, ORDER_STATUS_META } from "@/lib/dailygear/constants";
 import { cn } from "@/lib/utils";
 
 const money = (v: number) =>
@@ -146,7 +146,7 @@ export function LiveOrderFeed({
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <span className="text-sm font-semibold tabular-nums">{money(Number(o.total))}</span>
-                <StatusBadge status={o.status} />
+                <StatusBadge meta={ORDER_STATUS_META[o.status]} />
               </div>
             </li>
           ))}
@@ -370,7 +370,7 @@ export function NotificationsPanel({
       (p) => Number(p.stock_quantity) <= Number(p.low_stock_threshold),
     ).length;
     const pending = orders.filter((o) => ["new", "processing"].includes(o.status)).length;
-    const unpaid = orders.filter((o) => o.payment_status === "pending").length;
+    const unpaid = orders.filter((o) => o.payment_status === "unpaid").length;
     const shipping = orders.filter((o) => ["packed", "shipped"].includes(o.status)).length;
 
     if (low)
@@ -391,7 +391,7 @@ export function NotificationsPanel({
       list.push({
         id: "unpaid",
         icon: Bell,
-        text: `${unpaid} payment${unpaid > 1 ? "s" : ""} still pending`,
+        text: `${unpaid} order${unpaid > 1 ? "s" : ""} still unpaid`,
         tone: "text-chart-4",
       });
     if (shipping)
