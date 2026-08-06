@@ -171,3 +171,83 @@
     box-shadow: 0 18px 55px -32px var(--alexos-glow);
   }
 }
+
+/* ── Phase 3.8 — premium visual experience ─────────────────────── */
+
+@theme {
+  --breakpoint-3xl: 1920px;
+  --breakpoint-4k: 2560px;
+}
+
+@layer utilities {
+  .glass-panel {
+    background: color-mix(in oklch, var(--color-card) 72%, transparent);
+    backdrop-filter: blur(18px) saturate(150%);
+    border: 1px solid color-mix(in oklch, var(--color-border) 70%, transparent);
+  }
+
+  .soft-shadow {
+    box-shadow:
+      0 1px 2px color-mix(in oklch, var(--foreground) 6%, transparent),
+      0 12px 32px -18px color-mix(in oklch, var(--foreground) 26%, transparent);
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .swipe-row {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .swipe-row > * {
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+  }
+
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .safe-bottom {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+
+  .rise-in {
+    animation: rise-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .press {
+    transition:
+      transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.2s ease;
+  }
+  .press:active {
+    transform: scale(0.97);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in {
+    animation: none;
+  }
+}
