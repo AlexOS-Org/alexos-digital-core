@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   BarChart3,
-  Bell,
   Boxes,
   LayoutDashboard,
   Megaphone,
@@ -17,21 +16,20 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
-const TABS = [
+const TABS: Array<{ to: string; label: string; icon: typeof Package; exact?: boolean }> = [
   { to: "/e-commerce", label: "Home", icon: LayoutDashboard, exact: true },
   { to: "/e-commerce/orders", label: "Orders", icon: ShoppingCart },
   { to: "/e-commerce/products", label: "Products", icon: Package },
   { to: "/e-commerce/customers", label: "People", icon: Users },
-] as const;
+];
 
-const MORE = [
+const MORE: Array<{ to: string; label: string; icon: typeof Package }> = [
   { to: "/e-commerce/inventory", label: "Inventory", icon: Boxes },
   { to: "/e-commerce/marketing", label: "Marketing", icon: Megaphone },
   { to: "/e-commerce/reports", label: "Analytics", icon: BarChart3 },
   { to: "/e-commerce/checkout", label: "Checkout", icon: Wallet },
-  { to: "/e-commerce/notifications-placeholder", label: "", icon: Bell },
   { to: "/e-commerce/settings", label: "Settings", icon: Settings },
-] as const;
+];
 
 /**
  * Dedicated mobile shell for the business app: tab bar + floating action.
@@ -42,7 +40,6 @@ export function BusinessMobileNav() {
   const [open, setOpen] = useState(false);
 
   const active = (to: string, exact?: boolean) => (exact ? path === to : path.startsWith(to));
-  const links = MORE.filter((m) => m.label);
 
   return (
     <>
@@ -64,7 +61,7 @@ export function BusinessMobileNav() {
             return (
               <Link
                 key={t.to}
-                to={t.to}
+                to={t.to as never}
                 className={cn(
                   "tap-target flex flex-1 flex-col items-center gap-1 rounded-2xl px-1 py-1.5 transition-colors",
                   on ? "text-primary" : "text-muted-foreground",
@@ -89,10 +86,10 @@ export function BusinessMobileNav() {
                 <SheetTitle className="text-base">DailyGear</SheetTitle>
               </SheetHeader>
               <div className="mt-4 grid grid-cols-3 gap-3">
-                {links.map((m) => (
+                {MORE.map((m) => (
                   <Link
                     key={m.to}
-                    to={m.to}
+                    to={m.to as never}
                     onClick={() => setOpen(false)}
                     className="press flex flex-col items-center gap-2 rounded-2xl border border-border/60 px-2 py-4 text-center"
                   >
