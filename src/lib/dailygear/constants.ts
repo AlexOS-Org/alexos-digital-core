@@ -22,12 +22,18 @@ export const ORDER_STATUS_META: Record<OrderStatus, StatusMeta> = {
   packed: { label: "Packed", className: "bg-accent text-accent-foreground border-border" },
   shipped: { label: "Shipped", className: "bg-chart-2/10 text-chart-2 border-chart-2/20" },
   delivered: { label: "Delivered", className: "bg-success/10 text-success border-success/20" },
-  cancelled: { label: "Cancelled", className: "bg-destructive/10 text-destructive border-destructive/20" },
+  cancelled: {
+    label: "Cancelled",
+    className: "bg-destructive/10 text-destructive border-destructive/20",
+  },
   returned: { label: "Returned", className: "bg-muted text-muted-foreground border-border" },
 };
 
 export const PAYMENT_STATUS_META: Record<PaymentStatus, StatusMeta> = {
-  unpaid: { label: "Unpaid", className: "bg-destructive/10 text-destructive border-destructive/20" },
+  unpaid: {
+    label: "Unpaid",
+    className: "bg-destructive/10 text-destructive border-destructive/20",
+  },
   partial: { label: "Partial", className: "bg-chart-4/10 text-chart-4 border-chart-4/20" },
   paid: { label: "Paid", className: "bg-success/10 text-success border-success/20" },
   refunded: { label: "Refunded", className: "bg-muted text-muted-foreground border-border" },
@@ -37,7 +43,10 @@ export const PRODUCT_STATUS_META: Record<ProductStatus, StatusMeta> = {
   draft: { label: "Draft", className: "bg-muted text-muted-foreground border-border" },
   active: { label: "Active", className: "bg-success/10 text-success border-success/20" },
   archived: { label: "Archived", className: "bg-muted text-muted-foreground border-border" },
-  out_of_stock: { label: "Out of stock", className: "bg-destructive/10 text-destructive border-destructive/20" },
+  out_of_stock: {
+    label: "Out of stock",
+    className: "bg-destructive/10 text-destructive border-destructive/20",
+  },
 };
 
 export const STOCK_MOVEMENT_LABELS: Record<StockMovementType, string> = {

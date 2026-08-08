@@ -8,7 +8,10 @@ export const Route = createFileRoute("/shop/contact")({
       { title: "Contact us | DailyGear" },
       { name: "description", content: "Reach our support team by phone, email or WhatsApp." },
       { property: "og:title", content: "Contact us | DailyGear" },
-      { property: "og:description", content: "Reach our support team by phone, email or WhatsApp." },
+      {
+        property: "og:description",
+        content: "Reach our support team by phone, email or WhatsApp.",
+      },
       { property: "og:type", content: "website" },
     ],
   }),

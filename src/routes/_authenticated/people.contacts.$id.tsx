@@ -19,7 +19,10 @@ export const Route = createFileRoute("/_authenticated/people/contacts/$id")({
   head: () => ({
     meta: [
       { title: "Contact · Alex OS" },
-      { name: "description", content: "Full contact profile with leads, activities, tasks, notes and attachments." },
+      {
+        name: "description",
+        content: "Full contact profile with leads, activities, tasks, notes and attachments.",
+      },
     ],
   }),
 });
@@ -39,7 +42,9 @@ function ContactDetailPage() {
     return (
       <div className="text-center py-16">
         <p className="text-muted-foreground">Contact not found.</p>
-        <Button asChild variant="link"><Link to="/people">Back to contacts</Link></Button>
+        <Button asChild variant="link">
+          <Link to="/people">Back to contacts</Link>
+        </Button>
       </div>
     );
   }
@@ -50,7 +55,9 @@ function ContactDetailPage() {
     <div className="space-y-6">
       <div>
         <Button asChild variant="ghost" size="sm" className="-ml-3 mb-2">
-          <Link to="/people"><ArrowLeft className="mr-2 h-4 w-4" /> Contacts</Link>
+          <Link to="/people">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Contacts
+          </Link>
         </Button>
         <Card>
           <CardContent className="pt-6 flex flex-col md:flex-row md:items-center gap-4">
@@ -62,17 +69,25 @@ function ContactDetailPage() {
               </div>
               {contact.job_title || contact.company ? (
                 <p className="text-muted-foreground text-sm">
-                  {contact.job_title}{contact.job_title && contact.company ? " · " : ""}{contact.company}
+                  {contact.job_title}
+                  {contact.job_title && contact.company ? " · " : ""}
+                  {contact.company}
                 </p>
               ) : null}
               <div className="flex flex-wrap gap-4 mt-2 text-sm">
                 {contact.email ? (
-                  <a href={`mailto:${contact.email}`} className="inline-flex items-center gap-1.5 hover:text-primary">
+                  <a
+                    href={`mailto:${contact.email}`}
+                    className="inline-flex items-center gap-1.5 hover:text-primary"
+                  >
                     <Mail className="h-4 w-4" /> {contact.email}
                   </a>
                 ) : null}
                 {contact.phone ? (
-                  <a href={`tel:${contact.phone}`} className="inline-flex items-center gap-1.5 hover:text-primary">
+                  <a
+                    href={`tel:${contact.phone}`}
+                    className="inline-flex items-center gap-1.5 hover:text-primary"
+                  >
                     <Phone className="h-4 w-4" /> {contact.phone}
                   </a>
                 ) : null}
@@ -115,17 +130,26 @@ function ContactDetailPage() {
 
         <TabsContent value="overview" className="mt-4 grid gap-4 md:grid-cols-2">
           <Card>
-            <CardHeader><CardTitle className="text-base">Details</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-base">Details</CardTitle>
+            </CardHeader>
             <CardContent className="grid grid-cols-[120px_1fr] gap-y-2 text-sm">
-              <span className="text-muted-foreground">Source</span><span>{contact.source ?? "—"}</span>
-              <span className="text-muted-foreground">Status</span><span>{statusLabel}</span>
-              <span className="text-muted-foreground">Company</span><span>{contact.company ?? "—"}</span>
-              <span className="text-muted-foreground">Job title</span><span>{contact.job_title ?? "—"}</span>
-              <span className="text-muted-foreground">Created</span><span>{new Date(contact.created_at).toLocaleDateString()}</span>
+              <span className="text-muted-foreground">Source</span>
+              <span>{contact.source ?? "—"}</span>
+              <span className="text-muted-foreground">Status</span>
+              <span>{statusLabel}</span>
+              <span className="text-muted-foreground">Company</span>
+              <span>{contact.company ?? "—"}</span>
+              <span className="text-muted-foreground">Job title</span>
+              <span>{contact.job_title ?? "—"}</span>
+              <span className="text-muted-foreground">Created</span>
+              <span>{new Date(contact.created_at).toLocaleDateString()}</span>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader><CardTitle className="text-base">Notes</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-base">Notes</CardTitle>
+            </CardHeader>
             <CardContent>
               <p className="text-sm whitespace-pre-wrap text-muted-foreground">
                 {contact.notes || "No notes on this contact."}

@@ -16,9 +16,15 @@ export const Route = createFileRoute("/_authenticated/e-commerce/products")({
   head: () => ({
     meta: [
       { title: "Products | DailyGear" },
-      { name: "description", content: "Manage your DailyGear catalogue: pricing, cost, stock levels and suppliers." },
+      {
+        name: "description",
+        content: "Manage your DailyGear catalogue: pricing, cost, stock levels and suppliers.",
+      },
       { property: "og:title", content: "Products | DailyGear" },
-      { property: "og:description", content: "Manage your catalogue: pricing, cost, stock levels and suppliers." },
+      {
+        property: "og:description",
+        content: "Manage your catalogue: pricing, cost, stock levels and suppliers.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -40,8 +46,7 @@ function ProductsPage() {
     const q = query.trim().toLowerCase();
     if (!q) return products;
     return products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) || (p.sku ?? "").toLowerCase().includes(q),
+      (p) => p.name.toLowerCase().includes(q) || (p.sku ?? "").toLowerCase().includes(q),
     );
   }, [products, query]);
 
@@ -80,7 +85,9 @@ function ProductsPage() {
           <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
             <Package className="h-6 w-6 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              {products.length ? "No products match your search." : "Add your first product to start tracking revenue and stock."}
+              {products.length
+                ? "No products match your search."
+                : "Add your first product to start tracking revenue and stock."}
             </p>
           </CardContent>
         </Card>
@@ -116,7 +123,9 @@ function ProductsPage() {
                       <td className="px-4 py-3 text-right text-muted-foreground">
                         {money(Number(p.cost_price))}
                       </td>
-                      <td className={`px-4 py-3 text-right ${low ? "text-destructive font-medium" : ""}`}>
+                      <td
+                        className={`px-4 py-3 text-right ${low ? "text-destructive font-medium" : ""}`}
+                      >
                         {p.stock_quantity}
                       </td>
                       <td className="px-4 py-3">

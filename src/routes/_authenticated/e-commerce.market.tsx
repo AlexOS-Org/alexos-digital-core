@@ -21,7 +21,10 @@ function MarketPage() {
   const { context, isLoading } = useCommerceData();
   return (
     <div className="space-y-6">
-      <PageHeader title="Market Intelligence" description="Demand, category trends and seasonal opportunity." />
+      <PageHeader
+        title="Market Intelligence"
+        description="Demand, category trends and seasonal opportunity."
+      />
       <IntelligencePanel kind="market" ctx={context} ready={!isLoading} />
     </div>
   );

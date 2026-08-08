@@ -21,7 +21,10 @@ function MarketingPage() {
   const { context, isLoading } = useCommerceData();
   return (
     <div className="space-y-6">
-      <PageHeader title="Marketing Intelligence" description="Channel performance, ROAS, CTR, CPC and CPA." />
+      <PageHeader
+        title="Marketing Intelligence"
+        description="Channel performance, ROAS, CTR, CPC and CPA."
+      />
       <IntelligencePanel kind="marketing" ctx={context} ready={!isLoading} />
     </div>
   );

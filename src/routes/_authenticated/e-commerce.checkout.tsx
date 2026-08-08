@@ -402,10 +402,7 @@ function CheckoutPage() {
                 <p className="text-sm text-muted-foreground">
                   Your cart is empty. Build an order from the store preview or add a line item.
                 </p>
-                <Button
-                  variant="outline"
-                  onClick={() => navigate({ to: "/e-commerce/store" })}
-                >
+                <Button variant="outline" onClick={() => navigate({ to: "/e-commerce/store" })}>
                   Go to store preview
                 </Button>
               </div>

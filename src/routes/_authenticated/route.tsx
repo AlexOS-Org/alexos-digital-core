@@ -37,9 +37,7 @@ function AuthenticatedLayout() {
               <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
                 {current?.group ?? "Workspace"}
               </div>
-              <div className="text-sm font-semibold truncate">
-                {current?.title ?? "AlexOS"}
-              </div>
+              <div className="text-sm font-semibold truncate">{current?.title ?? "AlexOS"}</div>
             </div>
           </header>
           {/* Extra bottom padding on mobile so content clears the bottom nav */}

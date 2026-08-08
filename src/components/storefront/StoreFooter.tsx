@@ -94,10 +94,18 @@ export function StoreFooter({ store }: { store: Storefront | null }) {
             © {new Date().getFullYear()} {store?.name ?? "DailyGear"}. All rights reserved.
           </p>
           <div className="flex gap-4">
-            <Link to="/shop/policies/$slug" params={{ slug: "privacy" }} className="hover:text-foreground">
+            <Link
+              to="/shop/policies/$slug"
+              params={{ slug: "privacy" }}
+              className="hover:text-foreground"
+            >
               Privacy
             </Link>
-            <Link to="/shop/policies/$slug" params={{ slug: "terms" }} className="hover:text-foreground">
+            <Link
+              to="/shop/policies/$slug"
+              params={{ slug: "terms" }}
+              className="hover:text-foreground"
+            >
               Terms
             </Link>
           </div>

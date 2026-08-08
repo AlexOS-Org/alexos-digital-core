@@ -81,6 +81,21 @@ function orderNumber() {
   return `DG-${stamp}-${Math.floor(Math.random() * 9000 + 1000)}`;
 }
 
+// Deterministic, collision-free order number using the database sequence
+// added by the 20260808 hardening migration (dg_order_seq). Falls back to the
+// legacy random format if the sequence is unavailable (older environments).
+async function nextOrderNumber(
+  adminClient: Awaited<
+    ReturnType<typeof import("@/integrations/supabase/client.server").createSupabaseAdminClient>
+  >,
+) {
+  const { data, error } = await adminClient.rpc("next_order_number");
+  if (!error && typeof data === "string" && data.startsWith("DG-")) {
+    return data;
+  }
+  return orderNumber();
+}
+
 export async function placeGuestOrderImpl(input: GuestOrderInput) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -160,7 +175,7 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
     customerId = created.id;
   }
 
-  const number = orderNumber();
+  const number = await nextOrderNumber(supabaseAdmin);
   const { data: order, error: orderError } = await supabaseAdmin
     .from("dg_orders")
     .insert({
@@ -201,11 +216,18 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
   );
   if (itemsError) throw itemsError;
 
+  // Atomic, race-safe stock reservation (see dg_reserve_stock in the
+  // 20260808 hardening migration). Under concurrent checkouts the database
+  // constraint guarantees stock never goes negative and two orders can never
+  // oversell the last unit.
   for (const line of lines) {
-    await supabaseAdmin
-      .from("dg_products")
-      .update({ stock_quantity: Number(line.product.stock_quantity) - line.quantity })
-      .eq("id", line.product.id);
+    const { data: reserved, error: reserveError } = await supabaseAdmin.rpc("dg_reserve_stock", {
+      p_product_id: line.product.id,
+      p_qty: line.quantity,
+    });
+    if (reserveError || reserved !== true) {
+      throw new Error(`Only ${line.product.stock_quantity} left of ${line.product.name}.`);
+    }
   }
 
   await supabaseAdmin.from("dg_stock_movements").insert(

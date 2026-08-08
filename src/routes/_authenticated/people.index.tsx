@@ -1,17 +1,50 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Plus, Search, Mail, Phone, Building2, MoreHorizontal, Users, Edit3, Trash2, Eye } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Mail,
+  Phone,
+  Building2,
+  MoreHorizontal,
+  Users,
+  Edit3,
+  Trash2,
+  Eye,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
-  Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious,
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useContacts, useDeleteContact } from "@/lib/crm/api";
@@ -26,7 +59,10 @@ export const Route = createFileRoute("/_authenticated/people/")({
   head: () => ({
     meta: [
       { title: "Contacts · Alex OS" },
-      { name: "description", content: "Search, filter, and manage every customer, lead, and partner in one unified CRM." },
+      {
+        name: "description",
+        content: "Search, filter, and manage every customer, lead, and partner in one unified CRM.",
+      },
     ],
   }),
 });
@@ -74,7 +110,12 @@ function ContactsPage() {
           <h1 className="text-3xl font-bold">Contacts</h1>
           <p className="text-muted-foreground">Manage customers, leads and relationships.</p>
         </div>
-        <Button onClick={() => { setEditing(null); setDialogOpen(true); }}>
+        <Button
+          onClick={() => {
+            setEditing(null);
+            setDialogOpen(true);
+          }}
+        >
           <Plus className="mr-2 h-4 w-4" /> New Contact
         </Button>
       </div>
@@ -94,17 +135,30 @@ function ContactsPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 value={search}
-                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
                 placeholder="Search name, email, company..."
                 className="pl-9"
               />
             </div>
-            <Select value={status} onValueChange={(v) => { setStatus(v as typeof status); setPage(1); }}>
-              <SelectTrigger className="sm:w-40"><SelectValue /></SelectTrigger>
+            <Select
+              value={status}
+              onValueChange={(v) => {
+                setStatus(v as typeof status);
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="sm:w-40">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All statuses</SelectItem>
                 {CONTACT_STATUSES.map((s) => (
-                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                  <SelectItem key={s.value} value={s.value}>
+                    {s.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -113,10 +167,17 @@ function ContactsPage() {
         <CardContent>
           {isLoading ? (
             <div className="space-y-2">
-              {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-14 w-full" />
+              ))}
             </div>
           ) : contacts.length === 0 ? (
-            <EmptyState onCreate={() => { setEditing(null); setDialogOpen(true); }} />
+            <EmptyState
+              onCreate={() => {
+                setEditing(null);
+                setDialogOpen(true);
+              }}
+            />
           ) : (
             <>
               <div className="overflow-x-auto">
@@ -134,11 +195,17 @@ function ContactsPage() {
                     {paged.map((c) => (
                       <TableRow key={c.id} className="group">
                         <TableCell>
-                          <Link to="/people/contacts/$id" params={{ id: c.id }} className="flex items-center gap-3 hover:underline">
+                          <Link
+                            to="/people/contacts/$id"
+                            params={{ id: c.id }}
+                            className="flex items-center gap-3 hover:underline"
+                          >
                             <ContactAvatar contact={c} />
                             <div>
                               <div className="font-medium">{contactDisplayName(c)}</div>
-                              {c.job_title ? <div className="text-xs text-muted-foreground">{c.job_title}</div> : null}
+                              {c.job_title ? (
+                                <div className="text-xs text-muted-foreground">{c.job_title}</div>
+                              ) : null}
                             </div>
                           </Link>
                         </TableCell>
@@ -148,21 +215,31 @@ function ContactsPage() {
                               <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
                               {c.company}
                             </span>
-                          ) : <span className="text-muted-foreground text-sm">—</span>}
+                          ) : (
+                            <span className="text-muted-foreground text-sm">—</span>
+                          )}
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-0.5 text-xs">
                             {c.email ? (
-                              <a href={`mailto:${c.email}`} className="inline-flex items-center gap-1 hover:text-primary">
+                              <a
+                                href={`mailto:${c.email}`}
+                                className="inline-flex items-center gap-1 hover:text-primary"
+                              >
                                 <Mail className="h-3 w-3" /> {c.email}
                               </a>
                             ) : null}
                             {c.phone ? (
-                              <a href={`tel:${c.phone}`} className="inline-flex items-center gap-1 hover:text-primary">
+                              <a
+                                href={`tel:${c.phone}`}
+                                className="inline-flex items-center gap-1 hover:text-primary"
+                              >
                                 <Phone className="h-3 w-3" /> {c.phone}
                               </a>
                             ) : null}
-                            {!c.email && !c.phone ? <span className="text-muted-foreground">—</span> : null}
+                            {!c.email && !c.phone ? (
+                              <span className="text-muted-foreground">—</span>
+                            ) : null}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -183,7 +260,12 @@ function ContactsPage() {
                                   <Eye className="mr-2 h-4 w-4" /> View
                                 </Link>
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => { setEditing(c); setDialogOpen(true); }}>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setEditing(c);
+                                  setDialogOpen(true);
+                                }}
+                              >
                                 <Edit3 className="mr-2 h-4 w-4" /> Edit
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
@@ -209,7 +291,10 @@ function ContactsPage() {
                     <PaginationItem>
                       <PaginationPrevious
                         href="#"
-                        onClick={(e) => { e.preventDefault(); setPage((p) => Math.max(1, p - 1)); }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPage((p) => Math.max(1, p - 1));
+                        }}
                       />
                     </PaginationItem>
                     {Array.from({ length: totalPages }).map((_, i) => (
@@ -217,7 +302,10 @@ function ContactsPage() {
                         <PaginationLink
                           href="#"
                           isActive={currentPage === i + 1}
-                          onClick={(e) => { e.preventDefault(); setPage(i + 1); }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setPage(i + 1);
+                          }}
                         >
                           {i + 1}
                         </PaginationLink>
@@ -226,7 +314,10 @@ function ContactsPage() {
                     <PaginationItem>
                       <PaginationNext
                         href="#"
-                        onClick={(e) => { e.preventDefault(); setPage((p) => Math.min(totalPages, p + 1)); }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPage((p) => Math.min(totalPages, p + 1));
+                        }}
                       />
                     </PaginationItem>
                   </PaginationContent>
@@ -245,8 +336,12 @@ function ContactsPage() {
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
     <Card>
-      <CardHeader className="pb-2"><CardTitle className="text-xs text-muted-foreground font-medium">{label}</CardTitle></CardHeader>
-      <CardContent><p className="text-2xl font-bold">{value}</p></CardContent>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xs text-muted-foreground font-medium">{label}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-2xl font-bold">{value}</p>
+      </CardContent>
     </Card>
   );
 }
@@ -256,8 +351,12 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
     <div className="py-16 text-center">
       <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
       <h2 className="text-lg font-semibold">No contacts yet</h2>
-      <p className="text-muted-foreground mt-1 mb-4">Add your first customer, lead or partner to get started.</p>
-      <Button onClick={onCreate}><Plus className="mr-2 h-4 w-4" /> New Contact</Button>
+      <p className="text-muted-foreground mt-1 mb-4">
+        Add your first customer, lead or partner to get started.
+      </p>
+      <Button onClick={onCreate}>
+        <Plus className="mr-2 h-4 w-4" /> New Contact
+      </Button>
     </div>
   );
 }

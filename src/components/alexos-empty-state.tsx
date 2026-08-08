@@ -35,9 +35,8 @@ export function AlexOSEmptyState({
           {statusLabel}
         </div>
         <p className="text-sm leading-7 text-muted-foreground max-w-lg">
-          This module is part of the AlexOS roadmap. When activated, it will integrate
-          with your workspace data and surface actionable intelligence across all your
-          operations.
+          This module is part of the AlexOS roadmap. When activated, it will integrate with your
+          workspace data and surface actionable intelligence across all your operations.
         </p>
         <div className="grid gap-3 sm:grid-cols-3 pt-2">
           {[

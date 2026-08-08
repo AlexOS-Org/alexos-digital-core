@@ -117,7 +117,11 @@ export function ProductFormDialog({
 
           <div className="space-y-2">
             <Label>SKU</Label>
-            <Input value={form.sku} onChange={(e) => set("sku")(e.target.value)} placeholder="DG-BAG-001" />
+            <Input
+              value={form.sku}
+              onChange={(e) => set("sku")(e.target.value)}
+              placeholder="DG-BAG-001"
+            />
           </div>
 
           <div className="space-y-2">

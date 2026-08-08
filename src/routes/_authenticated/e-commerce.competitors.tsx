@@ -21,7 +21,10 @@ function CompetitorsPage() {
   const { context, isLoading } = useCommerceData();
   return (
     <div className="space-y-6">
-      <PageHeader title="Competitor Intelligence" description="Pricing, assortment and promotion monitoring." />
+      <PageHeader
+        title="Competitor Intelligence"
+        description="Pricing, assortment and promotion monitoring."
+      />
       <IntelligencePanel kind="competitor" ctx={context} ready={!isLoading} />
     </div>
   );

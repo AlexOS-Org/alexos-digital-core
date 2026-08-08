@@ -30,7 +30,10 @@ function formatMoney(value: number) {
 
 function ThankYouPage() {
   const navigate = useNavigate();
-  const search = useRouterState({ select: (r) => r.location.search }) as unknown as Record<string, string | undefined>;
+  const search = useRouterState({ select: (r) => r.location.search }) as unknown as Record<
+    string,
+    string | undefined
+  >;
   const { orders, customers, isLoading } = useCommerceData();
   const orderId = search["orderId"] ?? null;
   const orderNumber = search["orderNumber"] ?? null;
@@ -117,13 +120,8 @@ function ThankYouPage() {
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Button onClick={() => navigate({ to: "/e-commerce/orders" })}>
-          View orders
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => navigate({ to: "/e-commerce/store" })}
-        >
+        <Button onClick={() => navigate({ to: "/e-commerce/orders" })}>View orders</Button>
+        <Button variant="outline" onClick={() => navigate({ to: "/e-commerce/store" })}>
           Back to store preview
         </Button>
       </div>

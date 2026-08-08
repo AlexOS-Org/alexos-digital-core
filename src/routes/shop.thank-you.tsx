@@ -30,8 +30,8 @@ function ThankYou() {
       </p>
       {order ? (
         <p className="mt-6 rounded-2xl border bg-card p-4 text-sm">
-          Your order number is <span className="font-bold">{order}</span>. Keep it safe — you can use
-          it to track your delivery.
+          Your order number is <span className="font-bold">{order}</span>. Keep it safe — you can
+          use it to track your delivery.
         </p>
       ) : null}
       <div className="mt-8 flex flex-wrap justify-center gap-3">

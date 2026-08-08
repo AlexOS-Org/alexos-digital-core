@@ -46,11 +46,22 @@ function TrackPage() {
       >
         <div className="space-y-1.5">
           <Label htmlFor="order">Order number</Label>
-          <Input id="order" required value={orderNumber} onChange={(e) => setOrderNumber(e.target.value)} placeholder="DG-20260101-1234" />
+          <Input
+            id="order"
+            required
+            value={orderNumber}
+            onChange={(e) => setOrderNumber(e.target.value)}
+            placeholder="DG-20260101-1234"
+          />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="contact">Phone or email</Label>
-          <Input id="contact" required value={contact} onChange={(e) => setContact(e.target.value)} />
+          <Input
+            id="contact"
+            required
+            value={contact}
+            onChange={(e) => setContact(e.target.value)}
+          />
         </div>
         <Button type="submit" className="w-full rounded-xl" disabled={mutation.isPending}>
           {mutation.isPending ? "Looking up…" : "Track order"}

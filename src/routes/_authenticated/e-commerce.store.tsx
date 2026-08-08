@@ -159,16 +159,10 @@ function StorePage() {
               <CardTitle>Quick actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button
-                variant="outline"
-                onClick={() => navigate({ to: "/e-commerce/products" })}
-              >
+              <Button variant="outline" onClick={() => navigate({ to: "/e-commerce/products" })}>
                 Manage catalogue
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => navigate({ to: "/e-commerce/orders" })}
-              >
+              <Button variant="outline" onClick={() => navigate({ to: "/e-commerce/orders" })}>
                 Review orders
               </Button>
             </CardContent>

@@ -165,7 +165,14 @@ export function MarketingAnalytics({
   return (
     <ChartShell title="Revenue by channel" icon={PieIcon} height={height}>
       <PieChart>
-        <Pie data={data} dataKey="value" nameKey="name" innerRadius="55%" outerRadius="82%" paddingAngle={3}>
+        <Pie
+          data={data}
+          dataKey="value"
+          nameKey="name"
+          innerRadius="55%"
+          outerRadius="82%"
+          paddingAngle={3}
+        >
           {data.map((_, i) => (
             <Cell key={i} fill={CHANNEL_COLORS[i % CHANNEL_COLORS.length]} />
           ))}

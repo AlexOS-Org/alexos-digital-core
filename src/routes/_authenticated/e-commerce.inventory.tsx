@@ -1,14 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import {
-  AlertTriangle,
-  Boxes,
-  Minus,
-  Package,
-  Plus,
-  Search,
-  Wallet,
-} from "lucide-react";
+import { AlertTriangle, Boxes, Minus, Package, Plus, Search, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { KpiCard } from "@/components/dailygear/KpiCard";
 import { StatusBadge } from "@/components/dailygear/StatusBadge";
@@ -47,7 +39,10 @@ export const Route = createFileRoute("/_authenticated/e-commerce/inventory")({
       { title: "Inventory | DailyGear" },
       { name: "description", content: "Stock levels, movements, reorder and dead-stock signals." },
       { property: "og:title", content: "Inventory | DailyGear" },
-      { property: "og:description", content: "Stock levels, movements, reorder and dead-stock signals." },
+      {
+        property: "og:description",
+        content: "Stock levels, movements, reorder and dead-stock signals.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -166,12 +161,16 @@ function StockAdjustDialog({ product, open, onOpenChange }: AdjustDialogProps) {
           </div>
 
           <div className="rounded-xl border border-border/60 bg-muted/40 p-3 text-xs text-muted-foreground">
-            Current stock: <span className="font-semibold text-foreground">{product?.stock_quantity ?? 0}</span>
+            Current stock:{" "}
+            <span className="font-semibold text-foreground">{product?.stock_quantity ?? 0}</span>
             {!invalid && (
               <>
                 {" → "}
                 <span className="font-semibold text-foreground">
-                  {Math.max(0, num(product?.stock_quantity) + (direction === "in" ? parsed : -parsed))}
+                  {Math.max(
+                    0,
+                    num(product?.stock_quantity) + (direction === "in" ? parsed : -parsed),
+                  )}
                 </span>
               </>
             )}
@@ -210,7 +209,9 @@ function InventoryPage() {
     );
     return new Set(
       products
-        .filter((p) => p.status === "active" && num(p.stock_quantity) > 0 && !recentlySold.has(p.id))
+        .filter(
+          (p) => p.status === "active" && num(p.stock_quantity) > 0 && !recentlySold.has(p.id),
+        )
         .map((p) => p.id),
     );
   }, [products, movements]);
@@ -220,12 +221,20 @@ function InventoryPage() {
     const lowStock = active.filter(
       (p) => num(p.stock_quantity) <= num(p.low_stock_threshold) && num(p.stock_quantity) > 0,
     ).length;
-    const outOfStock = products.filter((p) => p.status === "out_of_stock" || num(p.stock_quantity) === 0).length;
+    const outOfStock = products.filter(
+      (p) => p.status === "out_of_stock" || num(p.stock_quantity) === 0,
+    ).length;
     const inventoryValue = active.reduce(
       (s, p) => s + num(p.cost_price) * num(p.stock_quantity),
       0,
     );
-    return { total: active.length, lowStock, outOfStock, deadStock: deadStockIds.size, inventoryValue };
+    return {
+      total: active.length,
+      lowStock,
+      outOfStock,
+      deadStock: deadStockIds.size,
+      inventoryValue,
+    };
   }, [products, deadStockIds]);
 
   /** Sort: out-of-stock → low stock → dead stock → normal */
@@ -233,9 +242,7 @@ function InventoryPage() {
     const q = query.trim().toLowerCase();
     const list = q
       ? products.filter(
-          (p) =>
-            p.name.toLowerCase().includes(q) ||
-            (p.sku ?? "").toLowerCase().includes(q),
+          (p) => p.name.toLowerCase().includes(q) || (p.sku ?? "").toLowerCase().includes(q),
         )
       : [...products];
     return list.sort((a, b) => {
@@ -263,12 +270,7 @@ function InventoryPage() {
 
       {/* KPIs */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard
-          label="Active SKUs"
-          value={summary.total}
-          icon={Boxes}
-          loading={isLoading}
-        />
+        <KpiCard label="Active SKUs" value={summary.total} icon={Boxes} loading={isLoading} />
         <KpiCard
           label="Low stock"
           value={summary.lowStock}
@@ -299,7 +301,8 @@ function InventoryPage() {
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
           <p className="text-sm text-amber-700 dark:text-amber-300">
             <span className="font-semibold">{summary.deadStock} items</span> have had no sales in
-            the last {DEAD_STOCK_DAYS} days. Consider discounting, bundling, or returning to supplier.
+            the last {DEAD_STOCK_DAYS} days. Consider discounting, bundling, or returning to
+            supplier.
           </p>
         </div>
       )}
@@ -364,11 +367,7 @@ function InventoryPage() {
                       </td>
                       <td
                         className={`px-4 py-3 text-right font-semibold ${
-                          isOut
-                            ? "text-destructive"
-                            : isLow
-                              ? "text-amber-500"
-                              : "text-foreground"
+                          isOut ? "text-destructive" : isLow ? "text-amber-500" : "text-foreground"
                         }`}
                       >
                         {stock}
@@ -418,11 +417,7 @@ function InventoryPage() {
         </Card>
       )}
 
-      <StockAdjustDialog
-        product={adjustTarget}
-        open={adjustOpen}
-        onOpenChange={setAdjustOpen}
-      />
+      <StockAdjustDialog product={adjustTarget} open={adjustOpen} onOpenChange={setAdjustOpen} />
     </div>
   );
 }

@@ -93,12 +93,7 @@ function CustomersPage() {
 
       {/* KPIs */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <KpiCard
-          label="Total customers"
-          value={summary.total}
-          icon={Users}
-          loading={isLoading}
-        />
+        <KpiCard label="Total customers" value={summary.total} icon={Users} loading={isLoading} />
         <KpiCard
           label="Returning customers"
           value={summary.returning}
@@ -187,16 +182,19 @@ function CustomersPage() {
                         <p className="text-xs">{c.email ?? "—"}</p>
                         <p className="text-xs text-muted-foreground">{c.phone ?? ""}</p>
                       </td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground">
-                        {location || "—"}
-                      </td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">{location || "—"}</td>
                       <td className="px-4 py-3 text-right">{s.orderCount}</td>
                       <td className="px-4 py-3 text-right font-medium">
                         {s.totalSpent > 0 ? money(s.totalSpent) : "—"}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex justify-end gap-1">
-                          <Button size="icon" variant="ghost" aria-label="Edit customer" onClick={() => openEdit(c)}>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            aria-label="Edit customer"
+                            onClick={() => openEdit(c)}
+                          >
                             <Pencil className="h-4 w-4" />
                           </Button>
                           <Button
@@ -219,11 +217,7 @@ function CustomersPage() {
         </Card>
       )}
 
-      <CustomerFormDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        customer={editing}
-      />
+      <CustomerFormDialog open={dialogOpen} onOpenChange={setDialogOpen} customer={editing} />
     </div>
   );
 }

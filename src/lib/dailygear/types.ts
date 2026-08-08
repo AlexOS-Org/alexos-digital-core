@@ -66,12 +66,7 @@ export interface TrendPoint {
 
 /* ── Intelligence (provider-backed, no persistence yet) ───────── */
 
-export type IntelligenceKind =
-  | "market"
-  | "competitor"
-  | "marketing"
-  | "landing"
-  | "advertising";
+export type IntelligenceKind = "market" | "competitor" | "marketing" | "landing" | "advertising";
 
 export type SignalTone = "positive" | "neutral" | "warning" | "critical";
 

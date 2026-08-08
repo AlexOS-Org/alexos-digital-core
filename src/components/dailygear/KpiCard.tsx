@@ -43,9 +43,7 @@ export function KpiCard({
             ) : (
               <p className="mt-1.5 text-2xl font-semibold tracking-tight truncate">{value}</p>
             )}
-            {hint && !loading && (
-              <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
-            )}
+            {hint && !loading && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
           </div>
           <div className={cn("rounded-xl p-2.5", toneClass)}>
             <Icon className="h-5 w-5" />

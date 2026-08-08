@@ -98,17 +98,13 @@ export function LiveOrderFeed({
 }) {
   const names = useMemo(
     () =>
-      new Map(
-        customers.map((c) => [c.id, [c.first_name, c.last_name].filter(Boolean).join(" ")]),
-      ),
+      new Map(customers.map((c) => [c.id, [c.first_name, c.last_name].filter(Boolean).join(" ")])),
     [customers],
   );
 
   const rows = useMemo(
     () =>
-      [...orders]
-        .sort((a, b) => +new Date(b.placed_at) - +new Date(a.placed_at))
-        .slice(0, limit),
+      [...orders].sort((a, b) => +new Date(b.placed_at) - +new Date(a.placed_at)).slice(0, limit),
     [orders, limit],
   );
 
@@ -454,9 +450,12 @@ export function RecommendationsPanel({
       list.push(`${pending.length} orders are queued — batch-pack them to protect delivery SLAs.`);
     const noImage = products.filter((p) => (p.images ?? []).length === 0);
     if (noImage.length)
-      list.push(`${noImage.length} products have no imagery — listings without photos convert far worse.`);
+      list.push(
+        `${noImage.length} products have no imagery — listings without photos convert far worse.`,
+      );
     const noSale = products.filter((p) => !p.sale_price).length;
-    if (noSale > 5) list.push("Run a limited promo on slow movers to unlock trapped working capital.");
+    if (noSale > 5)
+      list.push("Run a limited promo on slow movers to unlock trapped working capital.");
     if (!list.length) list.push("Operations look healthy — focus on acquisition this week.");
     return list.slice(0, 4);
   }, [products, orders]);

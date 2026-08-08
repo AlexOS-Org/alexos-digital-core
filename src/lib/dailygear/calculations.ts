@@ -1,12 +1,5 @@
 import { DEAD_STOCK_DAYS } from "./constants";
-import type {
-  CommerceKpis,
-  Customer,
-  Order,
-  OrderItem,
-  Product,
-  TrendPoint,
-} from "./types";
+import type { CommerceKpis, Customer, Order, OrderItem, Product, TrendPoint } from "./types";
 
 /** Pure functions only — no data fetching, no React. Trivially testable. */
 
@@ -26,13 +19,7 @@ function pctChange(current: number, previous: number) {
   return ((current - previous) / previous) * 100;
 }
 
-const COUNTS_AS_SALE: Order["status"][] = [
-  "new",
-  "processing",
-  "packed",
-  "shipped",
-  "delivered",
-];
+const COUNTS_AS_SALE: Order["status"][] = ["new", "processing", "packed", "shipped", "delivered"];
 
 export function computeKpis(
   orders: Order[],
@@ -92,11 +79,7 @@ export function computeKpis(
   };
 }
 
-export function computeTrend(
-  orders: Order[],
-  items: OrderItem[],
-  months = 6,
-): TrendPoint[] {
+export function computeTrend(orders: Order[], items: OrderItem[], months = 6): TrendPoint[] {
   const buckets = new Map<string, TrendPoint>();
   const now = new Date();
 
@@ -148,11 +131,12 @@ export function computeProductPerformance(
   return products
     .map((product) => {
       const rows = items.filter((i) => i.product_id === product.id);
-      const lastSoldAt = rows
-        .map((r) => orderDate.get(r.order_id) ?? null)
-        .filter((d): d is string => Boolean(d))
-        .sort()
-        .at(-1) ?? null;
+      const lastSoldAt =
+        rows
+          .map((r) => orderDate.get(r.order_id) ?? null)
+          .filter((d): d is string => Boolean(d))
+          .sort()
+          .at(-1) ?? null;
 
       return {
         product,
@@ -179,10 +163,7 @@ export interface CustomerInsight {
   lastOrderAt: string | null;
 }
 
-export function computeCustomerInsights(
-  customers: Customer[],
-  orders: Order[],
-): CustomerInsight[] {
+export function computeCustomerInsights(customers: Customer[], orders: Order[]): CustomerInsight[] {
   return customers
     .map((customer) => {
       const rows = orders.filter(
@@ -192,7 +173,11 @@ export function computeCustomerInsights(
         customer,
         orders: rows.length,
         lifetimeValue: rows.reduce((s, o) => s + num(o.total), 0),
-        lastOrderAt: rows.map((o) => o.placed_at).sort().at(-1) ?? null,
+        lastOrderAt:
+          rows
+            .map((o) => o.placed_at)
+            .sort()
+            .at(-1) ?? null,
       };
     })
     .sort((a, b) => b.lifetimeValue - a.lifetimeValue);
@@ -203,10 +188,7 @@ export function reorderSuggestions(products: Product[]) {
     .filter((p) => num(p.stock_quantity) <= num(p.low_stock_threshold))
     .map((p) => ({
       product: p,
-      suggestedQuantity: Math.max(
-        num(p.low_stock_threshold) * 2 - num(p.stock_quantity),
-        1,
-      ),
+      suggestedQuantity: Math.max(num(p.low_stock_threshold) * 2 - num(p.stock_quantity), 1),
     }))
     .sort((a, b) => num(a.product.stock_quantity) - num(b.product.stock_quantity));
 }

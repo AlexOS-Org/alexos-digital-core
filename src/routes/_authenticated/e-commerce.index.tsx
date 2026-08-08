@@ -93,13 +93,7 @@ type Panels = {
 
 /* ── Shared header ───────────────────────────────────────────── */
 
-function Hero({
-  kpis,
-  compactMode,
-}: {
-  kpis: Panels["kpis"];
-  compactMode?: boolean;
-}) {
+function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boolean }) {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 

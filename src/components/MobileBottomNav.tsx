@@ -27,22 +27,19 @@ export function MobileBottomNav() {
               to={item.url}
               className={cn(
                 "flex flex-col items-center gap-1 rounded-xl px-3 py-2 min-w-0 flex-1 transition-colors",
-                active ? "text-primary" : "text-muted-foreground"
+                active ? "text-primary" : "text-muted-foreground",
               )}
               aria-current={active ? "page" : undefined}
             >
               <div
-                className={cn(
-                  "flex h-6 w-6 items-center justify-center",
-                  active && "text-primary"
-                )}
+                className={cn("flex h-6 w-6 items-center justify-center", active && "text-primary")}
               >
                 <Icon className="h-5 w-5" />
               </div>
               <span
                 className={cn(
                   "text-[10px] font-medium truncate",
-                  active ? "text-primary" : "text-muted-foreground"
+                  active ? "text-primary" : "text-muted-foreground",
                 )}
               >
                 {item.title}

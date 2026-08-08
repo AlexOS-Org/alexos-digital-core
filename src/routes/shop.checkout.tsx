@@ -94,31 +94,63 @@ function CheckoutPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="firstName">First name</Label>
-                <Input id="firstName" required value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} />
+                <Input
+                  id="firstName"
+                  required
+                  value={form.firstName}
+                  onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="lastName">Last name</Label>
-                <Input id="lastName" value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} />
+                <Input
+                  id="lastName"
+                  value={form.lastName}
+                  onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="phone">Phone</Label>
-                <Input id="phone" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                <Input
+                  id="phone"
+                  required
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="email">Email (optional)</Label>
-                <Input id="email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                <Input
+                  id="email"
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="address">Delivery address</Label>
-                <Input id="address" required value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+                <Input
+                  id="address"
+                  required
+                  value={form.address}
+                  onChange={(e) => setForm({ ...form, address: e.target.value })}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="city">City / town</Label>
-                <Input id="city" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+                <Input
+                  id="city"
+                  value={form.city}
+                  onChange={(e) => setForm({ ...form, city: e.target.value })}
+                />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="notes">Order notes</Label>
-                <Textarea id="notes" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+                <Textarea
+                  id="notes"
+                  value={form.notes}
+                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                />
               </div>
             </div>
           </section>
@@ -135,7 +167,10 @@ function CheckoutPage() {
                 { value: "mpesa", label: "M-Pesa (instructions sent after ordering)" },
                 { value: "bank_transfer", label: "Bank transfer" },
               ].map((o) => (
-                <Label key={o.value} className="flex items-center gap-3 rounded-xl border p-3 text-sm">
+                <Label
+                  key={o.value}
+                  className="flex items-center gap-3 rounded-xl border p-3 text-sm"
+                >
                   <RadioGroupItem value={o.value} /> {o.label}
                 </Label>
               ))}
@@ -146,8 +181,13 @@ function CheckoutPage() {
         <aside className="h-fit space-y-3 rounded-2xl border bg-card p-5">
           <h2 className="text-sm font-semibold">Order summary</h2>
           {cart.items.map((l) => (
-            <div key={`${l.productId}-${l.variantId ?? ""}`} className="flex justify-between gap-3 text-sm">
-              <span className="min-w-0 truncate text-muted-foreground">{l.quantity} × {l.name}</span>
+            <div
+              key={`${l.productId}-${l.variantId ?? ""}`}
+              className="flex justify-between gap-3 text-sm"
+            >
+              <span className="min-w-0 truncate text-muted-foreground">
+                {l.quantity} × {l.name}
+              </span>
               <span className="shrink-0">{formatMoney(l.price * l.quantity, currency)}</span>
             </div>
           ))}
@@ -159,7 +199,12 @@ function CheckoutPage() {
             <span>Total</span>
             <span>{formatMoney(cart.subtotal + shipping, currency)}</span>
           </div>
-          <Button type="submit" size="lg" className="w-full rounded-xl" disabled={mutation.isPending}>
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full rounded-xl"
+            disabled={mutation.isPending}
+          >
             {mutation.isPending ? "Placing order…" : "Place order"}
           </Button>
         </aside>

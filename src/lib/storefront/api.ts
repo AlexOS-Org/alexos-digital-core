@@ -110,7 +110,9 @@ export function useStoreVariants(productId: string | undefined) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("dg_product_variants")
-        .select("id,product_id,name,sku,price,sale_price,stock_quantity,image_url,options,sort_order")
+        .select(
+          "id,product_id,name,sku,price,sale_price,stock_quantity,image_url,options,sort_order",
+        )
         .eq("product_id", productId!)
         .is("deleted_at", null)
         .order("sort_order", { ascending: true });

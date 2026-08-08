@@ -1,18 +1,35 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const FAQS = [
-  { q: "How long does delivery take?", a: "Orders are dispatched within 24 hours and typically arrive in 1–3 business days." },
+  {
+    q: "How long does delivery take?",
+    a: "Orders are dispatched within 24 hours and typically arrive in 1–3 business days.",
+  },
   { q: "How do I pay?", a: "You can pay on delivery, by M-Pesa or by bank transfer at checkout." },
-  { q: "Can I return an item?", a: "Yes — returns are accepted within 7 days of delivery in original condition." },
-  { q: "How do I track my order?", a: "Use the Track order page with your order number and the phone or email you checked out with." },
+  {
+    q: "Can I return an item?",
+    a: "Yes — returns are accepted within 7 days of delivery in original condition.",
+  },
+  {
+    q: "How do I track my order?",
+    a: "Use the Track order page with your order number and the phone or email you checked out with.",
+  },
 ];
 
 export const Route = createFileRoute("/shop/faq")({
   head: () => ({
     meta: [
       { title: "Help & FAQ | DailyGear" },
-      { name: "description", content: "Answers to common questions about delivery, payment and returns." },
+      {
+        name: "description",
+        content: "Answers to common questions about delivery, payment and returns.",
+      },
       { property: "og:title", content: "Help & FAQ | DailyGear" },
       { property: "og:description", content: "Delivery, payment and returns questions answered." },
       { property: "og:type", content: "website" },

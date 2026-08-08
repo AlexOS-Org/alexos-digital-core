@@ -1,13 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import {
-  CheckCircle,
-  ChevronRight,
-  Clock,
-  DollarSign,
-  ShoppingCart,
-  Search,
-} from "lucide-react";
+import { CheckCircle, ChevronRight, Clock, DollarSign, ShoppingCart, Search } from "lucide-react";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { KpiCard } from "@/components/dailygear/KpiCard";
 import { StatusBadge } from "@/components/dailygear/StatusBadge";
@@ -38,7 +31,10 @@ export const Route = createFileRoute("/_authenticated/e-commerce/orders")({
       { title: "Orders | DailyGear" },
       { name: "description", content: "Fulfilment pipeline, payments, shipping and timelines." },
       { property: "og:title", content: "Orders | DailyGear" },
-      { property: "og:description", content: "Fulfilment pipeline, payments, shipping and timelines." },
+      {
+        property: "og:description",
+        content: "Fulfilment pipeline, payments, shipping and timelines.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -49,13 +45,7 @@ export const Route = createFileRoute("/_authenticated/e-commerce/orders")({
 const money = (v: number) =>
   `${DG_CURRENCY} ${Number(v ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 
-const COUNTS_AS_SALE: Order["status"][] = [
-  "new",
-  "processing",
-  "packed",
-  "shipped",
-  "delivered",
-];
+const COUNTS_AS_SALE: Order["status"][] = ["new", "processing", "packed", "shipped", "delivered"];
 
 /** Returns the next status in the fulfilment flow, or null if already terminal. */
 function nextStatus(current: Order["status"]): Order["status"] | null {

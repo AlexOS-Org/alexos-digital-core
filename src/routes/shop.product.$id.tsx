@@ -5,7 +5,12 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { ProductCard } from "@/components/storefront/ProductCard";
 import { cartStore, useRecentlyViewed } from "@/lib/storefront/cart";
 import {
@@ -28,7 +33,10 @@ export const Route = createFileRoute("/shop/product/$id")({
       { property: "og:type", content: "product" },
     ],
     links: [
-      { rel: "canonical", href: `https://alexos-digital-core.lovable.app/shop/product/${params.id}` },
+      {
+        rel: "canonical",
+        href: `https://alexos-digital-core.lovable.app/shop/product/${params.id}`,
+      },
     ],
   }),
   component: ProductDetail,
@@ -94,9 +102,13 @@ function ProductDetail() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
       <nav className="mb-6 text-xs text-muted-foreground">
-        <Link to="/shop" className="hover:text-foreground">Home</Link>
+        <Link to="/shop" className="hover:text-foreground">
+          Home
+        </Link>
         <span className="px-2">/</span>
-        <Link to="/shop/products" className="hover:text-foreground">Shop</Link>
+        <Link to="/shop/products" className="hover:text-foreground">
+          Shop
+        </Link>
         <span className="px-2">/</span>
         <span className="text-foreground">{product.name}</span>
       </nav>
@@ -152,7 +164,12 @@ function ProductDetail() {
 
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center rounded-xl border">
-              <Button variant="ghost" size="icon" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                aria-label="Decrease"
+              >
                 <Minus className="h-4 w-4" />
               </Button>
               <span className="w-10 text-center text-sm font-semibold">{qty}</span>
@@ -176,7 +193,10 @@ function ProductDetail() {
               { icon: ShieldCheck, label: "Secure checkout" },
               { icon: Undo2, label: "7-day returns" },
             ].map((t) => (
-              <div key={t.label} className="flex items-center gap-2 rounded-xl border bg-card p-3 text-xs">
+              <div
+                key={t.label}
+                className="flex items-center gap-2 rounded-xl border bg-card p-3 text-xs"
+              >
                 <t.icon className="h-4 w-4 shrink-0 text-primary" />
                 {t.label}
               </div>
@@ -206,9 +226,12 @@ function ProductDetail() {
         <section className="mt-16 space-y-4">
           <h2 className="text-xl font-bold tracking-tight">You may also like</h2>
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {related.data.filter((p) => p.id !== product.id).slice(0, 4).map((p) => (
-              <ProductCard key={p.id} product={p} currency={currency} />
-            ))}
+            {related.data
+              .filter((p) => p.id !== product.id)
+              .slice(0, 4)
+              .map((p) => (
+                <ProductCard key={p.id} product={p} currency={currency} />
+              ))}
           </div>
         </section>
       ) : null}

@@ -33,10 +33,7 @@ function LandingPagesPage() {
         title="Landing Pages"
         description="Generated product pages, copy blocks and SEO metadata. Preview product landing pages and launch store campaigns."
         actions={
-          <Button
-            variant="outline"
-            onClick={() => navigate({ to: "/e-commerce/store" })}
-          >
+          <Button variant="outline" onClick={() => navigate({ to: "/e-commerce/store" })}>
             Store preview
           </Button>
         }
@@ -82,10 +79,7 @@ function LandingPagesPage() {
                     >
                       Preview in store
                     </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => navigate({ to: "/e-commerce/checkout" })}
-                    >
+                    <Button size="sm" onClick={() => navigate({ to: "/e-commerce/checkout" })}>
                       Sell now
                     </Button>
                   </div>

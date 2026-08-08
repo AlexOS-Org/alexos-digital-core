@@ -216,9 +216,9 @@ export const moduleGroups: ModuleGroup[] = [
 
 /** Five items pinned to the mobile bottom navigation bar. */
 export const bottomNavItems = [
-  { title: "Home",       url: "/dashboard",   icon: LayoutDashboard },
-  { title: "Businesses", url: "/businesses",  icon: Building2 },
-  { title: "Intelligence",      url: "/auren",       icon: Brain },
-  { title: "Money",      url: "/money-center",icon: Wallet },
-  { title: "Library",    url: "/library",     icon: BookOpen },
+  { title: "Home", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Businesses", url: "/businesses", icon: Building2 },
+  { title: "Intelligence", url: "/auren", icon: Brain },
+  { title: "Money", url: "/money-center", icon: Wallet },
+  { title: "Library", url: "/library", icon: BookOpen },
 ] as const;

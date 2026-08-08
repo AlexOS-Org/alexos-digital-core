@@ -77,11 +77,7 @@ export function AppSidebar() {
                 .filter((m) => m.group === "Home")
                 .map((item) => (
                   <SidebarMenuItem key={item.url}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive(item.url)}
-                      tooltip={item.title}
-                    >
+                    <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
                       <Link to={item.url} onClick={closeSidebar}>
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
@@ -102,11 +98,7 @@ export function AppSidebar() {
                 // Collapsed: show each business icon individually with tooltip
                 businessModules.map((item) => (
                   <SidebarMenuItem key={item.url}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive(item.url)}
-                      tooltip={item.title}
-                    >
+                    <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
                       <Link to={item.url} onClick={closeSidebar}>
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
@@ -129,9 +121,7 @@ export function AppSidebar() {
                       >
                         <Building2 className="h-4 w-4" />
                         <span>Businesses</span>
-                        <ChevronRight
-                          className="ml-auto h-3.5 w-3.5 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
-                        />
+                        <ChevronRight className="ml-auto h-3.5 w-3.5 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                   </SidebarMenuItem>
@@ -139,10 +129,7 @@ export function AppSidebar() {
                     <SidebarMenuSub>
                       {businessModules.map((item) => (
                         <SidebarMenuSubItem key={item.url}>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={isActive(item.url)}
-                          >
+                          <SidebarMenuSubButton asChild isActive={isActive(item.url)}>
                             <Link to={item.url} onClick={closeSidebar}>
                               <item.icon className="h-3.5 w-3.5" />
                               <span>{item.title}</span>
@@ -169,11 +156,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                   {items.map((item) => (
                     <SidebarMenuItem key={item.url}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActive(item.url)}
-                        tooltip={item.title}
-                      >
+                      <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
                         <Link to={item.url} onClick={closeSidebar}>
                           <item.icon className="h-4 w-4" />
                           <span>{item.title}</span>
@@ -195,11 +178,7 @@ export function AppSidebar() {
             .filter((m) => m.group === "System")
             .map((item) => (
               <SidebarMenuItem key={item.url}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={isActive(item.url)}
-                  tooltip={item.title}
-                >
+                <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
                   <Link to={item.url} onClick={closeSidebar}>
                     <item.icon className="h-4 w-4" />
                     <span>{item.title}</span>

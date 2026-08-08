@@ -66,7 +66,9 @@ function CartPage() {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => cart.setQuantity(line.productId, line.variantId, line.quantity - 1)}
+                    onClick={() =>
+                      cart.setQuantity(line.productId, line.variantId, line.quantity - 1)
+                    }
                     aria-label="Decrease"
                   >
                     <Minus className="h-3.5 w-3.5" />
@@ -76,7 +78,9 @@ function CartPage() {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => cart.setQuantity(line.productId, line.variantId, line.quantity + 1)}
+                    onClick={() =>
+                      cart.setQuantity(line.productId, line.variantId, line.quantity + 1)
+                    }
                     aria-label="Increase"
                   >
                     <Plus className="h-3.5 w-3.5" />
