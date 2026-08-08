@@ -31,10 +31,8 @@ dist-ssr
 *.sln
 *.sw?
 supabase/.temp
-.env
-.env.*
-.env
 
 # Secrets (Lovable Cloud injects these at deploy time — never commit)
 .env
 .env.*
+!.env.example
