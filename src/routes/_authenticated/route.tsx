@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
+import { SupabaseConfigBanner } from "@/components/SupabaseConfigBanner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
@@ -8,6 +9,10 @@ import { modules } from "@/lib/modules";
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async () => {
+    // When the Supabase credentials are not configured for the deployment,
+    // the app shell must still render rather than crashing on mobile/desktop.
+    // Treat the user as a guest so pages load and show the configuration banner.
+    if (!isSupabaseConfigured()) return { user: null };
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
     return { user: data.user };
@@ -41,6 +46,7 @@ function AuthenticatedLayout() {
             </div>
           </header>
           {/* Extra bottom padding on mobile so content clears the bottom nav */}
+          <SupabaseConfigBanner />
           <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
             <Outlet />
           </main>

@@ -29,22 +29,54 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
   };
 }
 
-function createSupabaseClient() {
+export function isSupabaseConfigured(): boolean {
   // Use import.meta.env for client-side (Vite build-time replacement)
   // Fall back to process.env for SSR (server-side rendering)
-  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const SUPABASE_PUBLISHABLE_KEY =
-    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+  const url = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+  const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+  return Boolean(url && key);
+}
 
-  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-    const missing = [
-      ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
-      ...(!SUPABASE_PUBLISHABLE_KEY ? ["SUPABASE_PUBLISHABLE_KEY"] : []),
-    ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
+export function getMissingSupabaseEnvVars(): string[] {
+  const url = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+  const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+  const missing: string[] = [];
+  if (!url) missing.push("SUPABASE_URL");
+  if (!key) missing.push("SUPABASE_PUBLISHABLE_KEY");
+  return missing;
+}
+
+/**
+ * A safe placeholder client returned when Supabase credentials are not
+ * configured in the deployment environment. It lets the application shell
+ * render instead of crashing the whole page; any data call made against it
+ * fails with a clear, actionable error that UI surfaces can handle.
+ */
+function createPlaceholderClient(): ReturnType<typeof createClient<Database>> {
+  const message =
+    "Supabase credentials are not configured in this environment. " +
+    "Add the Supabase secrets in Lovable Cloud (Settings → Secrets) and re-publish.";
+  return createClient<Database>("https://placeholder.invalid", "placeholder", {
+    global: {
+      fetch: () => Promise.reject(new Error(message)),
+    },
+  });
+}
+
+function createSupabaseClient() {
+  if (!isSupabaseConfigured()) {
+    const missing = getMissingSupabaseEnvVars();
+    console.error(
+      `[Supabase] Missing environment variable(s): ${missing.join(", ")}. ` +
+        "Falling back to a placeholder client so the app shell can still render. " +
+        "Please configure the Supabase secrets in the deployment environment.",
+    );
+    return createPlaceholderClient();
   }
+
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL!;
+  const SUPABASE_PUBLISHABLE_KEY = (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.SUPABASE_PUBLISHABLE_KEY)!;
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     global: {

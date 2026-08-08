@@ -84,11 +84,12 @@ function orderNumber() {
 // Deterministic, collision-free order number using the database sequence
 // added by the 20260808 hardening migration (dg_order_seq). Falls back to the
 // legacy random format if the sequence is unavailable (older environments).
-async function nextOrderNumber(
-  adminClient: Awaited<
-    ReturnType<typeof import("@/integrations/supabase/client.server").createSupabaseAdminClient>
-  >,
-) {
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
+
+type AdminClient = SupabaseClient<Database>;
+
+async function nextOrderNumber(adminClient: AdminClient) {
   const { data, error } = await adminClient.rpc("next_order_number");
   if (!error && typeof data === "string" && data.startsWith("DG-")) {
     return data;

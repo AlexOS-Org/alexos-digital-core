@@ -2444,6 +2444,11 @@ export type Database = {
     }
     Functions: {
       dg_is_published_store: { Args: { _user_id: string }; Returns: boolean }
+      dg_reserve_stock: {
+        Args: { p_product_id: string; p_qty: number }
+        Returns: boolean
+      }
+      next_order_number: { Args: Record<string, never>; Returns: string }
     }
     Enums: {
       account_status: "active" | "archived"

@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { ShieldCheck } from "lucide-react";
 import { AlexOSLogo } from "@/components/alexos-logo";
+import { SupabaseConfigBanner } from "@/components/SupabaseConfigBanner";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -52,6 +53,7 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
+      <SupabaseConfigBanner />
       <div className="hidden lg:flex flex-col justify-between bg-sidebar text-sidebar-foreground p-12">
         <Link to="/" className="w-fit">
           <AlexOSLogo showWordmark />
