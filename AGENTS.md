@@ -1,12 +1,14 @@
-<!-- LOVABLE:BEGIN -->
+# AlexOS repository guidance
 
-> [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
->
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
+## Source of truth
+GitHub is the source of truth for the application code. Production infrastructure must not depend on a third-party editor or hosted development environment.
 
-<!-- LOVABLE:END -->
+## Safe change policy
+- Never commit secrets, `.env` files, private keys, or service-role credentials.
+- Keep Supabase credentials in the deployment environment only.
+- Treat `supabase/config.toml` as the canonical linked Supabase project configuration.
+- Do not rewrite published history merely to remove old development metadata; rotate exposed credentials instead.
+- Prefer additive, reversible changes and verify builds before production deployment.
+
+## Supabase
+The controlled production Supabase project is `goafwbrayepaihxbqsse`. Client code may use the publishable key; service-role credentials are server-only.
