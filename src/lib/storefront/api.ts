@@ -39,6 +39,7 @@ export function useStorefront(slug?: string) {
 export interface ProductFilters {
   search?: string;
   categoryId?: string | null;
+  categoryIds?: string[];
   brandId?: string | null;
   sort?: "newest" | "price-asc" | "price-desc" | "name";
   limit?: number;
@@ -58,7 +59,8 @@ export function useStoreProducts(userId: string | undefined, filters: ProductFil
         .is("deleted_at", null);
 
       if (filters.search) q = q.ilike("name", `%${filters.search}%`);
-      if (filters.categoryId) q = q.eq("category_id", filters.categoryId);
+      if (filters.categoryIds?.length) q = q.in("category_id", filters.categoryIds);
+      else if (filters.categoryId) q = q.eq("category_id", filters.categoryId);
       if (filters.brandId) q = q.eq("brand_id", filters.brandId);
 
       switch (filters.sort) {
