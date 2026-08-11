@@ -32,6 +32,7 @@ function StoreHome() {
   const { data: categories } = useStoreCategories(store?.user_id);
   const featured = useStoreProducts(store?.user_id, { limit: 8 });
   const currency = store?.currency ?? "KES";
+  const primaryCategories = (categories ?? []).filter((category) => !category.parent_id);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:py-12">
@@ -76,11 +77,11 @@ function StoreHome() {
         </div>
       </section>
 
-      {categories?.length ? (
+      {primaryCategories.length ? (
         <section className="mt-12 space-y-4">
           <h2 className="text-xl font-bold tracking-tight">Shop by category</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            {categories.slice(0, 10).map((c) => (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+            {primaryCategories.map((c) => (
               <Link
                 key={c.id}
                 to="/shop/products"
