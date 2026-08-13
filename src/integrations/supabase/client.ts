@@ -16,7 +16,6 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
       new Headers(init.headers).forEach((value, key) => headers.set(key, value));
     }
 
-    // New Supabase API keys are opaque strings, not bearer JWTs.
     if (
       isNewSupabaseApiKey(supabaseKey) &&
       headers.get("Authorization") === `Bearer ${supabaseKey}`
@@ -30,8 +29,6 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
 }
 
 export function isSupabaseConfigured(): boolean {
-  // Use import.meta.env for client-side (Vite build-time replacement)
-  // Fall back to process.env for SSR (server-side rendering)
   const url = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
   const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
   return Boolean(url && key);
@@ -49,13 +46,13 @@ export function getMissingSupabaseEnvVars(): string[] {
 /**
  * A safe placeholder client returned when Supabase credentials are not
  * configured in the deployment environment. It lets the application shell
- * render instead of crashing the whole page; any data call made against it
- * fails with a clear, actionable error that UI surfaces can handle.
+ * render instead of crashing the whole page; data calls fail with a clear,
+ * actionable configuration error.
  */
 function createPlaceholderClient(): ReturnType<typeof createClient<Database>> {
   const message =
-    "Supabase credentials are not configured in this environment. " +
-    "Add the Supabase secrets in Lovable Cloud (Settings → Secrets) and re-publish.";
+    "Supabase credentials are not configured in this deployment environment. " +
+    "Configure SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY in the host's environment settings, then redeploy.";
   return createClient<Database>("https://placeholder.invalid", "placeholder", {
     global: {
       fetch: () => Promise.reject(new Error(message)),
@@ -69,7 +66,7 @@ function createSupabaseClient() {
     console.error(
       `[Supabase] Missing environment variable(s): ${missing.join(", ")}. ` +
         "Falling back to a placeholder client so the app shell can still render. " +
-        "Please configure the Supabase secrets in the deployment environment.",
+        "Configure the variables in the deployment environment.",
     );
     return createPlaceholderClient();
   }
@@ -92,8 +89,6 @@ function createSupabaseClient() {
 
 let _supabase: ReturnType<typeof createSupabaseClient> | undefined;
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
 export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>, {
   get(_, prop, receiver) {
     if (!_supabase) _supabase = createSupabaseClient();
