@@ -17,7 +17,9 @@ export function SupabaseConfigBanner() {
     >
       <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
       <div className="flex flex-col gap-1">
-        <p className="font-medium">The database connection is not configured for this deployment.</p>
+        <p className="font-medium">
+          The database connection is not configured for this deployment.
+        </p>
         <p className="text-xs opacity-90">
           Missing configuration: {missing.join(", ")}. Configure these Supabase environment
           variables in the hosting environment, then redeploy the application.

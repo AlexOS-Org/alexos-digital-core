@@ -1,6 +1,6 @@
-@import "tailwindcss" source(none);
+﻿@import "tw-animate-css";
+@import "tailwindcss";
 @source "../src";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -172,8 +172,6 @@
   }
 }
 
-/* ── Phase 3.8 — premium visual experience ─────────────────────── */
-
 @theme {
   --breakpoint-3xl: 1920px;
   --breakpoint-4k: 2560px;
@@ -196,6 +194,7 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -207,6 +206,7 @@
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
   }
+
   .swipe-row > * {
     scroll-snap-align: start;
     flex: 0 0 auto;
@@ -230,6 +230,7 @@
       transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
       box-shadow 0.2s ease;
   }
+
   .press:active {
     transform: scale(0.97);
   }
@@ -240,6 +241,7 @@
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
