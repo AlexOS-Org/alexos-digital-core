@@ -32,9 +32,7 @@ export function reportRuntimeError(
         : String(error);
 
   const payload: RuntimeErrorPayload = {
-    message: Object.keys(context).length
-      ? `${message} | ${JSON.stringify(context)}`
-      : message,
+    message: Object.keys(context).length ? `${message} | ${JSON.stringify(context)}` : message,
     stack: error instanceof Error ? error.stack : undefined,
     filename: window.location.pathname,
   };
