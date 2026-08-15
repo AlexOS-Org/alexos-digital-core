@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
@@ -14,27 +14,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
       - run: npm ci
-      - run: npx prettier --write src/routes/_authenticated/e-commerce.landing-pages.tsx src/components/SupabaseConfigBanner.tsx
-      - name: Commit formatting changes
-        run: |
-          if git diff --quiet; then
-            echo "Formatting already clean."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/routes/_authenticated/e-commerce.landing-pages.tsx src/components/SupabaseConfigBanner.tsx
-          git commit -m "style: format landing page changes"
-          git push origin "HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}"
-
       - run: npm run build
       - run: npm run lint
