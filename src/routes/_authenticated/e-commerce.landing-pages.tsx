@@ -1,15 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import {
-  ArrowRight,
-  Check,
-  ChevronDown,
-  Clock3,
-  ShieldCheck,
-  ShoppingBag,
-  Truck,
-  Zap,
-} from "lucide-react";
+import { useMemo, useState, type ReactNode } from "react";
+import { ArrowRight, Check, Clock3, ShieldCheck, ShoppingBag, Truck, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { IntelligencePanel } from "@/components/dailygear/IntelligencePanel";
@@ -19,12 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCommerceData } from "@/lib/dailygear/useCommerceData";
 import type { Product } from "@/lib/dailygear/types";
 import { cartStore } from "@/lib/storefront/cart";
-import {
-  effectivePrice,
-  formatMoney,
-  isOnSale,
-  productImage,
-} from "@/lib/storefront/api";
+import { effectivePrice, formatMoney, isOnSale, productImage } from "@/lib/storefront/api";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/landing-pages")({
   head: () => ({
@@ -62,7 +48,10 @@ function LandingPagesPage() {
 
   function openPreview(product: Product) {
     setSelectedId(product.id);
-    window.setTimeout(() => document.getElementById("landing-preview")?.scrollIntoView({ behavior: "smooth" }), 0);
+    window.setTimeout(
+      () => document.getElementById("landing-preview")?.scrollIntoView({ behavior: "smooth" }),
+      0,
+    );
   }
 
   return (
@@ -367,7 +356,7 @@ function Benefit({ title, text }: { title: string; text: string }) {
   );
 }
 
-function TrustMini({ icon, text }: { icon: React.ReactNode; text: string }) {
+function TrustMini({ icon, text }: { icon: ReactNode; text: string }) {
   return (
     <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-3">
       {icon}
@@ -376,7 +365,7 @@ function TrustMini({ icon, text }: { icon: React.ReactNode; text: string }) {
   );
 }
 
-function TrustCard({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+function TrustCard({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
   return (
     <div className="rounded-2xl border p-4">
       <div className="flex items-center gap-2 font-semibold">
