@@ -6,6 +6,7 @@ Default branch: `main`
 Verified current main: `5cad125aa3788bc097c825c7da40ea2b99199a8d`
 Current work branch: `feature/dailygear-landing-pages-test`
 Current PR: #14
+Current PR head after CI formatting: `e1ff96c9269bbbdfda2a7618221ded0add2a2935`
 
 ## Source of truth
 
@@ -91,16 +92,39 @@ PR #14 now implements the first correct step: a real Landing Pages preview surfa
 
 The preview binds live product data when a DailyGear product exists. If the controlled database has no products yet, it shows a safe non-transactional demo state rather than inventing inventory, pricing or stock.
 
+The landing page includes:
+- benefit-led hero
+- product image/gallery binding
+- tailored 150W Car Inverter copy
+- Why Own One benefit blocks
+- feature-to-benefit proof
+- offer/pricing/savings block
+- availability/stock state
+- trust and Kenya delivery signals
+- 30-day confidence block
+- direct add-to-cart -> existing `/shop/cart` flow
+- safe empty-database state
+
 ## Current testing status
 
-PR #14 added `.github/workflows/pr-verify.yml` to run:
-- `npm ci`
-- `npm run build`
-- `npm run lint`
+PR #14 verification is now **GREEN**.
 
-The first PR verification run is currently in progress. The branch is not considered merge-ready until these checks pass.
+Verified GitHub Actions run:
+- `npm ci` — PASS
+- `npm run build` — PASS
+- `npm run lint` — PASS
+
+The existing `Validate AlexOS` workflow also passed on the same PR head.
+
+The build produced the existing Cloudflare-compatible Nitro output (`cloudflare-module`) successfully. Build warnings remain for existing chunk-size/dynamic-import/deprecation items, but they are warnings, not failures.
 
 No Supabase schema, Supabase data, Cloudflare production resources, DNS, or production secrets were changed by PR #14.
+
+## Open PR / migration caution
+
+PR #12 (`chore/cloudflare-native-migration`) is still open/draft and is **not ready to merge**. Its previous CI run failed during `npm ci` because its lockfile was missing a required `lru-cache` entry. It also contains backup files and package-version changes that need review before using it as the Cloudflare migration baseline.
+
+Do not merge PR #12 blindly. The correct approach is to inspect its intended Cloudflare changes, normalize the dependency lockfile, remove repository backup artifacts, and re-verify from the current `main` baseline.
 
 ## Current Supabase state
 
@@ -125,8 +149,8 @@ These are not being changed blindly during migration.
 
 ## Immediate gates
 
-1. Get PR #14 build/lint verification green.
-2. Test the Landing Pages preview and simple checkout flow.
+1. **DONE:** Landing Pages implementation built and verified with CI.
+2. **NEXT:** Provide a real browser/Worker preview for the landing page without touching production.
 3. Add the real 150W Car Inverter product record and images to DailyGear so the campaign can bind real inventory.
 4. Complete the Cloudflare/TanStack Start migration in GitHub using the current supported Cloudflare configuration.
 5. Establish a non-production Cloudflare Worker preview from GitHub before any production cutover.
