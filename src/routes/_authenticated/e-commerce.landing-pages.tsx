@@ -1,34 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, type ReactNode } from "react";
-import {
-  ArrowRight,
-  Check,
-  Clock3,
-  ShieldCheck,
-  ShoppingBag,
-  Truck,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, Check, Clock3, ShieldCheck, ShoppingBag, Truck, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { IntelligencePanel } from "@/components/dailygear/IntelligencePanel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Product } from "@/lib/dailygear/types";
 import { useCommerceData } from "@/lib/dailygear/useCommerceData";
 import { cartStore } from "@/lib/storefront/cart";
-import {
-  effectivePrice,
-  formatMoney,
-  isOnSale,
-  productImage,
-} from "@/lib/storefront/api";
+import { effectivePrice, formatMoney, isOnSale, productImage } from "@/lib/storefront/api";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/landing-pages")({
   head: () => ({
@@ -36,14 +18,12 @@ export const Route = createFileRoute("/_authenticated/e-commerce/landing-pages")
       { title: "Landing Pages | DailyGear" },
       {
         name: "description",
-        content:
-          "Build and preview conversion-focused DailyGear product landing pages.",
+        content: "Build and preview conversion-focused DailyGear product landing pages.",
       },
       { property: "og:title", content: "Landing Pages | DailyGear" },
       {
         property: "og:description",
-        content:
-          "Build and preview conversion-focused DailyGear product landing pages.",
+        content: "Build and preview conversion-focused DailyGear product landing pages.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -60,9 +40,7 @@ function LandingPagesPage() {
   const selectedProduct = useMemo(
     () =>
       products.find((product) => product.id === selectedId) ??
-      products.find((product) =>
-        /150w.*car.*inverter|car.*inverter.*150w/i.test(product.name),
-      ) ??
+      products.find((product) => /150w.*car.*inverter|car.*inverter.*150w/i.test(product.name)) ??
       products[0] ??
       null,
     [products, selectedId],
@@ -71,10 +49,7 @@ function LandingPagesPage() {
   function openPreview(product: Product) {
     setSelectedId(product.id);
     window.setTimeout(
-      () =>
-        document
-          .getElementById("landing-preview")
-          ?.scrollIntoView({ behavior: "smooth" }),
+      () => document.getElementById("landing-preview")?.scrollIntoView({ behavior: "smooth" }),
       0,
     );
   }
@@ -85,10 +60,7 @@ function LandingPagesPage() {
         title="Landing Pages"
         description="Create conversion-focused product campaigns, preview the customer experience, and send shoppers into the existing DailyGear checkout."
         actions={
-          <Button
-            variant="outline"
-            onClick={() => navigate({ to: "/e-commerce/store" })}
-          >
+          <Button variant="outline" onClick={() => navigate({ to: "/e-commerce/store" })}>
             Store preview
           </Button>
         }
@@ -102,22 +74,16 @@ function LandingPagesPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {isLoading ? (
-            <p className="text-sm text-muted-foreground">
-              Loading landing page previews…
-            </p>
+            <p className="text-sm text-muted-foreground">Loading landing page previews…</p>
           ) : error ? (
-            <p className="text-sm text-destructive">
-              Unable to load products: {error.message}
-            </p>
+            <p className="text-sm text-destructive">Unable to load products: {error.message}</p>
           ) : products.length === 0 ? (
             <div className="rounded-2xl border border-dashed p-6">
-              <p className="font-semibold">
-                No DailyGear products are connected yet.
-              </p>
+              <p className="font-semibold">No DailyGear products are connected yet.</p>
               <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-                The landing-page engine is ready. Add the 150W Car Inverter to
-                DailyGear Products and this screen will automatically bind the
-                real price, stock and product images to the campaign.
+                The landing-page engine is ready. Add the 150W Car Inverter to DailyGear Products
+                and this screen will automatically bind the real price, stock and product images to
+                the campaign.
               </p>
               <Button
                 className="mt-4 rounded-xl"
@@ -130,10 +96,7 @@ function LandingPagesPage() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {products.map((product) => (
-                <div
-                  key={product.id}
-                  className="rounded-3xl border border-border p-4"
-                >
+                <div key={product.id} className="rounded-3xl border border-border p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-semibold">{product.name}</p>
@@ -141,11 +104,7 @@ function LandingPagesPage() {
                         {product.sku ?? "SKU missing"}
                       </p>
                     </div>
-                    <Badge
-                      variant={
-                        product.status === "active" ? "secondary" : "outline"
-                      }
-                    >
+                    <Badge variant={product.status === "active" ? "secondary" : "outline"}>
                       {product.status.replace(/_/g, " ")}
                     </Badge>
                   </div>
@@ -196,14 +155,10 @@ function LandingPagePreview({
   const [activeImage, setActiveImage] = useState(0);
   const price = effectivePrice(product);
   const originalPrice = Number(product.price);
-  const savings = isOnSale(product)
-    ? Math.max(0, originalPrice - price)
-    : 0;
+  const savings = isOnSale(product) ? Math.max(0, originalPrice - price) : 0;
   const images = ((product.images ?? []) as string[]).filter(Boolean);
   const heroImage = images[activeImage] ?? productImage(product);
-  const isInverter = /150w.*car.*inverter|car.*inverter.*150w/i.test(
-    product.name,
-  );
+  const isInverter = /150w.*car.*inverter|car.*inverter.*150w/i.test(product.name);
   const soldOut = Number(product.stock_quantity) <= 0;
 
   function addToCart() {
@@ -237,15 +192,13 @@ function LandingPagePreview({
               DailyGear New Arrival
             </Badge>
             <h2 className="mt-5 max-w-3xl text-4xl font-black tracking-tight sm:text-5xl">
-              {isInverter
-                ? "Keep your devices powered wherever the road takes you."
-                : product.name}
+              {isInverter ? "Keep your devices powered wherever the road takes you." : product.name}
             </h2>
             <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-300 sm:text-lg">
               {isInverter
                 ? "The 150W Car Power Inverter gives you practical AC power from your vehicle while keeping everyday USB devices charged on the move."
-                : product.description ??
-                  "A practical DailyGear essential designed to make everyday life easier."}
+                : (product.description ??
+                  "A practical DailyGear essential designed to make everyday life easier.")}
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Button
@@ -271,25 +224,15 @@ function LandingPagePreview({
                 icon={<Zap className="h-4 w-4" />}
                 text={isInverter ? "150W output" : "Everyday essential"}
               />
-              <TrustMini
-                icon={<ShieldCheck className="h-4 w-4" />}
-                text="Secure checkout"
-              />
-              <TrustMini
-                icon={<Truck className="h-4 w-4" />}
-                text="Kenya delivery"
-              />
+              <TrustMini icon={<ShieldCheck className="h-4 w-4" />} text="Secure checkout" />
+              <TrustMini icon={<Truck className="h-4 w-4" />} text="Kenya delivery" />
             </div>
           </div>
 
           <div className="order-1 lg:order-2">
             <div className="aspect-square overflow-hidden rounded-[2rem] bg-zinc-900 ring-1 ring-white/10">
               {heroImage ? (
-                <img
-                  src={heroImage}
-                  alt={product.name}
-                  className="h-full w-full object-cover"
-                />
+                <img src={heroImage} alt={product.name} className="h-full w-full object-cover" />
               ) : (
                 <div className="flex h-full items-center justify-center text-zinc-500">
                   <ShoppingBag className="h-20 w-20" />
@@ -321,10 +264,7 @@ function LandingPagePreview({
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">
               Why own one?
             </p>
-            <h3
-              id="why-own"
-              className="mt-2 text-3xl font-black tracking-tight sm:text-4xl"
-            >
+            <h3 id="why-own" className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
               {isInverter
                 ? "Power on the move, without carrying a full-size power station."
                 : "Built around the problem you actually want to solve."}
@@ -429,9 +369,7 @@ function LandingPagePreview({
             </p>
             <h4 className="mt-2 text-xl font-black">{product.name}</h4>
             <div className="mt-5 flex items-end gap-3">
-              <span className="text-3xl font-black">
-                {formatMoney(price, "KES")}
-              </span>
+              <span className="text-3xl font-black">{formatMoney(price, "KES")}</span>
               {isOnSale(product) ? (
                 <span className="pb-1 text-sm text-muted-foreground line-through">
                   {formatMoney(originalPrice, "KES")}
@@ -447,9 +385,7 @@ function LandingPagePreview({
               <div className="flex items-center justify-between text-sm">
                 <span>Availability</span>
                 <span className="font-semibold">
-                  {soldOut
-                    ? "Out of stock"
-                    : `${product.stock_quantity} available`}
+                  {soldOut ? "Out of stock" : `${product.stock_quantity} available`}
                 </span>
               </div>
             </div>
@@ -475,12 +411,12 @@ function LandingPagePreview({
             30-day confidence promise
           </p>
           <h3 className="mt-2 text-2xl font-black">
-            Buy with confidence. If the product does not meet its listed
-            specifications, contact DailyGear for support.
+            Buy with confidence. If the product does not meet its listed specifications, contact
+            DailyGear for support.
           </h3>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-            This trust block is intentionally visible before checkout so the
-            customer has the information needed to make a confident decision.
+            This trust block is intentionally visible before checkout so the customer has the
+            information needed to make a confident decision.
           </p>
         </div>
       </div>
@@ -508,9 +444,8 @@ function DemoLandingPage() {
           150W Car Power Inverter
         </h2>
         <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-zinc-300 sm:text-lg">
-          The campaign structure is ready for the real DailyGear product
-          record: benefit-led hero, feature-to-benefit proof, offer block,
-          trust signals and a simple path into checkout.
+          The campaign structure is ready for the real DailyGear product record: benefit-led hero,
+          feature-to-benefit proof, offer block, trust signals and a simple path into checkout.
         </p>
         <div className="mx-auto mt-8 grid max-w-3xl gap-3 text-left sm:grid-cols-2">
           {items.map((item) => (
@@ -524,8 +459,7 @@ function DemoLandingPage() {
           ))}
         </div>
         <p className="mt-8 text-sm text-zinc-400">
-          Add the 150W Car Inverter under DailyGear → Products to bind live
-          price, stock and images.
+          Add the 150W Car Inverter under DailyGear → Products to bind live price, stock and images.
         </p>
       </div>
     </div>
@@ -541,9 +475,7 @@ function Benefit({ title, text }: { title: string; text: string }) {
         </span>
         <div>
           <h4 className="font-bold">{title}</h4>
-          <p className="mt-1 text-sm leading-6 text-muted-foreground">
-            {text}
-          </p>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">{text}</p>
         </div>
       </div>
     </div>
@@ -559,15 +491,7 @@ function TrustMini({ icon, text }: { icon: ReactNode; text: string }) {
   );
 }
 
-function TrustCard({
-  icon,
-  title,
-  text,
-}: {
-  icon: ReactNode;
-  title: string;
-  text: string;
-}) {
+function TrustCard({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
   return (
     <div className="rounded-2xl border p-4">
       <div className="flex items-center gap-2 font-semibold">
