@@ -98,7 +98,7 @@ export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
         </DialogHeader>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5 col-span-2">
+            <div className="col-span-2 space-y-1.5">
               <Label>Lender / Name</Label>
               <Input
                 value={name}
@@ -109,8 +109,13 @@ export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
 
             <div className="space-y-1.5">
               <Label>Money belongs to</Label>
-              <Select value={scope} onValueChange={(v) => setScope(v as FinancialScope)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={scope}
+                onValueChange={(v) => setScope(v as FinancialScope)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="personal">Personal</SelectItem>
                   <SelectItem value="business">Business</SelectItem>
@@ -121,15 +126,21 @@ export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
             <div className="space-y-1.5">
               <Label>Category</Label>
               <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  {CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             {scope === "business" && (
-              <div className="space-y-1.5 col-span-2">
+              <div className="col-span-2 space-y-1.5">
                 <Label>Business</Label>
                 <Input
                   value={businessName}
@@ -140,13 +151,20 @@ export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
             )}
 
             {isNewLoan && (
-              <div className="space-y-1.5 col-span-2">
+              <div className="col-span-2 space-y-1.5">
                 <Label>Where did the loan money go?</Label>
-                <Select value={disbursementAccountId} onValueChange={setDisbursementAccountId}>
-                  <SelectTrigger><SelectValue placeholder="Select cash / bank / M-Pesa account" /></SelectTrigger>
+                <Select
+                  value={disbursementAccountId}
+                  onValueChange={setDisbursementAccountId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select cash / bank / M-Pesa account" />
+                  </SelectTrigger>
                   <SelectContent>
                     {accounts.map((a) => (
-                      <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+                      <SelectItem key={a.id} value={a.id}>
+                        {a.name}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -158,8 +176,13 @@ export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
 
             <div className="space-y-1.5">
               <Label>Priority</Label>
-              <Select value={priority} onValueChange={(v) => setPriority(v as Debt["priority"])}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={priority}
+                onValueChange={(v) => setPriority(v as Debt["priority"])}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="low">Low</SelectItem>
                   <SelectItem value="medium">Medium</SelectItem>
@@ -170,22 +193,42 @@ export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
 
             <div className="space-y-1.5">
               <Label>Principal</Label>
-              <Input type="number" step="0.01" value={principal} onChange={(e) => setPrincipal(e.target.value)} />
+              <Input
+                type="number"
+                step="0.01"
+                value={principal}
+                onChange={(e) => setPrincipal(e.target.value)}
+              />
             </div>
 
             <div className="space-y-1.5">
               <Label>Interest Rate (%)</Label>
-              <Input type="number" step="0.01" value={rate} onChange={(e) => setRate(e.target.value)} />
+              <Input
+                type="number"
+                step="0.01"
+                value={rate}
+                onChange={(e) => setRate(e.target.value)}
+              />
             </div>
 
             <div className="space-y-1.5">
               <Label>Minimum Payment</Label>
-              <Input type="number" step="0.01" value={minPay} onChange={(e) => setMinPay(e.target.value)} />
+              <Input
+                type="number"
+                step="0.01"
+                value={minPay}
+                onChange={(e) => setMinPay(e.target.value)}
+              />
             </div>
 
             <div className="space-y-1.5">
               <Label>Amount Paid</Label>
-              <Input type="number" step="0.01" value={paid} onChange={(e) => setPaid(e.target.value)} />
+              <Input
+                type="number"
+                step="0.01"
+                value={paid}
+                onChange={(e) => setPaid(e.target.value)}
+              />
             </div>
 
             <div className="space-y-1.5">
@@ -195,8 +238,13 @@ export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
 
             <div className="space-y-1.5">
               <Label>Status</Label>
-              <Select value={status} onValueChange={(v) => setStatus(v as Debt["status"])}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={status}
+                onValueChange={(v) => setStatus(v as Debt["status"])}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="paid">Paid</SelectItem>
@@ -206,15 +254,20 @@ export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
               </Select>
             </div>
 
-            <div className="space-y-1.5 col-span-2">
+            <div className="col-span-2 space-y-1.5">
               <Label>Notes</Label>
               <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
             </div>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={submit} disabled={save.isPending || (scope === "business" && !businessName.trim())}>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={submit}
+            disabled={save.isPending || (scope === "business" && !businessName.trim())}
+          >
             {save.isPending ? "Saving..." : debt ? "Save Debt" : "Record Loan"}
           </Button>
         </DialogFooter>
