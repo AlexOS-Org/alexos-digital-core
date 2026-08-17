@@ -25,14 +25,7 @@ type WorkItem = {
   createdAt: string;
 };
 
-type Mode =
-  | "tasks"
-  | "calendar"
-  | "ecommerce"
-  | "marketing"
-  | "vehicle"
-  | "banking"
-  | "reports";
+type Mode = "tasks" | "calendar" | "ecommerce" | "marketing" | "vehicle" | "banking" | "reports";
 
 type Config = {
   title: string;
@@ -80,14 +73,16 @@ const CONFIG: Record<Mode, Config> = {
   },
   banking: {
     title: "Banking",
-    subtitle: "A relationship and opportunity workspace for banking, loans, deposits and partnerships.",
+    subtitle:
+      "A relationship and opportunity workspace for banking, loans, deposits and partnerships.",
     icon: Wallet,
     labels: ["Opportunities", "Open", "Completed", "Total"],
     placeholder: "Add a banking opportunity",
   },
   reports: {
     title: "Reports",
-    subtitle: "Turn AlexOS activity into decisions: what moved, what is stuck and what deserves attention.",
+    subtitle:
+      "Turn AlexOS activity into decisions: what moved, what is stuck and what deserves attention.",
     icon: BarChart3,
     labels: ["Reports", "Open", "Completed", "Total"],
     placeholder: "Add a report note",
@@ -119,9 +114,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return q
-      ? items.filter((x) => `${x.title} ${x.detail}`.toLowerCase().includes(q))
-      : items;
+    return q ? items.filter((x) => `${x.title} ${x.detail}`.toLowerCase().includes(q)) : items;
   }, [items, search]);
 
   const add = (e: FormEvent) => {
@@ -165,7 +158,9 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
             </div>
             <div>
               <div className="mb-1 flex flex-wrap items-center gap-2">
-                <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{config.title}</h1>
+                <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                  {config.title}
+                </h1>
                 <Badge variant="outline">V1 workspace</Badge>
               </div>
               <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{config.subtitle}</p>
@@ -194,7 +189,12 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
             <CardTitle className="text-base">Workspace activity</CardTitle>
             <div className="relative w-full sm:w-48">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search" className="pl-9" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search"
+                className="pl-9"
+              />
             </div>
           </CardHeader>
           <CardContent>
@@ -203,24 +203,51 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
                 <Icon className="mx-auto h-9 w-9 text-muted-foreground/60" />
                 <p className="mt-3 font-medium">Nothing here yet</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Add your first item on the right. This workspace is intentionally simple for the Phase 3 validation cycle.
+                  Add your first item on the right. This workspace is intentionally simple for the
+                  Phase 3 validation cycle.
                 </p>
               </div>
             ) : (
               <div className="space-y-2">
                 {visible.map((item) => (
-                  <div key={item.id} className="flex items-center gap-3 rounded-2xl border p-3 transition-colors hover:bg-muted/40">
-                    <button type="button" onClick={() => complete(item.id)} className="shrink-0" aria-label="Toggle complete">
-                      {item.status === "Done" ? <CheckCircle2 className="h-5 w-5 text-emerald-600" /> : <div className="h-5 w-5 rounded-full border-2" />}
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-3 rounded-2xl border p-3 transition-colors hover:bg-muted/40"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => complete(item.id)}
+                      className="shrink-0"
+                      aria-label="Toggle complete"
+                    >
+                      {item.status === "Done" ? (
+                        <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                      ) : (
+                        <div className="h-5 w-5 rounded-full border-2" />
+                      )}
                     </button>
                     <div className="min-w-0 flex-1">
-                      <p className={`font-medium ${item.status === "Done" ? "line-through text-muted-foreground" : ""}`}>{item.title}</p>
-                      {item.detail && <p className="truncate text-xs text-muted-foreground">{item.detail}</p>}
+                      <p
+                        className={`font-medium ${item.status === "Done" ? "line-through text-muted-foreground" : ""}`}
+                      >
+                        {item.title}
+                      </p>
+                      {item.detail && (
+                        <p className="truncate text-xs text-muted-foreground">{item.detail}</p>
+                      )}
                     </div>
                     <span className="hidden text-xs text-muted-foreground sm:block">
-                      {new Date(item.createdAt).toLocaleDateString("en-KE", { day: "numeric", month: "short" })}
+                      {new Date(item.createdAt).toLocaleDateString("en-KE", {
+                        day: "numeric",
+                        month: "short",
+                      })}
                     </span>
-                    <Button variant="ghost" size="icon" onClick={() => remove(item.id)} aria-label="Delete">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => remove(item.id)}
+                      aria-label="Delete"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -231,15 +258,29 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
         </Card>
 
         <Card className="border-border/60">
-          <CardHeader><CardTitle className="text-base">Quick add</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="text-base">Quick add</CardTitle>
+          </CardHeader>
           <CardContent>
             <form onSubmit={add} className="space-y-3">
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={config.placeholder} />
-              <Input value={detail} onChange={(e) => setDetail(e.target.value)} placeholder="Optional detail" />
-              <Button type="submit" className="w-full"><Plus className="mr-2 h-4 w-4" />Add to AlexOS</Button>
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder={config.placeholder}
+              />
+              <Input
+                value={detail}
+                onChange={(e) => setDetail(e.target.value)}
+                placeholder="Optional detail"
+              />
+              <Button type="submit" className="w-full">
+                <Plus className="mr-2 h-4 w-4" />
+                Add to AlexOS
+              </Button>
             </form>
             <p className="mt-4 text-xs leading-5 text-muted-foreground">
-              Entries are kept on this device during the validation cycle. Core financial data remains in Supabase; this V1 workspace does not alter Money Center data.
+              Entries are kept on this device during the validation cycle. Core financial data
+              remains in Supabase; this V1 workspace does not alter Money Center data.
             </p>
           </CardContent>
         </Card>

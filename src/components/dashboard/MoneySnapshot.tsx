@@ -77,18 +77,16 @@ export default function MoneySnapshot() {
     .filter((t) => t.flow_type === "loan_received")
     .reduce((sum, t) => sum + Number(t.amount), 0);
 
-  const lowBalanceCount = scopedAccounts.reduce(
-    (count, account) => {
-      const balance = getBalance(account.id);
-      const isMpesa = /m[- ]?pesa/i.test(account.name);
-      const isBank = /bank|kcb|equity|coop|co-operative|absa|ncba|stanbic|family|dtb|i&m|im bank|sidian|prime/i.test(
+  const lowBalanceCount = scopedAccounts.reduce((count, account) => {
+    const balance = getBalance(account.id);
+    const isMpesa = /m[- ]?pesa/i.test(account.name);
+    const isBank =
+      /bank|kcb|equity|coop|co-operative|absa|ncba|stanbic|family|dtb|i&m|im bank|sidian|prime/i.test(
         `${account.name} ${account.type}`,
       );
-      const threshold = isMpesa ? 300 : isBank ? 500 : null;
-      return count + (threshold !== null && balance < threshold ? 1 : 0);
-    },
-    0,
-  );
+    const threshold = isMpesa ? 300 : isBank ? 500 : null;
+    return count + (threshold !== null && balance < threshold ? 1 : 0);
+  }, 0);
 
   const cards = [
     {

@@ -156,7 +156,9 @@ export function useRecordDebtPayment() {
       if (!Number.isFinite(total) || total <= 0) throw new Error("Enter a valid payment amount");
       if (interest > total) throw new Error("Interest cannot exceed the total payment");
       if (principal > remainingPrincipal) {
-        throw new Error(`Principal payment cannot exceed the remaining ${remainingPrincipal.toLocaleString()} principal`);
+        throw new Error(
+          `Principal payment cannot exceed the remaining ${remainingPrincipal.toLocaleString()} principal`,
+        );
       }
 
       const newPaid = Number(debt.amount_paid) + principal;
@@ -230,10 +232,7 @@ export function useArchiveDebt() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("debts")
-        .update({ status: "archived" })
-        .eq("id", id);
+      const { error } = await supabase.from("debts").update({ status: "archived" }).eq("id", id);
 
       if (error) throw error;
     },

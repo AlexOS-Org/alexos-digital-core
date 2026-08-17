@@ -33,9 +33,7 @@ export function DebtPaymentDialog({ open, onOpenChange, debt }: Props) {
   const [amount, setAmount] = useState("");
   const [interestAmount, setInterestAmount] = useState("0");
   const [accountId, setAccountId] = useState("");
-  const [paymentDate, setPaymentDate] = useState(
-    new Date().toISOString().slice(0, 10),
-  );
+  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().slice(0, 10));
   const [description, setDescription] = useState("");
 
   useEffect(() => {
@@ -136,7 +134,8 @@ export function DebtPaymentDialog({ open, onOpenChange, debt }: Props) {
                 <strong>{formatMoney(Math.min(interest, total))}</strong>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                Principal reduces the debt. Interest is recorded as an expense. The full payment reduces cash.
+                Principal reduces the debt. Interest is recorded as an expense. The full payment
+                reduces cash.
               </p>
             </div>
 

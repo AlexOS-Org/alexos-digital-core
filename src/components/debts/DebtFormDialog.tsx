@@ -109,10 +109,7 @@ export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
 
             <div className="space-y-1.5">
               <Label>Money belongs to</Label>
-              <Select
-                value={scope}
-                onValueChange={(v) => setScope(v as FinancialScope)}
-              >
+              <Select value={scope} onValueChange={(v) => setScope(v as FinancialScope)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -153,10 +150,7 @@ export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
             {isNewLoan && (
               <div className="col-span-2 space-y-1.5">
                 <Label>Where did the loan money go?</Label>
-                <Select
-                  value={disbursementAccountId}
-                  onValueChange={setDisbursementAccountId}
-                >
+                <Select value={disbursementAccountId} onValueChange={setDisbursementAccountId}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select cash / bank / M-Pesa account" />
                   </SelectTrigger>
@@ -176,10 +170,7 @@ export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
 
             <div className="space-y-1.5">
               <Label>Priority</Label>
-              <Select
-                value={priority}
-                onValueChange={(v) => setPriority(v as Debt["priority"])}
-              >
+              <Select value={priority} onValueChange={(v) => setPriority(v as Debt["priority"])}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -238,10 +229,7 @@ export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
 
             <div className="space-y-1.5">
               <Label>Status</Label>
-              <Select
-                value={status}
-                onValueChange={(v) => setStatus(v as Debt["status"])}
-              >
+              <Select value={status} onValueChange={(v) => setStatus(v as Debt["status"])}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

@@ -16,12 +16,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ACCOUNT_ICONS, ACCOUNT_ICON_OPTIONS, ACCOUNT_TYPES, CURRENCIES } from "@/lib/money/constants";
+import {
+  ACCOUNT_ICONS,
+  ACCOUNT_ICON_OPTIONS,
+  ACCOUNT_TYPES,
+  CURRENCIES,
+} from "@/lib/money/constants";
 import { useSaveAccount, type Account } from "@/lib/money/api";
 import { cn } from "@/lib/utils";
 
 type FinancialScope = "personal" | "business";
-type AccountOwnership = Account & { financial_scope?: FinancialScope; business_name?: string | null };
+type AccountOwnership = Account & {
+  financial_scope?: FinancialScope;
+  business_name?: string | null;
+};
 
 interface Props {
   open: boolean;
@@ -56,7 +64,7 @@ export function AccountFormDialog({ open, onOpenChange, account }: Props) {
     if (!name.trim()) return;
     if (scope === "business" && !businessName.trim()) return;
 
-    await save.mutateAsync(({ 
+    await save.mutateAsync({
       id: account?.id,
       name: name.trim(),
       icon,
@@ -65,7 +73,7 @@ export function AccountFormDialog({ open, onOpenChange, account }: Props) {
       opening_balance: Number(opening) || 0,
       financial_scope: scope,
       business_name: scope === "business" ? businessName.trim() : null,
-    } as never));
+    } as never);
     onOpenChange(false);
   };
 
@@ -78,13 +86,19 @@ export function AccountFormDialog({ open, onOpenChange, account }: Props) {
         <div className="space-y-4">
           <div className="space-y-1.5">
             <Label>Name</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Equity Bank" />
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Equity Bank"
+            />
           </div>
 
           <div className="space-y-1.5">
             <Label>Who owns this money?</Label>
             <Select value={scope} onValueChange={(v) => setScope(v as FinancialScope)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="personal">Personal</SelectItem>
                 <SelectItem value="business">Business</SelectItem>
@@ -95,7 +109,11 @@ export function AccountFormDialog({ open, onOpenChange, account }: Props) {
           {scope === "business" && (
             <div className="space-y-1.5">
               <Label>Business</Label>
-              <Input value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="e.g. CarBar Motion" />
+              <Input
+                value={businessName}
+                onChange={(e) => setBusinessName(e.target.value)}
+                placeholder="e.g. CarBar Motion"
+              />
             </div>
           )}
 
@@ -111,7 +129,9 @@ export function AccountFormDialog({ open, onOpenChange, account }: Props) {
                     onClick={() => setIcon(key)}
                     className={cn(
                       "h-10 rounded-lg border grid place-items-center transition",
-                      icon === key ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:text-foreground",
+                      icon === key
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border text-muted-foreground hover:text-foreground",
                     )}
                   >
                     <Icon className="h-4 w-4" />
@@ -125,18 +145,30 @@ export function AccountFormDialog({ open, onOpenChange, account }: Props) {
             <div className="space-y-1.5">
               <Label>Type</Label>
               <Select value={type} onValueChange={(v) => setType(v as Account["type"])}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {ACCOUNT_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                  {ACCOUNT_TYPES.map((t) => (
+                    <SelectItem key={t.value} value={t.value}>
+                      {t.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
               <Label>Currency</Label>
               <Select value={currency} onValueChange={setCurrency}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {CURRENCIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  {CURRENCIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -144,13 +176,28 @@ export function AccountFormDialog({ open, onOpenChange, account }: Props) {
 
           <div className="space-y-1.5">
             <Label>Opening Balance</Label>
-            <Input type="number" step="0.01" value={opening} onChange={(e) => setOpening(e.target.value)} disabled={!!account} />
-            {account && <p className="text-xs text-muted-foreground">Opening balance is locked after creation to keep history accurate.</p>}
+            <Input
+              type="number"
+              step="0.01"
+              value={opening}
+              onChange={(e) => setOpening(e.target.value)}
+              disabled={!!account}
+            />
+            {account && (
+              <p className="text-xs text-muted-foreground">
+                Opening balance is locked after creation to keep history accurate.
+              </p>
+            )}
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={submit} disabled={save.isPending || (scope === "business" && !businessName.trim())}>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={submit}
+            disabled={save.isPending || (scope === "business" && !businessName.trim())}
+          >
             {save.isPending ? "Saving..." : "Save Account"}
           </Button>
         </DialogFooter>
