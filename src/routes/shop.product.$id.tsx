@@ -24,19 +24,13 @@ import {
 } from "@/lib/storefront/api";
 
 export const Route = createFileRoute("/shop/product/$id")({
-  head: ({ params }) => ({
+  head: () => ({
     meta: [
       { title: "Product details | DailyGear" },
       { name: "description", content: "Product details, pricing and delivery information." },
       { property: "og:title", content: "Product details | DailyGear" },
       { property: "og:description", content: "Product details, pricing and delivery information." },
       { property: "og:type", content: "product" },
-    ],
-    links: [
-      {
-        rel: "canonical",
-        href: `https://alexos-digital-core.lovable.app/shop/product/${params.id}`,
-      },
     ],
   }),
   component: ProductDetail,

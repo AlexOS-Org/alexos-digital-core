@@ -43,12 +43,6 @@ export const Route = createFileRoute("/shop/policies/$slug")({
         { property: "og:description", content: policy?.body[0] ?? "Store policy information." },
         { property: "og:type", content: "website" },
       ],
-      links: [
-        {
-          rel: "canonical",
-          href: `https://alexos-digital-core.lovable.app/shop/policies/${params.slug}`,
-        },
-      ],
     };
   },
   component: PolicyPage,

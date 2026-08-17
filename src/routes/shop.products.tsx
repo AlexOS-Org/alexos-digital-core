@@ -45,7 +45,6 @@ export const Route = createFileRoute("/shop/products")({
       { property: "og:description", content: "Browse the full DailyGear catalogue." },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "canonical", href: "https://alexos-digital-core.lovable.app/shop/products" }],
   }),
   component: ProductsPage,
 });

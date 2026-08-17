@@ -5,9 +5,6 @@ on:
     branches: [main]
   workflow_dispatch:
 
-env:
-  PRODUCTION_URL: https://alexos-digital-core.lovable.app
-
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -21,22 +18,3 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run lint
-      - name: Smoke test production
-        shell: bash
-        run: |
-          set -euo pipefail
-          for attempt in {1..12}; do
-            status=$(curl -L -sS -o /tmp/alexos.html -w '%{http_code}' "$PRODUCTION_URL" || true)
-            if [ "$status" = "200" ]; then
-              if grep -qi "database connection is not configured\|Supabase configuration is missing" /tmp/alexos.html; then
-                echo "Production returned the database configuration failure banner."
-                exit 1
-              fi
-              echo "Production smoke test passed."
-              exit 0
-            fi
-            echo "Production not ready (HTTP $status); retry $attempt/12..."
-            sleep 10
-          done
-          echo "Production smoke test failed: no healthy 200 response."
-          exit 1

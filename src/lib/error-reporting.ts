@@ -16,7 +16,7 @@ declare global {
   }
 }
 
-/** Reports runtime errors without depending on Lovable's editor/runtime. */
+/** Reports runtime errors to the browser console and any registered handler. */
 export function reportRuntimeError(
   error: unknown,
   context: Record<string, unknown> = {},
@@ -43,6 +43,3 @@ export function reportRuntimeError(
     console.error("[AlexOS runtime error]", payload);
   }
 }
-
-/** @deprecated Use reportRuntimeError instead. */
-export const reportLovableError = reportRuntimeError;

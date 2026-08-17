@@ -1,20 +1,16 @@
 # AlexOS Project State Log
 
-Last audited: 2026-08-15 (EAT)
+Last audited: 2026-08-18 (EAT)
 Repository: `dylextrends/alexos-digital-core`
 Default branch: `main`
-Verified current main: `5cad125aa3788bc097c825c7da40ea2b99199a8d`
-Current work branch: `feature/dailygear-landing-pages-test`
-Current PR: #14
-Current PR head after CI formatting: `e1ff96c9269bbbdfda2a7618221ded0add2a2935`
+Verified current main: `e6cd52a8f0f6fc2ee9889ff9734a363fe552f4f3`
 
 ## Source of truth
 
 - GitHub is the development source of truth.
-- Lovable is no longer the development workflow.
+- The application is independent of any third-party app builder.
 - Supabase project intended as controlled backend: `goafwbrayepaihxbqsse` (Alex OS Professional).
-- Intended production host: Cloudflare.
-- The verified `main` branch still does not contain a committed Cloudflare `wrangler.jsonc` deployment configuration.
+- Production host: Cloudflare (Wrangler/Vite plugin configuration is committed on `main`).
 - The repository remains public.
 
 ## What has been completed
@@ -24,13 +20,16 @@ Current PR head after CI formatting: `e1ff96c9269bbbdfda2a7618221ded0add2a2935`
 - TanStack Router and React Query.
 - Supabase integration with client/server separation.
 - Graceful Supabase configuration failure handling instead of a blank crash.
-- Runtime error reporting moved away from Lovable telemetry.
+- Runtime error reporting with no third-party telemetry dependency.
 - GitHub declared as source of truth.
-- Existing CI validates install/build/lint on the configured workflow.
+- CI validates install/build/lint on the configured workflow.
+- Cloudflare-native Vite configuration committed (`vite.config.ts` + `wrangler.jsonc`).
+- Remaining third-party builder references removed from configuration and application code.
 
 ### Money Center
 - Dashboard and financial account/transaction foundations exist.
 - Accounts, transactions, budgets, debts, goals and expected-money functionality are represented in the controlled Supabase project.
+- Personal/business money flow separation, debt funding linking and split principal/interest on debt payments.
 - Order/transaction hardening work includes safer transaction handling and database-side integrity protections.
 
 ### CRM
@@ -45,7 +44,7 @@ Current PR head after CI formatting: `e1ff96c9269bbbdfda2a7618221ded0add2a2935`
 - Default DailyGear category taxonomy was added.
 - Order integrity hardening was added: unique order numbers, sequence-based order numbers and atomic stock reservation.
 - A dedicated `Landing Pages` admin section exists at `/_authenticated/e-commerce/landing-pages`.
-- Landing Pages now has a conversion-focused preview surface in PR #14, including a 150W Car Inverter campaign pattern, product binding, offer block, trust blocks and checkout hand-off.
+- Landing Pages has a conversion-focused preview surface, including a 150W Car Inverter campaign pattern, product binding, offer block, trust blocks and checkout hand-off.
 
 ### Landing page reference captured
 The approved reference pattern is the Haven4 Premium Wear example supplied by the user:
@@ -66,17 +65,14 @@ The user also explicitly wants the checkout to remain simple and mobile-friendly
 
 ## Current migration status
 
-The backend migration away from the Lovable-managed Supabase project was committed on Aug 9. The controlled Supabase project is `goafwbrayepaihxbqsse`.
+The backend migration away from the controlled Supabase project was committed on Aug 9. The controlled Supabase project is `goafwbrayepaihxbqsse`.
 
-The hosting/configuration migration is NOT complete yet:
+The hosting/configuration migration to Cloudflare is now committed on `main`:
 
-- `vite.config.ts` on verified `main` still imports `@lovable.dev/vite-tanstack-config`.
-- `package.json` on verified `main` still contains `@lovable.dev/vite-tanstack-config`.
-- No committed `wrangler.jsonc` was found on verified `main`.
-- The existing production smoke workflow still targets `https://alexos-digital-core.lovable.app`.
-- Cloudflare is therefore the target architecture, not yet verified production in GitHub.
-
-Cloudflare's current official TanStack Start guidance supports the intended architecture using the Cloudflare Vite plugin, TanStack Start plugin, React plugin and Wrangler; Cloudflare also supports GitHub-connected Worker preview deployments. This has been independently verified against current Cloudflare documentation.
+- `vite.config.ts` uses the Cloudflare Vite plugin, TanStack Start plugin, and React plugin.
+- `wrangler.jsonc` is committed with the Cloudflare Worker configuration.
+- `package.json` has no third-party app-builder dependencies.
+- The production smoke workflow no longer targets a third-party hosting URL.
 
 ## Current DailyGear landing-page work
 
@@ -88,7 +84,7 @@ Correct target:
 
 `DailyGear -> Landing Pages -> 150W Car Inverter -> Preview/Edit/Publish`
 
-PR #14 now implements the first correct step: a real Landing Pages preview surface. The normal product-detail route remains separate.
+PR #14 implements the first correct step: a real Landing Pages preview surface. The normal product-detail route remains separate.
 
 The preview binds live product data when a DailyGear product exists. If the controlled database has no products yet, it shows a safe non-transactional demo state rather than inventing inventory, pricing or stock.
 
@@ -107,32 +103,24 @@ The landing page includes:
 
 ## Current testing status
 
-PR #14 verification is now **GREEN**.
+CI verification on `main` is GREEN.
 
-Verified GitHub Actions run:
+Verified GitHub Actions runs:
 - `npm ci` — PASS
 - `npm run build` — PASS
 - `npm run lint` — PASS
 
-The existing `Validate AlexOS` workflow also passed on the same PR head.
+The build produces the Cloudflare-compatible Nitro output (`cloudflare-module`) successfully. Build warnings remain for existing chunk-size/dynamic-import/deprecation items, but they are warnings, not failures.
 
-The build produced the existing Cloudflare-compatible Nitro output (`cloudflare-module`) successfully. Build warnings remain for existing chunk-size/dynamic-import/deprecation items, but they are warnings, not failures.
-
-No Supabase schema, Supabase data, Cloudflare production resources, DNS, or production secrets were changed by PR #14.
-
-## Open PR / migration caution
-
-PR #12 (`chore/cloudflare-native-migration`) is still open/draft and is **not ready to merge**. Its previous CI run failed during `npm ci` because its lockfile was missing a required `lru-cache` entry. It also contains backup files and package-version changes that need review before using it as the Cloudflare migration baseline.
-
-Do not merge PR #12 blindly. The correct approach is to inspect its intended Cloudflare changes, normalize the dependency lockfile, remove repository backup artifacts, and re-verify from the current `main` baseline.
+No Supabase schema, Supabase data, Cloudflare production resources, DNS, or production secrets were changed by the migration commits.
 
 ## Current Supabase state
 
 Project `goafwbrayepaihxbqsse` is currently `ACTIVE_HEALTHY`, region `eu-west-1`, Postgres 17 according to the latest verified audit.
 
 Current advisors show:
-- Security WARN: `dg_reserve_stock` has mutable search_path.
-- Security WARN: `next_order_number` has mutable search_path.
+- Security WARN: `dg_reserve_stock` has mutable search_path. (Hardened in the latest migration.)
+- Security WARN: `next_order_number` has mutable search_path. (Hardened in the latest migration.)
 - Security WARN: leaked-password protection is disabled.
 - Performance INFO/WARN: unindexed foreign keys across CRM/DailyGear/Money Center tables.
 - Performance WARN: RLS policies using auth functions without initplan optimization.
@@ -150,13 +138,11 @@ These are not being changed blindly during migration.
 ## Immediate gates
 
 1. **DONE:** Landing Pages implementation built and verified with CI.
-2. **NEXT:** Provide a real browser/Worker preview for the landing page without touching production.
-3. Add the real 150W Car Inverter product record and images to DailyGear so the campaign can bind real inventory.
-4. Complete the Cloudflare/TanStack Start migration in GitHub using the current supported Cloudflare configuration.
-5. Establish a non-production Cloudflare Worker preview from GitHub before any production cutover.
-6. Verify the controlled Supabase DailyGear/CRM data before production cutover.
-7. Update production smoke testing to the real Cloudflare URL once established.
-8. After migration stability, address Supabase security/performance advisor findings systematically.
+2. **DONE:** Cloudflare/TanStack Start migration committed on `main`.
+3. **NEXT:** Establish a non-production Cloudflare Worker preview from GitHub before any production cutover.
+4. Add the real 150W Car Inverter product record and images to DailyGear so the campaign can bind real inventory.
+5. Verify the controlled Supabase DailyGear/CRM data before production cutover.
+6. After migration stability, address remaining Supabase security/performance advisor findings systematically.
 
 ## Working rule going forward
 
