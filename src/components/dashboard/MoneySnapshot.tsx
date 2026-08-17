@@ -1,13 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  TrendingDown,
-  TrendingUp,
-  Wallet,
-  Landmark,
-  ArrowDownCircle,
-  ArrowUpRight,
-  CircleAlert,
-} from "lucide-react";
+import { TrendingDown, TrendingUp, Wallet, Landmark, ArrowDownCircle, ArrowUpRight, CircleAlert, Briefcase, UserRound } from "lucide-react";
 import { useAccountBalances, useAccounts, useTransactions } from "@/lib/money/api";
 import { useDebts, debtRemaining } from "@/lib/debts/api";
 import { formatMoney } from "@/lib/money/format";
@@ -18,99 +10,75 @@ export default function MoneySnapshot() {
   const { data: transactions = [] } = useTransactions();
   const { data: debts = [] } = useDebts();
 
-  const cashAvailable = balances.reduce((total, account) => total + Number(account.balance), 0);
-  const totalDebt = debts
-    .filter((d) => d.status !== "paid")
-    .reduce((sum, debt) => sum + debtRemaining(debt), 0);
+  type AccountWithScope = (typeof accounts)[number] & { financial_scope?: "personal" | "business"; business_name?: string | null };
+  type TxWithFlow = (typeof transactions)[number] & {
+    financial_scope?: "personal" | "business";
+    business_name?: string | null;
+    flow_type?: "standard" | "loan_received" | "debt_payment" | "debt_interest";
+  };
+
+  const scopedAccounts = accounts as AccountWithScope[];
+  const scopedTransactions = transactions as TxWithFlow[];
+
+  const getBalance = (accountId: string) => Number(balances.find((b) => b.account_id === accountId)?.balance ?? 0);
+  const cashAvailable = scopedAccounts.reduce((total, account) => total + getBalance(account.id), 0);
+  const personalCash = scopedAccounts.filter((a) => (a.financial_scope ?? "personal") === "personal").reduce((total, a) => total + getBalance(a.id), 0);
+  const businessCash = scopedAccounts.filter((a) => a.financial_scope === "business").reduce((total, a) => total + getBalance(a.id), 0);
+  const totalDebt = debts.filter((d) => d.status !== "paid").reduce((sum, debt) => sum + debtRemaining(debt), 0);
+  const personalDebt = debts.filter((d) => d.status !== "paid" && d.financial_scope === "personal").reduce((sum, debt) => sum + debtRemaining(debt), 0);
+  const businessDebt = debts.filter((d) => d.status !== "paid" && d.financial_scope === "business").reduce((sum, debt) => sum + debtRemaining(debt), 0);
   const netWorth = cashAvailable - totalDebt;
+
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
-  const monthTransactions = transactions.filter((t) => {
+  const monthTransactions = scopedTransactions.filter((t) => {
     const date = new Date(t.occurred_at);
-    return (
-      date.getMonth() === currentMonth &&
-      date.getFullYear() === currentYear &&
-      t.status === "posted"
-    );
+    return date.getMonth() === currentMonth && date.getFullYear() === currentYear && t.status === "posted";
   });
-  const income = monthTransactions
-    .filter((t) => t.type === "income")
+
+  const operatingIncome = monthTransactions
+    .filter((t) => t.type === "income" && t.flow_type !== "loan_received")
     .reduce((sum, t) => sum + Number(t.amount), 0);
   const expenses = monthTransactions
-    .filter((t) => t.type === "expense")
+    .filter((t) => t.type === "expense" && t.flow_type !== "debt_payment")
+    .reduce((sum, t) => sum + Number(t.amount), 0);
+  const loanProceeds = monthTransactions
+    .filter((t) => t.flow_type === "loan_received")
     .reduce((sum, t) => sum + Number(t.amount), 0);
 
-  const lowBalanceCount = accounts.reduce((count, account) => {
-    const balance = Number(balances.find((b) => b.account_id === account.id)?.balance ?? 0);
+  const lowBalanceCount = scopedAccounts.reduce((count, account) => {
+    const balance = getBalance(account.id);
     const isMpesa = /m[- ]?pesa/i.test(account.name);
-    const isBank =
-      /bank|kcb|equity|coop|co-operative|absa|ncba|stanbic|family|dtb|i&m|im bank|sidian|prime/i.test(
-        `${account.name} ${account.type}`,
-      );
+    const isBank = /bank|kcb|equity|coop|co-operative|absa|ncba|stanbic|family|dtb|i&m|im bank|sidian|prime/i.test(`${account.name} ${account.type}`);
     const threshold = isMpesa ? 300 : isBank ? 500 : null;
     return count + (threshold !== null && balance < threshold ? 1 : 0);
   }, 0);
 
   const cards = [
-    {
-      title: "Cash Available",
-      value: formatMoney(cashAvailable),
-      icon: Wallet,
-      accent: "from-emerald-500 to-teal-400",
-      subtitle: "Across all accounts",
-    },
-    {
-      title: "Net Worth",
-      value: formatMoney(netWorth),
-      icon: Landmark,
-      accent: netWorth >= 0 ? "from-violet-500 to-indigo-400" : "from-red-400 to-rose-300",
-      subtitle: "Cash less outstanding debt",
-    },
-    {
-      title: "Income",
-      value: formatMoney(income),
-      icon: TrendingUp,
-      accent: "from-emerald-500 to-teal-400",
-      subtitle: "This month",
-    },
-    {
-      title: "Expenses",
-      value: formatMoney(expenses),
-      icon: TrendingDown,
-      accent: "from-amber-400 to-orange-300",
-      subtitle: "This month",
-    },
-    {
-      title: "Outstanding Debt",
-      value: formatMoney(totalDebt),
-      icon: ArrowDownCircle,
-      accent: "from-orange-400 to-red-300",
-      subtitle: `${debts.filter((d) => d.status !== "paid").length} active debt(s)`,
-    },
+    { title: "Cash Available", value: formatMoney(cashAvailable), icon: Wallet, subtitle: "All accounts", accent: "from-emerald-500 to-teal-400" },
+    { title: "Personal Cash", value: formatMoney(personalCash), icon: UserRound, subtitle: `Debt ${formatMoney(personalDebt)}`, accent: "from-sky-500 to-cyan-400" },
+    { title: "Business Cash", value: formatMoney(businessCash), icon: Briefcase, subtitle: `Debt ${formatMoney(businessDebt)}`, accent: "from-violet-500 to-indigo-400" },
+    { title: "Net Worth", value: formatMoney(netWorth), icon: Landmark, subtitle: "Cash less outstanding debt", accent: netWorth >= 0 ? "from-violet-500 to-indigo-400" : "from-red-400 to-rose-300" },
+    { title: "Operating Income", value: formatMoney(operatingIncome), icon: TrendingUp, subtitle: "This month · loans excluded", accent: "from-emerald-500 to-teal-400" },
+    { title: "Expenses", value: formatMoney(expenses), icon: TrendingDown, subtitle: "This month", accent: "from-amber-400 to-orange-300" },
+    { title: "Loan Proceeds", value: formatMoney(loanProceeds), icon: ArrowDownCircle, subtitle: "Cash received · not income", accent: "from-orange-400 to-red-300" },
   ];
 
   return (
     <div className="space-y-3">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        {cards.map((card, index) => {
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {cards.map((card) => {
           const Icon = card.icon;
           return (
-            <Card
-              key={card.title}
-              className="group relative overflow-hidden rounded-[1.6rem] border border-border/60 bg-card/80 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-            >
+            <Card key={card.title} className="group relative overflow-hidden rounded-[1.6rem] border border-border/60 bg-card/80 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
               <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${card.accent}`} />
               <CardContent className="relative p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                      {card.title}
-                    </p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">{card.title}</p>
                     <p className="mt-3 text-2xl font-bold tracking-tight">{card.value}</p>
                   </div>
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/[0.07] text-primary">
-                    <Icon className="h-5 w-5" />
-                  </div>
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/[0.07] text-primary"><Icon className="h-5 w-5" /></div>
                 </div>
                 <div className="mt-6 flex items-center justify-between text-xs text-muted-foreground">
                   <span>{card.subtitle}</span>
