@@ -23,6 +23,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Canonical gate: lint must pass before the production build runs.
       - name: Lint
         run: npm run lint
 
