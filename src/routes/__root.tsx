@@ -10,9 +10,9 @@ import {
 import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportRuntimeError } from "../lib/lovable-error-reporting";
-import { supabase } from "@/integrations/supabase/client";
-import { Toaster } from "@/components/ui/sonner";
-import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { supabase } from "../integrations/supabase/client";
+import { Toaster } from "../components/ui/sonner";
+import { ThemeProvider } from "../components/theme/ThemeProvider";
 
 function NotFoundComponent() {
   return (
