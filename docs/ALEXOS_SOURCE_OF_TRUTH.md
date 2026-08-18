@@ -47,6 +47,18 @@ Claude is responsible for adversarial review across the connected GitHub, Supaba
 
 Claude should review and recommend rather than create a competing application architecture. Any implementation recommendation returns to GitHub/main through the controlled workflow.
 
+## Controlled development loop
+1. ChatGPT inspects the current GitHub/Supabase state and implements approved architecture/features in `main`.
+2. Cline synchronizes the canonical local workspace from GitHub `main` and validates the local build/test state.
+3. Claude independently audits GitHub, Supabase and Cloudflare against the current `main` commit.
+4. Claude reports findings using the severity and acceptance format in `docs/CLAUDE_REVIEW_PROTOCOL.md`.
+5. ChatGPT decides which findings are required, recommended or rejected with rationale.
+6. Approved changes are implemented on GitHub `main` (or a reviewed PR that is merged to `main`).
+7. Cline pulls the resulting `main` and performs the local verification.
+8. Supabase schema changes are applied only from the corresponding version-controlled migration.
+9. Cloudflare is deployed only from a verified build/commit.
+10. No environment is allowed to become an independent source of truth.
+
 ## Environment model
 ```text
                          CHATGPT
@@ -146,6 +158,8 @@ AlexOS is intentionally starting fresh. Do not seed fake transactions, accounts,
 8. When uncertain, stop and report the conflict rather than guessing.
 9. Keep GitHub `main` coherent and buildable.
 10. Local cleanup must be done by synchronizing from GitHub, not by recovering random old clones.
+11. Claude findings must be evaluated against the current `main` commit, not against an older local clone.
+12. No agent may silently create a second implementation of an existing domain capability.
 
 ## Acceptance gate
 A feature is not complete until:
