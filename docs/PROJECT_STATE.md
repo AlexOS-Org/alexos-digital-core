@@ -3,7 +3,7 @@
 Last audited: 2026-08-18 (EAT)
 Repository: `dylextrends/alexos-digital-core`
 Default branch: `main`
-Verified current main: `e6cd52a8f0f6fc2ee9889ff9734a363fe552f4f3`
+Verified current main: `3642ff646b1bfbece5f69883da2e836b8bc65d14`
 
 ## Source of truth
 
@@ -67,12 +67,26 @@ The user also explicitly wants the checkout to remain simple and mobile-friendly
 
 The backend migration away from the controlled Supabase project was committed on Aug 9. The controlled Supabase project is `goafwbrayepaihxbqsse`.
 
-The hosting/configuration migration to Cloudflare is now committed on `main`:
+The hosting/configuration migration to Cloudflare is committed on `main`:
 
 - `vite.config.ts` uses the Cloudflare Vite plugin, TanStack Start plugin, and React plugin.
 - `wrangler.jsonc` is committed with the Cloudflare Worker configuration.
 - `package.json` has no third-party app-builder dependencies.
 - The production smoke workflow no longer targets a third-party hosting URL.
+
+### Migration reconciliation status
+
+An independent audit has identified a **GitHub-to-live migration ledger divergence that requires reconciliation before a fresh Supabase environment can be considered reproducible from Git alone**. Reported discrepancies include:
+
+- a version mismatch for `finance_flow_scope_and_debt_linking`;
+- hash-named Git migration files with no matching live ledger entries;
+- live migration entries with no matching Git files;
+- `order_integrity_hardening` versus a differently named live DailyGear order-hardening entry;
+- `dailygear_default_categories` versus differently named live DailyGear storefront entries;
+- a live `revoke_public_function_execute_privileges` security migration not currently represented by a matching Git migration file;
+- a version mismatch for `personal_business_finance_model`.
+
+These are currently treated as **migration-history/reproducibility findings, not proof of schema corruption**. Migration names and timestamps must not be assumed equivalent without comparing the actual SQL and resulting schema state. No production migration has been replayed or altered as a result of this finding.
 
 ## Current DailyGear landing-page work
 
@@ -103,7 +117,7 @@ The landing page includes:
 
 ## Current testing status
 
-CI verification on `main` is GREEN.
+CI verification on `main` is GREEN according to the latest recorded project state.
 
 Verified GitHub Actions runs:
 - `npm ci` — PASS
@@ -116,18 +130,17 @@ No Supabase schema, Supabase data, Cloudflare production resources, DNS, or prod
 
 ## Current Supabase state
 
-Project `goafwbrayepaihxbqsse` is currently `ACTIVE_HEALTHY`, region `eu-west-1`, Postgres 17 according to the latest verified audit.
+Project `goafwbrayepaihxbqsse` is currently recorded as `ACTIVE_HEALTHY`, region `eu-west-1`, Postgres 17 according to the latest verified project state.
 
-Current advisors show:
-- Security WARN: `dg_reserve_stock` has mutable search_path. (Hardened in the latest migration.)
-- Security WARN: `next_order_number` has mutable search_path. (Hardened in the latest migration.)
-- Security WARN: leaked-password protection is disabled.
-- Performance INFO/WARN: unindexed foreign keys across CRM/DailyGear/Money Center tables.
-- Performance WARN: RLS policies using auth functions without initplan optimization.
-- Performance WARN: multiple permissive policies on several DailyGear and transaction tables.
-- Performance INFO: a number of unused indexes.
+The independent audit reports the following current advisory areas:
+- Security: leaked-password protection is disabled.
+- Performance: unindexed foreign keys across CRM/DailyGear/Money Center tables.
+- Performance: RLS policies using auth functions without initplan optimization.
+- Performance: multiple permissive policies on several DailyGear and transaction tables.
+- Performance: a number of unused indexes.
+- The previously tracked mutable `search_path` warnings for `dg_reserve_stock` and `next_order_number` were reported as resolved by the latest hardening migration and should remain verified rather than reworked.
 
-These are not being changed blindly during migration.
+These findings are not being changed blindly. In particular, overlapping permissive RLS policies must be compared by command, role, `USING`, and `WITH CHECK` semantics before consolidation, and indexes must be evaluated against actual table size/query patterns before removal or addition.
 
 ## Security history
 
@@ -139,10 +152,11 @@ These are not being changed blindly during migration.
 
 1. **DONE:** Landing Pages implementation built and verified with CI.
 2. **DONE:** Cloudflare/TanStack Start migration committed on `main`.
-3. **NEXT:** Establish a non-production Cloudflare Worker preview from GitHub before any production cutover.
-4. Add the real 150W Car Inverter product record and images to DailyGear so the campaign can bind real inventory.
-5. Verify the controlled Supabase DailyGear/CRM data before production cutover.
-6. After migration stability, address remaining Supabase security/performance advisor findings systematically.
+3. **IN PROGRESS:** Reconcile GitHub migration history against the controlled Supabase migration ledger/schema before treating Git as a reproducible database source.
+4. **NEXT:** Establish a non-production Cloudflare Worker preview from GitHub after repository/database reconciliation is sufficiently understood.
+5. Add the real 150W Car Inverter product record and images to DailyGear so the campaign can bind real inventory.
+6. Verify the controlled Supabase DailyGear/CRM data before production cutover.
+7. After migration stability, address remaining Supabase security/performance advisor findings systematically.
 
 ## Working rule going forward
 
