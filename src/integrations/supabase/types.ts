@@ -16,10 +16,13 @@ export type Database = {
     Tables: {
       accounts: {
         Row: {
+          business_id: string | null
+          business_name: string | null
           color: string
           created_at: string
           currency: string
           deleted_at: string | null
+          financial_scope: string
           icon: string
           id: string
           name: string
@@ -31,10 +34,13 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          business_id?: string | null
+          business_name?: string | null
           color?: string
           created_at?: string
           currency?: string
           deleted_at?: string | null
+          financial_scope?: string
           icon?: string
           id?: string
           name: string
@@ -46,10 +52,13 @@ export type Database = {
           user_id: string
         }
         Update: {
+          business_id?: string | null
+          business_name?: string | null
           color?: string
           created_at?: string
           currency?: string
           deleted_at?: string | null
+          financial_scope?: string
           icon?: string
           id?: string
           name?: string
@@ -60,21 +69,252 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "accounts_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      activities: {
+        Row: {
+          activity_date: string
+          completed: boolean
+          contact_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          lead_id: string | null
+          subject: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          activity_date?: string
+          completed?: boolean
+          contact_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          lead_id?: string | null
+          subject: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          activity_date?: string
+          completed?: boolean
+          contact_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          lead_id?: string | null
+          subject?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_creatives: {
+        Row: {
+          brief: string | null
+          business_id: string | null
+          business_name: string | null
+          campaign_id: string | null
+          channel: string
+          created_at: string
+          cta: string | null
+          description: string | null
+          headline: string | null
+          id: string
+          image_idea: string | null
+          primary_text: string | null
+          source: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          brief?: string | null
+          business_id?: string | null
+          business_name?: string | null
+          campaign_id?: string | null
+          channel?: string
+          created_at?: string
+          cta?: string | null
+          description?: string | null
+          headline?: string | null
+          id?: string
+          image_idea?: string | null
+          primary_text?: string | null
+          source?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          brief?: string | null
+          business_id?: string | null
+          business_name?: string | null
+          campaign_id?: string | null
+          channel?: string
+          created_at?: string
+          cta?: string | null
+          description?: string | null
+          headline?: string | null
+          id?: string
+          image_idea?: string | null
+          primary_text?: string | null
+          source?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_creatives_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_creatives_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assets: {
+        Row: {
+          asset_type: string
+          business_id: string | null
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          valuation_date: string
+          value: number
+        }
+        Insert: {
+          asset_type: string
+          business_id?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          valuation_date?: string
+          value?: number
+        }
+        Update: {
+          asset_type?: string
+          business_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          valuation_date?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assets_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attachments: {
+        Row: {
+          contact_id: string | null
+          created_at: string
+          file_name: string
+          file_size: number | null
+          file_url: string
+          id: string
+          lead_id: string | null
+          user_id: string
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string
+          file_name: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          lead_id?: string | null
+          user_id: string
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string
+          file_name?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          lead_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attachments_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attachments_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bills: {
         Row: {
           account_id: string | null
           amount: number
-          auto_create_transaction: boolean
+          auto_create_transaction: boolean | null
           category: string | null
           created_at: string
           deleted_at: string | null
-          due_date: string
+          due_date: string | null
+          due_day: number | null
           frequency: Database["public"]["Enums"]["bill_frequency"]
           id: string
           last_paid_at: string | null
           name: string
+          next_due_date: string | null
           notes: string | null
           status: Database["public"]["Enums"]["bill_status"]
           updated_at: string
@@ -82,16 +322,18 @@ export type Database = {
         }
         Insert: {
           account_id?: string | null
-          amount: number
-          auto_create_transaction?: boolean
+          amount?: number
+          auto_create_transaction?: boolean | null
           category?: string | null
           created_at?: string
           deleted_at?: string | null
-          due_date: string
+          due_date?: string | null
+          due_day?: number | null
           frequency?: Database["public"]["Enums"]["bill_frequency"]
           id?: string
           last_paid_at?: string | null
           name: string
+          next_due_date?: string | null
           notes?: string | null
           status?: Database["public"]["Enums"]["bill_status"]
           updated_at?: string
@@ -100,15 +342,17 @@ export type Database = {
         Update: {
           account_id?: string | null
           amount?: number
-          auto_create_transaction?: boolean
+          auto_create_transaction?: boolean | null
           category?: string | null
           created_at?: string
           deleted_at?: string | null
-          due_date?: string
+          due_date?: string | null
+          due_day?: number | null
           frequency?: Database["public"]["Enums"]["bill_frequency"]
           id?: string
           last_paid_at?: string | null
           name?: string
+          next_due_date?: string | null
           notes?: string | null
           status?: Database["public"]["Enums"]["bill_status"]
           updated_at?: string
@@ -134,9 +378,12 @@ export type Database = {
       budgets: {
         Row: {
           amount: number
+          business_id: string | null
+          business_name: string | null
           category: string
           created_at: string
           deleted_at: string | null
+          financial_scope: string
           id: string
           month: string
           updated_at: string
@@ -144,9 +391,12 @@ export type Database = {
         }
         Insert: {
           amount: number
+          business_id?: string | null
+          business_name?: string | null
           category: string
           created_at?: string
           deleted_at?: string | null
+          financial_scope?: string
           id?: string
           month: string
           updated_at?: string
@@ -154,91 +404,162 @@ export type Database = {
         }
         Update: {
           amount?: number
+          business_id?: string | null
+          business_name?: string | null
           category?: string
           created_at?: string
           deleted_at?: string | null
+          financial_scope?: string
           id?: string
           month?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "budgets_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       businesses: {
         Row: {
+          business_type: string | null
+          cover_image_url: string | null
           created_at: string
-          display_name: string
+          currency: string
+          description: string | null
           id: string
+          logo_url: string | null
+          name: string
+          slug: string
+          status: string
+          updated_at: string
+          user_id: string
         }
         Insert: {
+          business_type?: string | null
+          cover_image_url?: string | null
           created_at?: string
-          display_name: string
-          id: string
+          currency?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          slug: string
+          status?: string
+          updated_at?: string
+          user_id: string
         }
         Update: {
+          business_type?: string | null
+          cover_image_url?: string | null
           created_at?: string
-          display_name?: string
+          currency?: string
+          description?: string | null
           id?: string
+          logo_url?: string | null
+          name?: string
+          slug?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       contacts: {
         Row: {
+          address: string | null
+          alternate_phone: string | null
           avatar_url: string | null
+          city: string | null
           company: string | null
+          company_name: string | null
+          country: string | null
+          county: string | null
           created_at: string
           deleted_at: string | null
+          display_name: string
           email: string | null
           first_name: string
           id: string
+          industry: string | null
           job_title: string | null
           last_name: string | null
           notes: string | null
           phone: string | null
+          postal_code: string | null
           sort_order: number
           source: string | null
           status: Database["public"]["Enums"]["contact_status"]
           tags: string[]
+          type: string
           updated_at: string
           user_id: string
+          website: string | null
         }
         Insert: {
+          address?: string | null
+          alternate_phone?: string | null
           avatar_url?: string | null
+          city?: string | null
           company?: string | null
+          company_name?: string | null
+          country?: string | null
+          county?: string | null
           created_at?: string
           deleted_at?: string | null
+          display_name: string
           email?: string | null
           first_name: string
           id?: string
+          industry?: string | null
           job_title?: string | null
           last_name?: string | null
           notes?: string | null
           phone?: string | null
+          postal_code?: string | null
           sort_order?: number
           source?: string | null
           status?: Database["public"]["Enums"]["contact_status"]
           tags?: string[]
+          type?: string
           updated_at?: string
           user_id: string
+          website?: string | null
         }
         Update: {
+          address?: string | null
+          alternate_phone?: string | null
           avatar_url?: string | null
+          city?: string | null
           company?: string | null
+          company_name?: string | null
+          country?: string | null
+          county?: string | null
           created_at?: string
           deleted_at?: string | null
+          display_name?: string
           email?: string | null
           first_name?: string
           id?: string
+          industry?: string | null
           job_title?: string | null
           last_name?: string | null
           notes?: string | null
           phone?: string | null
+          postal_code?: string | null
           sort_order?: number
           source?: string | null
           status?: Database["public"]["Enums"]["contact_status"]
           tags?: string[]
+          type?: string
           updated_at?: string
           user_id?: string
+          website?: string | null
         }
         Relationships: []
       }
@@ -446,14 +767,55 @@ export type Database = {
           },
         ]
       }
+      customers: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          source: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          source?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          source?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       debts: {
         Row: {
           amount_paid: number
+          business_id: string | null
+          business_name: string | null
           category: string | null
           created_at: string
           deleted_at: string | null
+          disbursement_account_id: string | null
           due_date: string | null
+          financial_scope: string
           id: string
+          interest_paid: number
           interest_rate: number
           minimum_payment: number
           name: string
@@ -467,11 +829,16 @@ export type Database = {
         }
         Insert: {
           amount_paid?: number
+          business_id?: string | null
+          business_name?: string | null
           category?: string | null
           created_at?: string
           deleted_at?: string | null
+          disbursement_account_id?: string | null
           due_date?: string | null
+          financial_scope?: string
           id?: string
+          interest_paid?: number
           interest_rate?: number
           minimum_payment?: number
           name: string
@@ -485,11 +852,16 @@ export type Database = {
         }
         Update: {
           amount_paid?: number
+          business_id?: string | null
+          business_name?: string | null
           category?: string | null
           created_at?: string
           deleted_at?: string | null
+          disbursement_account_id?: string | null
           due_date?: string | null
+          financial_scope?: string
           id?: string
+          interest_paid?: number
           interest_rate?: number
           minimum_payment?: number
           name?: string
@@ -501,39 +873,61 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "debts_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "debts_disbursement_account_id_fkey"
+            columns: ["disbursement_account_id"]
+            isOneToOne: false
+            referencedRelation: "account_balances"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "debts_disbursement_account_id_fkey"
+            columns: ["disbursement_account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dg_brands: {
         Row: {
-          created_at: string
+          created_at: string | null
           deleted_at: string | null
           id: string
           logo_url: string | null
           name: string
           notes: string | null
-          updated_at: string
+          updated_at: string | null
           user_id: string
           website: string | null
         }
         Insert: {
-          created_at?: string
+          created_at?: string | null
           deleted_at?: string | null
           id?: string
           logo_url?: string | null
           name: string
           notes?: string | null
-          updated_at?: string
+          updated_at?: string | null
           user_id: string
           website?: string | null
         }
         Update: {
-          created_at?: string
+          created_at?: string | null
           deleted_at?: string | null
           id?: string
           logo_url?: string | null
           name?: string
           notes?: string | null
-          updated_at?: string
+          updated_at?: string | null
           user_id?: string
           website?: string | null
         }
@@ -541,39 +935,39 @@ export type Database = {
       }
       dg_categories: {
         Row: {
-          created_at: string
+          created_at: string | null
           deleted_at: string | null
           description: string | null
           id: string
           name: string
           parent_id: string | null
           slug: string | null
-          sort_order: number
-          updated_at: string
+          sort_order: number | null
+          updated_at: string | null
           user_id: string
         }
         Insert: {
-          created_at?: string
+          created_at?: string | null
           deleted_at?: string | null
           description?: string | null
           id?: string
           name: string
           parent_id?: string | null
           slug?: string | null
-          sort_order?: number
-          updated_at?: string
+          sort_order?: number | null
+          updated_at?: string | null
           user_id: string
         }
         Update: {
-          created_at?: string
+          created_at?: string | null
           deleted_at?: string | null
           description?: string | null
           id?: string
           name?: string
           parent_id?: string | null
           slug?: string | null
-          sort_order?: number
-          updated_at?: string
+          sort_order?: number | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: [
@@ -907,78 +1301,75 @@ export type Database = {
       }
       dg_products: {
         Row: {
-          attributes: Json
+          attributes: Json | null
           barcode: string | null
           brand_id: string | null
           category_id: string | null
-          cost_price: number
-          created_at: string
-          currency: string
+          cost_price: number | null
+          created_at: string | null
+          currency: string | null
           deleted_at: string | null
           description: string | null
           id: string
-          images: string[]
-          low_stock_threshold: number
+          images: string[] | null
+          low_stock_threshold: number | null
           name: string
-          price: number
+          price: number | null
           sale_price: number | null
           sku: string | null
-          sort_order: number
-          status: Database["public"]["Enums"]["dg_product_status"]
-          stock_quantity: number
+          status: Database["public"]["Enums"]["dg_product_status"] | null
+          stock_quantity: number | null
           supplier_id: string | null
-          tags: string[]
-          updated_at: string
+          tags: string[] | null
+          updated_at: string | null
           user_id: string
         }
         Insert: {
-          attributes?: Json
+          attributes?: Json | null
           barcode?: string | null
           brand_id?: string | null
           category_id?: string | null
-          cost_price?: number
-          created_at?: string
-          currency?: string
+          cost_price?: number | null
+          created_at?: string | null
+          currency?: string | null
           deleted_at?: string | null
           description?: string | null
           id?: string
-          images?: string[]
-          low_stock_threshold?: number
+          images?: string[] | null
+          low_stock_threshold?: number | null
           name: string
-          price?: number
+          price?: number | null
           sale_price?: number | null
           sku?: string | null
-          sort_order?: number
-          status?: Database["public"]["Enums"]["dg_product_status"]
-          stock_quantity?: number
+          status?: Database["public"]["Enums"]["dg_product_status"] | null
+          stock_quantity?: number | null
           supplier_id?: string | null
-          tags?: string[]
-          updated_at?: string
+          tags?: string[] | null
+          updated_at?: string | null
           user_id: string
         }
         Update: {
-          attributes?: Json
+          attributes?: Json | null
           barcode?: string | null
           brand_id?: string | null
           category_id?: string | null
-          cost_price?: number
-          created_at?: string
-          currency?: string
+          cost_price?: number | null
+          created_at?: string | null
+          currency?: string | null
           deleted_at?: string | null
           description?: string | null
           id?: string
-          images?: string[]
-          low_stock_threshold?: number
+          images?: string[] | null
+          low_stock_threshold?: number | null
           name?: string
-          price?: number
+          price?: number | null
           sale_price?: number | null
           sku?: string | null
-          sort_order?: number
-          status?: Database["public"]["Enums"]["dg_product_status"]
-          stock_quantity?: number
+          status?: Database["public"]["Enums"]["dg_product_status"] | null
+          stock_quantity?: number | null
           supplier_id?: string | null
-          tags?: string[]
-          updated_at?: string
+          tags?: string[] | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: [
@@ -1142,76 +1533,76 @@ export type Database = {
         Row: {
           address: string | null
           contact_name: string | null
-          created_at: string
+          created_at: string | null
           deleted_at: string | null
           email: string | null
           id: string
-          lead_time_days: number
+          lead_time_days: number | null
           name: string
           notes: string | null
           phone: string | null
-          updated_at: string
+          updated_at: string | null
           user_id: string
         }
         Insert: {
           address?: string | null
           contact_name?: string | null
-          created_at?: string
+          created_at?: string | null
           deleted_at?: string | null
           email?: string | null
           id?: string
-          lead_time_days?: number
+          lead_time_days?: number | null
           name: string
           notes?: string | null
           phone?: string | null
-          updated_at?: string
+          updated_at?: string | null
           user_id: string
         }
         Update: {
           address?: string | null
           contact_name?: string | null
-          created_at?: string
+          created_at?: string | null
           deleted_at?: string | null
           email?: string | null
           id?: string
-          lead_time_days?: number
+          lead_time_days?: number | null
           name?: string
           notes?: string | null
           phone?: string | null
-          updated_at?: string
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
       }
       dg_warehouses: {
         Row: {
-          created_at: string
+          created_at: string | null
           deleted_at: string | null
           id: string
-          is_default: boolean
+          is_default: boolean | null
           location: string | null
           name: string
-          updated_at: string
+          updated_at: string | null
           user_id: string
         }
         Insert: {
-          created_at?: string
+          created_at?: string | null
           deleted_at?: string | null
           id?: string
-          is_default?: boolean
+          is_default?: boolean | null
           location?: string | null
           name: string
-          updated_at?: string
+          updated_at?: string | null
           user_id: string
         }
         Update: {
-          created_at?: string
+          created_at?: string | null
           deleted_at?: string | null
           id?: string
-          is_default?: boolean
+          is_default?: boolean | null
           location?: string | null
           name?: string
-          updated_at?: string
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -1220,10 +1611,13 @@ export type Database = {
         Row: {
           account_id: string | null
           amount: number
+          business_id: string | null
+          business_name: string | null
           created_at: string
           deleted_at: string | null
           description: string | null
           expected_date: string
+          financial_scope: string
           id: string
           probability: number
           received_transaction_id: string | null
@@ -1235,10 +1629,13 @@ export type Database = {
         Insert: {
           account_id?: string | null
           amount: number
+          business_id?: string | null
+          business_name?: string | null
           created_at?: string
           deleted_at?: string | null
           description?: string | null
           expected_date: string
+          financial_scope?: string
           id?: string
           probability?: number
           received_transaction_id?: string | null
@@ -1250,10 +1647,13 @@ export type Database = {
         Update: {
           account_id?: string | null
           amount?: number
+          business_id?: string | null
+          business_name?: string | null
           created_at?: string
           deleted_at?: string | null
           description?: string | null
           expected_date?: string
+          financial_scope?: string
           id?: string
           probability?: number
           received_transaction_id?: string | null
@@ -1275,6 +1675,13 @@ export type Database = {
             columns: ["account_id"]
             isOneToOne: false
             referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expected_money_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
           {
@@ -1422,50 +1829,65 @@ export type Database = {
       }
       leads: {
         Row: {
+          assigned_to: string | null
+          company: string | null
           contact_id: string | null
-          created_at: string
+          created_at: string | null
+          customer_id: string | null
           deleted_at: string | null
+          estimated_value: number | null
           expected_close_date: string | null
           id: string
           notes: string | null
           probability: number
           sort_order: number
           source: string | null
-          stage: Database["public"]["Enums"]["lead_stage"]
+          stage: Database["public"]["Enums"]["lead_stage"] | null
+          status: string | null
           title: string
-          updated_at: string
+          updated_at: string | null
           user_id: string
           value: number
         }
         Insert: {
+          assigned_to?: string | null
+          company?: string | null
           contact_id?: string | null
-          created_at?: string
+          created_at?: string | null
+          customer_id?: string | null
           deleted_at?: string | null
+          estimated_value?: number | null
           expected_close_date?: string | null
           id?: string
           notes?: string | null
           probability?: number
           sort_order?: number
           source?: string | null
-          stage?: Database["public"]["Enums"]["lead_stage"]
+          stage?: Database["public"]["Enums"]["lead_stage"] | null
+          status?: string | null
           title: string
-          updated_at?: string
+          updated_at?: string | null
           user_id: string
           value?: number
         }
         Update: {
+          assigned_to?: string | null
+          company?: string | null
           contact_id?: string | null
-          created_at?: string
+          created_at?: string | null
+          customer_id?: string | null
           deleted_at?: string | null
+          estimated_value?: number | null
           expected_close_date?: string | null
           id?: string
           notes?: string | null
           probability?: number
           sort_order?: number
           source?: string | null
-          stage?: Database["public"]["Enums"]["lead_stage"]
+          stage?: Database["public"]["Enums"]["lead_stage"] | null
+          status?: string | null
           title?: string
-          updated_at?: string
+          updated_at?: string | null
           user_id?: string
           value?: number
         }
@@ -1477,860 +1899,190 @@ export type Database = {
             referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
-        ]
-      }
-      media_asset_associations: {
-        Row: {
-          asset_id: string
-          created_at: string
-          entity_id: string
-          entity_type: string
-          id: string
-          role: string | null
-        }
-        Insert: {
-          asset_id: string
-          created_at?: string
-          entity_id: string
-          entity_type: string
-          id?: string
-          role?: string | null
-        }
-        Update: {
-          asset_id?: string
-          created_at?: string
-          entity_id?: string
-          entity_type?: string
-          id?: string
-          role?: string | null
-        }
-        Relationships: [
           {
-            foreignKeyName: "media_asset_associations_asset_id_fkey"
-            columns: ["asset_id"]
+            foreignKeyName: "leads_customer_id_fkey"
+            columns: ["customer_id"]
             isOneToOne: false
-            referencedRelation: "media_assets"
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
         ]
       }
-      media_asset_versions: {
-        Row: {
-          asset_id: string
-          change_note: string | null
-          changed_by: string | null
-          created_at: string
-          id: string
-          storage_path: string
-          version_number: number
-        }
-        Insert: {
-          asset_id: string
-          change_note?: string | null
-          changed_by?: string | null
-          created_at?: string
-          id?: string
-          storage_path: string
-          version_number: number
-        }
-        Update: {
-          asset_id?: string
-          change_note?: string | null
-          changed_by?: string | null
-          created_at?: string
-          id?: string
-          storage_path?: string
-          version_number?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "media_asset_versions_asset_id_fkey"
-            columns: ["asset_id"]
-            isOneToOne: false
-            referencedRelation: "media_assets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      media_assets: {
-        Row: {
-          alt_text: string | null
-          business_id: string
-          category: string | null
-          compression_status: string
-          created_at: string
-          file_hash: string
-          file_name: string
-          height: number | null
-          id: string
-          mime_type: string
-          optimized_path: string | null
-          size_bytes: number | null
-          source: string
-          storage_path: string
-          tags: string[] | null
-          thumbnail_path: string | null
-          updated_at: string
-          uploaded_by: string | null
-          user_id: string
-          width: number | null
-        }
-        Insert: {
-          alt_text?: string | null
-          business_id: string
-          category?: string | null
-          compression_status?: string
-          created_at?: string
-          file_hash: string
-          file_name: string
-          height?: number | null
-          id?: string
-          mime_type: string
-          optimized_path?: string | null
-          size_bytes?: number | null
-          source?: string
-          storage_path: string
-          tags?: string[] | null
-          thumbnail_path?: string | null
-          updated_at?: string
-          uploaded_by?: string | null
-          user_id: string
-          width?: number | null
-        }
-        Update: {
-          alt_text?: string | null
-          business_id?: string
-          category?: string | null
-          compression_status?: string
-          created_at?: string
-          file_hash?: string
-          file_name?: string
-          height?: number | null
-          id?: string
-          mime_type?: string
-          optimized_path?: string | null
-          size_bytes?: number | null
-          source?: string
-          storage_path?: string
-          tags?: string[] | null
-          thumbnail_path?: string | null
-          updated_at?: string
-          uploaded_by?: string | null
-          user_id?: string
-          width?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "media_assets_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      media_collection_items: {
-        Row: {
-          added_at: string
-          asset_id: string
-          collection_id: string
-        }
-        Insert: {
-          added_at?: string
-          asset_id: string
-          collection_id: string
-        }
-        Update: {
-          added_at?: string
-          asset_id?: string
-          collection_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "media_collection_items_asset_id_fkey"
-            columns: ["asset_id"]
-            isOneToOne: false
-            referencedRelation: "media_assets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "media_collection_items_collection_id_fkey"
-            columns: ["collection_id"]
-            isOneToOne: false
-            referencedRelation: "media_collections"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      media_collections: {
-        Row: {
-          business_id: string
-          created_at: string
-          description: string | null
-          id: string
-          name: string
-          user_id: string
-        }
-        Insert: {
-          business_id: string
-          created_at?: string
-          description?: string | null
-          id?: string
-          name: string
-          user_id: string
-        }
-        Update: {
-          business_id?: string
-          created_at?: string
-          description?: string | null
-          id?: string
-          name?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "media_collections_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      meta_ad_accounts: {
-        Row: {
-          account_status: string | null
-          business_id: string
-          created_at: string
-          currency: string | null
-          id: string
-          is_queryable: boolean
-          meta_ad_account_id: string
-          meta_business_id: string | null
-          name: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          account_status?: string | null
-          business_id: string
-          created_at?: string
-          currency?: string | null
-          id?: string
-          is_queryable?: boolean
-          meta_ad_account_id: string
-          meta_business_id?: string | null
-          name?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          account_status?: string | null
-          business_id?: string
-          created_at?: string
-          currency?: string | null
-          id?: string
-          is_queryable?: boolean
-          meta_ad_account_id?: string
-          meta_business_id?: string | null
-          name?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "meta_ad_accounts_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      meta_ad_sets: {
-        Row: {
-          billing_event: string | null
-          business_id: string
-          created_at: string
-          daily_budget: number | null
-          id: string
-          meta_ad_set_id: string
-          meta_campaign_id: string
-          name: string | null
-          optimization_goal: string | null
-          status: string | null
-          targeting: Json | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          billing_event?: string | null
-          business_id: string
-          created_at?: string
-          daily_budget?: number | null
-          id?: string
-          meta_ad_set_id: string
-          meta_campaign_id: string
-          name?: string | null
-          optimization_goal?: string | null
-          status?: string | null
-          targeting?: Json | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          billing_event?: string | null
-          business_id?: string
-          created_at?: string
-          daily_budget?: number | null
-          id?: string
-          meta_ad_set_id?: string
-          meta_campaign_id?: string
-          name?: string | null
-          optimization_goal?: string | null
-          status?: string | null
-          targeting?: Json | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "meta_ad_sets_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      meta_ads: {
-        Row: {
-          business_id: string
-          created_at: string
-          id: string
-          meta_ad_id: string
-          meta_ad_set_id: string
-          meta_creative_id: string | null
-          name: string | null
-          status: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          business_id: string
-          created_at?: string
-          id?: string
-          meta_ad_id: string
-          meta_ad_set_id: string
-          meta_creative_id?: string | null
-          name?: string | null
-          status?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          business_id?: string
-          created_at?: string
-          id?: string
-          meta_ad_id?: string
-          meta_ad_set_id?: string
-          meta_creative_id?: string | null
-          name?: string | null
-          status?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "meta_ads_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      meta_business_connections: {
-        Row: {
-          business_id: string
-          connected_at: string
-          id: string
-          last_synced_at: string | null
-          meta_business_id: string
-          meta_business_name: string | null
-          status: string
-          user_id: string
-        }
-        Insert: {
-          business_id: string
-          connected_at?: string
-          id?: string
-          last_synced_at?: string | null
-          meta_business_id: string
-          meta_business_name?: string | null
-          status?: string
-          user_id: string
-        }
-        Update: {
-          business_id?: string
-          connected_at?: string
-          id?: string
-          last_synced_at?: string | null
-          meta_business_id?: string
-          meta_business_name?: string | null
-          status?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "meta_business_connections_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      meta_campaigns: {
-        Row: {
-          bid_strategy: string | null
-          business_id: string
-          created_at: string
-          daily_budget: number | null
-          id: string
-          lifetime_budget: number | null
-          meta_ad_account_id: string
-          meta_campaign_id: string
-          name: string | null
-          objective: string | null
-          start_time: string | null
-          status: string | null
-          stop_time: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          bid_strategy?: string | null
-          business_id: string
-          created_at?: string
-          daily_budget?: number | null
-          id?: string
-          lifetime_budget?: number | null
-          meta_ad_account_id: string
-          meta_campaign_id: string
-          name?: string | null
-          objective?: string | null
-          start_time?: string | null
-          status?: string | null
-          stop_time?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          bid_strategy?: string | null
-          business_id?: string
-          created_at?: string
-          daily_budget?: number | null
-          id?: string
-          lifetime_budget?: number | null
-          meta_ad_account_id?: string
-          meta_campaign_id?: string
-          name?: string | null
-          objective?: string | null
-          start_time?: string | null
-          status?: string | null
-          stop_time?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "meta_campaigns_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      meta_catalogs: {
-        Row: {
-          business_id: string
-          created_at: string
-          id: string
-          meta_business_id: string | null
-          meta_catalog_id: string
-          name: string | null
-          product_count: number | null
-          product_set_count: number | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          business_id: string
-          created_at?: string
-          id?: string
-          meta_business_id?: string | null
-          meta_catalog_id: string
-          name?: string | null
-          product_count?: number | null
-          product_set_count?: number | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          business_id?: string
-          created_at?: string
-          id?: string
-          meta_business_id?: string | null
-          meta_catalog_id?: string
-          name?: string | null
-          product_count?: number | null
-          product_set_count?: number | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "meta_catalogs_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      meta_insights_daily: {
-        Row: {
-          business_id: string
-          clicks: number
-          conversion_value: number | null
-          conversions: number
-          cost_per_conversion: number | null
-          cpc: number | null
-          cpm: number | null
-          ctr: number | null
-          currency: string | null
-          date: string
-          entity_level: string
-          frequency: number | null
-          id: string
-          impressions: number
-          meta_ad_account_id: string
-          meta_entity_id: string
-          reach: number | null
-          roas: number | null
-          spend: number
-          synced_at: string
-          user_id: string
-        }
-        Insert: {
-          business_id: string
-          clicks?: number
-          conversion_value?: number | null
-          conversions?: number
-          cost_per_conversion?: number | null
-          cpc?: number | null
-          cpm?: number | null
-          ctr?: number | null
-          currency?: string | null
-          date: string
-          entity_level: string
-          frequency?: number | null
-          id?: string
-          impressions?: number
-          meta_ad_account_id: string
-          meta_entity_id: string
-          reach?: number | null
-          roas?: number | null
-          spend?: number
-          synced_at?: string
-          user_id: string
-        }
-        Update: {
-          business_id?: string
-          clicks?: number
-          conversion_value?: number | null
-          conversions?: number
-          cost_per_conversion?: number | null
-          cpc?: number | null
-          cpm?: number | null
-          ctr?: number | null
-          currency?: string | null
-          date?: string
-          entity_level?: string
-          frequency?: number | null
-          id?: string
-          impressions?: number
-          meta_ad_account_id?: string
-          meta_entity_id?: string
-          reach?: number | null
-          roas?: number | null
-          spend?: number
-          synced_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "meta_insights_daily_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      meta_instagram_accounts: {
-        Row: {
-          business_id: string
-          created_at: string
-          id: string
-          meta_ig_account_id: string
-          meta_page_id: string | null
-          user_id: string
-          username: string | null
-        }
-        Insert: {
-          business_id: string
-          created_at?: string
-          id?: string
-          meta_ig_account_id: string
-          meta_page_id?: string | null
-          user_id: string
-          username?: string | null
-        }
-        Update: {
-          business_id?: string
-          created_at?: string
-          id?: string
-          meta_ig_account_id?: string
-          meta_page_id?: string | null
-          user_id?: string
-          username?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "meta_instagram_accounts_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      meta_leads: {
-        Row: {
-          business_id: string
-          field_data: Json | null
-          form_id: string | null
-          id: string
-          meta_lead_id: string
-          meta_page_id: string | null
-          received_at: string | null
-          synced_at: string
-          user_id: string
-        }
-        Insert: {
-          business_id: string
-          field_data?: Json | null
-          form_id?: string | null
-          id?: string
-          meta_lead_id: string
-          meta_page_id?: string | null
-          received_at?: string | null
-          synced_at?: string
-          user_id: string
-        }
-        Update: {
-          business_id?: string
-          field_data?: Json | null
-          form_id?: string | null
-          id?: string
-          meta_lead_id?: string
-          meta_page_id?: string | null
-          received_at?: string | null
-          synced_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "meta_leads_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      meta_pages: {
-        Row: {
-          business_id: string
-          created_at: string
-          id: string
-          leadgen_tos_accepted: boolean | null
-          meta_page_id: string
-          name: string | null
-          user_id: string
-        }
-        Insert: {
-          business_id: string
-          created_at?: string
-          id?: string
-          leadgen_tos_accepted?: boolean | null
-          meta_page_id: string
-          name?: string | null
-          user_id: string
-        }
-        Update: {
-          business_id?: string
-          created_at?: string
-          id?: string
-          leadgen_tos_accepted?: boolean | null
-          meta_page_id?: string
-          name?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "meta_pages_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      meta_pixel_event_daily: {
-        Row: {
-          business_id: string
-          date: string
-          event_count: number
-          event_name: string
-          event_source: string | null
-          id: string
-          meta_pixel_id: string
-          synced_at: string
-          user_id: string
-        }
-        Insert: {
-          business_id: string
-          date: string
-          event_count?: number
-          event_name: string
-          event_source?: string | null
-          id?: string
-          meta_pixel_id: string
-          synced_at?: string
-          user_id: string
-        }
-        Update: {
-          business_id?: string
-          date?: string
-          event_count?: number
-          event_name?: string
-          event_source?: string | null
-          id?: string
-          meta_pixel_id?: string
-          synced_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "meta_pixel_event_daily_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      meta_pixels: {
-        Row: {
-          business_id: string
-          created_at: string
-          id: string
-          is_active: boolean | null
-          last_fired_at: string | null
-          meta_business_id: string | null
-          meta_pixel_id: string
-          name: string | null
-          server_last_fired_at: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          business_id: string
-          created_at?: string
-          id?: string
-          is_active?: boolean | null
-          last_fired_at?: string | null
-          meta_business_id?: string | null
-          meta_pixel_id: string
-          name?: string | null
-          server_last_fired_at?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          business_id?: string
-          created_at?: string
-          id?: string
-          is_active?: boolean | null
-          last_fired_at?: string | null
-          meta_business_id?: string | null
-          meta_pixel_id?: string
-          name?: string | null
-          server_last_fired_at?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "meta_pixels_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      meta_sync_runs: {
+      marketing_campaigns: {
         Row: {
           business_id: string | null
-          error_message: string | null
-          finished_at: string | null
+          business_name: string | null
+          channel: string
+          clicks: number
+          created_at: string
+          daily_budget: number | null
+          end_date: string | null
+          financial_scope: string
           id: string
-          rows_synced: number | null
-          started_at: string
+          impressions: number
+          name: string
+          notes: string | null
+          objective: string | null
+          result_type: string | null
+          results: number
+          revenue: number
+          start_date: string | null
           status: string
-          sync_type: string
+          total_spend: number
+          updated_at: string
+          user_id: string
         }
         Insert: {
           business_id?: string | null
-          error_message?: string | null
-          finished_at?: string | null
+          business_name?: string | null
+          channel?: string
+          clicks?: number
+          created_at?: string
+          daily_budget?: number | null
+          end_date?: string | null
+          financial_scope?: string
           id?: string
-          rows_synced?: number | null
-          started_at?: string
+          impressions?: number
+          name: string
+          notes?: string | null
+          objective?: string | null
+          result_type?: string | null
+          results?: number
+          revenue?: number
+          start_date?: string | null
           status?: string
-          sync_type: string
+          total_spend?: number
+          updated_at?: string
+          user_id: string
         }
         Update: {
           business_id?: string | null
-          error_message?: string | null
-          finished_at?: string | null
+          business_name?: string | null
+          channel?: string
+          clicks?: number
+          created_at?: string
+          daily_budget?: number | null
+          end_date?: string | null
+          financial_scope?: string
           id?: string
-          rows_synced?: number | null
-          started_at?: string
+          impressions?: number
+          name?: string
+          notes?: string | null
+          objective?: string | null
+          result_type?: string | null
+          results?: number
+          revenue?: number
+          start_date?: string | null
           status?: string
-          sync_type?: string
+          total_spend?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "meta_sync_runs_business_id_fkey"
+            foreignKeyName: "marketing_campaigns_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notes: {
+        Row: {
+          contact_id: string | null
+          content: string
+          created_at: string
+          id: string
+          lead_id: string | null
+          user_id: string
+        }
+        Insert: {
+          contact_id?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          user_id: string
+        }
+        Update: {
+          contact_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notes_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          completed_at: string | null
+          contact_id: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          lead_id: string | null
+          priority: string | null
+          status: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          lead_id?: string | null
+          priority?: string | null
+          status?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          lead_id?: string | null
+          priority?: string | null
+          status?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
             referencedColumns: ["id"]
           },
         ]
@@ -2340,12 +2092,22 @@ export type Database = {
           account_id: string
           amount: number
           attachment_url: string | null
+          business_id: string | null
+          business_name: string | null
           category: string | null
           created_at: string
+          debt_id: string | null
           deleted_at: string | null
           description: string | null
+          expense_type: string | null
+          financial_scope: string
+          flow_type: string
           id: string
+          income_type: string | null
+          interest_amount: number
+          marketing_campaign_id: string | null
           occurred_at: string
+          principal_amount: number
           reference: string | null
           source: string | null
           status: Database["public"]["Enums"]["transaction_status"]
@@ -2358,12 +2120,22 @@ export type Database = {
           account_id: string
           amount: number
           attachment_url?: string | null
+          business_id?: string | null
+          business_name?: string | null
           category?: string | null
           created_at?: string
+          debt_id?: string | null
           deleted_at?: string | null
           description?: string | null
+          expense_type?: string | null
+          financial_scope?: string
+          flow_type?: string
           id?: string
+          income_type?: string | null
+          interest_amount?: number
+          marketing_campaign_id?: string | null
           occurred_at?: string
+          principal_amount?: number
           reference?: string | null
           source?: string | null
           status?: Database["public"]["Enums"]["transaction_status"]
@@ -2376,12 +2148,22 @@ export type Database = {
           account_id?: string
           amount?: number
           attachment_url?: string | null
+          business_id?: string | null
+          business_name?: string | null
           category?: string | null
           created_at?: string
+          debt_id?: string | null
           deleted_at?: string | null
           description?: string | null
+          expense_type?: string | null
+          financial_scope?: string
+          flow_type?: string
           id?: string
+          income_type?: string | null
+          interest_amount?: number
+          marketing_campaign_id?: string | null
           occurred_at?: string
+          principal_amount?: number
           reference?: string | null
           source?: string | null
           status?: Database["public"]["Enums"]["transaction_status"]
@@ -2403,6 +2185,27 @@ export type Database = {
             columns: ["account_id"]
             isOneToOne: false
             referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_debt_id_fkey"
+            columns: ["debt_id"]
+            isOneToOne: false
+            referencedRelation: "debts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_marketing_campaign_id_fkey"
+            columns: ["marketing_campaign_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_campaigns"
             referencedColumns: ["id"]
           },
           {
@@ -2433,6 +2236,25 @@ export type Database = {
         }
         Relationships: []
       }
+      business_financial_summary: {
+        Row: {
+          business_id: string | null
+          expenses: number | null
+          income: number | null
+          month: string | null
+          operating_profit: number | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       goal_progress: {
         Row: {
           current_amount: number | null
@@ -2448,7 +2270,7 @@ export type Database = {
         Args: { p_product_id: string; p_qty: number }
         Returns: boolean
       }
-      next_order_number: { Args: Record<string, never>; Returns: string }
+      next_order_number: { Args: never; Returns: string }
     }
     Enums: {
       account_status: "active" | "archived"
@@ -2459,8 +2281,8 @@ export type Database = {
         | "credit_card"
         | "wallet"
         | "other"
-      bill_frequency: "one_time" | "weekly" | "monthly"
-      bill_status: "pending" | "paid"
+      bill_frequency: "weekly" | "monthly" | "quarterly" | "yearly" | "one_time"
+      bill_status: "active" | "paid" | "cancelled" | "pending"
       contact_status: "lead" | "active" | "inactive" | "archived"
       crm_activity_type: "call" | "email" | "meeting" | "note" | "other"
       crm_task_status: "pending" | "done"
@@ -2632,8 +2454,8 @@ export const Constants = {
         "wallet",
         "other",
       ],
-      bill_frequency: ["one_time", "weekly", "monthly"],
-      bill_status: ["pending", "paid"],
+      bill_frequency: ["weekly", "monthly", "quarterly", "yearly", "one_time"],
+      bill_status: ["active", "paid", "cancelled", "pending"],
       contact_status: ["lead", "active", "inactive", "archived"],
       crm_activity_type: ["call", "email", "meeting", "note", "other"],
       crm_task_status: ["pending", "done"],
