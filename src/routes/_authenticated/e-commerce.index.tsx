@@ -18,7 +18,8 @@ import {
   MetaAnalyticsPanel,
   OrderVolumeChart,
   RevenueAnalytics,
-} from "@/components/dailygear/dashboard/DashboardCharts";
+  DashboardChartsBoundary,
+} from "@/components/dailygear/dashboard/DashboardChartsLazy";
 import { QuickActionsGrid } from "@/components/dailygear/dashboard/QuickActionsGrid";
 import { ProfitCashFlowPanel } from "@/components/dailygear/ProfitCashFlowPanel";
 import { useCommerceData } from "@/lib/dailygear/useCommerceData";
@@ -74,10 +75,25 @@ function CommerceOverview() {
     loading: isLoading,
   };
 
-  if (tier === "mobile") return <MobileDashboard {...panels} ctx={context} />;
-  if (tier === "ultrawide" || tier === "desktop")
-    return <WideDashboard {...panels} ctx={context} dense={tier === "ultrawide"} />;
-  return <StandardDashboard {...panels} ctx={context} tablet={tier === "tablet"} />;
+  if (tier === "mobile") {
+    return (
+      <DashboardChartsBoundary>
+        <MobileDashboard {...panels} ctx={context} />
+      </DashboardChartsBoundary>
+    );
+  }
+  if (tier === "ultrawide" || tier === "desktop") {
+    return (
+      <DashboardChartsBoundary>
+        <WideDashboard {...panels} ctx={context} dense={tier === "ultrawide"} />
+      </DashboardChartsBoundary>
+    );
+  }
+  return (
+    <DashboardChartsBoundary>
+      <StandardDashboard {...panels} ctx={context} tablet={tier === "tablet"} />
+    </DashboardChartsBoundary>
+  );
 }
 
 type Panels = {
