@@ -16,6 +16,8 @@ import {
 
 const DEFAULT_GRAPH_API_VERSION = "v23.0";
 const DEFAULT_TIMEOUT_MS = 15_000;
+const DEFAULT_CACHE_TTL_MS = 5 * 60 * 1000;
+const MAX_CACHE_TTL_MS = 60 * 60 * 1000;
 
 /**
  * These are the DailyGear accounts verified through the current authorized
@@ -64,6 +66,10 @@ export interface DailyGearAdsManagerSyncOptions {
   includeInsights?: boolean;
   maxPages?: number;
   timeoutMs?: number;
+  /** Bypass the process-local cache and read fresh data from Meta. */
+  forceRefresh?: boolean;
+  /** Override the cache TTL for this request; bounded to one hour. */
+  cacheTtlMs?: number;
 }
 
 export interface DailyGearAdsManagerSyncConfig {
@@ -87,6 +93,59 @@ export interface DailyGearAdsManagerSyncResult {
   startedAt: string;
   completedAt: string;
   accounts: DailyGearAdsManagerAccountSnapshot[];
+  cache: {
+    hit: boolean;
+    fetchedAt: string;
+    expiresAt: string;
+    ttlMs: number;
+  };
+}
+
+interface CachedSyncResult {
+  result: Omit<DailyGearAdsManagerSyncResult, "cache">;
+  fetchedAtMs: number;
+  expiresAtMs: number;
+}
+
+const syncCache = new Map<string, CachedSyncResult>();
+
+function getCacheTtlMs(
+  options: DailyGearAdsManagerSyncOptions,
+  env: Record<string, string | undefined>,
+): number {
+  const configured = Number(
+    options.cacheTtlMs ?? env.META_SYNC_CACHE_TTL_MS ?? DEFAULT_CACHE_TTL_MS,
+  );
+  if (!Number.isFinite(configured) || configured < 0) return DEFAULT_CACHE_TTL_MS;
+  return Math.min(Math.floor(configured), MAX_CACHE_TTL_MS);
+}
+
+function getCacheKey(
+  accountIds: readonly DailyGearAdAccountId[],
+  options: Required<Pick<DailyGearAdsManagerSyncOptions, "includeInsights" | "maxPages">> &
+    Pick<DailyGearAdsManagerSyncOptions, "datePreset" | "timeRange">,
+  graphApiVersion: string,
+): string {
+  return JSON.stringify({
+    accountIds,
+    datePreset: options.datePreset ?? null,
+    timeRange: options.timeRange ?? null,
+    includeInsights: options.includeInsights,
+    maxPages: options.maxPages,
+    graphApiVersion,
+  });
+}
+
+function addCacheMetadata(cached: CachedSyncResult, hit: boolean): DailyGearAdsManagerSyncResult {
+  return {
+    ...cached.result,
+    cache: {
+      hit,
+      fetchedAt: new Date(cached.fetchedAtMs).toISOString(),
+      expiresAt: new Date(cached.expiresAtMs).toISOString(),
+      ttlMs: cached.expiresAtMs - cached.fetchedAtMs,
+    },
+  };
 }
 
 interface RawInsight extends MetaInsightPayload {
@@ -361,24 +420,36 @@ export async function syncDailyGearAdsManager(
   const startedAt = new Date().toISOString();
   const config = getDailyGearAdsManagerConfig(env);
   const accountIds = assertAllowedAccounts(options.accountIds ?? []);
-  const client = new MetaGraphReadClient(config, fetchImpl);
   const syncOptions = {
     includeInsights: options.includeInsights ?? true,
     maxPages: options.maxPages ?? 10,
     datePreset: options.datePreset ?? "maximum",
     timeRange: options.timeRange,
   } as const;
-
+  const ttlMs = getCacheTtlMs(options, env);
+  const key = getCacheKey(accountIds, syncOptions, config.graphApiVersion);
+  const cached = syncCache.get(key);
+  if (!options.forceRefresh && cached && cached.expiresAtMs > Date.now()) {
+    return addCacheMetadata(cached, true);
+  }
+  const client = new MetaGraphReadClient(config, fetchImpl);
   const accounts: DailyGearAdsManagerAccountSnapshot[] = [];
   for (const accountId of accountIds) {
     accounts.push(await syncAccount(client, accountId, syncOptions));
   }
 
-  return {
-    readOnly: true,
-    source: "meta-graph-api",
-    startedAt,
-    completedAt: new Date().toISOString(),
-    accounts,
+  const fetchedAtMs = Date.now();
+  const cachedResult: CachedSyncResult = {
+    result: {
+      readOnly: true,
+      source: "meta-graph-api",
+      startedAt,
+      completedAt: new Date(fetchedAtMs).toISOString(),
+      accounts,
+    },
+    fetchedAtMs,
+    expiresAtMs: fetchedAtMs + ttlMs,
   };
+  if (ttlMs > 0) syncCache.set(key, cachedResult);
+  return addCacheMetadata(cachedResult, false);
 }

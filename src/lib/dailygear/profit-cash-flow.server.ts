@@ -33,6 +33,7 @@ export interface DailyGearProfitCashFlowRequest {
   until?: string;
   includeInsights?: boolean;
   maxPages?: number;
+  forceRefresh?: boolean;
   cashEvents?: DailyGearCashFlowEvent[];
 }
 
@@ -46,6 +47,12 @@ export interface DailyGearProfitCashFlowResponse {
     adSetCount: number;
     adCount: number;
     insightCount: number;
+    cache: {
+      hit: boolean;
+      fetchedAt: string;
+      expiresAt: string;
+      ttlMs: number;
+    };
   };
 }
 
@@ -79,6 +86,7 @@ export function validateDailyGearProfitCashFlowRequest(
     until,
     includeInsights: input.includeInsights !== false,
     maxPages,
+    forceRefresh: input.forceRefresh === true,
     cashEvents: Array.isArray(input.cashEvents)
       ? (input.cashEvents as DailyGearCashFlowEvent[])
       : undefined,
@@ -112,6 +120,7 @@ export async function calculateDailyGearProfitCashFlowForUser(
       request.from || request.until ? { since: request.from, until: request.until } : undefined,
     includeInsights: request.includeInsights,
     maxPages: request.maxPages,
+    forceRefresh: request.forceRefresh,
   });
   const adInsights = adSync.accounts.flatMap((account) => account.insights);
 
@@ -137,6 +146,7 @@ export async function calculateDailyGearProfitCashFlowForUser(
       adSetCount: adSync.accounts.reduce((count, account) => count + account.adSets.length, 0),
       adCount: adSync.accounts.reduce((count, account) => count + account.ads.length, 0),
       insightCount: adInsights.length,
+      cache: adSync.cache,
     },
   };
 }

@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
+  RefreshCw,
   Banknote,
   CircleDollarSign,
   Loader2,
@@ -10,6 +11,7 @@ import {
 } from "lucide-react";
 import { getDailyGearProfitCashFlow } from "@/lib/dailygear/profit-cash-flow.functions";
 import type { DailyGearProfitCashFlowResponse } from "@/lib/dailygear/profit-cash-flow.server";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -69,13 +71,22 @@ export function ProfitCashFlowPanel() {
   const [response, setResponse] = useState<DailyGearProfitCashFlowResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshNonce, setRefreshNonce] = useState(0);
+  const forceRefreshRef = useRef(false);
 
   useEffect(() => {
+    const forceRefresh = forceRefreshRef.current;
+    forceRefreshRef.current = false;
     let active = true;
     setLoading(true);
     setError(null);
     getDailyGearProfitCashFlow({
-      data: { datePreset: period, includeInsights: true, maxPages: 10 },
+      data: {
+        datePreset: period,
+        includeInsights: true,
+        maxPages: 10,
+        forceRefresh,
+      },
     })
       .then((result) => {
         if (active) setResponse(result);
@@ -91,7 +102,7 @@ export function ProfitCashFlowPanel() {
     return () => {
       active = false;
     };
-  }, [period]);
+  }, [period, refreshNonce]);
 
   const financials = response?.financials;
   const maxDailyRevenue = useMemo(
@@ -113,18 +124,34 @@ export function ProfitCashFlowPanel() {
             Revenue, COGS, Meta Spend, operating profit, and cash conversion.
           </p>
         </div>
-        <select
-          value={period}
-          onChange={(event) => setPeriod(event.target.value as Period)}
-          className="rounded-xl border border-border/70 bg-background px-3 py-2 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/30"
-          aria-label="Profit and cash-flow period"
-        >
-          {PERIODS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="rounded-xl"
+            onClick={() => {
+              forceRefreshRef.current = true;
+              setRefreshNonce((value) => value + 1);
+            }}
+            disabled={loading}
+          >
+            <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+          <select
+            value={period}
+            onChange={(event) => setPeriod(event.target.value as Period)}
+            className="rounded-xl border border-border/70 bg-background px-3 py-2 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/30"
+            aria-label="Profit and cash-flow period"
+          >
+            {PERIODS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </CardHeader>
       <CardContent className="space-y-5">
         {loading ? (
@@ -248,6 +275,14 @@ export function ProfitCashFlowPanel() {
 
             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <Badge variant="secondary">Read-only Meta sync</Badge>
+              <Badge variant="outline">{response.meta.cache.hit ? "Cached" : "Fresh"}</Badge>
+              <span>
+                Updated{" "}
+                {new Date(response.meta.cache.fetchedAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
               <span>{response.meta.accountCount} account(s)</span>
               <span>{response.meta.campaignCount} campaign(s)</span>
               <span>{response.meta.insightCount} insight row(s)</span>
