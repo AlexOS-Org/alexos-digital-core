@@ -109,6 +109,10 @@ interface CachedSyncResult {
 
 const syncCache = new Map<string, CachedSyncResult>();
 
+export function clearDailyGearAdsManagerCache(): void {
+  syncCache.clear();
+}
+
 function getCacheTtlMs(
   options: DailyGearAdsManagerSyncOptions,
   env: Record<string, string | undefined>,

@@ -69,6 +69,7 @@ import { Route as AuthenticatedMoneyCenterTransactionsRouteImport } from './rout
 import { Route as AuthenticatedMoneyCenterTransfersRouteImport } from './routes/_authenticated/money-center.transfers'
 import { Route as AuthenticatedPeopleIndexRouteImport } from './routes/_authenticated/people.index'
 import { Route as AuthenticatedPeopleLeadsRouteImport } from './routes/_authenticated/people.leads'
+import { Route as ApiMetaAdsWebhookRouteImport } from './routes/api/meta/ads-webhook'
 import { Route as ShopPoliciesSlugRouteImport } from './routes/shop.policies.$slug'
 import { Route as ShopProductIdRouteImport } from './routes/shop.product.$id'
 import { Route as AuthenticatedPeopleContactsIdRouteImport } from './routes/_authenticated/people.contacts.$id'
@@ -404,6 +405,11 @@ const AuthenticatedPeopleLeadsRoute =
     path: '/leads',
     getParentRoute: () => AuthenticatedPeopleRoute,
   } as any)
+const ApiMetaAdsWebhookRoute = ApiMetaAdsWebhookRouteImport.update({
+  id: '/api/meta/ads-webhook',
+  path: '/api/meta/ads-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopPoliciesSlugRoute = ShopPoliciesSlugRouteImport.update({
   id: '/policies/$slug',
   path: '/policies/$slug',
@@ -484,6 +490,7 @@ export interface FileRoutesByFullPath {
   '/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/api/meta/ads-webhook': typeof ApiMetaAdsWebhookRoute
   '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
   '/shop/product/$id': typeof ShopProductIdRoute
   '/e-commerce/': typeof AuthenticatedECommerceIndexRoute
@@ -545,6 +552,7 @@ export interface FileRoutesByTo {
   '/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/api/meta/ads-webhook': typeof ApiMetaAdsWebhookRoute
   '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
   '/shop/product/$id': typeof ShopProductIdRoute
   '/e-commerce': typeof AuthenticatedECommerceIndexRoute
@@ -612,6 +620,7 @@ export interface FileRoutesById {
   '/_authenticated/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/_authenticated/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/_authenticated/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/api/meta/ads-webhook': typeof ApiMetaAdsWebhookRoute
   '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
   '/shop/product/$id': typeof ShopProductIdRoute
   '/_authenticated/e-commerce/': typeof AuthenticatedECommerceIndexRoute
@@ -679,6 +688,7 @@ export interface FileRouteTypes {
     | '/money-center/transactions'
     | '/money-center/transfers'
     | '/people/leads'
+    | '/api/meta/ads-webhook'
     | '/shop/policies/$slug'
     | '/shop/product/$id'
     | '/e-commerce/'
@@ -740,6 +750,7 @@ export interface FileRouteTypes {
     | '/money-center/transactions'
     | '/money-center/transfers'
     | '/people/leads'
+    | '/api/meta/ads-webhook'
     | '/shop/policies/$slug'
     | '/shop/product/$id'
     | '/e-commerce'
@@ -806,6 +817,7 @@ export interface FileRouteTypes {
     | '/_authenticated/money-center/transactions'
     | '/_authenticated/money-center/transfers'
     | '/_authenticated/people/leads'
+    | '/api/meta/ads-webhook'
     | '/shop/policies/$slug'
     | '/shop/product/$id'
     | '/_authenticated/e-commerce/'
@@ -820,6 +832,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ShopRoute: typeof ShopRouteWithChildren
+  ApiMetaAdsWebhookRoute: typeof ApiMetaAdsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1244,6 +1257,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPeopleLeadsRouteImport
       parentRoute: typeof AuthenticatedPeopleRoute
     }
+    '/api/meta/ads-webhook': {
+      id: '/api/meta/ads-webhook'
+      path: '/api/meta/ads-webhook'
+      fullPath: '/api/meta/ads-webhook'
+      preLoaderRoute: typeof ApiMetaAdsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/policies/$slug': {
       id: '/shop/policies/$slug'
       path: '/policies/$slug'
@@ -1470,6 +1490,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ShopRoute: ShopRouteWithChildren,
+  ApiMetaAdsWebhookRoute: ApiMetaAdsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

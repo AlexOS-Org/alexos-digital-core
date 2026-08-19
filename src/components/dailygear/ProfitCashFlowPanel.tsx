@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+const AUTO_REFRESH_INTERVAL_MS = 60_000;
+
 const PERIODS = [
   { value: "this_month", label: "This month" },
   { value: "last_30d", label: "Last 30 days" },
@@ -103,6 +105,13 @@ export function ProfitCashFlowPanel() {
       active = false;
     };
   }, [period, refreshNonce]);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setRefreshNonce((value) => value + 1);
+    }, AUTO_REFRESH_INTERVAL_MS);
+    return () => window.clearInterval(interval);
+  }, []);
 
   const financials = response?.financials;
   const maxDailyRevenue = useMemo(
@@ -276,6 +285,7 @@ export function ProfitCashFlowPanel() {
             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <Badge variant="secondary">Read-only Meta sync</Badge>
               <Badge variant="outline">{response.meta.cache.hit ? "Cached" : "Fresh"}</Badge>
+              <span>Auto-updates every minute</span>
               <span>
                 Updated{" "}
                 {new Date(response.meta.cache.fetchedAt).toLocaleTimeString([], {
