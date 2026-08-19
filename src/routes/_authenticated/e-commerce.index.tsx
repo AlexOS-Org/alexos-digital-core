@@ -20,6 +20,7 @@ import {
   RevenueAnalytics,
 } from "@/components/dailygear/dashboard/DashboardCharts";
 import { QuickActionsGrid } from "@/components/dailygear/dashboard/QuickActionsGrid";
+import { ProfitCashFlowPanel } from "@/components/dailygear/ProfitCashFlowPanel";
 import { useCommerceData } from "@/lib/dailygear/useCommerceData";
 import { computeKpis, computeTrend } from "@/lib/dailygear/calculations";
 import { DG_CURRENCY } from "@/lib/dailygear/constants";
@@ -245,6 +246,7 @@ function MobileDashboard(p: Panels) {
       </section>
 
       <QuickActionsGrid columns={4} />
+      <ProfitCashFlowPanel />
       <RevenueAnalytics trend={p.trend} loading={p.loading} height={180} />
       <LiveOrderFeed orders={p.orders} customers={p.customers} loading={p.loading} limit={4} />
       <NotificationsPanel products={p.products} orders={p.orders} loading={p.loading} />
@@ -272,6 +274,7 @@ function StandardDashboard(p: Panels & { tablet?: boolean }) {
         <KpiWall kpis={p.kpis} loading={p.loading} />
       </div>
 
+      <ProfitCashFlowPanel />
       <div className="grid gap-4 xl:grid-cols-3">
         <div className="xl:col-span-2">
           <RevenueAnalytics trend={p.trend} loading={p.loading} height={p.tablet ? 220 : 280} />
@@ -321,6 +324,7 @@ function WideDashboard(p: Panels & { dense?: boolean }) {
         <KpiWall kpis={p.kpis} loading={p.loading} />
       </div>
 
+      <ProfitCashFlowPanel />
       <div className={p.dense ? "grid gap-5 grid-cols-12" : "grid gap-5 grid-cols-8"}>
         <div className={p.dense ? "col-span-5" : "col-span-4"}>
           <RevenueAnalytics trend={p.trend} loading={p.loading} height={320} />
