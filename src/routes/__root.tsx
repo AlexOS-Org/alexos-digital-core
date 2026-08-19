@@ -140,6 +140,18 @@ function RootComponent() {
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
+  useEffect(() => {
+    let stopMonitoring: (() => void) | undefined;
+    let disposed = false;
+    void import("../lib/web-vitals").then(({ startWebVitalsMonitoring }) => {
+      if (disposed) return;
+      stopMonitoring = startWebVitalsMonitoring(1);
+    });
+    return () => {
+      disposed = true;
+      stopMonitoring?.();
+    };
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>

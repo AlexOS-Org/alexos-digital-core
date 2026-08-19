@@ -2224,6 +2224,48 @@ export type Database = {
           },
         ]
       }
+      web_vitals_events: {
+        Row: {
+          connection_type: string
+          created_at: string
+          device_class: string
+          id: string
+          load_mode: string
+          metric_name: string
+          metric_rating: string
+          metric_value: number
+          release_sha: string
+          route: string
+          user_id: string
+        }
+        Insert: {
+          connection_type: string
+          created_at?: string
+          device_class: string
+          id?: string
+          load_mode: string
+          metric_name: string
+          metric_rating: string
+          metric_value: number
+          release_sha: string
+          route: string
+          user_id: string
+        }
+        Update: {
+          connection_type?: string
+          created_at?: string
+          device_class?: string
+          id?: string
+          load_mode?: string
+          metric_name?: string
+          metric_rating?: string
+          metric_value?: number
+          release_sha?: string
+          route?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       account_balances: {
@@ -2441,7 +2483,6 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
-
 export const Constants = {
   public: {
     Enums: {
