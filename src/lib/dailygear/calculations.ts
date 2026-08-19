@@ -9,7 +9,8 @@ export function effectivePrice(p: Product) {
   return num(p.sale_price) > 0 ? num(p.sale_price) : num(p.price);
 }
 
-function inRange(iso: string, from: Date, to: Date) {
+function inRange(iso: string | null, from: Date, to: Date) {
+  if (!iso) return false;
   const t = new Date(iso).getTime();
   return t >= from.getTime() && t < to.getTime();
 }
@@ -19,7 +20,17 @@ function pctChange(current: number, previous: number) {
   return ((current - previous) / previous) * 100;
 }
 
-const COUNTS_AS_SALE: Order["status"][] = ["new", "processing", "packed", "shipped", "delivered"];
+const COUNTS_AS_SALE: NonNullable<Order["status"]>[] = [
+  "new",
+  "processing",
+  "packed",
+  "shipped",
+  "delivered",
+];
+
+function isSaleStatus(status: Order["status"]): status is NonNullable<Order["status"]> {
+  return status != null && COUNTS_AS_SALE.includes(status);
+}
 
 export function computeKpis(
   orders: Order[],
@@ -32,7 +43,7 @@ export function computeKpis(
   const start = new Date(now.getTime() - windowDays * 86_400_000);
   const prevStart = new Date(start.getTime() - windowDays * 86_400_000);
 
-  const sold = orders.filter((o) => COUNTS_AS_SALE.includes(o.status));
+  const sold = orders.filter((o) => isSaleStatus(o.status));
   const current = sold.filter((o) => inRange(o.placed_at, start, now));
   const previous = sold.filter((o) => inRange(o.placed_at, prevStart, start));
 
@@ -64,9 +75,8 @@ export function computeKpis(
     revenue,
     profit: revenue - cost,
     orders: current.length,
-    pendingOrders: orders.filter((o) =>
-      (["new", "processing", "packed"] as Order["status"][]).includes(o.status),
-    ).length,
+    pendingOrders: orders.filter((o) => ["new", "processing", "packed"].includes(o.status ?? ""))
+      .length,
     deliveredOrders: orders.filter((o) => o.status === "delivered").length,
     averageOrderValue: current.length ? revenue / current.length : 0,
     inventoryValue,
@@ -102,7 +112,7 @@ export function computeTrend(orders: Order[], items: OrderItem[], months = 6): T
   }
 
   for (const o of orders) {
-    if (!COUNTS_AS_SALE.includes(o.status)) continue;
+    if (!isSaleStatus(o.status) || !o.placed_at) continue;
     const d = new Date(o.placed_at);
     const bucket = buckets.get(`${d.getFullYear()}-${d.getMonth()}`);
     if (!bucket) continue;
@@ -151,6 +161,7 @@ export function computeProductPerformance(
 export function isDeadStock(p: ProductPerformance) {
   if (Number(p.product.stock_quantity) <= 0) return false;
   if (!p.lastSoldAt) {
+    if (!p.product.created_at) return false;
     return Date.now() - new Date(p.product.created_at).getTime() > DEAD_STOCK_DAYS * 86_400_000;
   }
   return Date.now() - new Date(p.lastSoldAt).getTime() > DEAD_STOCK_DAYS * 86_400_000;
@@ -166,9 +177,7 @@ export interface CustomerInsight {
 export function computeCustomerInsights(customers: Customer[], orders: Order[]): CustomerInsight[] {
   return customers
     .map((customer) => {
-      const rows = orders.filter(
-        (o) => o.customer_id === customer.id && COUNTS_AS_SALE.includes(o.status),
-      );
+      const rows = orders.filter((o) => o.customer_id === customer.id && isSaleStatus(o.status));
       return {
         customer,
         orders: rows.length,

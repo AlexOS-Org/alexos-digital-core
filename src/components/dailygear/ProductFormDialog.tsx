@@ -126,7 +126,7 @@ export function ProductFormDialog({
 
           <div className="space-y-2">
             <Label>Status</Label>
-            <Select value={form.status} onValueChange={(v) => set("status")(v)}>
+            <Select value={form.status ?? "draft"} onValueChange={(v) => set("status")(v)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

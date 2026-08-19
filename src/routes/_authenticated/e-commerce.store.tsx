@@ -205,8 +205,12 @@ function StorePage() {
                       <p className="text-sm font-medium">{product.name}</p>
                       <p className="text-xs text-muted-foreground">{product.sku ?? "No SKU"}</p>
                     </div>
-                    <Badge variant={product.stock_quantity > 0 ? "secondary" : "destructive"}>
-                      {product.stock_quantity > 0 ? "In stock" : "Out of stock"}
+                    <Badge
+                      variant={
+                        Number(product.stock_quantity ?? 0) > 0 ? "secondary" : "destructive"
+                      }
+                    >
+                      {Number(product.stock_quantity ?? 0) > 0 ? "In stock" : "Out of stock"}
                     </Badge>
                   </div>
                   <p className="text-2xl font-semibold">
@@ -230,7 +234,7 @@ function StorePage() {
                         unit_cost: Number(product.cost_price ?? 0),
                       })
                     }
-                    disabled={product.stock_quantity <= 0}
+                    disabled={Number(product.stock_quantity ?? 0) <= 0}
                   >
                     Add to cart
                   </Button>

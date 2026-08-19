@@ -130,13 +130,17 @@ export function computeBusinessMetrics(
   now = new Date(),
 ): BusinessMetrics {
   const { contacts, leads } = snapshot;
-  const open = leads.filter((l) => (OPEN_LEAD_STAGES as readonly string[]).includes(l.stage));
+  const open = leads.filter(
+    (l) => l.stage != null && (OPEN_LEAD_STAGES as readonly string[]).includes(l.stage),
+  );
   const won = leads.filter((l) => l.stage === "won");
   const lost = leads.filter((l) => l.stage === "lost");
   const closed = won.length + lost.length;
 
   const isStale = (lead: Lead) => {
-    const touched = new Date(lead.updated_at ?? lead.created_at).getTime();
+    const touchedAt = lead.updated_at ?? lead.created_at;
+    if (!touchedAt) return false;
+    const touched = new Date(touchedAt).getTime();
     return (now.getTime() - touched) / DAY_MS > LEAD_STALE_DAYS;
   };
 
@@ -152,7 +156,8 @@ export function computeBusinessMetrics(
     leadsTotal: leads.length,
     openLeads: open.length,
     newLeadsThisWeek: leads.filter(
-      (l) => (now.getTime() - new Date(l.created_at).getTime()) / DAY_MS <= 7,
+      (l) =>
+        l.created_at != null && (now.getTime() - new Date(l.created_at).getTime()) / DAY_MS <= 7,
     ).length,
     wonLeads: won.length,
     lostLeads: lost.length,

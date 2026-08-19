@@ -105,7 +105,7 @@ function LandingPagesPage() {
                       </p>
                     </div>
                     <Badge variant={product.status === "active" ? "secondary" : "outline"}>
-                      {product.status.replace(/_/g, " ")}
+                      {(product.status ?? "draft").replace(/_/g, " ")}
                     </Badge>
                   </div>
                   <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">

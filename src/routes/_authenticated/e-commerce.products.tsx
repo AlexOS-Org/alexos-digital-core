@@ -117,7 +117,7 @@ function ProductsPage() {
                         <p className="text-xs text-muted-foreground">{p.sku ?? "No SKU"}</p>
                       </td>
                       <td className="px-4 py-3">
-                        <StatusBadge meta={PRODUCT_STATUS_META[p.status]} />
+                        <StatusBadge meta={PRODUCT_STATUS_META[p.status ?? "draft"]} />
                       </td>
                       <td className="px-4 py-3 text-right">{money(Number(p.price))}</td>
                       <td className="px-4 py-3 text-right text-muted-foreground">

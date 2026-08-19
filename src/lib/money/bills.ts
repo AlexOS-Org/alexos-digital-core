@@ -155,7 +155,7 @@ export function useMarkBillPaid() {
           .update({
             status: "pending",
             last_paid_at: now,
-            due_date: advanceDueDate(bill.due_date, bill.frequency),
+            due_date: bill.due_date ? advanceDueDate(bill.due_date, bill.frequency) : null,
           })
           .eq("id", bill.id);
 

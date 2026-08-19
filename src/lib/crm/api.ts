@@ -86,6 +86,7 @@ export function useSaveContact() {
         user_id,
         first_name: input.first_name.trim(),
         last_name: input.last_name?.trim() || null,
+        display_name: [input.first_name.trim(), input.last_name?.trim()].filter(Boolean).join(" "),
         email: input.email?.trim() || null,
         phone: input.phone?.trim() || null,
         company: input.company?.trim() || null,

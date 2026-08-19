@@ -56,7 +56,7 @@ function LeadsPipelinePage() {
       won: [],
       lost: [],
     };
-    leads.forEach((l) => groups[l.stage].push(l));
+    leads.forEach((l) => groups[l.stage ?? "new"].push(l));
     return groups;
   }, [leads]);
 
@@ -71,14 +71,14 @@ function LeadsPipelinePage() {
       lost: 0,
     };
     leads.forEach((l) => {
-      t[l.stage] += Number(l.value ?? 0);
+      t[l.stage ?? "new"] += Number(l.value ?? 0);
     });
     return t;
   }, [leads]);
 
   const pipelineSummary = useMemo(() => {
     const openStages: LeadStage[] = ["new", "contacted", "qualified", "proposal", "negotiation"];
-    const openLeads = leads.filter((lead) => openStages.includes(lead.stage));
+    const openLeads = leads.filter((lead) => lead.stage != null && openStages.includes(lead.stage));
     const openValue = openLeads.reduce((sum, lead) => sum + Number(lead.value ?? 0), 0);
     const weightedValue = openLeads.reduce(
       (sum, lead) => sum + (Number(lead.value ?? 0) * Number(lead.probability ?? 0)) / 100,

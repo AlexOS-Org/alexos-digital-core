@@ -39,7 +39,7 @@ export const PAYMENT_STATUS_META: Record<PaymentStatus, StatusMeta> = {
   refunded: { label: "Refunded", className: "bg-muted text-muted-foreground border-border" },
 };
 
-export const PRODUCT_STATUS_META: Record<ProductStatus, StatusMeta> = {
+export const PRODUCT_STATUS_META: Record<NonNullable<ProductStatus>, StatusMeta> = {
   draft: { label: "Draft", className: "bg-muted text-muted-foreground border-border" },
   active: { label: "Active", className: "bg-success/10 text-success border-success/20" },
   archived: { label: "Archived", className: "bg-muted text-muted-foreground border-border" },
