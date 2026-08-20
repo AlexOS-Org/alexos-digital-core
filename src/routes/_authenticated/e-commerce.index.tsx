@@ -30,12 +30,12 @@ import { useDeviceTier } from "@/hooks/use-device-tier";
 export const Route = createFileRoute("/_authenticated/e-commerce/")({
   head: () => ({
     meta: [
-      { title: "DailyGear Commerce Overview | Alex OS" },
+      { title: "DailyGear Commerce Overview | AlexOS" },
       {
         name: "description",
         content: "Revenue, profit, order and inventory KPIs for your DailyGear commerce operation.",
       },
-      { property: "og:title", content: "DailyGear Commerce Overview | Alex OS" },
+      { property: "og:title", content: "DailyGear Commerce Overview | AlexOS" },
       {
         property: "og:description",
         content: "Revenue, profit, order and inventory KPIs for your commerce operation.",
