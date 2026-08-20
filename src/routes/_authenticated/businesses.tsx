@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { ArrowUpRight, Car, Gem, ShoppingBag } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -87,6 +87,7 @@ function BusinessesPage() {
           );
         })}
       </section>
+      <Outlet />
     </div>
   );
 }
