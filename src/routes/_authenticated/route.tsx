@@ -30,6 +30,16 @@ function AuthenticatedLayout() {
       (m.url !== "/dashboard" && pathname.startsWith(m.url + "/")) ||
       (m.url !== "/dashboard" && pathname.startsWith(m.url)),
   );
+  const businessContext = pathname.startsWith("/e-commerce")
+    ? "DailyGear"
+    : pathname.startsWith("/vehicle-sales")
+      ? "Car-Bar Motion.ke"
+      : pathname.startsWith("/businesses")
+        ? "Novera"
+        : null;
+  const breadcrumb = ["AlexOS", businessContext, current?.title].filter(
+    (label, index, labels): label is string => Boolean(label) && labels.indexOf(label) === index,
+  );
 
   return (
     <SidebarProvider>
@@ -43,6 +53,14 @@ function AuthenticatedLayout() {
                 {current?.group ?? "Workspace"}
               </div>
               <div className="text-sm font-semibold truncate">{current?.title ?? "AlexOS"}</div>
+              <div className="hidden items-center gap-1 text-[10px] text-muted-foreground sm:flex">
+                {breadcrumb.map((label, index) => (
+                  <span key={`${label}-${index}`}>
+                    {index > 0 && <span className="mr-1 text-muted-foreground/50">/</span>}
+                    {label}
+                  </span>
+                ))}
+              </div>
             </div>
           </header>
           {/* Extra bottom padding on mobile so content clears the bottom nav */}

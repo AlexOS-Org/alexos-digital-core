@@ -5,17 +5,17 @@ import { AlexOSEmptyState } from "@/components/alexos-empty-state";
 export const Route = createFileRoute("/_authenticated/auren")({
   component: AurenPage,
   head: () => ({
-    meta: [{ title: "Intelligence · AlexOS" }],
+    meta: [{ title: "Auren · AlexOS" }],
   }),
 });
 
 function AurenPage() {
   return (
     <AlexOSEmptyState
-      title="Intelligence"
-      description="Business signals, recommendations and intelligence across all your operations — surfaced when they matter."
+      title="Auren"
+      description="Auren will surface business signals and recommendations across your operations as live data sources are connected."
       icon={Brain}
-      statusLabel="Intelligence layer expanding"
+      statusLabel="Auren layer expanding"
     />
   );
 }

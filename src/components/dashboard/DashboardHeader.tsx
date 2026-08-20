@@ -128,7 +128,7 @@ export function DashboardHeader() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-xs font-medium text-emerald-50 backdrop-blur-md">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.9)]" />
-                Intelligence layer active
+                Auren active
               </span>
               <span className="rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-xs font-medium text-white/80 backdrop-blur-md">
                 {activeAtmosphere[0].toUpperCase() + activeAtmosphere.slice(1)}
@@ -194,7 +194,7 @@ export function DashboardHeader() {
             <div className="mt-5 flex gap-2">
               <Button className="bg-white text-slate-950 shadow-lg hover:bg-slate-100">
                 <Sparkles className="mr-2 h-4 w-4 text-[var(--alexos-purple)]" />
-                Intelligence
+                Auren
               </Button>
               <Button
                 size="icon"
@@ -219,9 +219,7 @@ export function DashboardHeader() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="font-semibold tracking-tight">
-                    Intelligence surfaces what matters.
-                  </h2>
+                  <h2 className="font-semibold tracking-tight">Auren surfaces what matters.</h2>
                   <span className="rounded-full bg-violet-400/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-violet-200">
                     Live
                   </span>
@@ -236,7 +234,7 @@ export function DashboardHeader() {
               variant="ghost"
               className="w-fit text-violet-200 hover:bg-white/5 hover:text-white"
             >
-              Open intelligence
+              Open Auren
               <ArrowUpRight className="ml-2 h-4 w-4" />
             </Button>
           </div>

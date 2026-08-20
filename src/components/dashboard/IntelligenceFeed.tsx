@@ -15,7 +15,7 @@ function Shell({ children, badge }: { children: React.ReactNode; badge: React.Re
             <Radar className="h-5 w-5" />
           </div>
           <div>
-            <CardTitle className="text-base text-white">Intelligence Feed</CardTitle>
+            <CardTitle className="text-base text-white">Auren Feed</CardTitle>
             <p className="mt-0.5 text-xs text-slate-400">Operational signals from your live data</p>
           </div>
         </div>

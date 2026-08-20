@@ -16,9 +16,9 @@ export default function IntelligenceSearch() {
           type="text"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search intelligence — cash position, overdue bills, pipeline value…"
+          placeholder="Ask Auren about cash position, overdue bills, pipeline value…"
           className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-          aria-label="Intelligence search"
+          aria-label="Ask Auren"
         />
       </div>
       <p className="mt-2 flex items-center gap-1.5 pl-8 text-[11px] text-muted-foreground">

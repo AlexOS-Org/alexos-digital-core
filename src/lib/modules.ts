@@ -27,7 +27,7 @@ export type ModuleGroup =
   | "Home"
   | "Businesses"
   | "Money"
-  | "Intelligence"
+  | "Auren"
   | "Growth"
   | "Library"
   | "Missions"
@@ -69,7 +69,7 @@ export const modules: ModuleDef[] = [
   },
   {
     title: "Novera",
-    url: "/businesses",
+    url: "/businesses/novera",
     icon: Gem,
     description: "Business operations and growth for Novera.",
     group: "Businesses",
@@ -105,13 +105,13 @@ export const modules: ModuleDef[] = [
     group: "Money",
   },
 
-  // ── Intelligence ─────────────────────────────────────
+  // ── Auren ────────────────────────────────────────────
   {
-    title: "Intelligence",
+    title: "Auren",
     url: "/auren",
     icon: Brain,
-    description: "Business signals, recommendations and intelligence.",
-    group: "Intelligence",
+    description: "Business signals and recommendations across your operations.",
+    group: "Auren",
   },
 
   // ── Growth ───────────────────────────────────────────
@@ -206,7 +206,7 @@ export const moduleGroups: ModuleGroup[] = [
   "Home",
   "Businesses",
   "Money",
-  "Intelligence",
+  "Auren",
   "Growth",
   "Library",
   "Missions",
@@ -218,7 +218,7 @@ export const moduleGroups: ModuleGroup[] = [
 export const bottomNavItems = [
   { title: "Home", url: "/dashboard", icon: LayoutDashboard },
   { title: "Businesses", url: "/businesses", icon: Building2 },
-  { title: "Intelligence", url: "/auren", icon: Brain },
+  { title: "Auren", url: "/auren", icon: Brain },
   { title: "Money", url: "/money-center", icon: Wallet },
   { title: "Library", url: "/library", icon: BookOpen },
 ] as const;

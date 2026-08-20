@@ -78,7 +78,7 @@ function Dashboard() {
         <section className="space-y-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-600 dark:text-violet-300">
-              Intelligence
+              Auren
             </p>
             <h2 className="mt-1 text-2xl font-semibold tracking-tight">
               What deserves your attention?
