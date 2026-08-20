@@ -26,6 +26,8 @@ import { useCommerceData } from "@/lib/dailygear/useCommerceData";
 import { computeKpis, computeTrend } from "@/lib/dailygear/calculations";
 import { DG_CURRENCY } from "@/lib/dailygear/constants";
 import { useDeviceTier } from "@/hooks/use-device-tier";
+import dailyGearMountainWide from "@/assets/visuals/dailygear-mountain-golden-wide.webp";
+import dailyGearMountainMobile from "@/assets/visuals/dailygear-mountain-mobile.webp";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/")({
   head: () => ({
@@ -115,8 +117,19 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   return (
-    <section className="rise-in overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-primary/[0.10] via-card to-card p-5 soft-shadow sm:p-7">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:flex-wrap sm:justify-between">
+    <section className="rise-in relative overflow-hidden rounded-3xl border border-white/15 bg-[#0c2340] p-5 text-white soft-shadow sm:p-7">
+      <picture className="pointer-events-none absolute inset-0 block">
+        <source media="(max-width: 640px)" srcSet={dailyGearMountainMobile} />
+        <img
+          src={dailyGearMountainWide}
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+          className="h-full w-full object-cover opacity-55"
+        />
+      </picture>
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(100deg,rgba(6,21,43,0.95),rgba(7,28,55,0.68),rgba(6,21,43,0.35))]" />
+      <div className="relative z-10 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:flex-wrap sm:justify-between">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
             DailyGear commerce

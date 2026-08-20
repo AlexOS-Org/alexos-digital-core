@@ -4,12 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getDailyInspiration } from "@/lib/dashboard/inspiration";
 import { DashboardWeather } from "@/components/dashboard/DashboardWeather";
+import alexosMountainWide from "@/assets/visuals/alexos-mountain-dusk-wide.webp";
+import alexosMountainMobile from "@/assets/visuals/alexos-mountain-mobile.webp";
 
 type Atmosphere = "auto" | "morning" | "day" | "evening" | "night";
 type TimeFormat = "12h" | "24h";
+type Backdrop = "mountains" | "gradient";
 
 const ATMOSPHERE_KEY = "alexos-dashboard-atmosphere";
 const TIME_FORMAT_KEY = "alexos-dashboard-time-format";
+const BACKDROP_KEY = "alexos-dashboard-backdrop";
 
 function getTimeAtmosphere(hour: number): Exclude<Atmosphere, "auto"> {
   if (hour >= 5 && hour < 11) return "morning";
@@ -72,6 +76,10 @@ export function DashboardHeader() {
     if (typeof window === "undefined") return "24h";
     return window.localStorage.getItem(TIME_FORMAT_KEY) === "12h" ? "12h" : "24h";
   });
+  const [backdrop, setBackdrop] = useState<Backdrop>(() => {
+    if (typeof window === "undefined") return "mountains";
+    return window.localStorage.getItem(BACKDROP_KEY) === "gradient" ? "gradient" : "mountains";
+  });
   const [showAtmosphereMenu, setShowAtmosphereMenu] = useState(false);
 
   useEffect(() => {
@@ -103,12 +111,29 @@ export function DashboardHeader() {
     window.localStorage.setItem(TIME_FORMAT_KEY, next);
   };
 
+  const setBackdropPreference = (value: Backdrop) => {
+    setBackdrop(value);
+    window.localStorage.setItem(BACKDROP_KEY, value);
+  };
+
   return (
     <div className="space-y-5">
       <section
         className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/15 text-white shadow-[0_24px_70px_-30px_rgba(37,99,235,0.42)] transition-[background] duration-[1800ms] ease-in-out sm:min-h-[330px]"
         style={{ background: visual.background }}
       >
+        {backdrop === "mountains" ? (
+          <picture className="pointer-events-none absolute inset-0 block">
+            <source media="(max-width: 640px)" srcSet={alexosMountainMobile} />
+            <img
+              src={alexosMountainWide}
+              alt=""
+              aria-hidden="true"
+              fetchPriority="high"
+              className="h-full w-full object-cover object-center opacity-85"
+            />
+          </picture>
+        ) : null}
         <div className="pointer-events-none absolute -left-20 top-8 h-44 w-44 rounded-full bg-emerald-300/15 blur-3xl" />
         <div className="pointer-events-none absolute left-[35%] -top-16 h-52 w-52 rounded-full bg-violet-400/15 blur-3xl" />
         <div className="pointer-events-none absolute -right-16 bottom-4 h-64 w-64 rounded-full bg-cyan-300/15 blur-3xl" />
@@ -175,6 +200,19 @@ export function DashboardHeader() {
                       </button>
                     ),
                   )}
+                  <p className="mt-2 border-t border-white/10 px-2 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wider text-white/45">
+                    Backdrop
+                  </p>
+                  {(["mountains", "gradient"] as Backdrop[]).map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setBackdropPreference(option)}
+                      className={`w-full rounded-xl px-2 py-2 text-left text-xs transition-colors ${backdrop === option ? "bg-white/10 text-white" : "text-white/65 hover:bg-white/5 hover:text-white"}`}
+                    >
+                      {option === "mountains" ? "Mountain ridges" : "Colour field"}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>

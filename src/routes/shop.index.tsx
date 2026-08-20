@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductCard } from "@/components/storefront/ProductCard";
 import { useStoreCategories, useStoreProducts, useStorefront } from "@/lib/storefront/api";
+import dailyGearMountainWide from "@/assets/visuals/dailygear-mountain-golden-wide.webp";
+import dailyGearMountainMobile from "@/assets/visuals/dailygear-mountain-mobile.webp";
 
 export const Route = createFileRoute("/shop/")({
   head: () => ({
@@ -34,7 +36,7 @@ function StoreHome() {
   const primaryCategories = (categories ?? []).filter((category) => !category.parent_id);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:py-12">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:py-12 4k:max-w-[1800px] 4k:px-8">
       <section className="overflow-hidden rounded-3xl border bg-gradient-to-br from-primary/10 via-background to-background">
         <div className="grid items-center gap-8 p-6 sm:p-12 lg:grid-cols-2">
           <div className="min-w-0 space-y-5">
@@ -60,18 +62,33 @@ function StoreHome() {
               </Button>
             </div>
           </div>
-          <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-muted">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#0c2340] shadow-[0_24px_60px_-28px_rgba(15,23,42,0.55)]">
             {store?.hero_image_url ? (
               <img
                 src={store.hero_image_url}
                 alt={store.name}
+                fetchPriority="high"
+                decoding="async"
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
-                Add a hero image in Storefront settings
-              </div>
+              <picture className="block h-full w-full">
+                <source media="(max-width: 640px)" srcSet={dailyGearMountainMobile} />
+                <img
+                  src={dailyGearMountainWide}
+                  alt="Layered highland mountain landscape for DailyGear"
+                  fetchPriority="high"
+                  decoding="async"
+                  className="h-full w-full object-cover"
+                />
+              </picture>
             )}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#06152b]/65 via-transparent to-transparent" />
+            {!store?.hero_image_url ? (
+              <span className="absolute bottom-4 left-4 rounded-full border border-white/20 bg-black/25 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/85 backdrop-blur-md">
+                DailyGear visual foundation
+              </span>
+            ) : null}
           </div>
         </div>
       </section>
