@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Package, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Package, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { StatusBadge } from "@/components/dailygear/StatusBadge";
 import { ProductFormDialog } from "@/components/dailygear/ProductFormDialog";
@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useDeleteProduct, useProducts } from "@/lib/dailygear/api";
+import { useDeleteProduct, useProductEvidence, useProducts } from "@/lib/dailygear/api";
 import { DG_CURRENCY, PRODUCT_STATUS_META } from "@/lib/dailygear/constants";
+import { getProductReadiness } from "@/lib/dailygear/types";
 import type { Product } from "@/lib/dailygear/types";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/products")({
@@ -37,10 +38,20 @@ const money = (v: number) =>
 
 function ProductsPage() {
   const { data: products = [], isLoading } = useProducts();
+  const { data: evidence = [] } = useProductEvidence();
   const remove = useDeleteProduct();
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<Product | null>(null);
   const [open, setOpen] = useState(false);
+
+  const evidenceCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const record of evidence) {
+      if (record.product_id)
+        counts.set(record.product_id, (counts.get(record.product_id) ?? 0) + 1);
+    }
+    return counts;
+  }, [evidence]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -101,6 +112,7 @@ function ProductsPage() {
                 <tr>
                   <th className="px-4 py-3 font-medium">Product</th>
                   <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium">Readiness</th>
                   <th className="px-4 py-3 font-medium text-right">Price</th>
                   <th className="px-4 py-3 font-medium text-right">Cost</th>
                   <th className="px-4 py-3 font-medium text-right">Stock</th>
@@ -110,6 +122,7 @@ function ProductsPage() {
               <tbody>
                 {filtered.map((p) => {
                   const low = Number(p.stock_quantity) <= Number(p.low_stock_threshold);
+                  const readiness = getProductReadiness(p, evidenceCounts.get(p.id) ?? 0);
                   return (
                     <tr key={p.id} className="border-t border-border/70">
                       <td className="px-4 py-3">
@@ -118,6 +131,26 @@ function ProductsPage() {
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge meta={PRODUCT_STATUS_META[p.status ?? "draft"]} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-medium ${
+                            readiness.readyToPublish
+                              ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                              : "bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                          }`}
+                        >
+                          {readiness.readyToPublish ? (
+                            <CheckCircle2 className="h-3 w-3" />
+                          ) : (
+                            <AlertTriangle className="h-3 w-3" />
+                          )}
+                          {readiness.readyToPublish ? "Ready" : "Needs verification"}
+                        </span>
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                          {evidenceCounts.get(p.id) ?? 0} source record
+                          {evidenceCounts.get(p.id) === 1 ? "" : "s"}
+                        </p>
                       </td>
                       <td className="px-4 py-3 text-right">{money(Number(p.price))}</td>
                       <td className="px-4 py-3 text-right text-muted-foreground">

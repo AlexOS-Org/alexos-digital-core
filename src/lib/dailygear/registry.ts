@@ -13,6 +13,7 @@ import {
   Settings,
   Truck,
   Wallet,
+  FileCheck,
   type LucideIcon,
 } from "lucide-react";
 
@@ -109,6 +110,13 @@ export const DAILYGEAR_SECTIONS: DailyGearSection[] = [
     description: "Channel performance, ROAS, CTR, CPC and CPA.",
     group: "Growth",
     preview: true,
+  },
+  {
+    to: "/e-commerce/evidence",
+    label: "Source reconciliation",
+    icon: FileCheck,
+    description: "Verified product, marketing and availability evidence.",
+    group: "Growth",
   },
   {
     to: "/e-commerce/landing-pages",

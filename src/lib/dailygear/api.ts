@@ -13,6 +13,7 @@ import type {
   OrderItem,
   OrderEvent,
   StockMovement,
+  ProductEvidence,
 } from "./types";
 
 /**
@@ -33,7 +34,8 @@ type DgTable =
   | "dg_orders"
   | "dg_order_items"
   | "dg_order_events"
-  | "dg_stock_movements";
+  | "dg_stock_movements"
+  | "dg_product_evidence";
 
 const SOFT_DELETE_TABLES = new Set<DgTable>([
   "dg_categories",
@@ -170,6 +172,9 @@ export const orderEventsResource = createResource<OrderEvent>("dg_order_events",
 export const stockMovementsResource = createResource<StockMovement>("dg_stock_movements", {
   orderBy: { column: "occurred_at", ascending: false },
 });
+export const productEvidenceResource = createResource<ProductEvidence>("dg_product_evidence", {
+  orderBy: { column: "created_at", ascending: false },
+});
 
 /* ── Convenience hooks ────────────────────────────────────────── */
 
@@ -195,6 +200,10 @@ export const useOrderEvents = orderEventsResource.useList;
 
 export const useStockMovements = stockMovementsResource.useList;
 export const useSaveStockMovement = () => stockMovementsResource.useSave("Stock movement");
+export const useProductEvidence = (productId?: string) =>
+  productEvidenceResource.useList(productId ? { product_id: productId } : undefined);
+export const useSaveProductEvidence = () => productEvidenceResource.useSave("Evidence record");
+export const useDeleteProductEvidence = () => productEvidenceResource.useRemove("Evidence record");
 export const useVariants = variantsResource.useList;
 
 /** Order status change + timeline entry, kept out of the components. */
@@ -335,37 +344,19 @@ export function useSaveOrderWithItems() {
         const sales = draft.items.filter((i) => i.product_id);
         if (sales.length) {
           for (const item of sales) {
-            if (item.variant_id) {
-              const { data: variant, error: variantError } = await supabase
-                .from("dg_product_variants")
-                .select("stock_quantity")
-                .eq("id", item.variant_id)
-                .single();
-              if (variantError) throw variantError;
-              if (variant == null || Number(variant.stock_quantity) < item.quantity) {
-                throw new Error(`Insufficient stock for variant ${item.name}`);
-              }
-              const { error: variantUpdateError } = await supabase
-                .from("dg_product_variants")
-                .update({ stock_quantity: Number(variant.stock_quantity) - item.quantity })
-                .eq("id", item.variant_id);
-              if (variantUpdateError) throw variantUpdateError;
-            }
-
-            const { data: product, error: productError } = await supabase
-              .from("dg_products")
-              .select("stock_quantity")
-              .eq("id", item.product_id!)
-              .single();
-            if (productError) throw productError;
-            if (product == null || Number(product.stock_quantity) < item.quantity) {
+            const { data: reserved, error: reserveError } = item.variant_id
+              ? await supabase.rpc("dg_reserve_variant_stock", {
+                  p_product_id: item.product_id!,
+                  p_variant_id: item.variant_id,
+                  p_qty: item.quantity,
+                })
+              : await supabase.rpc("dg_reserve_stock", {
+                  p_product_id: item.product_id!,
+                  p_qty: item.quantity,
+                });
+            if (reserveError || reserved !== true) {
               throw new Error(`Insufficient stock for ${item.name}`);
             }
-            const { error: productUpdateError } = await supabase
-              .from("dg_products")
-              .update({ stock_quantity: Number(product.stock_quantity) - item.quantity })
-              .eq("id", item.product_id!);
-            if (productUpdateError) throw productUpdateError;
           }
 
           const { error } = await supabase.from("dg_stock_movements").insert(

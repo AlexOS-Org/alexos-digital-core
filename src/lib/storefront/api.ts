@@ -17,7 +17,7 @@ export type StoreBrand = Tables<"dg_brands">;
 
 /** Fields safe to expose publicly — cost price and internals stay server-side. */
 const PRODUCT_COLUMNS =
-  "id,user_id,name,description,price,sale_price,currency,images,tags,sku,stock_quantity,status,category_id,brand_id,attributes,created_at";
+  "id,user_id,name,slug,description,short_description,seo_title,seo_description,seo_keywords,image_alt_text,price,sale_price,currency,images,tags,sku,stock_quantity,status,category_id,brand_id,attributes,availability_confirmed,created_at";
 
 export const STORE_KEY = ["storefront"] as const;
 
@@ -113,7 +113,7 @@ export function useStoreVariants(productId: string | undefined) {
       const { data, error } = await supabase
         .from("dg_product_variants")
         .select(
-          "id,product_id,name,sku,price,sale_price,stock_quantity,image_url,options,sort_order",
+          "id,product_id,name,sku,price,sale_price,stock_quantity,image_url,options,color,availability_confirmed,sort_order",
         )
         .eq("product_id", productId!)
         .is("deleted_at", null)

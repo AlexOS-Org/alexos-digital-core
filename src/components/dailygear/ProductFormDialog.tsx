@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,9 +24,16 @@ import type { Product, ProductStatus } from "@/lib/dailygear/types";
 
 const EMPTY = {
   name: "",
+  slug: "",
   sku: "",
   description: "",
-  status: "active" as ProductStatus,
+  short_description: "",
+  seo_title: "",
+  seo_description: "",
+  seo_keywords: "",
+  image_alt_text: "",
+  status: "draft" as ProductStatus,
+  availability_confirmed: "false",
   price: "",
   sale_price: "",
   cost_price: "",
@@ -57,9 +65,16 @@ export function ProductFormDialog({
       product
         ? {
             name: product.name,
+            slug: product.slug ?? "",
             sku: product.sku ?? "",
             description: product.description ?? "",
-            status: product.status,
+            short_description: product.short_description ?? "",
+            seo_title: product.seo_title ?? "",
+            seo_description: product.seo_description ?? "",
+            seo_keywords: (product.seo_keywords ?? []).join(", "),
+            image_alt_text: product.image_alt_text ?? "",
+            status: product.status ?? "draft",
+            availability_confirmed: product.availability_confirmed ? "true" : "false",
             price: String(product.price ?? ""),
             sale_price: product.sale_price != null ? String(product.sale_price) : "",
             cost_price: String(product.cost_price ?? ""),
@@ -74,18 +89,31 @@ export function ProductFormDialog({
   }, [open, product]);
 
   const set = (key: keyof typeof EMPTY) => (value: string) =>
-    setForm((f) => ({ ...f, [key]: value }));
+    setForm((current) => ({ ...current, [key]: value }));
 
-  const invalid = !form.name.trim() || Number(form.price) <= 0;
+  const hasMinimumStock = Number(form.stock_quantity) >= 15;
+  const publicationBlocked =
+    form.status === "active" && (!hasMinimumStock || form.availability_confirmed !== "true");
+  const invalid = !form.name.trim() || Number(form.price) <= 0 || publicationBlocked;
 
   async function submit() {
     if (invalid) return;
     await save.mutateAsync({
       ...(product ? { id: product.id } : {}),
       name: form.name.trim(),
+      slug: form.slug.trim() || null,
       sku: form.sku.trim() || null,
       description: form.description.trim() || null,
+      short_description: form.short_description.trim() || null,
+      seo_title: form.seo_title.trim() || null,
+      seo_description: form.seo_description.trim() || null,
+      seo_keywords: form.seo_keywords
+        .split(",")
+        .map((keyword) => keyword.trim())
+        .filter(Boolean),
+      image_alt_text: form.image_alt_text.trim() || null,
       status: form.status,
+      availability_confirmed: form.availability_confirmed === "true",
       price: Number(form.price) || 0,
       sale_price: form.sale_price ? Number(form.sale_price) : null,
       cost_price: Number(form.cost_price) || 0,
@@ -100,18 +128,27 @@ export function ProductFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{product ? "Edit product" : "New product"}</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="sm:col-span-2 space-y-2">
+          <div className="space-y-2 sm:col-span-2">
             <Label>Name</Label>
             <Input
               value={form.name}
               onChange={(e) => set("name")(e.target.value)}
               placeholder="Leather laptop backpack"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Public slug</Label>
+            <Input
+              value={form.slug}
+              onChange={(e) => set("slug")(e.target.value)}
+              placeholder="leather-laptop-backpack"
             />
           </div>
 
@@ -126,7 +163,7 @@ export function ProductFormDialog({
 
           <div className="space-y-2">
             <Label>Status</Label>
-            <Select value={form.status ?? "draft"} onValueChange={(v) => set("status")(v)}>
+            <Select value={form.status ?? "draft"} onValueChange={(value) => set("status")(value)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -141,9 +178,26 @@ export function ProductFormDialog({
           </div>
 
           <div className="space-y-2">
+            <Label>Availability evidence</Label>
+            <Select
+              value={form.availability_confirmed}
+              onValueChange={(value) => set("availability_confirmed")(value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="false">Not confirmed</SelectItem>
+                <SelectItem value="true">Confirmed from source</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
             <Label>Selling price</Label>
             <Input
               type="number"
+              min="0"
               value={form.price}
               onChange={(e) => set("price")(e.target.value)}
               placeholder="0"
@@ -154,6 +208,7 @@ export function ProductFormDialog({
             <Label>Sale price (optional)</Label>
             <Input
               type="number"
+              min="0"
               value={form.sale_price}
               onChange={(e) => set("sale_price")(e.target.value)}
               placeholder="0"
@@ -164,6 +219,7 @@ export function ProductFormDialog({
             <Label>Cost price</Label>
             <Input
               type="number"
+              min="0"
               value={form.cost_price}
               onChange={(e) => set("cost_price")(e.target.value)}
               placeholder="0"
@@ -174,6 +230,7 @@ export function ProductFormDialog({
             <Label>Stock quantity</Label>
             <Input
               type="number"
+              min="0"
               value={form.stock_quantity}
               onChange={(e) => set("stock_quantity")(e.target.value)}
               placeholder="0"
@@ -184,6 +241,7 @@ export function ProductFormDialog({
             <Label>Low stock alert at</Label>
             <Input
               type="number"
+              min="0"
               value={form.low_stock_threshold}
               onChange={(e) => set("low_stock_threshold")(e.target.value)}
             />
@@ -193,16 +251,16 @@ export function ProductFormDialog({
             <Label>Category</Label>
             <Select
               value={form.category_id || "none"}
-              onValueChange={(v) => set("category_id")(v === "none" ? "" : v)}
+              onValueChange={(value) => set("category_id")(value === "none" ? "" : value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Uncategorised" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Uncategorised</SelectItem>
-                {categories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -213,16 +271,16 @@ export function ProductFormDialog({
             <Label>Brand</Label>
             <Select
               value={form.brand_id || "none"}
-              onValueChange={(v) => set("brand_id")(v === "none" ? "" : v)}
+              onValueChange={(value) => set("brand_id")(value === "none" ? "" : value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="No brand" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">No brand</SelectItem>
-                {brands.map((b) => (
-                  <SelectItem key={b.id} value={b.id}>
-                    {b.name}
+                {brands.map((brand) => (
+                  <SelectItem key={brand.id} value={brand.id}>
+                    {brand.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -233,31 +291,99 @@ export function ProductFormDialog({
             <Label>Supplier</Label>
             <Select
               value={form.supplier_id || "none"}
-              onValueChange={(v) => set("supplier_id")(v === "none" ? "" : v)}
+              onValueChange={(value) => set("supplier_id")(value === "none" ? "" : value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="No supplier" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">No supplier</SelectItem>
-                {suppliers.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.name}
+                {suppliers.map((supplier) => (
+                  <SelectItem key={supplier.id} value={supplier.id}>
+                    {supplier.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="sm:col-span-2 space-y-2">
-            <Label>Description</Label>
+          <div className="space-y-2 sm:col-span-2">
+            <Label>Short description</Label>
             <Textarea
-              rows={3}
-              value={form.description}
-              onChange={(e) => set("description")(e.target.value)}
-              placeholder="Sales copy shown on landing pages and product listings."
+              rows={2}
+              value={form.short_description}
+              onChange={(e) => set("short_description")(e.target.value)}
+              placeholder="A concise, search-friendly product promise."
             />
           </div>
+
+          <div className="space-y-2 sm:col-span-2">
+            <Label>Description</Label>
+            <Textarea
+              rows={4}
+              value={form.description}
+              onChange={(e) => set("description")(e.target.value)}
+              placeholder="Accurate product details, materials, fit, delivery and care information."
+            />
+          </div>
+
+          <div className="rounded-2xl border border-border/70 bg-muted/30 p-4 sm:col-span-2">
+            <p className="text-sm font-semibold">Search preview fields</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              These fields power page titles, descriptions, image alternatives and future structured
+              data. Avoid unsupported claims or copied competitor language.
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>SEO title</Label>
+                <Input
+                  value={form.seo_title}
+                  onChange={(e) => set("seo_title")(e.target.value)}
+                  placeholder="Leather Laptop Backpack | DailyGear Kenya"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Image alt text</Label>
+                <Input
+                  value={form.image_alt_text}
+                  onChange={(e) => set("image_alt_text")(e.target.value)}
+                  placeholder="Black leather laptop backpack"
+                />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label>SEO description</Label>
+                <Textarea
+                  rows={2}
+                  value={form.seo_description}
+                  onChange={(e) => set("seo_description")(e.target.value)}
+                  placeholder="Describe the product accurately for Kenyan shoppers."
+                />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label>SEO keywords</Label>
+                <Input
+                  value={form.seo_keywords}
+                  onChange={(e) => set("seo_keywords")(e.target.value)}
+                  placeholder="laptop backpack, leather backpack, DailyGear Kenya"
+                />
+              </div>
+            </div>
+          </div>
+
+          {publicationBlocked ? (
+            <div className="flex gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm sm:col-span-2">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+              <div>
+                <p className="font-semibold">
+                  Publication is blocked until the catalogue is ready.
+                </p>
+                <p className="mt-1 text-muted-foreground">
+                  An active product needs confirmed availability and at least 15 units. Keep it as a
+                  draft until the source and stock are verified.
+                </p>
+              </div>
+            </div>
+          ) : null}
         </div>
 
         <DialogFooter>

@@ -1236,7 +1236,9 @@ export type Database = {
       }
       dg_product_variants: {
         Row: {
+          availability_confirmed: boolean
           barcode: string | null
+          color: string | null
           cost_price: number | null
           created_at: string
           deleted_at: string | null
@@ -1254,7 +1256,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          availability_confirmed?: boolean
           barcode?: string | null
+          color?: string | null
           cost_price?: number | null
           created_at?: string
           deleted_at?: string | null
@@ -1272,7 +1276,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          availability_confirmed?: boolean
           barcode?: string | null
+          color?: string | null
           cost_price?: number | null
           created_at?: string
           deleted_at?: string | null
@@ -1299,9 +1305,84 @@ export type Database = {
           },
         ]
       }
+      dg_product_evidence: {
+        Row: {
+          confidence: "high" | "medium" | "low"
+          created_at: string
+          historical: boolean
+          id: string
+          metadata: Json
+          observed_attributes: Json
+          observed_currency: string
+          observed_price: number | null
+          product_id: string | null
+          raw_excerpt: string | null
+          reconciliation_status: "candidate" | "matched" | "verified" | "rejected"
+          source_date: string | null
+          source_id: string | null
+          source_label: string
+          source_type: "commerce_manager" | "meta_ad" | "instagram_post" | "facebook_post" | "pixel_event" | "existing_app" | "image_asset" | "competitor_research" | "auren_recommendation"
+          source_url: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          confidence?: "high" | "medium" | "low"
+          created_at?: string
+          historical?: boolean
+          id?: string
+          metadata?: Json
+          observed_attributes?: Json
+          observed_currency?: string
+          observed_price?: number | null
+          product_id?: string | null
+          raw_excerpt?: string | null
+          reconciliation_status?: "candidate" | "matched" | "verified" | "rejected"
+          source_date?: string | null
+          source_id?: string | null
+          source_label: string
+          source_type: "commerce_manager" | "meta_ad" | "instagram_post" | "facebook_post" | "pixel_event" | "existing_app" | "image_asset" | "competitor_research" | "auren_recommendation"
+          source_url?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          confidence?: "high" | "medium" | "low"
+          created_at?: string
+          historical?: boolean
+          id?: string
+          metadata?: Json
+          observed_attributes?: Json
+          observed_currency?: string
+          observed_price?: number | null
+          product_id?: string | null
+          raw_excerpt?: string | null
+          reconciliation_status?: "candidate" | "matched" | "verified" | "rejected"
+          source_date?: string | null
+          source_id?: string | null
+          source_label?: string
+          source_type?: "commerce_manager" | "meta_ad" | "instagram_post" | "facebook_post" | "pixel_event" | "existing_app" | "image_asset" | "competitor_research" | "auren_recommendation"
+          source_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dg_product_evidence_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dg_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dg_products: {
         Row: {
           attributes: Json | null
+          availability_confirmed: boolean
           barcode: string | null
           brand_id: string | null
           category_id: string | null
@@ -1311,12 +1392,18 @@ export type Database = {
           deleted_at: string | null
           description: string | null
           id: string
+          image_alt_text: string | null
           images: string[] | null
           low_stock_threshold: number | null
           name: string
           price: number | null
           sale_price: number | null
+          seo_description: string | null
+          seo_keywords: string[] | null
+          seo_title: string | null
+          short_description: string | null
           sku: string | null
+          slug: string | null
           status: Database["public"]["Enums"]["dg_product_status"] | null
           stock_quantity: number | null
           supplier_id: string | null
@@ -1326,6 +1413,7 @@ export type Database = {
         }
         Insert: {
           attributes?: Json | null
+          availability_confirmed?: boolean
           barcode?: string | null
           brand_id?: string | null
           category_id?: string | null
@@ -1335,12 +1423,18 @@ export type Database = {
           deleted_at?: string | null
           description?: string | null
           id?: string
+          image_alt_text?: string | null
           images?: string[] | null
           low_stock_threshold?: number | null
           name: string
           price?: number | null
           sale_price?: number | null
+          seo_description?: string | null
+          seo_keywords?: string[] | null
+          seo_title?: string | null
+          short_description?: string | null
           sku?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["dg_product_status"] | null
           stock_quantity?: number | null
           supplier_id?: string | null
@@ -1359,12 +1453,18 @@ export type Database = {
           deleted_at?: string | null
           description?: string | null
           id?: string
+          image_alt_text?: string | null
           images?: string[] | null
           low_stock_threshold?: number | null
           name?: string
           price?: number | null
           sale_price?: number | null
+          seo_description?: string | null
+          seo_keywords?: string[] | null
+          seo_title?: string | null
+          short_description?: string | null
           sku?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["dg_product_status"] | null
           stock_quantity?: number | null
           supplier_id?: string | null
@@ -2308,6 +2408,10 @@ export type Database = {
     }
     Functions: {
       dg_is_published_store: { Args: { _user_id: string }; Returns: boolean }
+      dg_reserve_variant_stock: {
+        Args: { p_product_id: string; p_qty: number; p_variant_id: string }
+        Returns: boolean
+      }
       dg_reserve_stock: {
         Args: { p_product_id: string; p_qty: number }
         Returns: boolean

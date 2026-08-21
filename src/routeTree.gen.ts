@@ -48,6 +48,7 @@ import { Route as AuthenticatedECommerceAdsRouteImport } from './routes/_authent
 import { Route as AuthenticatedECommerceCheckoutRouteImport } from './routes/_authenticated/e-commerce.checkout'
 import { Route as AuthenticatedECommerceCompetitorsRouteImport } from './routes/_authenticated/e-commerce.competitors'
 import { Route as AuthenticatedECommerceCustomersRouteImport } from './routes/_authenticated/e-commerce.customers'
+import { Route as AuthenticatedECommerceEvidenceRouteImport } from './routes/_authenticated/e-commerce.evidence'
 import { Route as AuthenticatedECommerceInventoryRouteImport } from './routes/_authenticated/e-commerce.inventory'
 import { Route as AuthenticatedECommerceLandingPagesRouteImport } from './routes/_authenticated/e-commerce.landing-pages'
 import { Route as AuthenticatedECommerceMarketRouteImport } from './routes/_authenticated/e-commerce.market'
@@ -280,6 +281,12 @@ const AuthenticatedECommerceCustomersRoute =
     path: '/customers',
     getParentRoute: () => AuthenticatedECommerceRoute,
   } as any)
+const AuthenticatedECommerceEvidenceRoute =
+  AuthenticatedECommerceEvidenceRouteImport.update({
+    id: '/evidence',
+    path: '/evidence',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
 const AuthenticatedECommerceInventoryRoute =
   AuthenticatedECommerceInventoryRouteImport.update({
     id: '/inventory',
@@ -478,6 +485,7 @@ export interface FileRoutesByFullPath {
   '/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
   '/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
   '/e-commerce/customers': typeof AuthenticatedECommerceCustomersRoute
+  '/e-commerce/evidence': typeof AuthenticatedECommerceEvidenceRoute
   '/e-commerce/inventory': typeof AuthenticatedECommerceInventoryRoute
   '/e-commerce/landing-pages': typeof AuthenticatedECommerceLandingPagesRoute
   '/e-commerce/market': typeof AuthenticatedECommerceMarketRoute
@@ -541,6 +549,7 @@ export interface FileRoutesByTo {
   '/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
   '/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
   '/e-commerce/customers': typeof AuthenticatedECommerceCustomersRoute
+  '/e-commerce/evidence': typeof AuthenticatedECommerceEvidenceRoute
   '/e-commerce/inventory': typeof AuthenticatedECommerceInventoryRoute
   '/e-commerce/landing-pages': typeof AuthenticatedECommerceLandingPagesRoute
   '/e-commerce/market': typeof AuthenticatedECommerceMarketRoute
@@ -610,6 +619,7 @@ export interface FileRoutesById {
   '/_authenticated/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
   '/_authenticated/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
   '/_authenticated/e-commerce/customers': typeof AuthenticatedECommerceCustomersRoute
+  '/_authenticated/e-commerce/evidence': typeof AuthenticatedECommerceEvidenceRoute
   '/_authenticated/e-commerce/inventory': typeof AuthenticatedECommerceInventoryRoute
   '/_authenticated/e-commerce/landing-pages': typeof AuthenticatedECommerceLandingPagesRoute
   '/_authenticated/e-commerce/market': typeof AuthenticatedECommerceMarketRoute
@@ -679,6 +689,7 @@ export interface FileRouteTypes {
     | '/e-commerce/checkout'
     | '/e-commerce/competitors'
     | '/e-commerce/customers'
+    | '/e-commerce/evidence'
     | '/e-commerce/inventory'
     | '/e-commerce/landing-pages'
     | '/e-commerce/market'
@@ -742,6 +753,7 @@ export interface FileRouteTypes {
     | '/e-commerce/checkout'
     | '/e-commerce/competitors'
     | '/e-commerce/customers'
+    | '/e-commerce/evidence'
     | '/e-commerce/inventory'
     | '/e-commerce/landing-pages'
     | '/e-commerce/market'
@@ -810,6 +822,7 @@ export interface FileRouteTypes {
     | '/_authenticated/e-commerce/checkout'
     | '/_authenticated/e-commerce/competitors'
     | '/_authenticated/e-commerce/customers'
+    | '/_authenticated/e-commerce/evidence'
     | '/_authenticated/e-commerce/inventory'
     | '/_authenticated/e-commerce/landing-pages'
     | '/_authenticated/e-commerce/market'
@@ -1123,6 +1136,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedECommerceCustomersRouteImport
       parentRoute: typeof AuthenticatedECommerceRoute
     }
+    '/_authenticated/e-commerce/evidence': {
+      id: '/_authenticated/e-commerce/evidence'
+      path: '/evidence'
+      fullPath: '/e-commerce/evidence'
+      preLoaderRoute: typeof AuthenticatedECommerceEvidenceRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
     '/_authenticated/e-commerce/inventory': {
       id: '/_authenticated/e-commerce/inventory'
       path: '/inventory'
@@ -1334,6 +1354,7 @@ interface AuthenticatedECommerceRouteChildren {
   AuthenticatedECommerceCheckoutRoute: typeof AuthenticatedECommerceCheckoutRoute
   AuthenticatedECommerceCompetitorsRoute: typeof AuthenticatedECommerceCompetitorsRoute
   AuthenticatedECommerceCustomersRoute: typeof AuthenticatedECommerceCustomersRoute
+  AuthenticatedECommerceEvidenceRoute: typeof AuthenticatedECommerceEvidenceRoute
   AuthenticatedECommerceInventoryRoute: typeof AuthenticatedECommerceInventoryRoute
   AuthenticatedECommerceLandingPagesRoute: typeof AuthenticatedECommerceLandingPagesRoute
   AuthenticatedECommerceMarketRoute: typeof AuthenticatedECommerceMarketRoute
@@ -1354,6 +1375,7 @@ const AuthenticatedECommerceRouteChildren: AuthenticatedECommerceRouteChildren =
     AuthenticatedECommerceCompetitorsRoute:
       AuthenticatedECommerceCompetitorsRoute,
     AuthenticatedECommerceCustomersRoute: AuthenticatedECommerceCustomersRoute,
+    AuthenticatedECommerceEvidenceRoute: AuthenticatedECommerceEvidenceRoute,
     AuthenticatedECommerceInventoryRoute: AuthenticatedECommerceInventoryRoute,
     AuthenticatedECommerceLandingPagesRoute:
       AuthenticatedECommerceLandingPagesRoute,

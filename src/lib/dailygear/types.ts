@@ -15,6 +15,10 @@ export type Product = Tables<"dg_products">;
 export type ProductInsert = TablesInsert<"dg_products">;
 export type ProductUpdate = TablesUpdate<"dg_products">;
 
+export type ProductEvidence = Tables<"dg_product_evidence">;
+export type ProductEvidenceInsert = TablesInsert<"dg_product_evidence">;
+export type ProductEvidenceUpdate = TablesUpdate<"dg_product_evidence">;
+
 export type ProductVariant = Tables<"dg_product_variants">;
 export type Category = Tables<"dg_categories">;
 export type Brand = Tables<"dg_brands">;
@@ -34,6 +38,30 @@ export type ProductStatus = Product["status"];
 export type OrderStatus = Order["status"];
 export type PaymentStatus = Order["payment_status"];
 export type StockMovementType = StockMovement["type"];
+
+export interface ProductReadiness {
+  available: boolean;
+  hasMinimumStock: boolean;
+  hasConfirmedAvailability: boolean;
+  hasEvidence: boolean;
+  readyToPublish: boolean;
+}
+
+export function getProductReadiness(
+  product: Pick<Product, "stock_quantity" | "availability_confirmed" | "status">,
+  evidenceCount = 0,
+): ProductReadiness {
+  const hasMinimumStock = Number(product.stock_quantity ?? 0) >= 15;
+  const hasConfirmedAvailability = product.availability_confirmed === true;
+  const available = product.status === "active" && Number(product.stock_quantity ?? 0) > 0;
+  return {
+    available,
+    hasMinimumStock,
+    hasConfirmedAvailability,
+    hasEvidence: evidenceCount > 0,
+    readyToPublish: hasMinimumStock && hasConfirmedAvailability,
+  };
+}
 
 export interface OrderWithCustomer extends Order {
   customer: Pick<Customer, "id" | "first_name" | "last_name" | "email" | "phone"> | null;

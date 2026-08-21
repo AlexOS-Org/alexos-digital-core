@@ -20,6 +20,7 @@ import {
   productImage,
   useStoreProduct,
   useStoreProducts,
+  useStoreVariants,
   useStorefront,
 } from "@/lib/storefront/api";
 
@@ -40,15 +41,35 @@ function ProductDetail() {
   const { id } = Route.useParams();
   const { data: store } = useStorefront();
   const { data: product, isLoading } = useStoreProduct(id);
+  const { data: variants = [] } = useStoreVariants(product?.id);
   const related = useStoreProducts(store?.user_id, { limit: 4 });
   const { track } = useRecentlyViewed();
   const [qty, setQty] = useState(1);
   const [active, setActive] = useState(0);
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const currency = store?.currency ?? "KES";
 
   useEffect(() => {
     if (product) track(product.id);
   }, [product, track]);
+
+  useEffect(() => {
+    if (!product) return;
+    setSelectedVariantId(variants[0]?.id ?? null);
+    setQty(1);
+    setActive(0);
+    document.title = `${product.seo_title ?? product.name} | DailyGear`;
+    const description = product.seo_description ?? product.short_description ?? product.description;
+    if (description) {
+      let meta = document.querySelector('meta[name="description"]');
+      if (!meta) {
+        meta = document.createElement("meta");
+        meta.setAttribute("name", "description");
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute("content", description);
+    }
+  }, [product, variants]);
 
   if (isLoading) {
     return (
@@ -73,20 +94,23 @@ function ProductDetail() {
   }
 
   const images = ((product.images ?? []) as string[]).filter(Boolean);
-  const price = effectivePrice(product);
-  const soldOut = Number(product.stock_quantity) <= 0;
+  const selectedVariant = variants.find((variant) => variant.id === selectedVariantId) ?? null;
+  const sellingItem = selectedVariant ?? product;
+  const price = effectivePrice(sellingItem);
+  const availableStock = Number(sellingItem.stock_quantity ?? 0);
+  const soldOut = availableStock <= 0;
 
   function add() {
     if (!product) return;
     cartStore.add(
       {
         productId: product.id,
-        variantId: null,
-        name: product.name,
-        sku: product.sku,
+        variantId: selectedVariant?.id ?? null,
+        name: selectedVariant ? `${product.name} — ${selectedVariant.name}` : product.name,
+        sku: selectedVariant?.sku ?? product.sku,
         price,
-        image: productImage(product),
-        maxQuantity: Number(product.stock_quantity),
+        image: selectedVariant?.image_url ?? productImage(product),
+        maxQuantity: availableStock,
       },
       qty,
     );
@@ -111,7 +135,11 @@ function ProductDetail() {
         <div className="space-y-3">
           <div className="aspect-square overflow-hidden rounded-3xl border bg-muted">
             {images[active] ? (
-              <img src={images[active]} alt={product.name} className="h-full w-full object-cover" />
+              <img
+                src={images[active]}
+                alt={product.image_alt_text ?? product.name}
+                className="h-full w-full object-cover"
+              />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-muted-foreground">
                 <ShoppingBag className="h-12 w-12" />
@@ -137,22 +165,51 @@ function ProductDetail() {
         <div className="space-y-6">
           <div className="space-y-3">
             <div className="flex flex-wrap gap-2">
-              {isOnSale(product) ? <Badge className="rounded-full">Sale</Badge> : null}
+              {isOnSale(sellingItem) ? <Badge className="rounded-full">Sale</Badge> : null}
               <Badge variant={soldOut ? "secondary" : "outline"} className="rounded-full">
-                {soldOut ? "Sold out" : `${product.stock_quantity} in stock`}
+                {soldOut ? "Sold out" : `${availableStock} in stock`}
               </Badge>
             </div>
             <h1 className="text-3xl font-black tracking-tight">{product.name}</h1>
             <div className="flex items-baseline gap-3">
               <span className="text-2xl font-bold">{formatMoney(price, currency)}</span>
-              {isOnSale(product) ? (
+              {isOnSale(sellingItem) ? (
                 <span className="text-sm text-muted-foreground line-through">
-                  {formatMoney(Number(product.price), currency)}
+                  {formatMoney(Number(sellingItem.price), currency)}
                 </span>
               ) : null}
             </div>
-            {product.description ? (
-              <p className="text-sm leading-relaxed text-muted-foreground">{product.description}</p>
+            {variants.length ? (
+              <div className="space-y-2">
+                <p className="text-sm font-semibold">Choose an option</p>
+                <div className="flex flex-wrap gap-2">
+                  {variants.map((variant) => {
+                    const variantStock = Number(variant.stock_quantity ?? 0);
+                    const selected = variant.id === selectedVariantId;
+                    return (
+                      <button
+                        key={variant.id}
+                        type="button"
+                        disabled={variantStock <= 0}
+                        onClick={() => setSelectedVariantId(variant.id)}
+                        className={`rounded-xl border px-3 py-2 text-left text-sm transition ${
+                          selected ? "border-primary bg-primary/10 text-primary" : "hover:bg-muted"
+                        } ${variantStock <= 0 ? "cursor-not-allowed opacity-50" : ""}`}
+                      >
+                        <span className="font-medium">{variant.name}</span>
+                        <span className="ml-2 text-xs text-muted-foreground">
+                          {variantStock > 0 ? `${variantStock} available` : "Sold out"}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+            {(product.short_description ?? product.description) ? (
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {product.short_description ?? product.description}
+              </p>
             ) : null}
           </div>
 
@@ -170,7 +227,7 @@ function ProductDetail() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setQty((q) => Math.min(Number(product.stock_quantity) || 1, q + 1))}
+                onClick={() => setQty((q) => Math.min(availableStock || 1, q + 1))}
                 aria-label="Increase"
               >
                 <Plus className="h-4 w-4" />
