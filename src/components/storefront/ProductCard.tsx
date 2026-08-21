@@ -75,7 +75,7 @@ export function ProductCard({ product, currency }: Props) {
         <p className="text-xs leading-relaxed text-muted-foreground">
           {soldOut
             ? "This listing is currently unavailable."
-            : "View current stock and choose any available size or colour."
+            : "View current stock and choose any available size or colour."}
         </p>
 
         <Button asChild className="mt-auto w-full rounded-xl">
