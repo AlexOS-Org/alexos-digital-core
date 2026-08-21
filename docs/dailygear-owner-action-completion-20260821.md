@@ -48,6 +48,12 @@ The canonical `alexos-business-os` Worker currently exposes only these secret bi
 
 The connected Meta Ads Manager integration can inspect ad accounts independently, but its connector credential is not automatically a valid Worker runtime secret. A real `RESEND_API_KEY` and a real `META_ACCESS_TOKEN` must be entered through a secure secret-entry channel before those Worker-backed features can be enabled. The service-role binding exists, but because the previously exposed key requires rotation, the owner must regenerate a replacement service-role credential in Supabase and replace the Worker secret; the secret value was not read or written during this task.
 
+## Deployment verification
+
+The completion report is committed to GitHub `main` at commit `e3479a0e3cb8b6effa786e0493bad2ae158a8054`. The corresponding Cloudflare Workers Build is `a05a00da-93ea-488d-bb35-a321d43e10b4`, using `npm run build` and `npx wrangler deploy`; its terminal outcome is `success` on the canonical `alexos-business-os` Worker.
+
+The final Supabase production read reports one published DailyGear storefront, ten active products, ten verified evidence records and one published target funnel with steps `landing:0,checkout:1,thank_you:2`.
+
 ## Remaining secure prerequisites
 
 The storefront, evidence reconciliation and first funnel are complete. The remaining infrastructure work is credential-dependent: add `RESEND_API_KEY`, add `META_ACCESS_TOKEN`, and rotate then replace the Supabase service-role key. These values must not be pasted into chat or committed to GitHub.
