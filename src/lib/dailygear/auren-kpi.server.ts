@@ -169,7 +169,7 @@ export async function getDailyGearAurenKpiSummary(
     period: range,
     currency: currencies.length === 1 ? currencies[0] : currencies.length > 1 ? "mixed" : null,
     productCount: products.length,
-    publishedProductCount: products.filter((product) => product.status === "published").length,
+    publishedProductCount: products.filter((product) => product.status === "active").length,
     inventoryUnits: products.reduce((sum, product) => sum + numberValue(product.stock_quantity), 0),
     lowStockCount: products.filter((product) => {
       const stock = numberValue(product.stock_quantity);

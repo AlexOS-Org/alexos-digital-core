@@ -1,3 +1,5 @@
+import type { Json } from "@/integrations/supabase/types";
+
 /**
  * Guest checkout — server-only implementation.
  *
@@ -80,14 +82,14 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
   const { data, error } = await supabaseAdmin.rpc("dg_create_guest_order", {
     p_store_slug: input.storeSlug,
     p_first_name: input.firstName,
-    p_last_name: input.lastName,
-    p_email: input.email,
+    p_last_name: input.lastName ?? null,
+    p_email: input.email ?? null,
     p_phone: input.phone,
     p_address: input.address,
-    p_city: input.city,
-    p_notes: input.notes,
+    p_city: input.city ?? null,
+    p_notes: input.notes ?? null,
     p_payment_method: input.paymentMethod,
-    p_items: input.items,
+    p_items: input.items as unknown as Json,
   });
   if (error) throw error;
 

@@ -2407,6 +2407,21 @@ export type Database = {
       }
     }
     Functions: {
+      dg_create_guest_order: {
+        Args: {
+          p_address: string
+          p_city: string | null
+          p_email: string | null
+          p_first_name: string
+          p_items: Json
+          p_last_name: string | null
+          p_notes: string | null
+          p_payment_method: string
+          p_phone: string
+          p_store_slug: string
+        }
+        Returns: Json
+      }
       dg_is_published_store: { Args: { _user_id: string }; Returns: boolean }
       dg_reserve_variant_stock: {
         Args: { p_product_id: string; p_qty: number; p_variant_id: string }

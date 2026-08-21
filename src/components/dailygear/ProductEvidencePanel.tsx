@@ -71,7 +71,7 @@ export function ProductEvidencePanel() {
 
   async function submit() {
     if (!form.title.trim() || !form.source_label.trim()) return;
-    const values: ProductEvidenceInsert = {
+    const values: Omit<ProductEvidenceInsert, "user_id"> = {
       product_id: form.product_id || null,
       source_type: form.source_type,
       source_id: form.source_id.trim() || null,
