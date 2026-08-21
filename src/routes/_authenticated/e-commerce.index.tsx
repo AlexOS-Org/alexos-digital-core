@@ -1,3 +1,4 @@
+import { CatalogueReadinessCard } from "@/components/dailygear/dashboard/CatalogueReadinessCard";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { Boxes, DollarSign, Percent, ShoppingCart, TrendingUp, Users } from "lucide-react";
@@ -265,6 +266,7 @@ function MobileDashboard(p: Panels) {
   return (
     <div className="space-y-4 pb-40">
       <Hero kpis={p.kpis} compactMode />
+      <CatalogueReadinessCard products={p.products} loading={p.loading} />
 
       <section className="-mx-4 px-4">
         <div className="swipe-row no-scrollbar gap-3 pb-1">
@@ -314,6 +316,7 @@ function StandardDashboard(p: Panels & { tablet?: boolean }) {
   return (
     <div className="space-y-5">
       <Hero kpis={p.kpis} />
+      <CatalogueReadinessCard products={p.products} loading={p.loading} />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KpiWall kpis={p.kpis} loading={p.loading} />
@@ -364,6 +367,7 @@ function WideDashboard(p: Panels & { dense?: boolean }) {
   return (
     <div className="space-y-6">
       <Hero kpis={p.kpis} />
+      <CatalogueReadinessCard products={p.products} loading={p.loading} />
 
       <div className={p.dense ? "grid gap-5 grid-cols-8" : "grid gap-5 grid-cols-4"}>
         <KpiWall kpis={p.kpis} loading={p.loading} />

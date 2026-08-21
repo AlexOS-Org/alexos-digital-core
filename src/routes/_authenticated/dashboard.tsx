@@ -1,9 +1,9 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowUpRight, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { modules, moduleGroups } from "@/lib/modules";
-import { ArrowUpRight, Sparkles } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import IntelligenceSearch from "@/components/dashboard/IntelligenceSearch";
 import MoneySnapshot from "@/components/dashboard/MoneySnapshot";
@@ -12,9 +12,7 @@ import BusinessSnapshot from "@/components/dashboard/BusinessSnapshot";
 import TodaysMission from "@/components/dashboard/TodaysMission";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import IntelligenceFeed from "@/components/dashboard/IntelligenceFeed";
-
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: Dashboard });
-
 class DashboardPanelBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   state = { hasError: false };
   static getDerivedStateFromError() {
@@ -41,18 +39,17 @@ class DashboardPanelBoundary extends Component<{ children: ReactNode }, { hasErr
 function SafePanel({ children }: { children: ReactNode }) {
   return <DashboardPanelBoundary>{children}</DashboardPanelBoundary>;
 }
-
 function Dashboard() {
   const navModules = modules.filter((m) => m.url !== "/dashboard");
   return (
-    <div className="relative space-y-8 pb-10 animate-in fade-in duration-500">
+    <div className="relative space-y-6 pb-10 animate-in fade-in duration-500">
       <SafePanel>
         <DashboardHeader />
       </SafePanel>
       <SafePanel>
-        <section className="relative overflow-hidden rounded-3xl border border-primary/15 bg-gradient-to-r from-primary/[0.07] via-background to-[var(--alexos-purple)]/[0.07] p-5 sm:p-6">
+        <section className="relative overflow-hidden rounded-[1.75rem] border border-primary/15 bg-gradient-to-r from-primary/[0.08] via-background to-[var(--alexos-purple)]/[0.08] p-5 shadow-[0_20px_50px_-35px_var(--alexos-glow)] sm:p-6">
           <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
-          <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.75fr)] lg:items-center">
             <div>
               <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
                 <Sparkles className="h-3.5 w-3.5" />
@@ -65,63 +62,87 @@ function Dashboard() {
                 Live signals, priorities, money and business performance in one view.
               </p>
             </div>
-            <div className="w-full lg:max-w-xl">
-              <IntelligenceSearch />
-            </div>
+            <IntelligenceSearch />
           </div>
         </section>
       </SafePanel>
-      <SafePanel>
-        <section className="space-y-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Money</p>
-            <h2 className="text-2xl font-semibold tracking-tight">Know where you stand.</h2>
-            <p className="text-sm text-muted-foreground">
-              Cash, commitments and financial momentum — without the noise.
-            </p>
+      <section className="grid gap-5 xl:grid-cols-12">
+        <div className="space-y-5 xl:col-span-8">
+          <SafePanel>
+            <section className="alexos-surface rounded-[1.75rem] border border-border/60 p-5 shadow-[0_18px_50px_-35px_var(--alexos-glow)] sm:p-6">
+              <div className="mb-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                  Money
+                </p>
+                <h2 className="mt-1 text-2xl font-semibold tracking-tight">
+                  Know where you stand.
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Cash, commitments and financial momentum — without the noise.
+                </p>
+              </div>
+              <MoneySnapshot />
+            </section>
+          </SafePanel>
+          <div className="grid gap-5 lg:grid-cols-2">
+            <SafePanel>
+              <TodaysMission />
+            </SafePanel>
+            <SafePanel>
+              <section className="relative h-full overflow-hidden rounded-[1.75rem] border border-[var(--alexos-purple)]/20 bg-gradient-to-br from-[var(--alexos-purple)]/[0.12] via-card to-primary/[0.05] p-5 shadow-[0_18px_50px_-35px_var(--alexos-glow)] sm:p-6">
+                <div className="pointer-events-none absolute -right-14 -top-16 h-40 w-40 rounded-full bg-[var(--alexos-purple)]/15 blur-3xl" />
+                <div className="relative mb-4 flex items-end justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-600 dark:text-violet-300">
+                      Auren
+                    </p>
+                    <h2 className="mt-1 text-xl font-semibold tracking-tight">
+                      What deserves your attention?
+                    </h2>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Signals first. Noise later.
+                    </p>
+                  </div>
+                  <Link
+                    to="/auren"
+                    className="inline-flex shrink-0 items-center text-xs font-semibold text-primary hover:underline"
+                  >
+                    Open Auren <ArrowUpRight className="ml-1 h-3.5 w-3.5" />
+                  </Link>
+                </div>
+                <IntelligenceFeed />
+              </section>
+            </SafePanel>
           </div>
-          <MoneySnapshot />
-        </section>
-      </SafePanel>
+          <SafePanel>
+            <RecentActivity />
+          </SafePanel>
+        </div>
+        <div className="space-y-5 xl:col-span-4">
+          <SafePanel>
+            <section className="relative overflow-hidden rounded-[1.75rem] border border-primary/15 bg-gradient-to-br from-card via-card to-primary/[0.08] p-5 shadow-[0_18px_50px_-35px_var(--alexos-glow)] sm:p-6">
+              <div className="alexos-visual-strip absolute inset-x-0 top-0 h-1 opacity-80" />
+              <div className="relative mb-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--alexos-purple)]">
+                  Business
+                </p>
+                <h2 className="mt-1 text-xl font-semibold tracking-tight">
+                  Build what moves you forward.
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Customers, sales, revenue and growth.
+                </p>
+              </div>
+              <BusinessSnapshot />
+            </section>
+          </SafePanel>
+          <SafePanel>
+            <QuickActions />
+          </SafePanel>
+        </div>
+      </section>
       <SafePanel>
-        <TodaysMission />
-      </SafePanel>
-      <SafePanel>
-        <section className="space-y-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-600 dark:text-violet-300">
-              Auren
-            </p>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight">
-              What deserves your attention?
-            </h2>
-            <p className="text-sm text-muted-foreground">Signals first. Noise later.</p>
-          </div>
-          <IntelligenceFeed />
-        </section>
-      </SafePanel>
-      <SafePanel>
-        <QuickActions />
-      </SafePanel>
-      <SafePanel>
-        <section className="space-y-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--alexos-purple)]">
-              Business
-            </p>
-            <h2 className="text-2xl font-semibold tracking-tight">Build what moves you forward.</h2>
-            <p className="text-sm text-muted-foreground">
-              See the signals behind customers, sales, revenue and growth.
-            </p>
-          </div>
-          <BusinessSnapshot />
-        </section>
-      </SafePanel>
-      <SafePanel>
-        <RecentActivity />
-      </SafePanel>
-      <SafePanel>
-        <section className="space-y-5">
+        <section className="space-y-5 rounded-[1.75rem] border border-border/60 bg-card/45 p-5 shadow-sm sm:p-6">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">

@@ -1,34 +1,27 @@
-import { Bell, Sparkles, BookOpen, Quote, Bot, ArrowUpRight, Clock3 } from "lucide-react";
+import { Bell, Clock3, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
-import { Card, CardContent } from "@/components/ui/card";
-import { getDailyInspiration } from "@/lib/dashboard/inspiration";
 import { DashboardWeather } from "@/components/dashboard/DashboardWeather";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { getVisualTheme } from "@/components/theme/visual-themes";
 import alexosMountainWide from "@/assets/visuals/alexos-mountain-dusk-wide.webp";
 import alexosMountainMobile from "@/assets/visuals/alexos-mountain-mobile.webp";
 
-type Atmosphere = "auto" | "morning" | "day" | "evening" | "night";
 type TimeFormat = "12h" | "24h";
-const ATMOSPHERE_KEY = "alexos-dashboard-atmosphere";
 const TIME_FORMAT_KEY = "alexos-dashboard-time-format";
-
-function getTimeAtmosphere(hour: number): Exclude<Atmosphere, "auto"> {
+function getTimeAtmosphere(hour: number) {
   if (hour >= 5 && hour < 11) return "morning";
   if (hour >= 11 && hour < 17) return "day";
   if (hour >= 17 && hour < 21) return "evening";
   return "night";
 }
-
 function getGreeting(hour: number) {
   if (hour < 12) return "Good morning";
   if (hour < 18) return "Good afternoon";
   return "Good evening";
 }
-
-function getAtmosphereStyle(atmosphere: Exclude<Atmosphere, "auto">) {
+function getAtmosphereStyle(atmosphere: string) {
   const styles = {
     morning: {
       background: "linear-gradient(145deg, #365d68 0%, #4d8b82 42%, #d4a56f 70%, #294f63 100%)",
@@ -51,10 +44,8 @@ function getAtmosphereStyle(atmosphere: Exclude<Atmosphere, "auto">) {
       horizon: "linear-gradient(180deg, rgba(4,10,29,0) 0%, rgba(3,8,23,0.9) 100%)",
     },
   } as const;
-
-  return styles[atmosphere];
+  return styles[atmosphere as keyof typeof styles] ?? styles.night;
 }
-
 function formatTime(date: Date, timeFormat: TimeFormat) {
   return date.toLocaleTimeString("en-KE", {
     hour: "2-digit",
@@ -62,53 +53,39 @@ function formatTime(date: Date, timeFormat: TimeFormat) {
     hour12: timeFormat === "12h",
   });
 }
-
 export function DashboardHeader() {
   const [now, setNow] = useState(() => new Date());
-  const [atmosphere, setAtmosphere] = useState<Atmosphere>(() => {
-    if (typeof window === "undefined") return "auto";
-    const saved = window.localStorage.getItem(ATMOSPHERE_KEY);
-    return saved === "morning" || saved === "day" || saved === "evening" || saved === "night"
-      ? saved
-      : "auto";
-  });
   const [timeFormat, setTimeFormat] = useState<TimeFormat>(() => {
     if (typeof window === "undefined") return "24h";
     return window.localStorage.getItem(TIME_FORMAT_KEY) === "12h" ? "12h" : "24h";
   });
-
+  const { visualTheme } = useTheme();
+  const selectedTheme = getVisualTheme(visualTheme);
+  const activeAtmosphere = getTimeAtmosphere(now.getHours());
+  const visual = getAtmosphereStyle(activeAtmosphere);
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
     return () => window.clearInterval(timer);
   }, []);
-
-  const hour = now.getHours();
-  const activeAtmosphere = atmosphere === "auto" ? getTimeAtmosphere(hour) : atmosphere;
-  const visual = getAtmosphereStyle(activeAtmosphere);
-  const { visualTheme } = useTheme();
-  const backdrop = getVisualTheme(visualTheme).backdrop;
-  const greeting = getGreeting(hour);
+  const greeting = getGreeting(now.getHours());
   const today = now.toLocaleDateString("en-KE", {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
   });
-  const inspiration = getDailyInspiration();
-
   const toggleTimeFormat = () => {
     const next: TimeFormat = timeFormat === "12h" ? "24h" : "12h";
     setTimeFormat(next);
     window.localStorage.setItem(TIME_FORMAT_KEY, next);
   };
-
   return (
-    <div className="space-y-5">
+    <div>
       <section
         className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/15 text-white shadow-[0_24px_70px_-30px_rgba(37,99,235,0.42)] transition-[background] duration-[1800ms] ease-in-out sm:min-h-[330px]"
         style={{ background: visual.background }}
       >
-        {backdrop === "mountains" ? (
+        {selectedTheme.backdrop === "mountains" ? (
           <picture className="alexos-dashboard-backdrop pointer-events-none absolute inset-0 block">
             <source media="(max-width: 640px)" srcSet={alexosMountainMobile} />
             <img
@@ -133,7 +110,6 @@ export function DashboardHeader() {
         />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_20%,rgba(139,92,246,0.22),transparent_30%),radial-gradient(circle_at_35%_100%,rgba(16,185,129,0.18),transparent_34%)]" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#061126]/80 via-[#071329]/15 to-transparent" />
-
         <div className="relative flex min-h-[360px] flex-col justify-between p-5 sm:min-h-[330px] sm:p-8 lg:p-10">
           <div className="flex items-start justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
@@ -142,27 +118,23 @@ export function DashboardHeader() {
                 Auren active
               </span>
               <span className="rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-xs font-medium text-white/80 backdrop-blur-md">
-                {activeAtmosphere[0].toUpperCase() + activeAtmosphere.slice(1)}
+                {selectedTheme.label}
               </span>
             </div>
-
-            <div className="relative flex shrink-0 gap-2">
-              <Button
-                size="icon"
-                variant="ghost"
-                className="border border-white/15 bg-black/20 text-white backdrop-blur-md hover:bg-white/10 hover:text-white"
-                aria-label={`Switch to ${timeFormat === "12h" ? "24-hour" : "12-hour"} time`}
-                title={`Use ${timeFormat === "12h" ? "24-hour" : "12-hour"} time`}
-                onClick={toggleTimeFormat}
-              >
-                <Clock3 className="h-5 w-5" />
-              </Button>
-            </div>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="shrink-0 border border-white/15 bg-black/20 text-white backdrop-blur-md hover:bg-white/10 hover:text-white"
+              aria-label={`Switch to ${timeFormat === "12h" ? "24-hour" : "12-hour"} time`}
+              title={`Use ${timeFormat === "12h" ? "24-hour" : "12-hour"} time`}
+              onClick={toggleTimeFormat}
+            >
+              <Clock3 className="h-5 w-5" />
+            </Button>
           </div>
-
           <div className="max-w-3xl pb-2 sm:pb-0">
             <p className="text-xs font-medium text-white/65 sm:text-sm">
-              {today} · {formatTime(now, timeFormat)}
+              {today} · {formatTime(now, timeFormat)} · {activeAtmosphere}
             </p>
             <h1 className="mt-2 text-[2rem] font-semibold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
               {greeting}, Alex.
@@ -171,11 +143,11 @@ export function DashboardHeader() {
               You know what matters. Now let’s move it forward.
             </p>
             <DashboardWeather />
-            <div className="mt-5 flex gap-2">
+            <div className="mt-5 flex flex-wrap gap-2">
               <Button asChild className="bg-white text-slate-950 shadow-lg hover:bg-slate-100">
                 <Link to="/auren">
                   <Sparkles className="mr-2 h-4 w-4 text-[var(--alexos-purple)]" />
-                  Auren
+                  Open Auren
                 </Link>
               </Button>
               <Button
@@ -190,70 +162,6 @@ export function DashboardHeader() {
           </div>
         </div>
       </section>
-
-      <Card className="relative overflow-hidden rounded-3xl border border-[var(--alexos-purple)]/20 bg-gradient-to-br from-[#0b1730] via-[#101b3c] to-[#18133a] text-white shadow-[0_18px_50px_-28px_rgba(124,58,237,0.65)]">
-        <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[var(--alexos-purple)]/15 blur-3xl" />
-        <CardContent className="relative p-5 sm:p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.07]">
-                <Bot className="h-5 w-5 text-violet-300" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="font-semibold tracking-tight">Auren surfaces what matters.</h2>
-                  <span className="rounded-full bg-violet-400/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-violet-200">
-                    Live
-                  </span>
-                </div>
-                <p className="mt-1 text-sm leading-6 text-slate-300">
-                  Your financial position, business activity and priorities are being brought into
-                  focus.
-                </p>
-              </div>
-            </div>
-            <Button
-              asChild
-              variant="ghost"
-              className="w-fit text-violet-200 hover:bg-white/5 hover:text-white"
-            >
-              <Link to="/auren">
-                Open Auren
-                <ArrowUpRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="rounded-3xl border-border/60 bg-gradient-to-br from-emerald-50/90 to-background shadow-sm">
-          <CardContent className="p-5 sm:p-6">
-            <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-emerald-700">
-              <BookOpen className="h-4 w-4" />
-              <span>Today’s anchor</span>
-            </div>
-            <p className="text-[15px] leading-7 text-foreground/80">{inspiration.verse.text}</p>
-            <p className="mt-4 text-sm font-semibold text-emerald-700">
-              {inspiration.verse.reference}
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="rounded-3xl border-border/60 bg-gradient-to-br from-violet-50/80 to-background shadow-sm">
-          <CardContent className="p-5 sm:p-6">
-            <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-violet-700">
-              <Quote className="h-4 w-4" />
-              <span>One thought worth carrying</span>
-            </div>
-            <p className="text-[15px] italic leading-7 text-foreground/80">
-              “{inspiration.quote.text}”
-            </p>
-            <p className="mt-4 text-sm font-semibold text-violet-700">
-              — {inspiration.quote.author}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }
