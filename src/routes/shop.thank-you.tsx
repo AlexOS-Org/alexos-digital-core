@@ -89,6 +89,7 @@ function ThankYou() {
         maxQuantity: product.stockQuantity,
         offerRole: step.stepType === "upsell" ? "upsell" : "downsell",
         funnelStepId: step.id,
+        funnelSlug: funnel.slug,
       },
       1,
     );

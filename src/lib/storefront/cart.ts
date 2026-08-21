@@ -17,6 +17,7 @@ export interface CartLine {
   maxQuantity: number;
   offerRole?: FunnelOfferRole;
   funnelStepId?: string | null;
+  funnelSlug?: string | null;
 }
 
 const KEY = "dailygear.cart.v1";
@@ -44,7 +45,7 @@ function hydrate() {
   hydrated = true;
   try {
     const raw = window.localStorage.getItem(KEY);
-    if (raw) lines = JSON.parse(raw) as CartLine[];
+    if (raw) lines = sanitizeLines(JSON.parse(raw));
   } catch {
     lines = [];
   }
@@ -60,8 +61,42 @@ const EMPTY: CartLine[] = [];
 const getSnapshot = () => (hydrated ? lines : EMPTY);
 const getServerSnapshot = () => EMPTY;
 
-function keyOf(line: Pick<CartLine, "productId" | "variantId" | "offerRole" | "funnelStepId">) {
-  return `${line.productId}::${line.variantId ?? ""}::${line.offerRole ?? "primary"}::${line.funnelStepId ?? ""}`;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function keyOf(
+  line: Pick<CartLine, "productId" | "variantId" | "offerRole" | "funnelStepId" | "funnelSlug">,
+) {
+  return `${line.productId}::${line.variantId ?? ""}::${line.offerRole ?? "primary"}::${line.funnelStepId ?? ""}::${line.funnelSlug ?? ""}`;
+}
+
+function sanitizeLines(input: unknown[]): CartLine[] {
+  return input.flatMap((raw) => {
+    if (!raw || typeof raw !== "object") return [];
+    const candidate = raw as Partial<CartLine>;
+    const productId = typeof candidate.productId === "string" ? candidate.productId.trim() : "";
+    const variantId =
+      candidate.variantId == null
+        ? null
+        : typeof candidate.variantId === "string"
+          ? candidate.variantId.trim()
+          : "";
+    const quantity = Number(candidate.quantity);
+    const maxQuantity = Number(candidate.maxQuantity);
+    if (!UUID_RE.test(productId) || (variantId && !UUID_RE.test(variantId))) return [];
+    if (!Number.isFinite(quantity) || quantity < 1) return [];
+    return [
+      {
+        ...candidate,
+        productId,
+        variantId: variantId || null,
+        quantity: Math.max(1, Math.min(Math.floor(quantity), Math.max(1, maxQuantity || 1))),
+        maxQuantity: Math.max(1, maxQuantity || 1),
+        offerRole: candidate.offerRole ?? "primary",
+        funnelStepId: candidate.funnelStepId ?? null,
+        funnelSlug: candidate.funnelSlug ?? null,
+      } as CartLine,
+    ];
+  });
 }
 
 export const cartStore = {
@@ -79,13 +114,7 @@ export const cartStore = {
   },
   replace(next: CartLine[]) {
     hydrate();
-    lines = next
-      .filter((line) => line.productId && line.quantity > 0)
-      .map((line) => ({
-        ...line,
-        offerRole: line.offerRole ?? "primary",
-        quantity: Math.max(1, Math.min(Math.floor(line.quantity), Math.max(1, line.maxQuantity))),
-      }));
+    lines = sanitizeLines(next);
 
     persist();
     emit();
@@ -95,11 +124,13 @@ export const cartStore = {
     variantId: string | null,
     quantity: number,
     offerRole: FunnelOfferRole = "primary",
+    funnelStepId: string | null = null,
+    funnelSlug: string | null = null,
   ) {
     hydrate();
     lines = lines
       .map((l) =>
-        keyOf(l) === keyOf({ productId, variantId, offerRole })
+        keyOf(l) === keyOf({ productId, variantId, offerRole, funnelStepId, funnelSlug })
           ? { ...l, quantity: Math.max(0, Math.min(quantity, Math.max(1, l.maxQuantity))) }
           : l,
       )
@@ -107,9 +138,17 @@ export const cartStore = {
     persist();
     emit();
   },
-  remove(productId: string, variantId: string | null, offerRole: FunnelOfferRole = "primary") {
+  remove(
+    productId: string,
+    variantId: string | null,
+    offerRole: FunnelOfferRole = "primary",
+    funnelStepId: string | null = null,
+    funnelSlug: string | null = null,
+  ) {
     hydrate();
-    lines = lines.filter((l) => keyOf(l) !== keyOf({ productId, variantId, offerRole }));
+    lines = lines.filter(
+      (l) => keyOf(l) !== keyOf({ productId, variantId, offerRole, funnelStepId, funnelSlug }),
+    );
     persist();
     emit();
   },

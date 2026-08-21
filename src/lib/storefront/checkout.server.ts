@@ -140,6 +140,16 @@ export function validateGuestOrder(raw: unknown): GuestOrderInput {
   };
 }
 
+export function buildGuestOrderRpcItems(items: GuestOrderLineInput[]) {
+  return items.map((item) => ({
+    product_id: item.productId,
+    variant_id: item.variantId ?? null,
+    quantity: item.quantity,
+    offer_role: item.offerRole ?? "primary",
+    funnel_step_id: item.funnelStepId ?? null,
+  }));
+}
+
 export async function placeGuestOrderImpl(input: GuestOrderInput) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   type GuestOrderRpcArgs = Database["public"]["Functions"]["dg_create_guest_order"]["Args"];
@@ -157,7 +167,7 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
     p_delivery_details: input.deliveryDetails ?? null,
     p_notes: input.notes ?? null,
     p_payment_method: input.paymentMethod,
-    p_items: input.items as unknown as Json,
+    p_items: buildGuestOrderRpcItems(input.items) as unknown as Json,
     p_funnel_id: input.funnelId ?? null,
     p_attribution: (input.attribution ?? {}) as unknown as Json,
   } as unknown as GuestOrderRpcArgs;

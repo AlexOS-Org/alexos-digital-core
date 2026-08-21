@@ -284,6 +284,68 @@ export interface DraftOrder {
   items: DraftOrderItem[];
 }
 
+export interface OrderDetailsEditInput {
+  orderId: string;
+  status: Order["status"];
+  paymentStatus: Order["payment_status"];
+  paymentMethod: string | null;
+  shippingMethod: string | null;
+  shippingAddress: string | null;
+  shippingCountry: string | null;
+  shippingCounty: string | null;
+  shippingTown: string | null;
+  shippingAddressDetails: string | null;
+  shippingZone: string | null;
+  trackingNumber: string | null;
+  notes: string | null;
+  internalNotes: string | null;
+  customer: {
+    first_name: string;
+    last_name: string | null;
+    email: string | null;
+    phone: string | null;
+    address: string | null;
+    city: string | null;
+    country: string | null;
+    county: string | null;
+    town: string | null;
+    delivery_details: string | null;
+    notes: string | null;
+  } | null;
+}
+
+export function useUpdateOrderDetails() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: OrderDetailsEditInput) => {
+      const { data, error } = await supabase.rpc("dg_update_admin_order", {
+        p_order_id: input.orderId,
+        p_status: input.status,
+        p_payment_status: input.paymentStatus,
+        p_payment_method: input.paymentMethod,
+        p_shipping_method: input.shippingMethod,
+        p_shipping_address: input.shippingAddress,
+        p_shipping_country: input.shippingCountry,
+        p_shipping_county: input.shippingCounty,
+        p_shipping_town: input.shippingTown,
+        p_shipping_address_details: input.shippingAddressDetails,
+        p_shipping_zone: input.shippingZone,
+        p_tracking_number: input.trackingNumber,
+        p_notes: input.notes,
+        p_internal_notes: input.internalNotes,
+        p_customer: input.customer,
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["dailygear"] });
+      toast.success("Order details updated");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+}
+
 function orderNumber() {
   const d = new Date();
   const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;

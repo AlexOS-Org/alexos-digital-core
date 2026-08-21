@@ -161,6 +161,7 @@ function FunnelPage() {
         image: selectedVariant?.imageUrl ?? product.images[0] ?? null,
         maxQuantity,
         offerRole: "primary",
+        funnelSlug: funnel.slug,
       },
       Math.min(quantity, maxQuantity),
     );

@@ -67,7 +67,29 @@ export const KENYA_COUNTIES = [
 export type KenyaCountySlug = (typeof KENYA_COUNTIES)[number]["slug"];
 
 export const KENYA_TOWNS_BY_COUNTY: Record<KenyaCountySlug, readonly string[]> = {
-  nairobi: ["Nairobi", "Imara Daima Estate"],
+  // GeoNames provides Nairobi and Imara Daima as populated places; the remaining
+  // entries are common Nairobi delivery-area labels used for customer address
+  // capture, not promises that a fee or route is available.
+  nairobi: [
+    "Nairobi",
+    "Imara Daima Estate",
+    "Westlands",
+    "Kilimani",
+    "Kileleshwa",
+    "Lavington",
+    "Karen",
+    "Lang'ata",
+    "Kasarani",
+    "Roysambu",
+    "Embakasi",
+    "South C",
+    "South B",
+    "Eastleigh",
+    "Parklands",
+    "Runda",
+    "Donholm",
+    "Kawangware",
+  ],
   baringo: ["Kabarnet", "Eldama Ravine", "Mogotio", "Marigat", "Baringo", "Maji Mazuri"],
   bomet: ["Bomet", "Sotik", "Mulot"],
   bungoma: [

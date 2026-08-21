@@ -82,6 +82,7 @@ function CheckoutPage() {
   const [shippingAddress, setShippingAddress] = useState("");
   const [county, setCounty] = useState("");
   const [town, setTown] = useState("");
+  const [townInputMode, setTownInputMode] = useState<"list" | "manual">("list");
   const [shippingDetails, setShippingDetails] = useState("");
   const [couponCode, setCouponCode] = useState("");
   const [couponMessage, setCouponMessage] = useState<string | null>(null);
@@ -367,6 +368,7 @@ function CheckoutPage() {
                 onChange={(event) => {
                   setCounty(event.target.value);
                   setTown("");
+                  setTownInputMode("list");
                 }}
                 className="h-10 w-full rounded-xl border bg-background px-3 text-sm"
               >
@@ -377,19 +379,53 @@ function CheckoutPage() {
                   </option>
                 ))}
               </select>
-              <select
-                value={town}
-                disabled={!county}
-                onChange={(event) => setTown(event.target.value)}
-                className="h-10 w-full rounded-xl border bg-background px-3 text-sm disabled:opacity-60"
-              >
-                <option value="">{county ? "Select town" : "Select a county first"}</option>
-                {availableTowns.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <label className="text-sm font-medium text-foreground">Town or area</label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 rounded-lg px-2 text-xs"
+                    disabled={!county}
+                    onClick={() => {
+                      setTownInputMode((mode) => (mode === "list" ? "manual" : "list"));
+                      if (townInputMode === "list") setTown("");
+                    }}
+                  >
+                    {townInputMode === "list" ? "Type a town or area" : "Choose from list"}
+                  </Button>
+                </div>
+                {townInputMode === "manual" ? (
+                  <Input
+                    value={town}
+                    disabled={!county}
+                    onChange={(event) => setTown(event.target.value)}
+                    placeholder="Type town, estate or area"
+                  />
+                ) : (
+                  <select
+                    value={town}
+                    disabled={!county}
+                    onChange={(event) => setTown(event.target.value)}
+                    className="h-10 w-full rounded-xl border bg-background px-3 text-sm disabled:opacity-60"
+                  >
+                    <option value="">
+                      {county ? "Select town or area" : "Select a county first"}
+                    </option>
+                    {availableTowns.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  {town && !availableTowns.includes(town)
+                    ? "Manual location entered. Keep the estate or landmark in delivery instructions."
+                    : "Use a major town or area, or type one if it is not listed."}
+                </p>
+              </div>
               <Input
                 value={shippingAddress}
                 onChange={(e) => setShippingAddress(e.target.value)}

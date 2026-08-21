@@ -66,7 +66,7 @@ function CartPage() {
         <div className="space-y-3">
           {cart.items.map((line) => (
             <div
-              key={`${line.productId}-${line.variantId ?? ""}`}
+              key={`${line.productId}-${line.variantId ?? ""}-${line.offerRole ?? "primary"}-${line.funnelStepId ?? ""}-${line.funnelSlug ?? ""}`}
               className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 rounded-2xl border bg-card p-3"
             >
               <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-muted">
@@ -90,7 +90,14 @@ function CartPage() {
                     size="icon"
                     className="h-8 w-8"
                     onClick={() =>
-                      cart.setQuantity(line.productId, line.variantId, line.quantity - 1)
+                      cart.setQuantity(
+                        line.productId,
+                        line.variantId,
+                        line.quantity - 1,
+                        line.offerRole,
+                        line.funnelStepId ?? null,
+                        line.funnelSlug ?? null,
+                      )
                     }
                     aria-label="Decrease"
                   >
@@ -102,7 +109,14 @@ function CartPage() {
                     size="icon"
                     className="h-8 w-8"
                     onClick={() =>
-                      cart.setQuantity(line.productId, line.variantId, line.quantity + 1)
+                      cart.setQuantity(
+                        line.productId,
+                        line.variantId,
+                        line.quantity + 1,
+                        line.offerRole,
+                        line.funnelStepId ?? null,
+                        line.funnelSlug ?? null,
+                      )
                     }
                     aria-label="Increase"
                   >
@@ -117,7 +131,15 @@ function CartPage() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => cart.remove(line.productId, line.variantId)}
+                  onClick={() =>
+                    cart.remove(
+                      line.productId,
+                      line.variantId,
+                      line.offerRole,
+                      line.funnelStepId ?? null,
+                      line.funnelSlug ?? null,
+                    )
+                  }
                   aria-label="Remove item"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -142,7 +164,16 @@ function CartPage() {
             <span>{formatMoney(cart.subtotal + shipping, currency)}</span>
           </div>
           <Button asChild size="lg" className="w-full rounded-xl">
-            <Link to="/shop/checkout">Checkout</Link>
+            <Link
+              to="/shop/checkout"
+              search={
+                cart.items.find((line) => line.funnelSlug)?.funnelSlug
+                  ? { funnel: cart.items.find((line) => line.funnelSlug)?.funnelSlug }
+                  : {}
+              }
+            >
+              Checkout
+            </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full rounded-xl">
             <Link to="/shop/products">Continue shopping</Link>

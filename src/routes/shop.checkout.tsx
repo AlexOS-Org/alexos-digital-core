@@ -135,6 +135,7 @@ function CheckoutPage() {
     search.recovery ? "loading" : "idle",
   );
   const [reminderOptIn, setReminderOptIn] = useState(false);
+  const [townInputMode, setTownInputMode] = useState<"list" | "manual">("list");
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -228,7 +229,12 @@ function CheckoutPage() {
   }, [cart.items, orderBump]);
 
   function updateCounty(county: string) {
+    setTownInputMode("list");
     setForm((previous) => ({ ...previous, county, town: "", city: "" }));
+  }
+
+  function updateTown(town: string) {
+    setForm((previous) => ({ ...previous, town, city: town }));
   }
 
   function toggleOrderBump(checked: boolean) {
@@ -245,11 +251,18 @@ function CheckoutPage() {
           maxQuantity: orderBumpProduct.stockQuantity,
           offerRole: "order_bump",
           funnelStepId: orderBump.id,
+          funnelSlug: funnelContext?.slug ?? null,
         },
         1,
       );
     } else {
-      cartStore.remove(orderBumpProduct.id, null, "order_bump");
+      cartStore.remove(
+        orderBumpProduct.id,
+        null,
+        "order_bump",
+        orderBump.id,
+        funnelContext?.slug ?? null,
+      );
     }
     setOrderBumpAccepted(checked);
   }
@@ -355,6 +368,10 @@ function CheckoutPage() {
         className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]"
         onSubmit={async (e) => {
           e.preventDefault();
+          if (!form.county || !form.town.trim()) {
+            toast.error("Select or type a delivery town or area.");
+            return;
+          }
           const token = await captureCartSession();
           mutation.mutate(token);
         }}
@@ -469,18 +486,50 @@ function CheckoutPage() {
                 />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
-                <Label htmlFor="town">
-                  Town <span className="text-destructive">*</span>
-                </Label>
-                <SearchableLocationSelect
-                  id="town"
-                  value={form.town}
-                  options={availableTowns}
-                  placeholder={form.county ? "Select town" : "Select a county first"}
-                  searchPlaceholder="Search towns"
-                  disabled={!form.county}
-                  onChange={(town) => setForm({ ...form, town, city: town })}
-                />
+                <div className="flex items-center justify-between gap-3">
+                  <Label htmlFor="town">
+                    Town or area <span className="text-destructive">*</span>
+                  </Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 rounded-lg px-2 text-xs"
+                    disabled={!form.county}
+                    onClick={() => {
+                      setTownInputMode((mode) => (mode === "list" ? "manual" : "list"));
+                      if (townInputMode === "list") updateTown("");
+                    }}
+                  >
+                    {townInputMode === "list" ? "Type a town or area" : "Choose from list"}
+                  </Button>
+                </div>
+                {townInputMode === "manual" ? (
+                  <Input
+                    id="town"
+                    required
+                    disabled={!form.county}
+                    value={form.town}
+                    onChange={(event) => updateTown(event.target.value)}
+                    placeholder="Type town, estate or area"
+                    autoComplete="address-level2"
+                  />
+                ) : (
+                  <SearchableLocationSelect
+                    id="town"
+                    value={form.town}
+                    options={availableTowns}
+                    placeholder={form.county ? "Select town or area" : "Select a county first"}
+                    searchPlaceholder="Search towns and areas"
+                    disabled={!form.county}
+                    onChange={updateTown}
+                  />
+                )}
+                <p className="text-xs text-muted-foreground">
+                  {form.town && !availableTowns.includes(form.town)
+                    ? "Manual location entered; add an estate, landmark or delivery instruction below."
+                    : "Choose a major town or area, or type one if it is not listed."}
+                </p>
               </div>
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="address">

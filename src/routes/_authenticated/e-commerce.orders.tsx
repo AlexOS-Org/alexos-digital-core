@@ -1,6 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { CheckCircle, ChevronRight, Clock, DollarSign, ShoppingCart, Search } from "lucide-react";
+import {
+  CheckCircle,
+  ChevronRight,
+  Clock,
+  DollarSign,
+  Edit3,
+  ShoppingCart,
+  Search,
+} from "lucide-react";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { KpiCard } from "@/components/dailygear/KpiCard";
 import { StatusBadge } from "@/components/dailygear/StatusBadge";
@@ -17,6 +25,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCommerceData } from "@/lib/dailygear/useCommerceData";
 import { useUpdateOrderStatus } from "@/lib/dailygear/api";
+import { OrderEditDialog } from "@/components/dailygear/OrderEditDialog";
 import {
   DG_CURRENCY,
   ORDER_STATUS_FLOW,
@@ -66,6 +75,7 @@ function OrdersPage() {
   const updateStatus = useUpdateOrderStatus();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<Order["status"] | "all">("all");
+  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
 
   const summary = useMemo(() => {
     const now = new Date();
@@ -193,6 +203,7 @@ function OrdersPage() {
                   <th className="px-4 py-3 font-medium text-right">Total</th>
                   <th className="px-4 py-3 font-medium">Date</th>
                   <th className="px-4 py-3 font-medium">Advance</th>
+                  <th className="px-4 py-3 font-medium">Manage</th>
                 </tr>
               </thead>
               <tbody>
@@ -235,6 +246,17 @@ function OrdersPage() {
                           </Button>
                         )}
                       </td>
+                      <td className="px-4 py-3">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="whitespace-nowrap text-xs"
+                          onClick={() => setEditingOrder(order)}
+                        >
+                          <Edit3 className="mr-1 h-3.5 w-3.5" />
+                          Edit details
+                        </Button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -243,6 +265,19 @@ function OrdersPage() {
           </div>
         </Card>
       )}
+
+      <OrderEditDialog
+        open={Boolean(editingOrder)}
+        onOpenChange={(open) => {
+          if (!open) setEditingOrder(null);
+        }}
+        order={editingOrder}
+        customer={
+          editingOrder?.customer_id
+            ? (customers.find((customer) => customer.id === editingOrder.customer_id) ?? null)
+            : null
+        }
+      />
     </div>
   );
 }

@@ -2751,6 +2751,26 @@ export type Database = {
         }
         Returns: Json
       }
+      dg_update_admin_order: {
+        Args: {
+          p_customer?: Json
+          p_internal_notes?: string
+          p_notes?: string
+          p_order_id: string
+          p_payment_method?: string
+          p_payment_status: Database["public"]["Enums"]["dg_payment_status"]
+          p_shipping_address?: string
+          p_shipping_address_details?: string
+          p_shipping_country?: string
+          p_shipping_county?: string
+          p_shipping_method?: string
+          p_shipping_town?: string
+          p_shipping_zone?: string
+          p_status: Database["public"]["Enums"]["dg_order_status"]
+          p_tracking_number?: string
+        }
+        Returns: Json
+      }
       dg_is_published_store: { Args: { _user_id: string }; Returns: boolean }
       dg_reserve_stock: {
         Args: { p_product_id: string; p_qty: number }
