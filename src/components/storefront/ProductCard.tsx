@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ShoppingBag, Star } from "lucide-react";
+import { ResponsiveProductImage } from "@/components/storefront/ResponsiveProductImage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cartStore } from "@/lib/storefront/cart";
@@ -44,10 +45,12 @@ export function ProductCard({ product, currency }: Props) {
         className="relative block aspect-square overflow-hidden bg-muted"
       >
         {image ? (
-          <img
+          <ResponsiveProductImage
             src={image}
             alt={product.name}
-            loading="lazy"
+            width={800}
+            height={800}
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (

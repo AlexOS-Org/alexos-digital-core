@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -7,12 +7,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useCart } from "@/lib/storefront/cart";
+import { cartStore, useCart } from "@/lib/storefront/cart";
 import { formatMoney, useStorefront } from "@/lib/storefront/api";
+import { loadCartSession, saveCartSession } from "@/lib/storefront/cart-session.functions";
 import { placeGuestOrder } from "@/lib/storefront/checkout.functions";
 
+interface CheckoutSearch {
+  recovery?: string;
+}
+
 export const Route = createFileRoute("/shop/checkout")({
+  validateSearch: (search: Record<string, unknown>): CheckoutSearch => ({
+    recovery: typeof search["recovery"] === "string" ? search["recovery"] : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Checkout | DailyGear" },
@@ -28,13 +37,21 @@ export const Route = createFileRoute("/shop/checkout")({
 function CheckoutPage() {
   const cart = useCart();
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const { data: store } = useStorefront();
   const submit = useServerFn(placeGuestOrder);
+  const loadRecovery = useServerFn(loadCartSession);
+  const saveRecovery = useServerFn(saveCartSession);
   const currency = store?.currency ?? "KES";
   const threshold = Number(store?.free_shipping_threshold ?? 0);
   const shipping =
     threshold > 0 && cart.subtotal >= threshold ? 0 : Number(store?.flat_shipping_fee ?? 0);
 
+  const [recoveryToken, setRecoveryToken] = useState<string | null>(search.recovery ?? null);
+  const [recoveryState, setRecoveryState] = useState<"idle" | "loading" | "loaded" | "unavailable">(
+    search.recovery ? "loading" : "idle",
+  );
+  const [reminderOptIn, setReminderOptIn] = useState(false);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -46,8 +63,69 @@ function CheckoutPage() {
     paymentMethod: "cod",
   });
 
+  useEffect(() => {
+    const token = search.recovery;
+    if (!token) return;
+    let cancelled = false;
+    setRecoveryState("loading");
+    void loadRecovery({ data: { sessionToken: token } })
+      .then((recovery) => {
+        if (cancelled) return;
+        if (!recovery) {
+          setRecoveryState("unavailable");
+          return;
+        }
+        cartStore.replace(recovery.items);
+        setForm((previous) => ({
+          ...previous,
+          firstName: recovery.firstName ?? previous.firstName,
+          email: recovery.email,
+          phone: recovery.phone ?? previous.phone,
+        }));
+        setRecoveryToken(recovery.sessionToken);
+        setReminderOptIn(true);
+        setRecoveryState("loaded");
+      })
+      .catch(() => {
+        if (!cancelled) setRecoveryState("unavailable");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [loadRecovery, search.recovery]);
+
+  async function captureCartSession(optIn = reminderOptIn) {
+    if (!optIn || !store?.slug || !form.email || cart.items.length === 0) return recoveryToken;
+    try {
+      const result = await saveRecovery({
+        data: {
+          storeSlug: store.slug,
+          sessionToken: recoveryToken,
+          email: form.email,
+          firstName: form.firstName,
+          phone: form.phone,
+          currency,
+          subtotal: cart.subtotal,
+          consent: true,
+          items: cart.items.map((item) => ({
+            productId: item.productId,
+            variantId: item.variantId,
+            quantity: item.quantity,
+          })),
+        },
+      });
+      if (result.saved && result.sessionToken) {
+        setRecoveryToken(result.sessionToken);
+        return result.sessionToken;
+      }
+    } catch (error) {
+      console.warn("[DailyGear] Checkout recovery capture skipped", error);
+    }
+    return recoveryToken;
+  }
+
   const mutation = useMutation({
-    mutationFn: async () =>
+    mutationFn: async (submittedRecoveryToken?: string | null) =>
       submit({
         data: {
           storeSlug: store?.slug ?? "",
@@ -57,6 +135,7 @@ function CheckoutPage() {
             variantId: l.variantId,
             quantity: l.quantity,
           })),
+          recoveryToken: submittedRecoveryToken ?? recoveryToken,
         },
       }),
     onSuccess: (result) => {
@@ -83,9 +162,10 @@ function CheckoutPage() {
 
       <form
         className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
-          mutation.mutate();
+          const token = await captureCartSession();
+          mutation.mutate(token);
         }}
       >
         <div className="space-y-6">
@@ -116,6 +196,7 @@ function CheckoutPage() {
                   required
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  onBlur={() => void captureCartSession()}
                 />
               </div>
               <div className="space-y-1.5">
@@ -125,8 +206,36 @@ function CheckoutPage() {
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  onBlur={() => void captureCartSession()}
                 />
               </div>
+              <div className="flex items-start gap-3 rounded-xl bg-muted/60 p-3 sm:col-span-2">
+                <Checkbox
+                  id="checkout-reminder"
+                  checked={reminderOptIn}
+                  onCheckedChange={(checked) => {
+                    const optedIn = checked === true;
+                    setReminderOptIn(optedIn);
+                    if (optedIn) void captureCartSession(true);
+                  }}
+                />
+                <Label
+                  htmlFor="checkout-reminder"
+                  className="cursor-pointer text-xs leading-relaxed"
+                >
+                  Email me one reminder if I leave checkout before ordering. This is optional.
+                </Label>
+              </div>
+              {recoveryState === "loaded" ? (
+                <p className="text-xs text-emerald-700 sm:col-span-2">
+                  Your saved DailyGear bag has been restored.
+                </p>
+              ) : recoveryState === "unavailable" ? (
+                <p className="text-xs text-muted-foreground sm:col-span-2">
+                  This saved bag is no longer available. You can continue with the items currently
+                  in your bag.
+                </p>
+              ) : null}
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="address">Delivery address</Label>
                 <Input

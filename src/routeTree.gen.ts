@@ -72,6 +72,7 @@ import { Route as AuthenticatedMoneyCenterTransfersRouteImport } from './routes/
 import { Route as AuthenticatedPeopleIndexRouteImport } from './routes/_authenticated/people.index'
 import { Route as AuthenticatedPeopleLeadsRouteImport } from './routes/_authenticated/people.leads'
 import { Route as ApiMetaAdsWebhookRouteImport } from './routes/api/meta/ads-webhook'
+import { Route as ApiScheduledAbandonedCartRouteImport } from './routes/api/scheduled/abandoned-cart'
 import { Route as ShopPoliciesSlugRouteImport } from './routes/shop.policies.$slug'
 import { Route as ShopProductIdRouteImport } from './routes/shop.product.$id'
 import { Route as AuthenticatedPeopleContactsIdRouteImport } from './routes/_authenticated/people.contacts.$id'
@@ -424,6 +425,12 @@ const ApiMetaAdsWebhookRoute = ApiMetaAdsWebhookRouteImport.update({
   path: '/api/meta/ads-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiScheduledAbandonedCartRoute =
+  ApiScheduledAbandonedCartRouteImport.update({
+    id: '/api/scheduled/abandoned-cart',
+    path: '/api/scheduled/abandoned-cart',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ShopPoliciesSlugRoute = ShopPoliciesSlugRouteImport.update({
   id: '/policies/$slug',
   path: '/policies/$slug',
@@ -507,6 +514,7 @@ export interface FileRoutesByFullPath {
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
   '/api/meta/ads-webhook': typeof ApiMetaAdsWebhookRoute
+  '/api/scheduled/abandoned-cart': typeof ApiScheduledAbandonedCartRoute
   '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
   '/shop/product/$id': typeof ShopProductIdRoute
   '/e-commerce/': typeof AuthenticatedECommerceIndexRoute
@@ -571,6 +579,7 @@ export interface FileRoutesByTo {
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
   '/api/meta/ads-webhook': typeof ApiMetaAdsWebhookRoute
+  '/api/scheduled/abandoned-cart': typeof ApiScheduledAbandonedCartRoute
   '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
   '/shop/product/$id': typeof ShopProductIdRoute
   '/e-commerce': typeof AuthenticatedECommerceIndexRoute
@@ -641,6 +650,7 @@ export interface FileRoutesById {
   '/_authenticated/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/_authenticated/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
   '/api/meta/ads-webhook': typeof ApiMetaAdsWebhookRoute
+  '/api/scheduled/abandoned-cart': typeof ApiScheduledAbandonedCartRoute
   '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
   '/shop/product/$id': typeof ShopProductIdRoute
   '/_authenticated/e-commerce/': typeof AuthenticatedECommerceIndexRoute
@@ -711,6 +721,7 @@ export interface FileRouteTypes {
     | '/money-center/transfers'
     | '/people/leads'
     | '/api/meta/ads-webhook'
+    | '/api/scheduled/abandoned-cart'
     | '/shop/policies/$slug'
     | '/shop/product/$id'
     | '/e-commerce/'
@@ -775,6 +786,7 @@ export interface FileRouteTypes {
     | '/money-center/transfers'
     | '/people/leads'
     | '/api/meta/ads-webhook'
+    | '/api/scheduled/abandoned-cart'
     | '/shop/policies/$slug'
     | '/shop/product/$id'
     | '/e-commerce'
@@ -844,6 +856,7 @@ export interface FileRouteTypes {
     | '/_authenticated/money-center/transfers'
     | '/_authenticated/people/leads'
     | '/api/meta/ads-webhook'
+    | '/api/scheduled/abandoned-cart'
     | '/shop/policies/$slug'
     | '/shop/product/$id'
     | '/_authenticated/e-commerce/'
@@ -859,6 +872,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ShopRoute: typeof ShopRouteWithChildren
   ApiMetaAdsWebhookRoute: typeof ApiMetaAdsWebhookRoute
+  ApiScheduledAbandonedCartRoute: typeof ApiScheduledAbandonedCartRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1304,6 +1318,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiMetaAdsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/scheduled/abandoned-cart': {
+      id: '/api/scheduled/abandoned-cart'
+      path: '/api/scheduled/abandoned-cart'
+      fullPath: '/api/scheduled/abandoned-cart'
+      preLoaderRoute: typeof ApiScheduledAbandonedCartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/policies/$slug': {
       id: '/shop/policies/$slug'
       path: '/policies/$slug'
@@ -1547,6 +1568,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ShopRoute: ShopRouteWithChildren,
   ApiMetaAdsWebhookRoute: ApiMetaAdsWebhookRoute,
+  ApiScheduledAbandonedCartRoute: ApiScheduledAbandonedCartRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

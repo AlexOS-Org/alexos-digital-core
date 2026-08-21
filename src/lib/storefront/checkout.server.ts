@@ -1,4 +1,5 @@
-import type { Json } from "@/integrations/supabase/types";
+import type { Database, Json } from "@/integrations/supabase/types";
+import { markCartSessionConvertedImpl } from "./cart-session.server";
 
 /**
  * Guest checkout — server-only implementation.
@@ -24,6 +25,7 @@ export interface GuestOrderInput {
   notes?: string | null;
   paymentMethod: string;
   items: GuestOrderLineInput[];
+  recoveryToken?: string | null;
 }
 
 const PAYMENT_METHODS = new Set(["cod", "mpesa", "card", "bank_transfer"]);
@@ -74,12 +76,16 @@ export function validateGuestOrder(raw: unknown): GuestOrderInput {
     notes: text(input["notes"], 800) || null,
     paymentMethod,
     items: parsed,
+    recoveryToken: /^[a-f0-9]{64}$/i.test(text(input["recoveryToken"], 100))
+      ? text(input["recoveryToken"], 100).toLowerCase()
+      : null,
   };
 }
 
 export async function placeGuestOrderImpl(input: GuestOrderInput) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin.rpc("dg_create_guest_order", {
+  type GuestOrderRpcArgs = Database["public"]["Functions"]["dg_create_guest_order"]["Args"];
+  const rpcArgs = {
     p_store_slug: input.storeSlug,
     p_first_name: input.firstName,
     p_last_name: input.lastName ?? null,
@@ -90,7 +96,8 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
     p_notes: input.notes ?? null,
     p_payment_method: input.paymentMethod,
     p_items: input.items as unknown as Json,
-  });
+  } as unknown as GuestOrderRpcArgs;
+  const { data, error } = await supabaseAdmin.rpc("dg_create_guest_order", rpcArgs);
   if (error) throw error;
 
   const result = data as {
@@ -102,6 +109,10 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
   } | null;
   if (!result || typeof result.orderNumber !== "string") {
     throw new Error("The order was not created. Please try again.");
+  }
+
+  if (input.recoveryToken) {
+    await markCartSessionConvertedImpl(input.storeSlug, input.recoveryToken);
   }
 
   return {

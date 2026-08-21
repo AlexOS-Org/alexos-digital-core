@@ -933,6 +933,80 @@ export type Database = {
         }
         Relationships: []
       }
+      dg_cart_sessions: {
+        Row: {
+          cart_json: Json
+          consent_at: string
+          converted_at: string | null
+          created_at: string
+          currency: string
+          email: string
+          expires_at: string
+          first_name: string | null
+          follow_up_claimed_at: string | null
+          follow_up_sent_at: string | null
+          id: string
+          last_error: string | null
+          phone: string | null
+          session_token_hash: string
+          status: string
+          store_slug: string
+          storefront_id: string
+          subtotal: number
+          updated_at: string
+        }
+        Insert: {
+          cart_json?: Json
+          consent_at: string
+          converted_at?: string | null
+          created_at?: string
+          currency?: string
+          email: string
+          expires_at?: string
+          first_name?: string | null
+          follow_up_claimed_at?: string | null
+          follow_up_sent_at?: string | null
+          id?: string
+          last_error?: string | null
+          phone?: string | null
+          session_token_hash: string
+          status?: string
+          store_slug: string
+          storefront_id: string
+          subtotal?: number
+          updated_at?: string
+        }
+        Update: {
+          cart_json?: Json
+          consent_at?: string
+          converted_at?: string | null
+          created_at?: string
+          currency?: string
+          email?: string
+          expires_at?: string
+          first_name?: string | null
+          follow_up_claimed_at?: string | null
+          follow_up_sent_at?: string | null
+          id?: string
+          last_error?: string | null
+          phone?: string | null
+          session_token_hash?: string
+          status?: string
+          store_slug?: string
+          storefront_id?: string
+          subtotal?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dg_cart_sessions_storefront_id_fkey"
+            columns: ["storefront_id"]
+            isOneToOne: false
+            referencedRelation: "dg_storefronts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dg_categories: {
         Row: {
           created_at: string | null
@@ -1234,6 +1308,80 @@ export type Database = {
           },
         ]
       }
+      dg_product_evidence: {
+        Row: {
+          confidence: string
+          created_at: string
+          historical: boolean
+          id: string
+          metadata: Json
+          observed_attributes: Json
+          observed_currency: string
+          observed_price: number | null
+          product_id: string | null
+          raw_excerpt: string | null
+          reconciliation_status: string
+          source_date: string | null
+          source_id: string | null
+          source_label: string
+          source_type: string
+          source_url: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          confidence?: string
+          created_at?: string
+          historical?: boolean
+          id?: string
+          metadata?: Json
+          observed_attributes?: Json
+          observed_currency?: string
+          observed_price?: number | null
+          product_id?: string | null
+          raw_excerpt?: string | null
+          reconciliation_status?: string
+          source_date?: string | null
+          source_id?: string | null
+          source_label: string
+          source_type: string
+          source_url?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          confidence?: string
+          created_at?: string
+          historical?: boolean
+          id?: string
+          metadata?: Json
+          observed_attributes?: Json
+          observed_currency?: string
+          observed_price?: number | null
+          product_id?: string | null
+          raw_excerpt?: string | null
+          reconciliation_status?: string
+          source_date?: string | null
+          source_id?: string | null
+          source_label?: string
+          source_type?: string
+          source_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dg_product_evidence_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dg_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dg_product_variants: {
         Row: {
           availability_confirmed: boolean
@@ -1305,80 +1453,6 @@ export type Database = {
           },
         ]
       }
-      dg_product_evidence: {
-        Row: {
-          confidence: "high" | "medium" | "low"
-          created_at: string
-          historical: boolean
-          id: string
-          metadata: Json
-          observed_attributes: Json
-          observed_currency: string
-          observed_price: number | null
-          product_id: string | null
-          raw_excerpt: string | null
-          reconciliation_status: "candidate" | "matched" | "verified" | "rejected"
-          source_date: string | null
-          source_id: string | null
-          source_label: string
-          source_type: "commerce_manager" | "meta_ad" | "instagram_post" | "facebook_post" | "pixel_event" | "existing_app" | "image_asset" | "competitor_research" | "auren_recommendation"
-          source_url: string | null
-          title: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          confidence?: "high" | "medium" | "low"
-          created_at?: string
-          historical?: boolean
-          id?: string
-          metadata?: Json
-          observed_attributes?: Json
-          observed_currency?: string
-          observed_price?: number | null
-          product_id?: string | null
-          raw_excerpt?: string | null
-          reconciliation_status?: "candidate" | "matched" | "verified" | "rejected"
-          source_date?: string | null
-          source_id?: string | null
-          source_label: string
-          source_type: "commerce_manager" | "meta_ad" | "instagram_post" | "facebook_post" | "pixel_event" | "existing_app" | "image_asset" | "competitor_research" | "auren_recommendation"
-          source_url?: string | null
-          title: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          confidence?: "high" | "medium" | "low"
-          created_at?: string
-          historical?: boolean
-          id?: string
-          metadata?: Json
-          observed_attributes?: Json
-          observed_currency?: string
-          observed_price?: number | null
-          product_id?: string | null
-          raw_excerpt?: string | null
-          reconciliation_status?: "candidate" | "matched" | "verified" | "rejected"
-          source_date?: string | null
-          source_id?: string | null
-          source_label?: string
-          source_type?: "commerce_manager" | "meta_ad" | "instagram_post" | "facebook_post" | "pixel_event" | "existing_app" | "image_asset" | "competitor_research" | "auren_recommendation"
-          source_url?: string | null
-          title?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dg_product_evidence_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "dg_products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       dg_products: {
         Row: {
           attributes: Json | null
@@ -1399,7 +1473,7 @@ export type Database = {
           price: number | null
           sale_price: number | null
           seo_description: string | null
-          seo_keywords: string[] | null
+          seo_keywords: string[]
           seo_title: string | null
           short_description: string | null
           sku: string | null
@@ -1430,7 +1504,7 @@ export type Database = {
           price?: number | null
           sale_price?: number | null
           seo_description?: string | null
-          seo_keywords?: string[] | null
+          seo_keywords?: string[]
           seo_title?: string | null
           short_description?: string | null
           sku?: string | null
@@ -1444,6 +1518,7 @@ export type Database = {
         }
         Update: {
           attributes?: Json | null
+          availability_confirmed?: boolean
           barcode?: string | null
           brand_id?: string | null
           category_id?: string | null
@@ -1460,7 +1535,7 @@ export type Database = {
           price?: number | null
           sale_price?: number | null
           seo_description?: string | null
-          seo_keywords?: string[] | null
+          seo_keywords?: string[]
           seo_title?: string | null
           short_description?: string | null
           sku?: string | null
@@ -2410,12 +2485,12 @@ export type Database = {
       dg_create_guest_order: {
         Args: {
           p_address: string
-          p_city: string | null
-          p_email: string | null
+          p_city: string
+          p_email: string
           p_first_name: string
           p_items: Json
-          p_last_name: string | null
-          p_notes: string | null
+          p_last_name: string
+          p_notes: string
           p_payment_method: string
           p_phone: string
           p_store_slug: string
@@ -2423,12 +2498,12 @@ export type Database = {
         Returns: Json
       }
       dg_is_published_store: { Args: { _user_id: string }; Returns: boolean }
-      dg_reserve_variant_stock: {
-        Args: { p_product_id: string; p_qty: number; p_variant_id: string }
-        Returns: boolean
-      }
       dg_reserve_stock: {
         Args: { p_product_id: string; p_qty: number }
+        Returns: boolean
+      }
+      dg_reserve_variant_stock: {
+        Args: { p_product_id: string; p_qty: number; p_variant_id: string }
         Returns: boolean
       }
       next_order_number: { Args: never; Returns: string }
@@ -2602,6 +2677,7 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
 export const Constants = {
   public: {
     Enums: {

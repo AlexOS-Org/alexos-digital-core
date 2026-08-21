@@ -12,6 +12,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ProductCard } from "@/components/storefront/ProductCard";
+import { ResponsiveProductImage } from "@/components/storefront/ResponsiveProductImage";
 import { cartStore, useRecentlyViewed } from "@/lib/storefront/cart";
 import {
   effectivePrice,
@@ -135,9 +136,13 @@ function ProductDetail() {
         <div className="space-y-3">
           <div className="aspect-square overflow-hidden rounded-3xl border bg-muted">
             {images[active] ? (
-              <img
+              <ResponsiveProductImage
                 src={images[active]}
                 alt={product.image_alt_text ?? product.name}
+                width={800}
+                height={800}
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                priority
                 className="h-full w-full object-cover"
               />
             ) : (
@@ -155,7 +160,14 @@ function ProductDetail() {
                   className={`h-20 w-20 shrink-0 overflow-hidden rounded-xl border ${i === active ? "ring-2 ring-primary" : ""}`}
                   aria-label={`View image ${i + 1}`}
                 >
-                  <img src={img} alt="" className="h-full w-full object-cover" />
+                  <ResponsiveProductImage
+                    src={img}
+                    alt=""
+                    width={160}
+                    height={160}
+                    sizes="80px"
+                    className="h-full w-full object-cover"
+                  />
                 </button>
               ))}
             </div>

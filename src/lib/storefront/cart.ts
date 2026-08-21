@@ -74,6 +74,17 @@ export const cartStore = {
     persist();
     emit();
   },
+  replace(next: CartLine[]) {
+    hydrate();
+    lines = next
+      .filter((line) => line.productId && line.quantity > 0)
+      .map((line) => ({
+        ...line,
+        quantity: Math.max(1, Math.min(Math.floor(line.quantity), Math.max(1, line.maxQuantity))),
+      }));
+    persist();
+    emit();
+  },
   setQuantity(productId: string, variantId: string | null, quantity: number) {
     hydrate();
     lines = lines
