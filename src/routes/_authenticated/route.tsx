@@ -5,6 +5,7 @@ import { SupabaseConfigBanner } from "@/components/SupabaseConfigBanner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { DailyGearBrand } from "@/components/dailygear/DailyGearBrand";
 import { modules } from "@/lib/modules";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -22,19 +23,6 @@ export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
 });
 
-function DailyGearWordmark() {
-  return (
-    <Link to="/e-commerce" className="flex min-w-0 flex-col items-center leading-none">
-      <span className="text-[1.35rem] font-black italic tracking-[-0.08em] text-foreground">
-        Daily<span className="text-red-500">Gear</span>
-      </span>
-      <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-        Sell more. Grow daily.
-      </span>
-    </Link>
-  );
-}
-
 function MobileWorkspaceHeader({
   isDailyGearRoute,
   currentTitle,
@@ -48,15 +36,19 @@ function MobileWorkspaceHeader({
 
   return (
     <header
-      className={`sticky top-0 z-20 flex h-[4.5rem] items-center gap-3 border-b px-4 backdrop-blur-xl ${isDailyGearRoute ? "border-white/10 bg-[#090b11]/95 text-white" : "border-border/60 bg-background/90"}`}
+      className={`relative isolate sticky top-0 z-20 flex h-[4.5rem] items-center gap-3 overflow-hidden border-b px-4 backdrop-blur-xl ${isDailyGearRoute ? "border-white/10 bg-[#090b11]/95 text-white" : "border-border/60 bg-background/90"}`}
     >
       <SidebarTrigger
         className={`tap-target rounded-xl ${isDailyGearRoute ? "text-white hover:bg-white/10 hover:text-white" : ""}`}
       />
       {isDailyGearRoute ? (
-        <div className="flex min-w-0 flex-1 justify-center">
-          <DailyGearWordmark />
-        </div>
+        <Link
+          to="/e-commerce"
+          className="relative z-10 flex min-w-0 flex-1 justify-center rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b11]"
+          aria-label="Open DailyGear overview"
+        >
+          <DailyGearBrand />
+        </Link>
       ) : (
         <div className="flex min-w-0 flex-1 items-center gap-2.5">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--alexos-purple)] to-[var(--alexos-blue)] text-white shadow-lg shadow-[var(--alexos-glow)]">

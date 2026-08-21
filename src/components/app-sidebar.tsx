@@ -20,6 +20,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { modules, moduleGroups } from "@/lib/modules";
 import { DAILYGEAR_SECTIONS } from "@/lib/dailygear/registry";
 import { AlexOSLogo } from "@/components/alexos-logo";
+import { DailyGearBrand } from "@/components/dailygear/DailyGearBrand";
 import { Building2, ChevronRight, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -34,6 +35,7 @@ export function AppSidebar() {
   const currentPath = useRouterState({
     select: (r) => r.location.pathname,
   });
+  const isDailyGearRoute = currentPath.startsWith("/e-commerce");
 
   const navigate = useNavigate();
 
@@ -61,11 +63,20 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="alexos-sidebar-sheen border-r border-sidebar-border">
       <SidebarHeader className="border-b border-sidebar-border/70 bg-sidebar/80">
         <Link
-          to="/dashboard"
+          to={isDailyGearRoute ? "/e-commerce" : "/dashboard"}
           onClick={closeSidebar}
-          className="flex items-center gap-2 px-2 py-2 text-sidebar-foreground"
+          className="flex min-w-0 items-center gap-2 px-2 py-2 text-sidebar-foreground"
         >
-          <AlexOSLogo compact showWordmark={!collapsed} />
+          {isDailyGearRoute ? (
+            <>
+              <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-red-500 text-xs font-black text-white shadow-lg shadow-red-500/20">
+                DG
+              </div>
+              {!collapsed && <DailyGearBrand compact tone="sidebar" />}
+            </>
+          ) : (
+            <AlexOSLogo compact showWordmark={!collapsed} />
+          )}
         </Link>
       </SidebarHeader>
 
