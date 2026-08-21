@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductCard } from "@/components/storefront/ProductCard";
 import { StoreConfidenceStrip } from "@/components/storefront/StoreConfidenceStrip";
+import { StoreJourneyGuide } from "@/components/storefront/StoreJourneyGuide";
 import { useStoreCategories, useStoreProducts, useStorefront } from "@/lib/storefront/api";
 import dailyGearMountainWide from "@/assets/visuals/dailygear-mountain-golden-wide.webp";
 import dailyGearMountainMobile from "@/assets/visuals/dailygear-mountain-mobile.webp";
@@ -95,6 +96,7 @@ function StoreHome() {
       </section>
 
       <StoreConfidenceStrip />
+      <StoreJourneyGuide />
 
       {primaryCategories.length ? (
         <section className="mt-12 space-y-4">

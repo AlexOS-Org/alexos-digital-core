@@ -195,28 +195,40 @@ function CheckoutPage() {
             <h2 className="text-sm font-semibold">Contact & delivery</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="firstName">First name</Label>
+                <Label htmlFor="firstName">
+                  First name <span className="text-destructive">*</span>
+                </Label>
+
                 <Input
                   id="firstName"
                   required
+                  autoComplete="given-name"
                   value={form.firstName}
+
                   onChange={(e) => setForm({ ...form, firstName: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="lastName">Last name</Label>
+                <Label htmlFor="lastName">Last name (optional)</Label>
+
                 <Input
                   id="lastName"
+                  autoComplete="family-name"
                   value={form.lastName}
+
                   onChange={(e) => setForm({ ...form, lastName: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="phone">Phone</Label>
+                <Label htmlFor="phone">Phone (required for delivery)</Label>
+
                 <Input
                   id="phone"
                   required
+                  inputMode="tel"
+                  autoComplete="tel"
                   value={form.phone}
+
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
                   onBlur={() => void captureCartSession()}
                 />
@@ -226,7 +238,9 @@ function CheckoutPage() {
                 <Input
                   id="email"
                   type="email"
+                  autoComplete="email"
                   value={form.email}
+
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   onBlur={() => void captureCartSession()}
                 />
@@ -259,24 +273,28 @@ function CheckoutPage() {
                 </p>
               ) : null}
               <div className="space-y-1.5 sm:col-span-2">
-                <Label htmlFor="address">Delivery address</Label>
+                <Label htmlFor="address">
+                  Delivery address <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="address"
                   required
+                  autoComplete="street-address"
                   value={form.address}
                   onChange={(e) => setForm({ ...form, address: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="city">City / town</Label>
+                <Label htmlFor="city">City / town (optional)</Label>
                 <Input
                   id="city"
+                  autoComplete="address-level2"
                   value={form.city}
                   onChange={(e) => setForm({ ...form, city: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
-                <Label htmlFor="notes">Order notes</Label>
+                <Label htmlFor="notes">Order notes (optional)</Label>
                 <Textarea
                   id="notes"
                   value={form.notes}
@@ -330,6 +348,11 @@ function CheckoutPage() {
             <span>Total</span>
             <span>{formatMoney(cart.subtotal + shipping, currency)}</span>
           </div>
+          {mutation.isError ? (
+            <p role="alert" className="text-sm text-destructive">
+              {(mutation.error as Error).message}
+            </p>
+          ) : null}
           <p className="text-xs leading-relaxed text-muted-foreground">
             By placing this order, you confirm your delivery details are correct and agree to the
             DailyGear terms and policies.
@@ -339,6 +362,7 @@ function CheckoutPage() {
             size="lg"
             className="w-full rounded-xl"
             disabled={mutation.isPending}
+            aria-busy={mutation.isPending}
           >
             {mutation.isPending ? "Placing order…" : "Place order"}
           </Button>

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ResponsiveProductImage } from "@/components/storefront/ResponsiveProductImage";
 import { useCart } from "@/lib/storefront/cart";
 import { formatMoney, useStorefront } from "@/lib/storefront/api";
 
@@ -70,7 +71,14 @@ function CartPage() {
             >
               <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-muted">
                 {line.image ? (
-                  <img src={line.image} alt={line.name} className="h-full w-full object-cover" />
+                  <ResponsiveProductImage
+                    src={line.image}
+                    alt={line.name}
+                    width={160}
+                    height={160}
+                    sizes="80px"
+                    className="h-full w-full object-cover"
+                  />
                 ) : null}
               </div>
               <div className="min-w-0 space-y-2">

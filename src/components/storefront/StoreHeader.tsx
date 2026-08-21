@@ -91,8 +91,16 @@ export function StoreHeader({
             </SheetContent>
           </Sheet>
 
-          <Link to="/shop" className="truncate text-base font-black tracking-tight sm:text-lg">
-            {store?.name ?? "DailyGear"}
+          <Link to="/shop" className="flex min-w-0 items-center gap-2.5">
+            <span
+              aria-hidden="true"
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-primary text-xs font-black text-primary-foreground shadow-sm"
+            >
+              DG
+            </span>
+            <span className="truncate text-base font-black tracking-tight sm:text-lg">
+              {store?.name ?? "DailyGear"}
+            </span>
           </Link>
         </div>
 
@@ -122,11 +130,6 @@ export function StoreHeader({
               </Link>
             ))}
           </nav>
-          <Button asChild variant="ghost" size="icon" className="lg:hidden" aria-label="Search">
-            <Link to="/shop/products">
-              <Search className="h-5 w-5" />
-            </Link>
-          </Button>
           <Button asChild variant="ghost" size="icon" className="relative" aria-label="Cart">
             <Link to="/shop/cart">
               <ShoppingBag className="h-5 w-5" />
@@ -139,6 +142,19 @@ export function StoreHeader({
           </Button>
         </div>
       </div>
+
+      <form onSubmit={search} className="border-t px-4 pb-3 pt-3 lg:hidden">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search DailyGear"
+            className="rounded-xl pl-9"
+            aria-label="Search DailyGear"
+          />
+        </div>
+      </form>
 
       {categories.length ? (
         <div className="hidden border-t lg:block">
