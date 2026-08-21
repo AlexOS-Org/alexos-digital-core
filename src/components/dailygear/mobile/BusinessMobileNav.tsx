@@ -32,8 +32,8 @@ const MORE: Array<{ to: string; label: string; icon: typeof Package }> = [
 ];
 
 /**
- * Dedicated mobile shell for the business app: tab bar + floating action.
- * Renders above the global AlexOS bottom nav on DailyGear routes only.
+ * Dedicated mobile shell for the DailyGear business app: tab bar + floating action.
+ * It is the only bottom navigation rendered on authenticated DailyGear routes.
  */
 export function BusinessMobileNav() {
   const path = useRouterState({ select: (r) => r.location.pathname });
@@ -46,13 +46,13 @@ export function BusinessMobileNav() {
       <Link
         to="/e-commerce/checkout"
         aria-label="New order"
-        className="press fixed bottom-36 right-4 z-40 grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 md:hidden"
+        className="press fixed bottom-20 right-4 z-40 grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 md:hidden"
       >
         <Plus className="h-6 w-6" />
       </Link>
 
       <nav
-        className="safe-bottom fixed bottom-[4.25rem] left-2 right-2 z-30 rounded-3xl glass-panel soft-shadow md:hidden"
+        className="safe-bottom fixed bottom-0 left-2 right-2 z-30 rounded-3xl glass-panel soft-shadow md:hidden"
         aria-label="DailyGear navigation"
       >
         <div className="flex items-center justify-around px-1 py-1.5">
@@ -64,7 +64,9 @@ export function BusinessMobileNav() {
                 to={t.to as never}
                 className={cn(
                   "tap-target flex flex-1 flex-col items-center gap-1 rounded-2xl px-1 py-1.5 transition-colors",
-                  on ? "text-primary" : "text-muted-foreground",
+                  on
+                    ? "bg-primary/12 text-primary shadow-sm ring-1 ring-primary/15"
+                    : "text-muted-foreground hover:bg-sidebar-accent/50",
                 )}
               >
                 <t.icon className="h-[18px] w-[18px]" />
@@ -75,7 +77,7 @@ export function BusinessMobileNav() {
 
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
-              className="tap-target flex flex-1 flex-col items-center gap-1 rounded-2xl px-1 py-1.5 text-muted-foreground"
+              className="tap-target flex flex-1 flex-col items-center gap-1 rounded-2xl px-1 py-1.5 text-muted-foreground hover:bg-sidebar-accent/50"
               aria-label="More sections"
             >
               <MoreHorizontal className="h-[18px] w-[18px]" />

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { ArrowUpRight, Car, Gem, ShoppingBag } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -43,9 +43,20 @@ const businessWorkspaces = [
 ] as const;
 
 function BusinessesPage() {
+  const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const isNoveraWorkspace = pathname.startsWith("/businesses/novera");
+
+  if (isNoveraWorkspace) {
+    return (
+      <div className="mx-auto w-full max-w-6xl pb-10">
+        <Outlet />
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto w-full max-w-6xl space-y-8 pb-10">
-      <section className="rounded-[2rem] border border-primary/15 bg-gradient-to-br from-primary/[0.08] via-background to-[var(--alexos-purple)]/[0.08] p-6 sm:p-8 lg:p-10">
+      <section className="alexos-mesh relative overflow-hidden rounded-[2rem] border border-primary/15 p-6 shadow-[0_24px_80px_-48px_var(--alexos-glow)] sm:p-8 lg:p-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Businesses</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
           Choose the workspace that moves today forward.
@@ -87,7 +98,6 @@ function BusinessesPage() {
           );
         })}
       </section>
-      <Outlet />
     </div>
   );
 }

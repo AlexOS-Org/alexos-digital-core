@@ -51,17 +51,21 @@
   --color-alexos-glow: var(--alexos-glow);
   --color-alexos-green: var(--alexos-green);
   --color-alexos-green-dark: var(--alexos-green-dark);
+  --color-alexos-amber: var(--alexos-amber);
+  --color-alexos-coral: var(--alexos-coral);
 }
 
 :root {
   --radius: 0.7rem;
-  --alexos-blue: oklch(0.55 0.20 255);
+  --alexos-blue: oklch(0.55 0.2 255);
   --alexos-blue-dark: oklch(0.35 0.15 258);
   --alexos-purple: oklch(0.58 0.22 292);
-  --alexos-purple-dark: oklch(0.40 0.16 292);
+  --alexos-purple-dark: oklch(0.4 0.16 292);
   --alexos-glow: oklch(0.68 0.19 280 / 22%);
   --alexos-green: oklch(0.59 0.17 155);
   --alexos-green-dark: oklch(0.46 0.14 155);
+  --alexos-amber: oklch(0.72 0.16 80);
+  --alexos-coral: oklch(0.66 0.16 35);
   --background: oklch(0.985 0.006 155);
   --foreground: oklch(0.19 0.025 160);
   --card: oklch(1 0 0);
@@ -101,11 +105,13 @@
 .dark {
   --alexos-blue: oklch(0.68 0.18 255);
   --alexos-blue-dark: oklch(0.42 0.16 258);
-  --alexos-purple: oklch(0.70 0.19 292);
+  --alexos-purple: oklch(0.7 0.19 292);
   --alexos-purple-dark: oklch(0.48 0.17 292);
   --alexos-glow: oklch(0.72 0.19 280 / 25%);
   --alexos-green: oklch(0.72 0.17 155);
   --alexos-green-dark: oklch(0.54 0.15 155);
+  --alexos-amber: oklch(0.78 0.17 82);
+  --alexos-coral: oklch(0.72 0.16 35);
   --background: oklch(0.13 0.025 160);
   --foreground: oklch(0.97 0.005 155);
   --card: oklch(0.18 0.035 160);
@@ -122,7 +128,7 @@
   --accent-foreground: oklch(0.97 0.005 155);
   --success: var(--alexos-green);
   --success-foreground: oklch(0.12 0.025 160);
-  --destructive: oklch(0.65 0.20 27);
+  --destructive: oklch(0.65 0.2 27);
   --destructive-foreground: oklch(0.99 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 14%);
@@ -132,7 +138,7 @@
   --chart-3: var(--alexos-purple);
   --chart-4: oklch(0.76 0.14 85);
   --chart-5: oklch(0.68 0.12 220);
-  --sidebar: oklch(0.10 0.03 265);
+  --sidebar: oklch(0.1 0.03 265);
   --sidebar-foreground: oklch(0.92 0.01 155);
   --sidebar-primary: var(--alexos-green);
   --sidebar-primary-foreground: oklch(0.99 0 0);
@@ -143,14 +149,35 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html { background: var(--color-background); }
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    background: var(--color-background);
+  }
   body {
     min-height: 100vh;
     background:
-      radial-gradient(circle at 8% 4%, color-mix(in oklch, var(--alexos-green) 8%, transparent), transparent 28rem),
-      radial-gradient(circle at 92% 10%, color-mix(in oklch, var(--alexos-blue) 6%, transparent), transparent 26rem),
-      radial-gradient(circle at 55% 96%, color-mix(in oklch, var(--alexos-purple) 5%, transparent), transparent 30rem),
+      radial-gradient(
+        circle at 8% 4%,
+        color-mix(in oklch, var(--alexos-green) 8%, transparent),
+        transparent 28rem
+      ),
+      radial-gradient(
+        circle at 92% 10%,
+        color-mix(in oklch, var(--alexos-blue) 6%, transparent),
+        transparent 26rem
+      ),
+      radial-gradient(
+        circle at 55% 96%,
+        color-mix(in oklch, var(--alexos-purple) 5%, transparent),
+        transparent 30rem
+      ),
+      radial-gradient(
+        circle at 48% 2%,
+        color-mix(in oklch, var(--alexos-amber) 5%, transparent),
+        transparent 22rem
+      ),
       var(--color-background);
     color: var(--color-foreground);
     font-feature-settings: "cv11", "ss01";
@@ -159,12 +186,55 @@
 
 @layer utilities {
   .alexos-surface {
-    background: linear-gradient(135deg, color-mix(in oklch, var(--color-card) 96%, var(--alexos-green) 4%), var(--color-card));
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--color-card) 96%, var(--alexos-green) 4%),
+      var(--color-card)
+    );
     border-color: color-mix(in oklch, var(--color-border) 80%, var(--alexos-green) 20%);
   }
 
   .alexos-visual-strip {
-    background: linear-gradient(90deg, var(--alexos-green), var(--alexos-blue), var(--alexos-purple));
+    background: linear-gradient(
+      90deg,
+      var(--alexos-green),
+      var(--alexos-amber) 32%,
+      var(--alexos-blue) 62%,
+      var(--alexos-purple)
+    );
+  }
+
+  .alexos-sidebar-sheen {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--color-sidebar) 88%, var(--alexos-blue) 12%),
+      var(--color-sidebar)
+    );
+  }
+
+  .alexos-nav-active {
+    box-shadow:
+      inset 3px 0 0 var(--alexos-amber),
+      0 10px 26px -18px var(--alexos-glow);
+  }
+
+  .alexos-mesh {
+    background-image:
+      radial-gradient(
+        circle at 12% 0%,
+        color-mix(in oklch, var(--alexos-green) 13%, transparent),
+        transparent 24rem
+      ),
+      radial-gradient(
+        circle at 92% 12%,
+        color-mix(in oklch, var(--alexos-purple) 12%, transparent),
+        transparent 22rem
+      ),
+      linear-gradient(
+        135deg,
+        color-mix(in oklch, var(--color-card) 96%, var(--alexos-blue) 4%),
+        var(--color-card)
+      );
   }
 
   .alexos-glow {

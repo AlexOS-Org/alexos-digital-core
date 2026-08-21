@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { modules, moduleGroups } from "@/lib/modules";
+import { DAILYGEAR_SECTIONS } from "@/lib/dailygear/registry";
 import { AlexOSLogo } from "@/components/alexos-logo";
 import { Building2, ChevronRight, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,8 +58,8 @@ export function AppSidebar() {
   );
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border">
-      <SidebarHeader className="border-b border-sidebar-border">
+    <Sidebar collapsible="icon" className="alexos-sidebar-sheen border-r border-sidebar-border">
+      <SidebarHeader className="border-b border-sidebar-border/70 bg-sidebar/80">
         <Link
           to="/dashboard"
           onClick={closeSidebar}
@@ -77,7 +78,12 @@ export function AppSidebar() {
                 .filter((m) => m.group === "Home")
                 .map((item) => (
                   <SidebarMenuItem key={item.url}>
-                    <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive(item.url)}
+                      tooltip={item.title}
+                      className="data-[active=true]:alexos-nav-active"
+                    >
                       <Link to={item.url} onClick={closeSidebar}>
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
@@ -98,7 +104,12 @@ export function AppSidebar() {
                 // Collapsed: show each business icon individually with tooltip
                 businessModules.map((item) => (
                   <SidebarMenuItem key={item.url}>
-                    <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive(item.url)}
+                      tooltip={item.title}
+                      className="data-[active=true]:alexos-nav-active"
+                    >
                       <Link to={item.url} onClick={closeSidebar}>
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
@@ -129,7 +140,11 @@ export function AppSidebar() {
                     <SidebarMenuSub>
                       {businessModules.map((item) => (
                         <SidebarMenuSubItem key={item.url}>
-                          <SidebarMenuSubButton asChild isActive={isActive(item.url)}>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={isActive(item.url)}
+                            className="data-[active=true]:alexos-nav-active"
+                          >
                             <Link to={item.url} onClick={closeSidebar}>
                               <item.icon className="h-3.5 w-3.5" />
                               <span>{item.title}</span>
@@ -145,6 +160,36 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {/* ── DailyGear contextual workspace ─────────── */}
+        {currentPath.startsWith("/e-commerce") ? (
+          <SidebarGroup>
+            {!collapsed && (
+              <SidebarGroupLabel className="text-sidebar-foreground/55">
+                DailyGear workspace
+              </SidebarGroupLabel>
+            )}
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {DAILYGEAR_SECTIONS.map((section) => (
+                  <SidebarMenuItem key={section.to}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={section.exact ? currentPath === section.to : isActive(section.to)}
+                      tooltip={section.label}
+                      className="data-[active=true]:alexos-nav-active"
+                    >
+                      <Link to={section.to} onClick={closeSidebar}>
+                        <section.icon className="h-4 w-4" />
+                        <span>{section.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ) : null}
+
         {/* ── Remaining groups ──────────────────────── */}
         {contentGroups.map((group) => {
           const items = modules.filter((m) => m.group === group);
@@ -156,7 +201,12 @@ export function AppSidebar() {
                 <SidebarMenu>
                   {items.map((item) => (
                     <SidebarMenuItem key={item.url}>
-                      <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={isActive(item.url)}
+                        tooltip={item.title}
+                        className="data-[active=true]:alexos-nav-active"
+                      >
                         <Link to={item.url} onClick={closeSidebar}>
                           <item.icon className="h-4 w-4" />
                           <span>{item.title}</span>
@@ -172,13 +222,18 @@ export function AppSidebar() {
       </SidebarContent>
 
       {/* ── Footer: Settings + Sign out ───────────── */}
-      <SidebarFooter className="border-t border-sidebar-border">
+      <SidebarFooter className="border-t border-sidebar-border/70 bg-sidebar/70">
         <SidebarMenu>
           {modules
             .filter((m) => m.group === "System")
             .map((item) => (
               <SidebarMenuItem key={item.url}>
-                <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={isActive(item.url)}
+                  tooltip={item.title}
+                  className="data-[active=true]:alexos-nav-active"
+                >
                   <Link to={item.url} onClick={closeSidebar}>
                     <item.icon className="h-4 w-4" />
                     <span>{item.title}</span>

@@ -22,6 +22,7 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AuthenticatedLayout() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const isDailyGearRoute = pathname.startsWith("/e-commerce");
 
   // Match the deepest module whose URL is a prefix of the current path
   const current = modules.find(
@@ -68,7 +69,7 @@ function AuthenticatedLayout() {
           <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
             <Outlet />
           </main>
-          <MobileBottomNav />
+          {!isDailyGearRoute && <MobileBottomNav />}
         </div>
       </div>
     </SidebarProvider>

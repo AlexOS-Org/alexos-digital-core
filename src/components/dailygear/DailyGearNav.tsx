@@ -7,8 +7,12 @@ export function DailyGearNav() {
   const path = useRouterState({ select: (r) => r.location.pathname });
 
   return (
-    <div className="border-b border-border -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 sticky top-14 z-[5] bg-background/85 backdrop-blur">
-      <nav className="flex gap-1 overflow-x-auto py-2 scrollbar-thin">
+    <div className="relative -mx-4 border-b border-border/70 bg-background/85 px-4 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 sticky top-14 z-[5]">
+      <div className="alexos-visual-strip absolute inset-x-0 top-0 h-0.5 opacity-80" />
+      <nav
+        className="no-scrollbar flex gap-1 overflow-x-auto py-2 pt-2.5 scrollbar-thin"
+        aria-label="DailyGear sections"
+      >
         {DAILYGEAR_SECTIONS.map((section) => {
           const active = section.exact ? path === section.to : path.startsWith(section.to);
           return (
@@ -18,7 +22,7 @@ export function DailyGearNav() {
               className={cn(
                 "inline-flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
                 active
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground",
               )}
             >
