@@ -1,4 +1,5 @@
 import * as React from "react";
+import { getMobileLayoutMatch } from "./use-mobile";
 
 /**
  * Device tiers drive *layout selection*, not just resizing.
@@ -16,6 +17,7 @@ const QUERIES: Array<[DeviceTier, string]> = [
 
 function read(): DeviceTier {
   if (typeof window === "undefined") return "laptop";
+  if (getMobileLayoutMatch()) return "mobile";
   for (const [tier, query] of QUERIES) {
     if (window.matchMedia(query).matches) return tier;
   }
@@ -23,14 +25,18 @@ function read(): DeviceTier {
 }
 
 export function useDeviceTier(): DeviceTier {
-  const [tier, setTier] = React.useState<DeviceTier>("laptop");
+  const [tier, setTier] = React.useState<DeviceTier>(() => read());
 
   React.useEffect(() => {
     const update = () => setTier(read());
+    const lists = QUERIES.map(([, query]) => window.matchMedia(query));
+    lists.forEach((list) => list.addEventListener("change", update));
+    window.addEventListener("resize", update);
     update();
-    const lists = QUERIES.map(([, q]) => window.matchMedia(q));
-    lists.forEach((l) => l.addEventListener("change", update));
-    return () => lists.forEach((l) => l.removeEventListener("change", update));
+    return () => {
+      lists.forEach((list) => list.removeEventListener("change", update));
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
   return tier;

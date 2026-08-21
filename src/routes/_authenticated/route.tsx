@@ -1,11 +1,12 @@
-import { Bell, ShoppingBag, Sparkles } from "lucide-react";
 import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
+import { Bell, ShoppingBag, Sparkles } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { SupabaseConfigBanner } from "@/components/SupabaseConfigBanner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { modules } from "@/lib/modules";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -21,6 +22,19 @@ export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
 });
 
+function DailyGearWordmark() {
+  return (
+    <Link to="/e-commerce" className="flex min-w-0 flex-col items-center leading-none">
+      <span className="text-[1.35rem] font-black italic tracking-[-0.08em] text-foreground">
+        Daily<span className="text-red-500">Gear</span>
+      </span>
+      <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        Sell more. Grow daily.
+      </span>
+    </Link>
+  );
+}
+
 function MobileWorkspaceHeader({
   isDailyGearRoute,
   currentTitle,
@@ -28,40 +42,47 @@ function MobileWorkspaceHeader({
   isDailyGearRoute: boolean;
   currentTitle?: string;
 }) {
-  const Icon = isDailyGearRoute ? ShoppingBag : Sparkles;
-  const title = isDailyGearRoute ? "DailyGear" : currentTitle === "Dashboard" ? "Auren" : "AlexOS";
-  const subtitle = isDailyGearRoute
-    ? "Sell more. Grow daily."
-    : title === "Auren"
-      ? "AI assistant"
-      : "Business OS";
+  const isAurenRoute = !isDailyGearRoute && currentTitle === "Auren";
+  const title = isAurenRoute ? "Auren" : "AlexOS";
+  const subtitle = isAurenRoute ? "AI assistant" : "Business OS";
+
   return (
-    <header className="sticky top-0 z-20 flex h-[4.5rem] items-center gap-3 border-b border-border/60 bg-background/90 px-4 backdrop-blur-xl md:hidden">
-      <SidebarTrigger className="tap-target rounded-xl" />
-      <div className="flex min-w-0 flex-1 items-center gap-2.5">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--alexos-purple)] to-[var(--alexos-blue)] text-white shadow-lg shadow-[var(--alexos-glow)]">
-          <Icon className="h-[18px] w-[18px]" />
+    <header
+      className={`sticky top-0 z-20 flex h-[4.5rem] items-center gap-3 border-b px-4 backdrop-blur-xl ${isDailyGearRoute ? "border-white/10 bg-[#090b11]/95 text-white" : "border-border/60 bg-background/90"}`}
+    >
+      <SidebarTrigger
+        className={`tap-target rounded-xl ${isDailyGearRoute ? "text-white hover:bg-white/10 hover:text-white" : ""}`}
+      />
+      {isDailyGearRoute ? (
+        <div className="flex min-w-0 flex-1 justify-center">
+          <DailyGearWordmark />
         </div>
-        <div className="min-w-0 leading-tight">
-          <p className="truncate text-sm font-bold tracking-tight">{title}</p>
-          <p className="truncate text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {subtitle}
-          </p>
+      ) : (
+        <div className="flex min-w-0 flex-1 items-center gap-2.5">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--alexos-purple)] to-[var(--alexos-blue)] text-white shadow-lg shadow-[var(--alexos-glow)]">
+            <Sparkles className="h-[18px] w-[18px]" />
+          </div>
+          <div className="min-w-0 leading-tight">
+            <p className="truncate text-sm font-bold tracking-tight">{title}</p>
+            <p className="truncate text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              {subtitle}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
       <Link
         to="/notifications"
-        className="tap-target grid place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        className={`tap-target grid place-items-center rounded-xl transition-colors ${isDailyGearRoute ? "text-white/75 hover:bg-white/10 hover:text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
         aria-label="Notifications"
       >
         <Bell className="h-[19px] w-[19px]" />
       </Link>
       <Link
         to="/settings"
-        className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[var(--alexos-blue)] to-[var(--alexos-purple)] text-[11px] font-bold text-white shadow-md"
+        className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-[11px] font-bold shadow-md ${isDailyGearRoute ? "bg-red-500 text-white shadow-red-500/25" : "bg-gradient-to-br from-[var(--alexos-blue)] to-[var(--alexos-purple)] text-white"}`}
         aria-label="Open settings"
       >
-        AO
+        {isDailyGearRoute ? "DG" : "AO"}
       </Link>
     </header>
   );
@@ -70,6 +91,7 @@ function MobileWorkspaceHeader({
 function AuthenticatedLayout() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const isDailyGearRoute = pathname.startsWith("/e-commerce");
+  const isMobile = useIsMobile();
 
   // Match the deepest module whose URL is a prefix of the current path
   const current = modules.find(
@@ -93,40 +115,43 @@ function AuthenticatedLayout() {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background text-foreground transition-colors duration-300">
         <AppSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          <header className="sticky top-0 z-20 hidden h-16 items-center gap-3 border-b border-border/70 bg-background/80 px-4 backdrop-blur-xl sm:px-6 md:flex">
-            <SidebarTrigger className="tap-target rounded-xl" />
-            <div className="min-w-0">
-              <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
-                {current?.group ?? "Workspace"}
+        <div className="flex min-w-0 flex-1 flex-col">
+          {!isMobile && (
+            <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border/70 bg-background/80 px-4 backdrop-blur-xl sm:px-6">
+              <SidebarTrigger className="tap-target rounded-xl" />
+              <div className="min-w-0">
+                <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
+                  {current?.group ?? "Workspace"}
+                </div>
+                <div className="truncate text-sm font-semibold">{current?.title ?? "AlexOS"}</div>
+                <div className="hidden items-center gap-1 text-[10px] text-muted-foreground sm:flex">
+                  {breadcrumb.map((label, index) => (
+                    <span key={`${label}-${index}`}>
+                      {index > 0 && <span className="mr-1 text-muted-foreground/50">/</span>}
+                      {label}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div className="text-sm font-semibold truncate">{current?.title ?? "AlexOS"}</div>
-              <div className="hidden items-center gap-1 text-[10px] text-muted-foreground sm:flex">
-                {breadcrumb.map((label, index) => (
-                  <span key={`${label}-${index}`}>
-                    {index > 0 && <span className="mr-1 text-muted-foreground/50">/</span>}
-                    {label}
-                  </span>
-                ))}
+              <div className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="hidden sm:inline">Settings control appearance</span>
+                <Link
+                  to="/settings"
+                  className="rounded-lg px-2 py-1.5 font-medium text-primary hover:bg-primary/10"
+                >
+                  Settings
+                </Link>
               </div>
-            </div>
-            <div className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="hidden sm:inline">Settings control appearance</span>
-              <Link
-                to="/settings"
-                className="rounded-lg px-2 py-1.5 font-medium text-primary hover:bg-primary/10"
-              >
-                Settings
-              </Link>
-            </div>
-          </header>
-          <MobileWorkspaceHeader
-            isDailyGearRoute={isDailyGearRoute}
-            currentTitle={current?.title}
-          />
-          {/* Extra bottom padding on mobile so content clears the bottom nav */}
+            </header>
+          )}
+          {isMobile && (
+            <MobileWorkspaceHeader
+              isDailyGearRoute={isDailyGearRoute}
+              currentTitle={current?.title}
+            />
+          )}
           <SupabaseConfigBanner />
-          <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
+          <main className={`flex-1 p-4 sm:p-6 lg:p-8 ${isMobile ? "pb-28" : "pb-8"}`}>
             <Outlet />
           </main>
           {!isDailyGearRoute && <MobileBottomNav />}

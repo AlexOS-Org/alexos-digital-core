@@ -23,7 +23,7 @@ export function MobileBottomNav() {
 
   return (
     <nav
-      className="safe-area-inset-bottom fixed bottom-0 left-0 right-0 z-50 border-t border-border/70 bg-background/90 shadow-[0_-18px_40px_-28px_var(--alexos-glow)] backdrop-blur-xl md:hidden"
+      className="safe-area-inset-bottom fixed bottom-0 left-0 right-0 z-50 border-t border-border/70 bg-background/90 shadow-[0_-18px_40px_-28px_var(--alexos-glow)] backdrop-blur-xl"
       aria-label="Main navigation"
     >
       <div className="mx-auto flex max-w-lg items-center gap-1 px-2 py-1.5">

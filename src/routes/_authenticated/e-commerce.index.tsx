@@ -1,10 +1,19 @@
 import { CatalogueReadinessCard } from "@/components/dailygear/dashboard/CatalogueReadinessCard";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Boxes, DollarSign, Percent, ShoppingCart, TrendingUp, Users } from "lucide-react";
+import {
+  ArrowUpRight,
+  Boxes,
+  DollarSign,
+  Percent,
+  ShoppingCart,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 import { KpiCard } from "@/components/dailygear/KpiCard";
 import { IntelligencePanel } from "@/components/dailygear/IntelligencePanel";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   ActivityTimeline,
   BusinessCalendar,
@@ -153,14 +162,16 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
             DailyGear commerce
           </p>
           <h1 className="mt-1 truncate text-xl font-black tracking-tight sm:text-3xl">
-            {greeting}, here is your store
+            {compactMode ? `${greeting}, Alex` : `${greeting}, here is your store`}
           </h1>
           <p className="mt-1 text-xs text-white/70 sm:text-sm">
-            {new Date().toLocaleDateString(undefined, {
-              weekday: "long",
-              day: "numeric",
-              month: "long",
-            })}
+            {compactMode
+              ? "Here\u0027s what\u0027s happening with DailyGear today."
+              : new Date().toLocaleDateString(undefined, {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                })}
           </p>
         </div>
         {!compactMode && (
@@ -174,15 +185,6 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
           </div>
         )}
       </div>
-
-      {compactMode && (
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <MiniStat label="Revenue 30d" value={compact(kpis.revenue)} />
-          <MiniStat label="Profit 30d" value={compact(kpis.profit)} />
-          <MiniStat label="Orders" value={String(kpis.orders)} />
-          <MiniStat label="Pending" value={String(kpis.pendingOrders)} />
-        </div>
-      )}
     </section>
   );
 }
@@ -193,6 +195,177 @@ function MiniStat({ label, value }: { label: string; value: string }) {
       <p className="text-[10px] font-semibold uppercase tracking-wide text-white/60">{label}</p>
       <p className="mt-0.5 text-lg font-bold tabular-nums text-white">{value}</p>
     </div>
+  );
+}
+
+function buildSparklinePath(trend: Panels["trend"]) {
+  const values = trend.map((point) => Number(point.revenue));
+  const max = Math.max(...values, 1);
+  const min = Math.min(...values, 0);
+  const span = Math.max(max - min, 1);
+  const denominator = Math.max(values.length - 1, 1);
+
+  return values
+    .map((value, index) => {
+      const x = (index / denominator) * 100;
+      const y = 42 - ((value - min) / span) * 34;
+      return `${index === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
+    })
+    .join(" ");
+}
+
+function MobileStoreOverview({ kpis, trend, loading }: Pick<Panels, "kpis" | "trend" | "loading">) {
+  const comparison =
+    Number.isFinite(kpis.revenueChangePct) && kpis.revenueChangePct !== 0
+      ? `${kpis.revenueChangePct > 0 ? "↑" : "↓"} ${Math.abs(kpis.revenueChangePct).toFixed(1)}% vs comparison`
+      : "No comparable baseline";
+
+  return (
+    <section className="relative overflow-hidden rounded-[1.75rem] border border-border/70 bg-card/90 p-4 shadow-[0_18px_48px_-30px_var(--alexos-glow)] sm:p-5">
+      <span className="alexos-visual-strip absolute inset-x-0 top-0 h-1 opacity-90" />
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
+            Store overview
+          </p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight">Sales you can see.</h2>
+        </div>
+        <Link
+          to="/e-commerce/reports"
+          className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-primary hover:underline"
+        >
+          View analytics <ArrowUpRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-border/60 bg-background/55 p-3.5">
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              Total sales · last 30 days
+            </p>
+            <p className="mt-1 text-2xl font-black tabular-nums">{money(kpis.revenue)}</p>
+            <p
+              className={`mt-1 text-xs font-semibold ${kpis.revenueChangePct > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}
+            >
+              {comparison}
+            </p>
+          </div>
+          <div className="h-16 w-[48%] min-w-32">
+            {loading ? (
+              <Skeleton className="h-full w-full rounded-xl" />
+            ) : trend.length > 0 ? (
+              <svg
+                viewBox="0 0 100 48"
+                className="h-full w-full overflow-visible"
+                role="img"
+                aria-label="Revenue trend"
+              >
+                <defs>
+                  <linearGradient id="dg-mobile-revenue" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0" stopColor="var(--color-chart-1)" stopOpacity="0.3" />
+                    <stop offset="1" stopColor="var(--color-chart-1)" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d={`${buildSparklinePath(trend)} L 100 48 L 0 48 Z`}
+                  fill="url(#dg-mobile-revenue)"
+                />
+                <path
+                  d={buildSparklinePath(trend)}
+                  fill="none"
+                  stroke="var(--color-chart-1)"
+                  strokeWidth="1.8"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
+            ) : (
+              <div className="grid h-full place-items-center rounded-xl border border-dashed border-border/70 text-[10px] text-muted-foreground">
+                No sales trend yet
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-2 gap-2.5">
+        <MiniStat label="Orders" value={String(kpis.orders)} />
+        <MiniStat label="Customers" value={String(kpis.customers)} />
+        <MiniStat label="Purchase rate" value={`${kpis.conversionRate.toFixed(0)}%`} />
+        <MiniStat label="Average order" value={compact(kpis.averageOrderValue)} />
+      </div>
+    </section>
+  );
+}
+
+function MobileFocus(p: Panels) {
+  const pendingOrders = p.orders.filter((order) => ["new", "processing"].includes(order.status));
+  const draftProducts = p.products.filter((product) => product.status === "draft");
+  const gatedProducts = p.products.filter(
+    (product) => Number(product.stock_quantity) < 15 || !product.availability_confirmed,
+  );
+  const focus = [
+    pendingOrders.length > 0
+      ? {
+          title: "Process pending orders",
+          detail: `${pendingOrders.length} order(s) need fulfilment`,
+          to: "/e-commerce/orders",
+        }
+      : null,
+    draftProducts.length > 0
+      ? {
+          title: "Verify catalogue drafts",
+          detail: `${draftProducts.length} draft product(s) need current evidence`,
+          to: "/e-commerce/products",
+        }
+      : null,
+    gatedProducts.length > 0
+      ? {
+          title: "Pass the stock gate",
+          detail: "Confirm availability and at least 15 units per SKU or variant",
+          to: "/e-commerce/inventory",
+        }
+      : null,
+  ].filter((item): item is { title: string; detail: string; to: string } => item !== null);
+
+  return (
+    <section className="rounded-[1.75rem] border border-border/70 bg-card/90 p-4 shadow-[0_16px_42px_-30px_var(--alexos-glow)] sm:p-5">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
+            Today&apos;s focus
+          </p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight">Move the store forward.</h2>
+        </div>
+        <span className="text-xs text-muted-foreground">{focus.length} open</span>
+      </div>
+      <div className="mt-4 divide-y divide-border/70">
+        {focus.length > 0 ? (
+          focus.map((item, index) => (
+            <Link
+              key={item.title}
+              to={item.to}
+              className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
+            >
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-primary text-xs font-bold text-primary-foreground">
+                {index + 1}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-semibold">{item.title}</span>
+                <span className="mt-0.5 block truncate text-xs text-muted-foreground">
+                  {item.detail}
+                </span>
+              </span>
+              <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+            </Link>
+          ))
+        ) : (
+          <p className="py-3 text-sm text-muted-foreground">
+            No open actions are recorded. New orders and catalogue changes will appear here.
+          </p>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -266,38 +439,18 @@ function MobileDashboard(p: Panels) {
   return (
     <div className="space-y-4 pb-40">
       <Hero kpis={p.kpis} compactMode />
+      <MobileStoreOverview kpis={p.kpis} trend={p.trend} loading={p.loading} />
+      <MobileFocus {...p} />
+
+      <div className="grid gap-4">
+        <LiveOrderFeed orders={p.orders} customers={p.customers} loading={p.loading} limit={4} />
+        <InventoryMonitor products={p.products} loading={p.loading} limit={4} />
+      </div>
+
       <CatalogueReadinessCard products={p.products} loading={p.loading} />
-
-      <section className="-mx-4 px-4">
-        <div className="swipe-row no-scrollbar gap-3 pb-1">
-          {[
-            { label: "AOV", value: compact(p.kpis.averageOrderValue) },
-            { label: "Customers", value: String(p.kpis.customers) },
-            { label: "Inventory", value: compact(p.kpis.inventoryValue) },
-            { label: "Low stock", value: String(p.kpis.lowStockCount) },
-            { label: "Delivered", value: String(p.kpis.deliveredOrders) },
-            { label: "Purchase rate", value: `${p.kpis.conversionRate.toFixed(0)}%` },
-          ].map((s) => (
-            <div
-              key={s.label}
-              className="relative w-36 overflow-hidden rounded-2xl border border-border/60 bg-card/90 px-4 py-3 shadow-[0_12px_30px_-22px_var(--alexos-glow)] backdrop-blur-sm"
-            >
-              <span className="alexos-visual-strip absolute inset-x-0 top-0 h-px opacity-80" />
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                {s.label}
-              </p>
-              <p className="mt-1 text-base font-bold tabular-nums">{s.value}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       <QuickActionsGrid columns={4} />
-      <ProfitCashFlowPanel />
-      <RevenueAnalytics trend={p.trend} loading={p.loading} height={180} />
-      <LiveOrderFeed orders={p.orders} customers={p.customers} loading={p.loading} limit={4} />
       <NotificationsPanel products={p.products} orders={p.orders} loading={p.loading} />
-      <InventoryMonitor products={p.products} loading={p.loading} limit={3} />
+      <ProfitCashFlowPanel />
       <RecommendationsPanel products={p.products} orders={p.orders} loading={p.loading} />
       <ActivityTimeline
         orders={p.orders}

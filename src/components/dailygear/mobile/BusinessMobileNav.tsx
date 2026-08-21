@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   BarChart3,
   Boxes,
@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const TABS: Array<{ to: string; label: string; icon: typeof Package; exact?: boolean }> = [
   { to: "/e-commerce", label: "Home", icon: LayoutDashboard, exact: true },
@@ -37,7 +38,10 @@ const MORE: Array<{ to: string; label: string; icon: typeof Package }> = [
  */
 export function BusinessMobileNav() {
   const path = useRouterState({ select: (r) => r.location.pathname });
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
+
+  if (!isMobile) return null;
 
   const active = (to: string, exact?: boolean) => (exact ? path === to : path.startsWith(to));
 
@@ -46,13 +50,13 @@ export function BusinessMobileNav() {
       <Link
         to="/e-commerce/checkout"
         aria-label="New order"
-        className="press fixed bottom-20 right-4 z-40 grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 md:hidden"
+        className="press fixed bottom-20 right-4 z-40 grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30"
       >
         <Plus className="h-6 w-6" />
       </Link>
 
       <nav
-        className="safe-bottom fixed bottom-0 left-2 right-2 z-30 rounded-3xl glass-panel soft-shadow md:hidden"
+        className="safe-bottom fixed bottom-0 left-2 right-2 z-30 rounded-3xl glass-panel soft-shadow"
         aria-label="DailyGear navigation"
       >
         <div className="flex items-center justify-around px-1 py-1.5">
