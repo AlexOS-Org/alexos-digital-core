@@ -13,7 +13,7 @@ function NoveraPage() {
   return (
     <AlexOSEmptyState
       title="Novera"
-      description="BF business operations and growth for Novera. Connect live workspace data to bring this view online."
+      description="Business operations and growth for Novera. Connect live workspace data to bring this view online."
       icon={Gem}
       statusLabel="Workspace preparing"
     />

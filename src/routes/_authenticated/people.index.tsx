@@ -53,6 +53,7 @@ import { contactDisplayName } from "@/lib/crm/utils";
 import { ContactAvatar } from "@/components/crm/ContactAvatar";
 import { ContactFormDialog } from "@/components/crm/ContactFormDialog";
 import type { Contact, ContactStatus } from "@/lib/crm/types";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/_authenticated/people/")({
   component: ContactsPage,
@@ -85,6 +86,7 @@ function ContactsPage() {
 
   const { data: contacts = [], isLoading } = useContacts({ search, status });
   const del = useDeleteContact();
+  const isMobile = useIsMobile();
 
   const totalPages = Math.max(1, Math.ceil(contacts.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -180,7 +182,82 @@ function ContactsPage() {
             />
           ) : (
             <>
-              <div className="overflow-x-auto">
+              <div className={isMobile ? "space-y-3" : "hidden"}>
+                {paged.map((c) => (
+                  <article
+                    key={c.id}
+                    className="rounded-2xl border border-border/70 bg-background/40 p-4"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <Link
+                        to="/people/contacts/$id"
+                        params={{ id: c.id }}
+                        className="flex min-w-0 items-center gap-3 hover:underline"
+                      >
+                        <ContactAvatar contact={c} />
+                        <div className="min-w-0">
+                          <div className="truncate font-medium">{contactDisplayName(c)}</div>
+                          {c.job_title ? (
+                            <div className="truncate text-xs text-muted-foreground">
+                              {c.job_title}
+                            </div>
+                          ) : null}
+                        </div>
+                      </Link>
+                      <ContactActions
+                        contact={c}
+                        onEdit={() => {
+                          setEditing(c);
+                          setDialogOpen(true);
+                        }}
+                        onDelete={() => {
+                          if (confirm(`Delete ${contactDisplayName(c)}?`)) del.mutate(c.id);
+                        }}
+                      />
+                    </div>
+                    <div className="mt-4 space-y-2 text-xs">
+                      {c.company ? (
+                        <div className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
+                          <Building2 className="h-3.5 w-3.5 shrink-0" />
+                          <span className="truncate">{c.company}</span>
+                        </div>
+                      ) : null}
+                      {c.email ? (
+                        <a
+                          href={`mailto:${c.email}`}
+                          className="flex min-w-0 items-center gap-1.5 break-all hover:text-primary"
+                        >
+                          <Mail className="h-3.5 w-3.5 shrink-0" /> {c.email}
+                        </a>
+                      ) : null}
+                      {c.phone ? (
+                        <a
+                          href={`tel:${c.phone}`}
+                          className="flex min-w-0 items-center gap-1.5 hover:text-primary"
+                        >
+                          <Phone className="h-3.5 w-3.5 shrink-0" /> {c.phone}
+                        </a>
+                      ) : null}
+                      {!c.company && !c.email && !c.phone ? (
+                        <span className="text-muted-foreground">No company or contact details</span>
+                      ) : null}
+                    </div>
+                    <div className="mt-4 flex items-center justify-between gap-3">
+                      <Badge variant="outline" className={STATUS_TONE[c.status]}>
+                        {CONTACT_STATUSES.find((s) => s.value === c.status)?.label}
+                      </Badge>
+                      <Link
+                        to="/people/contacts/$id"
+                        params={{ id: c.id }}
+                        className="text-xs font-medium text-primary hover:underline"
+                      >
+                        View contact
+                      </Link>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              <div className={isMobile ? "hidden" : "overflow-x-auto"}>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -330,6 +407,45 @@ function ContactsPage() {
 
       <ContactFormDialog open={dialogOpen} onOpenChange={setDialogOpen} contact={editing} />
     </div>
+  );
+}
+
+function ContactActions({
+  contact,
+  onEdit,
+  onDelete,
+}: {
+  contact: Contact;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 shrink-0"
+          aria-label="Contact actions"
+        >
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem asChild>
+          <Link to="/people/contacts/$id" params={{ id: contact.id }}>
+            <Eye className="mr-2 h-4 w-4" /> View
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={onEdit}>
+          <Edit3 className="mr-2 h-4 w-4" /> Edit
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={onDelete}>
+          <Trash2 className="mr-2 h-4 w-4" /> Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 

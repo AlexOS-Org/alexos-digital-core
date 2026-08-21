@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/businesses")({
 const businessWorkspaces = [
   {
     name: "Novera",
-    description: "BF business operations and growth workspace.",
+    description: "Business operations and growth workspace.",
     detail: "Open the workspace when its live operating data is connected.",
     href: "/businesses/novera",
     icon: Gem,
