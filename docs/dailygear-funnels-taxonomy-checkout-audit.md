@@ -54,3 +54,5 @@ The existing default-category migration contains an older 11-category taxonomy a
 ## Verification note
 
 The initial category count query used a mistyped owner UUID suffix and returned zero; a direct production row audit confirmed the taxonomy rows were seeded for the correct owner. The verification query must use owner UUID `c8b05141-4253-4bb0-9ca7-8ea32658a02e`.
+
+The final checkout pass adds searchable county and town pickers using the existing command/popover UI primitives. County changes clear the town selection, and the town picker stays disabled until a county is chosen. This keeps the mobile flow concise while preventing unrelated town choices.

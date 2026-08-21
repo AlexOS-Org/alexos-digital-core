@@ -3,10 +3,20 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cartStore, useCart } from "@/lib/storefront/cart";
@@ -21,6 +31,71 @@ import { KENYA_COUNTIES, townsForCounty } from "@/lib/storefront/kenya-locations
 interface CheckoutSearch {
   recovery?: string;
   funnel?: string;
+}
+
+function SearchableLocationSelect({
+  id,
+  value,
+  options,
+  placeholder,
+  searchPlaceholder,
+  disabled,
+  onChange,
+}: {
+  id: string;
+  value: string;
+  options: readonly string[];
+  placeholder: string;
+  searchPlaceholder: string;
+  disabled?: boolean;
+  onChange: (value: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          id={id}
+          type="button"
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          disabled={disabled}
+          className="h-10 w-full justify-between rounded-xl font-normal"
+        >
+          <span className={value ? "truncate text-foreground" : "truncate text-muted-foreground"}>
+            {value || placeholder}
+          </span>
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+        <Command>
+          <CommandInput placeholder={searchPlaceholder} />
+          <CommandList>
+            <CommandEmpty>No matching location.</CommandEmpty>
+            <CommandGroup>
+              {options.map((option) => (
+                <CommandItem
+                  key={option}
+                  value={option}
+                  onSelect={() => {
+                    onChange(option);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={`mr-2 h-4 w-4 ${value === option ? "opacity-100" : "opacity-0"}`}
+                  />
+                  {option}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
 }
 
 export const Route = createFileRoute("/shop/checkout")({
@@ -384,42 +459,28 @@ function CheckoutPage() {
                 <Label htmlFor="county">
                   County <span className="text-destructive">*</span>
                 </Label>
-                <select
+                <SearchableLocationSelect
                   id="county"
-                  required
                   value={form.county}
-                  onChange={(event) => updateCounty(event.target.value)}
-                  className="h-10 w-full rounded-xl border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-                >
-                  <option value="">Select county</option>
-                  {KENYA_COUNTIES.map((county) => (
-                    <option key={county.code} value={county.name}>
-                      {county.name}
-                    </option>
-                  ))}
-                </select>
+                  options={KENYA_COUNTIES.map((county) => county.name)}
+                  placeholder="Select county"
+                  searchPlaceholder="Search counties"
+                  onChange={updateCounty}
+                />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="town">
                   Town <span className="text-destructive">*</span>
                 </Label>
-                <select
+                <SearchableLocationSelect
                   id="town"
-                  required
-                  disabled={!form.county}
                   value={form.town}
-                  onChange={(event) =>
-                    setForm({ ...form, town: event.target.value, city: event.target.value })
-                  }
-                  className="h-10 w-full rounded-xl border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <option value="">{form.county ? "Select town" : "Select a county first"}</option>
-                  {availableTowns.map((town) => (
-                    <option key={town} value={town}>
-                      {town}
-                    </option>
-                  ))}
-                </select>
+                  options={availableTowns}
+                  placeholder={form.county ? "Select town" : "Select a county first"}
+                  searchPlaceholder="Search towns"
+                  disabled={!form.county}
+                  onChange={(town) => setForm({ ...form, town, city: town })}
+                />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="address">
