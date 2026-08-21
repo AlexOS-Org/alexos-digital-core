@@ -9,13 +9,13 @@
 
 ## Verified production data state
 
-| Relation | Non-deleted rows |
-|---|---:|
-| `dg_categories` | 0 |
-| `dg_products` | 10 |
-| `dg_product_variants` | 49 |
-| `dg_customers` | 0 |
-| `dg_orders` | 0 |
+| Relation              | Non-deleted rows |
+| --------------------- | ---------------: |
+| `dg_categories`       |                0 |
+| `dg_products`         |               10 |
+| `dg_product_variants` |               49 |
+| `dg_customers`        |                0 |
+| `dg_orders`           |                0 |
 
 The existing default-category migration contains an older 11-category taxonomy and a seed trigger, but production currently has no categories. The attached requirements replace that older customer-facing taxonomy with the requested 20-category DailyGear structure. No products, orders or customers will be fabricated.
 
@@ -56,3 +56,31 @@ The existing default-category migration contains an older 11-category taxonomy a
 The initial category count query used a mistyped owner UUID suffix and returned zero; a direct production row audit confirmed the taxonomy rows were seeded for the correct owner. The verification query must use owner UUID `c8b05141-4253-4bb0-9ca7-8ea32658a02e`.
 
 The final checkout pass adds searchable county and town pickers using the existing command/popover UI primitives. County changes clear the town selection, and the town picker stays disabled until a county is chosen. This keeps the mobile flow concise while preventing unrelated town choices.
+
+## Final deployment verification
+
+The repository is clean at `ff0f712` on `main` and `origin/main`. Local verification passed with 20 tests across 6 test files, `npx tsc --noEmit`, lint with the existing 9 Fast Refresh warnings and zero errors, `npm run build`, and `git diff --check`.
+
+Cloudflare Workers Build `f422d35a-0380-44f3-9400-2359b6c67297` completed successfully for commit `ff0f71231534c19182ebd71f7f055ecb0b0ddfdb` on the canonical `alexos-business-os` script. The live `/e-commerce/funnels` page was verified on `https://dailygear.co.ke/e-commerce/funnels` and shows the catalogue landing-template inventory, landing-copy editor and native journey flow controls.
+
+The live public category route also resolves on the Worker. It currently shows the honest unavailable state because `dg_storefronts` still has no published storefront; this is a business configuration prerequisite, not a route or build failure. The same publication gate protects public funnels until a storefront is published.
+
+## References
+
+[1] [Esri Eastern Africa Mapping and Application Portal — Kenya county dataset](https://hub.arcgis.com/maps/f89c5dc641404cff9e1ac86b782e8e50)
+
+[2] [GeoNames — Kenya country dump](https://download.geonames.org/export/dump/KE.zip)
+
+[3] [GeoNames — administrative codes](https://download.geonames.org/export/dump/admin1CodesASCII.zip)
+
+## Earlier re-audit against the attached prompt
+
+At the time of the earlier re-audit, the production owner scope contained 0 published storefront rows, 0 saved native funnels, 0 funnel-step rows, 10 products, 49 variants, 0 customers and 0 orders. The taxonomy contained 132 non-deleted rows, corresponding to 20 top-level categories plus 112 subcategories. The category-assignment gap identified in that audit has since been remediated conservatively from matched first-party evidence; no product, customer or order was fabricated.
+
+The current 49 variants have stock quantity 15 for the reviewed size/color variants and each audited variant has an image URL. The 10 product records each have one primary product image. The two watch records have no variant rows, so colour names remain a business confirmation item rather than something to invent. The attached prompt’s 15-unit publication rule is preserved; only the verified category assignments were changed; stock, prices, variants, evidence status and publication states were not changed.
+
+## Requirement re-audit result
+
+The repository audit found that `main` already contains the category routes, Kenya-first checkout fields, canonical 20-category taxonomy seed, native Funnel template inventory and editable funnel flow. The material gaps were product category assignment and readiness enforcement: the editor and public/runtime paths did not consistently require a canonical category plus verified evidence.
+
+The production category-assignment migration has now assigned the 10 existing matched DailyGear products to canonical subcategories without creating product duplicates: Wardrobe → Home & Living / Home Organization; Berluti Footwear, Boys Leather School Shoes and Girls Leather School Shoes → Fashion & Clothing / Shoes; the two children bags and Tote Bag → Bags & Luggage / Backpacks or Handbags; Ladies Sandals → Fashion & Clothing / Sandals; and both watch records → Fashion & Clothing / Watches. All 10 remain backed by one matched Instagram evidence record, but none is marked `verified`; the new gate therefore keeps them private until the source records are verified by the owner.

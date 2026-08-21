@@ -48,10 +48,12 @@ export function ProductFormDialog({
   open,
   onOpenChange,
   product,
+  evidenceCount = 0,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   product?: Product | null;
+  evidenceCount?: number;
 }) {
   const [form, setForm] = useState(EMPTY);
   const save = useSaveProduct();
@@ -90,10 +92,19 @@ export function ProductFormDialog({
 
   const set = (key: keyof typeof EMPTY) => (value: string) =>
     setForm((current) => ({ ...current, [key]: value }));
+  const categoryNameById = new Map(categories.map((category) => [category.id, category.name]));
 
   const hasMinimumStock = Number(form.stock_quantity) >= 15;
-  const publicationBlocked =
-    form.status === "active" && (!hasMinimumStock || form.availability_confirmed !== "true");
+  const hasConfirmedAvailability = form.availability_confirmed === "true";
+  const hasCategory = Boolean(form.category_id);
+  const hasEvidence = evidenceCount > 0;
+  const missingPublicationRequirements = [
+    !hasMinimumStock ? "at least 15 units" : null,
+    !hasConfirmedAvailability ? "confirmed availability" : null,
+    !hasCategory ? "a primary category" : null,
+    !hasEvidence ? "source evidence" : null,
+  ].filter((requirement): requirement is string => Boolean(requirement));
+  const publicationBlocked = form.status === "active" && missingPublicationRequirements.length > 0;
   const invalid = !form.name.trim() || Number(form.price) <= 0 || publicationBlocked;
 
   async function submit() {
@@ -260,7 +271,9 @@ export function ProductFormDialog({
                 <SelectItem value="none">Uncategorised</SelectItem>
                 {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
-                    {category.name}
+                    {category.parent_id
+                      ? `${categoryNameById.get(category.parent_id) ?? "Category"} / ${category.name}`
+                      : category.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -378,8 +391,8 @@ export function ProductFormDialog({
                   Publication is blocked until the catalogue is ready.
                 </p>
                 <p className="mt-1 text-muted-foreground">
-                  An active product needs confirmed availability and at least 15 units. Keep it as a
-                  draft until the source and stock are verified.
+                  An active product needs {missingPublicationRequirements.join(", ")}. Keep it as a
+                  draft until the source, category and stock are verified.
                 </p>
               </div>
             </div>

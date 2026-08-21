@@ -56,9 +56,13 @@ function ProductsPage() {
   const { data: store } = useStorefront();
   const { data: categories } = useStoreCategories(store?.user_id);
   const { data: brands } = useStoreBrands(store?.user_id);
+  const selectedCategory = (categories ?? []).find(
+    (category) => category.slug === search.category || category.id === search.category,
+  );
+  const categoryNames = new Map((categories ?? []).map((category) => [category.id, category.name]));
   const products = useStoreProducts(store?.user_id, {
     search: search.q,
-    categoryId: search.category ?? null,
+    categoryId: selectedCategory?.id ?? null,
     brandId: search.brand ?? null,
     sort: search.sort ?? "newest",
   });
@@ -104,8 +108,10 @@ function ProductsPage() {
           <SelectContent>
             <SelectItem value="all">All categories</SelectItem>
             {(categories ?? []).map((c) => (
-              <SelectItem key={c.id} value={c.id}>
-                {c.name}
+              <SelectItem key={c.id} value={c.slug ?? c.id}>
+                {c.parent_id
+                  ? `${categoryNames.get(c.parent_id) ?? "Category"} / ${c.name}`
+                  : c.name}
               </SelectItem>
             ))}
           </SelectContent>

@@ -65,23 +65,27 @@ export interface ProductReadiness {
   available: boolean;
   hasMinimumStock: boolean;
   hasConfirmedAvailability: boolean;
+  hasCategory: boolean;
   hasEvidence: boolean;
   readyToPublish: boolean;
 }
 
 export function getProductReadiness(
-  product: Pick<Product, "stock_quantity" | "availability_confirmed" | "status">,
+  product: Pick<Product, "stock_quantity" | "availability_confirmed" | "status" | "category_id">,
   evidenceCount = 0,
 ): ProductReadiness {
   const hasMinimumStock = Number(product.stock_quantity ?? 0) >= 15;
   const hasConfirmedAvailability = product.availability_confirmed === true;
+  const hasCategory = Boolean(product.category_id);
+  const hasEvidence = evidenceCount > 0;
   const available = product.status === "active" && Number(product.stock_quantity ?? 0) > 0;
   return {
     available,
     hasMinimumStock,
     hasConfirmedAvailability,
-    hasEvidence: evidenceCount > 0,
-    readyToPublish: hasMinimumStock && hasConfirmedAvailability,
+    hasCategory,
+    hasEvidence,
+    readyToPublish: hasMinimumStock && hasConfirmedAvailability && hasCategory && hasEvidence,
   };
 }
 

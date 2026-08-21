@@ -91,7 +91,7 @@ export async function loadPublicFunnelImpl(slug: string): Promise<PublicFunnel |
   const { data: product, error: productError } = await supabaseAdmin
     .from("dg_products")
     .select(
-      "id,name,slug,description,short_description,price,sale_price,currency,images,sku,stock_quantity,attributes,status,availability_confirmed,deleted_at,user_id",
+      "id,name,slug,description,short_description,price,sale_price,currency,images,sku,stock_quantity,attributes,status,availability_confirmed,category_id,deleted_at,user_id",
     )
     .eq("id", funnel.product_id)
     .eq("user_id", funnel.user_id)
@@ -100,7 +100,7 @@ export async function loadPublicFunnelImpl(slug: string): Promise<PublicFunnel |
     .is("deleted_at", null)
     .maybeSingle();
   if (productError) throw productError;
-  if (!product || Number(product.stock_quantity ?? 0) < 1) return null;
+  if (!product || Number(product.stock_quantity ?? 0) < 1 || !product.category_id) return null;
 
   const { data: steps, error: stepError } = await supabaseAdmin
     .from("dg_funnel_steps")
@@ -115,11 +115,20 @@ export async function loadPublicFunnelImpl(slug: string): Promise<PublicFunnel |
     .map((step) => step.product_id)
     .filter((id): id is string => Boolean(id) && id !== product.id);
   const productIds = [product.id, ...offerProductIds];
+  const { data: verifiedEvidence, error: evidenceError } = await supabaseAdmin
+    .from("dg_product_evidence")
+    .select("product_id")
+    .in("product_id", productIds)
+    .eq("user_id", funnel.user_id)
+    .eq("reconciliation_status", "verified");
+  if (evidenceError) throw evidenceError;
+  if (!verifiedEvidence?.some((record) => record.product_id === product.id)) return null;
+
   const { data: offerProducts, error: offerProductError } = offerProductIds.length
     ? await supabaseAdmin
         .from("dg_products")
         .select(
-          "id,name,slug,description,short_description,price,sale_price,currency,images,sku,stock_quantity,attributes,status,availability_confirmed,deleted_at,user_id",
+          "id,name,slug,description,short_description,price,sale_price,currency,images,sku,stock_quantity,attributes,status,availability_confirmed,category_id,deleted_at,user_id",
         )
         .in("id", offerProductIds)
         .eq("user_id", funnel.user_id)
@@ -129,12 +138,22 @@ export async function loadPublicFunnelImpl(slug: string): Promise<PublicFunnel |
     : { data: [], error: null };
   if (offerProductError) throw offerProductError;
 
+  const eligibleOfferProducts = (offerProducts ?? []).filter(
+    (offerProduct) =>
+      offerProduct.category_id &&
+      verifiedEvidence?.some((record) => record.product_id === offerProduct.id),
+  );
+  const eligibleProductIds = [
+    product.id,
+    ...eligibleOfferProducts.map((offerProduct) => offerProduct.id),
+  ];
+
   const { data: variants, error: variantError } = await supabaseAdmin
     .from("dg_product_variants")
     .select(
       "id,product_id,name,sku,price,sale_price,stock_quantity,image_url,options,color,availability_confirmed,deleted_at,user_id",
     )
-    .in("product_id", productIds)
+    .in("product_id", eligibleProductIds)
     .eq("user_id", funnel.user_id)
     .eq("availability_confirmed", true)
     .is("deleted_at", null)
@@ -163,7 +182,7 @@ export async function loadPublicFunnelImpl(slug: string): Promise<PublicFunnel |
       stockQuantity: Number(product.stock_quantity ?? 0),
       attributes: product.attributes,
     },
-    offerProducts: (offerProducts ?? []).map((offerProduct) => ({
+    offerProducts: eligibleOfferProducts.map((offerProduct) => ({
       id: offerProduct.id,
       name: offerProduct.name,
       slug: offerProduct.slug,

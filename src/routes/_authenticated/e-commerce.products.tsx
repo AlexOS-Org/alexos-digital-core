@@ -19,7 +19,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useDeleteProduct, useProductEvidence, useProducts } from "@/lib/dailygear/api";
+import {
+  useCategories,
+  useDeleteProduct,
+  useProductEvidence,
+  useProducts,
+} from "@/lib/dailygear/api";
 import { DG_CURRENCY, PRODUCT_STATUS_META } from "@/lib/dailygear/constants";
 import { getProductReadiness } from "@/lib/dailygear/types";
 import type { Product } from "@/lib/dailygear/types";
@@ -50,6 +55,7 @@ const money = (v: number) =>
 function ProductsPage() {
   const { data: products = [], isLoading } = useProducts();
   const { data: evidence = [] } = useProductEvidence();
+  const { data: categories = [] } = useCategories();
   const remove = useDeleteProduct();
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<Product | null>(null);
@@ -58,11 +64,22 @@ function ProductsPage() {
   const evidenceCounts = useMemo(() => {
     const counts = new Map<string, number>();
     for (const record of evidence) {
-      if (record.product_id)
+      if (record.product_id && record.reconciliation_status === "verified")
         counts.set(record.product_id, (counts.get(record.product_id) ?? 0) + 1);
     }
     return counts;
   }, [evidence]);
+  const categoryNames = useMemo(() => {
+    const names = new Map(categories.map((category) => [category.id, category.name]));
+    return new Map(
+      categories.map((category) => [
+        category.id,
+        category.parent_id
+          ? `${names.get(category.parent_id) ?? "Category"} / ${category.name}`
+          : category.name,
+      ]),
+    );
+  }, [categories]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -203,6 +220,9 @@ function ProductsPage() {
                       <td className="px-4 py-3">
                         <p className="font-medium">{p.name}</p>
                         <p className="text-xs text-muted-foreground">{p.sku ?? "No SKU"}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {categoryNames.get(p.category_id ?? "") ?? "Uncategorised"}
+                        </p>
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge meta={PRODUCT_STATUS_META[p.status ?? "draft"]} />
@@ -223,7 +243,7 @@ function ProductsPage() {
                           {readiness.readyToPublish ? "Ready" : "Needs verification"}
                         </span>
                         <p className="mt-1 text-[11px] text-muted-foreground">
-                          {evidenceCounts.get(p.id) ?? 0} source record
+                          {evidenceCounts.get(p.id) ?? 0} verified source record
                           {evidenceCounts.get(p.id) === 1 ? "" : "s"}
                         </p>
                       </td>
@@ -268,7 +288,12 @@ function ProductsPage() {
         </Card>
       )}
 
-      <ProductFormDialog open={open} onOpenChange={setOpen} product={editing} />
+      <ProductFormDialog
+        open={open}
+        onOpenChange={setOpen}
+        product={editing}
+        evidenceCount={editing ? (evidenceCounts.get(editing.id) ?? 0) : 0}
+      />
     </div>
   );
 }
