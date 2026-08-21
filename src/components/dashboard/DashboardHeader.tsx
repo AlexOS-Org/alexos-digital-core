@@ -165,3 +165,108 @@ export function DashboardHeader() {
     </div>
   );
 }
+export function MobileDashboardHeader() {
+  const [now, setNow] = useState(() => new Date());
+  const { visualTheme } = useTheme();
+  const selectedTheme = getVisualTheme(visualTheme);
+  const atmosphere = getTimeAtmosphere(now.getHours());
+  const visual = getAtmosphereStyle(atmosphere);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const today = now.toLocaleDateString("en-KE", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  const greeting = getGreeting(now.getHours());
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3 px-1">
+        <SidebarTrigger className="tap-target rounded-xl" />
+        <div className="flex min-w-0 flex-1 items-center gap-2.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--alexos-purple)] to-[var(--alexos-blue)] text-white shadow-lg shadow-[var(--alexos-glow)]">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 leading-tight">
+            <p className="truncate text-sm font-bold tracking-tight">Auren</p>
+            <p className="truncate text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              AI assistant
+            </p>
+          </div>
+        </div>
+        <Link
+          to="/notifications"
+          className="tap-target grid place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          aria-label="Notifications"
+        >
+          <Bell className="h-[19px] w-[19px]" />
+        </Link>
+        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[var(--alexos-blue)] to-[var(--alexos-purple)] text-xs font-bold text-white shadow-md">
+          AO
+        </div>
+      </div>
+
+      <section
+        className="relative min-h-[250px] overflow-hidden rounded-[1.9rem] border border-white/15 p-5 text-white shadow-[0_22px_58px_-30px_var(--alexos-glow)]"
+        style={{ background: visual.background }}
+      >
+        {selectedTheme.backdrop === "mountains" ? (
+          <picture className="pointer-events-none absolute inset-0 block">
+            <source media="(max-width: 640px)" srcSet={alexosMountainMobile} />
+            <img
+              src={alexosMountainWide}
+              alt=""
+              aria-hidden="true"
+              decoding="async"
+              className="h-full w-full object-cover object-center opacity-65"
+            />
+          </picture>
+        ) : null}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#061126]/85 via-[#071329]/20 to-transparent" />
+        <div className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-white/15 blur-3xl" />
+        <div
+          className="pointer-events-none absolute right-[13%] top-[16%] h-14 w-14 rounded-full blur-[1px]"
+          style={{ background: visual.sun, boxShadow: `0 0 45px 12px ${visual.sun}` }}
+        />
+        <div className="relative flex min-h-[210px] flex-col justify-between">
+          <div className="flex items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-[10px] font-semibold backdrop-blur-md">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,0.9)]" />
+              Auren active
+            </span>
+            <span className="rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-[10px] font-medium text-white/85 backdrop-blur-md">
+              {selectedTheme.label}
+            </span>
+          </div>
+          <div>
+            <p className="text-[10px] font-medium text-white/70">
+              {today} · {formatTime(now, "24h")} · {atmosphere}
+            </p>
+            <h1 className="mt-2 text-[2rem] font-semibold leading-tight tracking-tight">
+              {greeting}, Alex.
+            </h1>
+            <p className="mt-2 max-w-[28rem] text-sm leading-5 text-white/90">
+              You know what matters. Now let’s move it forward.
+            </p>
+            <DashboardWeather />
+            <Button
+              asChild
+              className="mt-4 h-10 rounded-xl bg-white px-4 text-slate-950 shadow-lg hover:bg-slate-100"
+            >
+              <Link to="/auren">
+                <Sparkles className="mr-2 h-4 w-4 text-[var(--alexos-purple)]" />
+                Ask Auren
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

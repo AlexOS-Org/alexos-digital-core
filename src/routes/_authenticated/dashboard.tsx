@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, Sparkles } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { modules, moduleGroups } from "@/lib/modules";
@@ -12,6 +13,12 @@ import BusinessSnapshot from "@/components/dashboard/BusinessSnapshot";
 import TodaysMission from "@/components/dashboard/TodaysMission";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import IntelligenceFeed from "@/components/dashboard/IntelligenceFeed";
+import {
+  MobileAurenBriefing,
+  MobileMetricTiles,
+  MobileRevenueToday,
+} from "@/components/dashboard/MobileCommandCenter";
+import { MobileDashboardHeader } from "@/components/dashboard/DashboardHeader";
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: Dashboard });
 class DashboardPanelBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   state = { hasError: false };
@@ -39,8 +46,30 @@ class DashboardPanelBoundary extends Component<{ children: ReactNode }, { hasErr
 function SafePanel({ children }: { children: ReactNode }) {
   return <DashboardPanelBoundary>{children}</DashboardPanelBoundary>;
 }
+function MobileDashboard() {
+  return (
+    <div className="space-y-5 pb-24">
+      <MobileDashboardHeader />
+      <MobileAurenBriefing />
+      <SafePanel>
+        <TodaysMission compact />
+      </SafePanel>
+      <MobileMetricTiles />
+      <MobileRevenueToday />
+      <SafePanel>
+        <QuickActions compact />
+      </SafePanel>
+      <SafePanel>
+        <RecentActivity />
+      </SafePanel>
+    </div>
+  );
+}
+
 function Dashboard() {
   const navModules = modules.filter((m) => m.url !== "/dashboard");
+  const isMobile = useIsMobile();
+  if (isMobile) return <MobileDashboard />;
   return (
     <div className="relative space-y-6 pb-10 animate-in fade-in duration-500">
       <SafePanel>
