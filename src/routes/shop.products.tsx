@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProductCard } from "@/components/storefront/ProductCard";
+import { StoreConfidenceStrip } from "@/components/storefront/StoreConfidenceStrip";
 import {
   useStoreBrands,
   useStoreCategories,
@@ -141,6 +142,8 @@ function ProductsPage() {
           </SelectContent>
         </Select>
       </div>
+
+      <StoreConfidenceStrip compact />
 
       <div className="mt-8">
         {products.isLoading ? (

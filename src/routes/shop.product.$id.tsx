@@ -266,6 +266,33 @@ function ProductDetail() {
             ))}
           </div>
 
+          <div className="rounded-2xl border bg-muted/40 p-4">
+            <p className="text-sm font-semibold">Before you add to bag</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              Check the selected option and current availability. Delivery, returns and support
+              details are available before you place an order.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold text-primary">
+              <Link
+                to="/shop/policies/$slug"
+                params={{ slug: "shipping" }}
+                className="hover:underline"
+              >
+                Shipping policy
+              </Link>
+              <Link
+                to="/shop/policies/$slug"
+                params={{ slug: "returns" }}
+                className="hover:underline"
+              >
+                Returns policy
+              </Link>
+              <Link to="/shop/contact" className="hover:underline">
+                Need help?
+              </Link>
+            </div>
+          </div>
+
           <Accordion type="single" collapsible className="rounded-2xl border px-4">
             <AccordionItem value="delivery">
               <AccordionTrigger className="text-sm">Delivery & returns</AccordionTrigger>

@@ -67,6 +67,13 @@ export function StoreFooter({ store }: { store: Storefront | null }) {
             >
               Shipping policy
             </Link>
+            <Link
+              to="/shop/policies/$slug"
+              params={{ slug: "payments" }}
+              className="block text-muted-foreground hover:text-foreground"
+            >
+              Payment methods
+            </Link>
           </nav>
 
           <div className="space-y-2 text-sm">

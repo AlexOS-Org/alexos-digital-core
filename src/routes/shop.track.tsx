@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
@@ -7,6 +7,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { trackOrder } from "@/lib/storefront/checkout.functions";
+
+function statusCopy(status: string) {
+  switch (status.toLowerCase()) {
+    case "new":
+      return "Your order has been received and is awaiting fulfilment.";
+    case "processing":
+      return "Your order is being prepared.";
+    case "packed":
+      return "Your order has been packed and is ready for dispatch.";
+    case "shipped":
+      return "Your order has been dispatched.";
+    case "delivered":
+      return "Your order is marked as delivered.";
+    case "cancelled":
+      return "This order is marked as cancelled. Contact support if you need help.";
+    default:
+      return "We will show the latest recorded order event here.";
+  }
+}
 
 export const Route = createFileRoute("/shop/track")({
   head: () => ({
@@ -34,7 +53,8 @@ function TrackPage() {
     <div className="mx-auto max-w-2xl px-4 py-12">
       <h1 className="text-2xl font-black tracking-tight">Track your order</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Enter your order number and the phone or email used at checkout.
+        Enter your order number and the phone or email used at checkout. Your details are used only
+        to locate the matching order.
       </p>
 
       <form
@@ -78,6 +98,7 @@ function TrackPage() {
             <span className="font-bold">{mutation.data.orderNumber}</span>
             <Badge className="rounded-full capitalize">{mutation.data.status}</Badge>
           </div>
+          <p className="text-sm text-muted-foreground">{statusCopy(mutation.data.status)}</p>
           <p className="text-sm text-muted-foreground">
             Payment: <span className="capitalize">{mutation.data.paymentStatus}</span> · Total:{" "}
             {mutation.data.currency} {mutation.data.total.toLocaleString()}
@@ -92,6 +113,13 @@ function TrackPage() {
               </li>
             ))}
           </ol>
+          <p className="text-xs text-muted-foreground">
+            Need help with this order?{" "}
+            <Link to="/shop/contact" className="font-semibold text-primary hover:underline">
+              Contact support
+            </Link>
+            .
+          </p>
         </div>
       ) : null}
     </div>

@@ -1,9 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingBag, Star } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { ResponsiveProductImage } from "@/components/storefront/ResponsiveProductImage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { cartStore } from "@/lib/storefront/cart";
 import {
   effectivePrice,
   formatMoney,
@@ -11,7 +10,6 @@ import {
   productImage,
   type StoreProduct,
 } from "@/lib/storefront/api";
-import { toast } from "sonner";
 
 interface Props {
   product: StoreProduct;
@@ -23,19 +21,6 @@ export function ProductCard({ product, currency }: Props) {
   const price = effectivePrice(product);
   const image = productImage(product);
   const soldOut = Number(product.stock_quantity) <= 0;
-
-  function add() {
-    cartStore.add({
-      productId: product.id,
-      variantId: null,
-      name: product.name,
-      sku: product.sku,
-      price,
-      image,
-      maxQuantity: Number(product.stock_quantity),
-    });
-    toast.success(`${product.name} added to bag`);
-  }
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-3xl border bg-card transition-shadow hover:shadow-lg">
@@ -87,13 +72,16 @@ export function ProductCard({ product, currency }: Props) {
           </div>
         </div>
 
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Star className="h-3.5 w-3.5 fill-current text-amber-500" />
-          <span>Trusted seller</span>
-        </div>
+        <p className="text-xs leading-relaxed text-muted-foreground">
+          {soldOut
+            ? "This listing is currently unavailable."
+            : "View current stock and choose any available size or colour."}
+        </p>
 
-        <Button className="mt-auto w-full rounded-xl" disabled={soldOut} onClick={add}>
-          {soldOut ? "Sold out" : "Add to bag"}
+        <Button asChild className="mt-auto w-full rounded-xl">
+          <Link to="/shop/product/$id" params={{ id: product.id }}>
+            {soldOut ? "View details" : "View details & options"}
+          </Link>
         </Button>
       </div>
     </article>

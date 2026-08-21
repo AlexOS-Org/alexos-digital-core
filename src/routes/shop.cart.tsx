@@ -45,6 +45,21 @@ function CartPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <h1 className="text-2xl font-black tracking-tight">Your bag</h1>
+      <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+        Review your items and quantities before checkout. Current price and availability are checked
+        again when you place the order.
+      </p>
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold text-primary">
+        <Link to="/shop/policies/$slug" params={{ slug: "shipping" }} className="hover:underline">
+          Shipping
+        </Link>
+        <Link to="/shop/policies/$slug" params={{ slug: "returns" }} className="hover:underline">
+          Returns & refunds
+        </Link>
+        <Link to="/shop/contact" className="hover:underline">
+          Need help?
+        </Link>
+      </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="space-y-3">

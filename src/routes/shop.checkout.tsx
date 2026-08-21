@@ -159,6 +159,28 @@ function CheckoutPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <h1 className="text-2xl font-black tracking-tight">Checkout</h1>
+      <div className="mt-3 rounded-2xl border bg-muted/40 p-4">
+        <p className="text-sm font-semibold">Review before placing your order</p>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+          DailyGear rechecks the current product or variant price and availability when you place
+          the order. Payment instructions or status depend on the method you choose and are not
+          treated as settled until confirmed.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold text-primary">
+          <Link to="/shop/policies/$slug" params={{ slug: "shipping" }} className="hover:underline">
+            Shipping
+          </Link>
+          <Link to="/shop/policies/$slug" params={{ slug: "returns" }} className="hover:underline">
+            Returns & refunds
+          </Link>
+          <Link to="/shop/policies/$slug" params={{ slug: "privacy" }} className="hover:underline">
+            Privacy
+          </Link>
+          <Link to="/shop/policies/$slug" params={{ slug: "terms" }} className="hover:underline">
+            Terms
+          </Link>
+        </div>
+      </div>
 
       <form
         className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]"
@@ -308,6 +330,10 @@ function CheckoutPage() {
             <span>Total</span>
             <span>{formatMoney(cart.subtotal + shipping, currency)}</span>
           </div>
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            By placing this order, you confirm your delivery details are correct and agree to the
+            DailyGear terms and policies.
+          </p>
           <Button
             type="submit"
             size="lg"
