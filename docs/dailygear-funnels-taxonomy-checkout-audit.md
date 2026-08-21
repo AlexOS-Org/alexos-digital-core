@@ -88,3 +88,9 @@ The production category-assignment migration has now assigned the 10 existing ma
 ## Live smoke test for commit 08d0e1a
 
 The live `https://dailygear.co.ke/e-commerce/funnels` route loads the deployed Funnels workspace, shows all 10 catalogue landing templates, exposes the landing-copy editor, and displays the native journey flow controls. The live `https://dailygear.co.ke/shop/category/bags-luggage/backpacks` route matches the new nested category route and correctly shows the intentional unavailable state because no published `dg_storefronts` row exists; this is a production configuration gate rather than a route or build failure.
+
+## Storefront visibility recovery
+
+The production visibility audit found one canonical published DailyGear storefront, 132 categories, 10 catalogue products, eight products eligible under the verified-evidence gate, two remaining matched evidence records, zero customers and zero orders. The connected first-party Instagram account is `@daily_gearz`; its current posts exactly match eight product identities and prices. OCHSTIN remains matched pending confirmed colour names, while NAVIFORCE remains matched because the current Instagram post shows KES 3,450 and the current catalogue record is KES 3,950.
+
+The canonical storefront row was published with the confirmed DailyGear identity, KES currency, zero unconfirmed shipping fees and blank support contacts left editable in Settings. The live `/shop/products?sort=price-desc` route now renders 10 product cards with images, prices and detail links, plus the public category rail for Bags & Luggage, Fashion & Clothing and Home & Living. The previous empty-shell state is resolved in production.

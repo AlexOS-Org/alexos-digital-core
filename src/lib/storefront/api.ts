@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -20,6 +20,72 @@ const PRODUCT_COLUMNS =
   "id,user_id,name,slug,description,short_description,seo_title,seo_description,seo_keywords,image_alt_text,price,sale_price,currency,images,tags,sku,stock_quantity,status,category_id,brand_id,attributes,availability_confirmed,created_at";
 
 export const STORE_KEY = ["storefront"] as const;
+
+export type StorefrontSettings = Pick<
+  Storefront,
+  | "slug"
+  | "name"
+  | "tagline"
+  | "support_email"
+  | "support_phone"
+  | "whatsapp"
+  | "currency"
+  | "free_shipping_threshold"
+  | "flat_shipping_fee"
+  | "published"
+>;
+
+/** Loads the owner’s storefront, including an unpublished draft used by Settings. */
+export function useAdminStorefront() {
+  return useQuery({
+    queryKey: [...STORE_KEY, "admin"],
+    queryFn: async () => {
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+      if (authError) throw authError;
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from("dg_storefronts")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (error) throw error;
+      return (data ?? null) as Storefront | null;
+    },
+  });
+}
+
+/** Upserts the one canonical DailyGear storefront row for the authenticated owner. */
+export function useSaveAdminStorefront() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (settings: StorefrontSettings) => {
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+      if (authError) throw authError;
+      if (!user) throw new Error("You must be signed in to manage the DailyGear storefront.");
+
+      const { data, error } = await supabase
+        .from("dg_storefronts")
+        .upsert({ user_id: user.id, ...settings }, { onConflict: "user_id" })
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data as Storefront;
+    },
+    onSuccess: (storefront) => {
+      queryClient.setQueryData([...STORE_KEY, "admin"], storefront);
+      queryClient.invalidateQueries({ queryKey: [...STORE_KEY, "store"] });
+      queryClient.invalidateQueries({ queryKey: [...STORE_KEY, "categories"] });
+      queryClient.invalidateQueries({ queryKey: [...STORE_KEY, "products"] });
+    },
+  });
+}
 
 /** Resolves the active storefront. With no slug, the first published store wins. */
 export function useStorefront(slug?: string) {
