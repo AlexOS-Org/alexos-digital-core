@@ -14,6 +14,7 @@ import {
 import { ProductCard } from "@/components/storefront/ProductCard";
 import { ResponsiveProductImage } from "@/components/storefront/ResponsiveProductImage";
 import { cartStore, useRecentlyViewed } from "@/lib/storefront/cart";
+import { trackMetaPixel } from "@/lib/storefront/meta-pixel";
 import {
   effectivePrice,
   formatMoney,
@@ -51,8 +52,16 @@ function ProductDetail() {
   const currency = store?.currency ?? "KES";
 
   useEffect(() => {
-    if (product) track(product.id);
-  }, [product, track]);
+    if (!product) return;
+    track(product.id);
+    trackMetaPixel("ViewContent", {
+      content_ids: [product.sku ?? product.id],
+      content_name: product.name,
+      content_type: "product",
+      currency,
+      value: effectivePrice(product),
+    });
+  }, [currency, product, track]);
 
   useEffect(() => {
     if (!product) return;
@@ -115,6 +124,14 @@ function ProductDetail() {
       },
       qty,
     );
+    trackMetaPixel("AddToCart", {
+      content_ids: [selectedVariant?.sku ?? product.sku ?? product.id],
+      content_name: product.name,
+      content_type: "product",
+      contents: [{ id: selectedVariant?.sku ?? product.sku ?? product.id, quantity: qty }],
+      currency,
+      value: price * qty,
+    });
     toast.success(`${product.name} added to bag`);
   }
 
@@ -246,7 +263,7 @@ function ProductDetail() {
               </Button>
             </div>
             <Button size="lg" className="flex-1 rounded-xl" disabled={soldOut} onClick={add}>
-              {soldOut ? "Sold out" : "Add to bag"}
+              {soldOut ? "Sold out" : "Order now"}
             </Button>
           </div>
 

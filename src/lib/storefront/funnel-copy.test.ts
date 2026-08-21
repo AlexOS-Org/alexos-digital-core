@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   defaultFunnelLandingContent,
+  improvedFunnelLandingContent,
   parseFunnelLandingContent,
   serializeFunnelLandingContent,
 } from "./funnel-copy";
@@ -13,6 +14,22 @@ describe("DailyGear funnel landing copy", () => {
     expect(content.subheadline).toContain("Golden Wolf Laptop and Travel Backpack");
     expect(content.benefits).toHaveLength(4);
     expect(content.ctaLabel).toBe("Choose this bag");
+  });
+
+  it("builds product-specific AIDA copy from canonical SEO fields", () => {
+    const content = improvedFunnelLandingContent({
+      name: "Children School Backpack — Blue",
+      sku: "DG-BAG-BLUE",
+      description: "A school backpack with the verified catalogue details shown before checkout.",
+      short_description: "School backpack for everyday use.",
+      seo_description: "Children School Backpack in Kenya with verified size and colour details.",
+    });
+
+    expect(content.headline).toContain("Children School Backpack");
+    expect(content.subheadline).toContain("verified size and colour details");
+    expect(content.benefits).toHaveLength(4);
+    expect(content.proof).toContain("SKU DG-BAG-BLUE");
+    expect(content.ctaLabel).toBe("Review and order");
   });
 
   it("round-trips saved content and falls back when the stored body is invalid", () => {

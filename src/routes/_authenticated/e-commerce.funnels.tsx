@@ -5,6 +5,7 @@ import {
   ArrowRight,
   ArrowUp,
   Check,
+  ExternalLink,
   GitBranch,
   Plus,
   Save,
@@ -31,6 +32,7 @@ import {
 import type { Funnel, FunnelStep } from "@/lib/dailygear/types";
 import {
   defaultFunnelLandingContent,
+  improvedFunnelLandingContent,
   parseFunnelLandingContent,
   serializeFunnelLandingContent,
   type FunnelLandingContent,
@@ -205,7 +207,7 @@ function FunnelsPage() {
       slug: slugify(product.name),
       productId: product.id,
     });
-    setLanding(defaultFunnelLandingContent(product.name));
+    setLanding(improvedFunnelLandingContent(product));
     setOffers(EMPTY_OFFERS);
     setFlowOrder(DEFAULT_FLOW_ORDER);
     toast.success(`Landing template opened for ${product.name}`);
@@ -213,6 +215,15 @@ function FunnelsPage() {
 
   function selectFunnel(funnel: Funnel) {
     setSelectedId(funnel.id);
+  }
+
+  function applyImprovedCopy() {
+    if (!selectedProduct) {
+      toast.error("Choose a canonical product before improving the landing copy.");
+      return;
+    }
+    setLanding(improvedFunnelLandingContent(selectedProduct));
+    toast.success(`Improved AIDA copy prepared for ${selectedProduct.name}`);
   }
 
   function isFlowEnabled(stepType: FlowStepType) {
@@ -614,12 +625,17 @@ function FunnelsPage() {
             </div>
 
             <section className="space-y-4 rounded-2xl border bg-muted/25 p-4">
-              <div>
-                <h3 className="text-sm font-semibold">Landing page content</h3>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  This is the landing step of the funnel. Keep the promise clear, use only verified
-                  product details and let the same checkout handle the order.
-                </p>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <h3 className="text-sm font-semibold">Landing page content</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    This is the landing step of the funnel. Keep the promise clear, use only
+                    verified product details and let the same checkout handle the order.
+                  </p>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={applyImprovedCopy}>
+                  Improve for this product
+                </Button>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
@@ -871,12 +887,28 @@ function FunnelsPage() {
       </div>
 
       {selectedId ? (
-        <p className="text-xs text-muted-foreground">
-          Public test path:{" "}
-          <code className="rounded bg-muted px-1.5 py-0.5">/funnel/{form.slug || "your-slug"}</code>
-          <ArrowRight className="mx-1 inline h-3 w-3" />
-          Product landing page, then the existing DailyGear checkout.
-        </p>
+        <div className="flex flex-col gap-3 rounded-2xl border bg-muted/25 p-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            Public path:{" "}
+            <code className="rounded bg-muted px-1.5 py-0.5">
+              /funnel/{form.slug || "your-slug"}
+            </code>
+            <ArrowRight className="mx-1 inline h-3 w-3" />
+            Product landing page, then the existing DailyGear checkout.
+          </p>
+          {form.status === "published" && form.slug ? (
+            <Button asChild type="button" variant="outline" size="sm" className="shrink-0">
+              <a href={`/funnel/${form.slug}`} target="_blank" rel="noreferrer">
+                <ExternalLink className="mr-2 h-3.5 w-3.5" />
+                Open live preview
+              </a>
+            </Button>
+          ) : (
+            <span className="shrink-0 rounded-full border px-3 py-1.5 text-[11px]">
+              Publish this funnel to open its live preview.
+            </span>
+          )}
+        </div>
       ) : null}
     </div>
   );

@@ -3,6 +3,7 @@ import { StoreHeader } from "@/components/storefront/StoreHeader";
 import { StoreFooter } from "@/components/storefront/StoreFooter";
 import { StoreMobileTabs } from "@/components/storefront/StoreMobileTabs";
 import { useStoreCategories, useStoreProducts, useStorefront } from "@/lib/storefront/api";
+import { useMetaPixel } from "@/lib/storefront/meta-pixel";
 
 export const Route = createFileRoute("/shop")({
   component: ShopLayout,
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/shop")({
 
 function ShopLayout() {
   const { data: store } = useStorefront();
+  useMetaPixel(store?.meta_pixel_id);
   const { data: categories } = useStoreCategories(store?.user_id);
   const { data: products } = useStoreProducts(store?.user_id, { limit: 250 });
   const categoryById = new Map((categories ?? []).map((category) => [category.id, category]));

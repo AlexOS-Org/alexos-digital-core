@@ -21,6 +21,7 @@ const DEFAULT_SETTINGS: StorefrontSettings = {
   slug: "dailygear",
   name: "DailyGear",
   tagline: "Smart, convenient gear for the way your day moves.",
+  meta_pixel_id: null,
   support_email: null,
   support_phone: null,
   whatsapp: null,
@@ -41,6 +42,7 @@ function SettingsPage() {
         slug: storefront.slug,
         name: storefront.name,
         tagline: storefront.tagline,
+        meta_pixel_id: storefront.meta_pixel_id,
         support_email: storefront.support_email,
         support_phone: storefront.support_phone,
         whatsapp: storefront.whatsapp,
@@ -68,6 +70,7 @@ function SettingsPage() {
         name: form.name.trim(),
         slug: form.slug.trim().toLowerCase(),
         tagline: form.tagline?.trim() || null,
+        meta_pixel_id: form.meta_pixel_id?.trim() || null,
         support_email: form.support_email?.trim() || null,
         support_phone: form.support_phone?.trim() || null,
         whatsapp: form.whatsapp?.trim() || null,
@@ -178,6 +181,19 @@ function SettingsPage() {
               </div>
 
               <div className="grid gap-4 rounded-2xl border bg-muted/25 p-4 sm:grid-cols-3">
+                <Field
+                  label="Meta Pixel ID"
+                  htmlFor="meta-pixel-id"
+                  hint="Use the numeric ID from Events Manager. Never paste a Meta access token."
+                >
+                  <Input
+                    id="meta-pixel-id"
+                    inputMode="numeric"
+                    placeholder="Enter the real Pixel ID"
+                    value={form.meta_pixel_id ?? ""}
+                    onChange={(event) => update("meta_pixel_id", event.target.value)}
+                  />
+                </Field>
                 <Field label="Support email" htmlFor="support-email">
                   <Input
                     id="support-email"

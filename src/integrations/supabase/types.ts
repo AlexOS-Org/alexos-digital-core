@@ -1359,6 +1359,74 @@ export type Database = {
           },
         ]
       }
+      dg_order_expenses: {
+        Row: {
+          account_id: string | null
+          amount: number
+          cost_type: string
+          created_at: string
+          description: string | null
+          id: string
+          money_transaction_id: string | null
+          order_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          amount?: number
+          cost_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          money_transaction_id?: string | null
+          order_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          amount?: number
+          cost_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          money_transaction_id?: string | null
+          order_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dg_order_expenses_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "account_balances"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "dg_order_expenses_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dg_order_expenses_money_transaction_id_fkey"
+            columns: ["money_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dg_order_expenses_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "dg_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dg_order_items: {
         Row: {
           created_at: string
@@ -1898,6 +1966,7 @@ export type Database = {
           hero_subheadline: string | null
           id: string
           logo_url: string | null
+          meta_pixel_id: string | null
           name: string
           published: boolean
           slug: string
@@ -1919,6 +1988,7 @@ export type Database = {
           hero_subheadline?: string | null
           id?: string
           logo_url?: string | null
+          meta_pixel_id?: string | null
           name?: string
           published?: boolean
           slug: string
@@ -1940,6 +2010,7 @@ export type Database = {
           hero_subheadline?: string | null
           id?: string
           logo_url?: string | null
+          meta_pixel_id?: string | null
           name?: string
           published?: boolean
           slug?: string
@@ -2751,6 +2822,31 @@ export type Database = {
         }
         Returns: Json
       }
+      dg_is_published_store: { Args: { _user_id: string }; Returns: boolean }
+      dg_record_order_fulfilment: {
+        Args: {
+          p_account_id?: string
+          p_delivery_cost?: number
+          p_next_status?: Database["public"]["Enums"]["dg_order_status"]
+          p_order_id: string
+          p_other_cost?: number
+          p_other_description?: string
+          p_purchase_cost?: number
+        }
+        Returns: Json
+      }
+      dg_reserve_stock: {
+        Args: { p_product_id: string; p_qty: number }
+        Returns: boolean
+      }
+      dg_reserve_variant_stock: {
+        Args: { p_product_id: string; p_qty: number; p_variant_id: string }
+        Returns: boolean
+      }
+      dg_seed_default_categories: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
       dg_update_admin_order: {
         Args: {
           p_customer?: Json
@@ -2770,19 +2866,6 @@ export type Database = {
           p_tracking_number?: string
         }
         Returns: Json
-      }
-      dg_is_published_store: { Args: { _user_id: string }; Returns: boolean }
-      dg_reserve_stock: {
-        Args: { p_product_id: string; p_qty: number }
-        Returns: boolean
-      }
-      dg_reserve_variant_stock: {
-        Args: { p_product_id: string; p_qty: number; p_variant_id: string }
-        Returns: boolean
-      }
-      dg_seed_default_categories: {
-        Args: { _user_id: string }
-        Returns: undefined
       }
       next_order_number: { Args: never; Returns: string }
     }

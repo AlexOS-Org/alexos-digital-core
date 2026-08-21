@@ -121,9 +121,6 @@ export function CategoryPageContent({
               "Browse verified DailyGear products in this category."}
           </p>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {products.data?.length ?? 0} product{(products.data?.length ?? 0) === 1 ? "" : "s"}
-        </p>
       </header>
 
       {subcategories.length ? (

@@ -26,6 +26,7 @@ import { placeGuestOrder } from "@/lib/storefront/checkout.functions";
 import { loadPublicFunnel } from "@/lib/storefront/funnel.functions";
 import type { PublicFunnel } from "@/lib/storefront/funnel.server";
 import { readFunnelAttribution } from "@/lib/storefront/funnel-session";
+import { trackMetaPixel } from "@/lib/storefront/meta-pixel";
 import { KENYA_COUNTIES, townsForCounty } from "@/lib/storefront/kenya-locations";
 
 interface CheckoutSearch {
@@ -128,6 +129,21 @@ function CheckoutPage() {
   const threshold = Number(store?.free_shipping_threshold ?? 0);
   const shipping =
     threshold > 0 && cart.subtotal >= threshold ? 0 : Number(store?.flat_shipping_fee ?? 0);
+  useEffect(() => {
+    if (cart.items.length === 0) return;
+    trackMetaPixel("InitiateCheckout", {
+      content_ids: cart.items.map((line) => line.sku ?? line.productId),
+      content_type: "product",
+      contents: cart.items.map((line) => ({
+        id: line.sku ?? line.productId,
+        quantity: line.quantity,
+      })),
+      currency,
+      num_items: cart.items.reduce((sum, line) => sum + line.quantity, 0),
+      value: cart.subtotal + shipping,
+    });
+  }, [cart.items, cart.subtotal, currency, shipping]);
+
   const [recoveryToken, setRecoveryToken] = useState<string | null>(search.recovery ?? null);
   const [funnelContext, setFunnelContext] = useState<PublicFunnel | null>(null);
   const [orderBumpAccepted, setOrderBumpAccepted] = useState(false);
@@ -318,10 +334,20 @@ function CheckoutPage() {
         },
       }),
     onSuccess: (result) => {
+      const contentIds = cart.items
+        .map((line) => line.sku ?? line.productId)
+        .filter(Boolean)
+        .join(",");
       cart.clear();
       navigate({
         to: "/shop/thank-you",
-        search: { order: result.orderNumber, funnel: funnelContext?.slug },
+        search: {
+          order: result.orderNumber,
+          funnel: funnelContext?.slug,
+          value: result.total,
+          currency: result.currency,
+          contentIds,
+        },
       });
     },
     onError: (e: Error) => toast.error(e.message),

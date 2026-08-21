@@ -13,6 +13,8 @@ import type {
 import { rememberFunnelAttribution } from "@/lib/storefront/funnel-session";
 import { cartStore } from "@/lib/storefront/cart";
 import { parseFunnelLandingContent } from "@/lib/storefront/funnel-copy";
+import { useStorefront } from "@/lib/storefront/api";
+import { initMetaPixel, trackMetaPixel, useMetaPixel } from "@/lib/storefront/meta-pixel";
 
 interface FunnelSearch {
   utm_source?: string;
@@ -70,6 +72,8 @@ function FunnelPage() {
   const navigate = useNavigate();
   const { slug } = Route.useParams();
   const search = Route.useSearch() as FunnelSearch;
+  const { data: store } = useStorefront();
+  useMetaPixel(store?.meta_pixel_id);
   const load = useServerFn(loadPublicFunnel);
   const [funnel, setFunnel] = useState<PublicFunnel | null>(null);
   const [loading, setLoading] = useState(true);
@@ -88,6 +92,14 @@ function FunnelPage() {
           return;
         }
         setFunnel(result);
+        initMetaPixel(store?.meta_pixel_id);
+        trackMetaPixel("ViewContent", {
+          content_ids: [result.product.sku ?? result.product.id],
+          content_name: result.product.name,
+          content_type: "product",
+          currency: result.product.currency,
+          value: sellingPrice(result.product),
+        });
         const firstVariant = result.variants.find(
           (variant) => variant.productId === result.product.id && variant.stockQuantity > 0,
         );
@@ -119,9 +131,36 @@ function FunnelPage() {
     return () => {
       cancelled = true;
     };
-  }, [load, search, slug]);
+  }, [load, search, slug, store?.meta_pixel_id]);
 
   const product = funnel?.product ?? null;
+
+  useEffect(() => {
+    if (!product || typeof document === "undefined") return;
+    const title = `${product.seoTitle?.trim() || product.name} | DailyGear`;
+    const description =
+      product.seoDescription?.trim() ||
+      product.shortDescription?.trim() ||
+      product.description?.trim() ||
+      "A focused DailyGear product offer with secure guest checkout.";
+
+    document.title = title;
+    const setMeta = (selector: string, attributes: Record<string, string>, content: string) => {
+      let element = document.head.querySelector<HTMLMetaElement>(selector);
+      if (!element) {
+        element = document.createElement("meta");
+        Object.entries(attributes).forEach(([key, value]) => element?.setAttribute(key, value));
+        document.head.appendChild(element);
+      }
+      element.setAttribute("content", content);
+    };
+    setMeta('meta[name="description"]', { name: "description" }, description);
+    setMeta('meta[property="og:title"]', { property: "og:title" }, title);
+    setMeta('meta[property="og:description"]', { property: "og:description" }, description);
+    setMeta('meta[name="twitter:title"]', { name: "twitter:title" }, title);
+    setMeta('meta[name="twitter:description"]', { name: "twitter:description" }, description);
+  }, [product]);
+
   const landingCopy = product
     ? parseFunnelLandingContent(
         funnel?.steps.find((step) => step.stepType === "landing")?.body,
@@ -165,6 +204,19 @@ function FunnelPage() {
       },
       Math.min(quantity, maxQuantity),
     );
+    trackMetaPixel("AddToCart", {
+      content_ids: [selectedVariant?.sku ?? product.sku ?? product.id],
+      content_name: product.name,
+      content_type: "product",
+      contents: [
+        {
+          id: selectedVariant?.sku ?? product.sku ?? product.id,
+          quantity: Math.min(quantity, maxQuantity),
+        },
+      ],
+      currency: product.currency,
+      value: price * Math.min(quantity, maxQuantity),
+    });
     navigate({ to: "/shop/checkout", search: { funnel: funnel.slug } });
   }
 
@@ -362,7 +414,7 @@ function FunnelPage() {
             disabled={maxQuantity < 1}
             onClick={addToCheckout}
           >
-            {maxQuantity < 1 ? "Out of stock" : (landingCopy?.ctaLabel ?? "Continue to checkout")}
+            {maxQuantity < 1 ? "Out of stock" : "Order now"}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
           <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">

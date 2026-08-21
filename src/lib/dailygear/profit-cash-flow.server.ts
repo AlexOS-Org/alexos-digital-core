@@ -5,6 +5,7 @@ import type { Order, OrderItem } from "./types";
 import {
   calculateDailyGearProfitAndCashFlow,
   type DailyGearCashFlowEvent,
+  type DailyGearOrderExpense,
   type DailyGearProfitCashFlowResult,
 } from "./profit-cash-flow";
 
@@ -41,7 +42,9 @@ export interface DailyGearProfitCashFlowResponse {
   financials: DailyGearProfitCashFlowResult;
   meta: {
     readOnly: true;
-    source: "meta-graph-api";
+    source: "meta-graph-api" | "unavailable";
+    available: boolean;
+    error: string | null;
     accountCount: number;
     campaignCount: number;
     adSetCount: number;
@@ -109,44 +112,84 @@ export async function calculateDailyGearProfitCashFlowForUser(
     .from("dg_order_items")
     .select("*")
     .eq("user_id", context.userId);
-  const [{ data: orderRows, error: orderError }, { data: itemRows, error: itemError }] =
-    await Promise.all([orderQuery, itemQuery]);
+  const expenseQuery = context.supabase
+    .from("dg_order_expenses")
+    .select("id,order_id,cost_type,amount,created_at,description")
+    .eq("user_id", context.userId);
+  const [
+    { data: orderRows, error: orderError },
+    { data: itemRows, error: itemError },
+    { data: expenseRows, error: expenseError },
+  ] = await Promise.all([orderQuery, itemQuery, expenseQuery]);
   if (orderError) throw orderError;
   if (itemError) throw itemError;
+  if (expenseError) throw expenseError;
 
-  const adSync = await syncDailyGearAdsManager({
-    datePreset: request.datePreset,
-    timeRange:
-      request.from || request.until ? { since: request.from, until: request.until } : undefined,
-    includeInsights: request.includeInsights,
-    maxPages: request.maxPages,
-    forceRefresh: request.forceRefresh,
-  });
-  const adInsights = adSync.accounts.flatMap((account) => account.insights);
+  const currencyByOrder = new Map(
+    (orderRows ?? []).map((order) => [order.id, order.currency ?? "KES"]),
+  );
+  const orderExpenses: DailyGearOrderExpense[] = (expenseRows ?? []).map((expense) => ({
+    id: expense.id,
+    orderId: expense.order_id,
+    costType: expense.cost_type as DailyGearOrderExpense["costType"],
+    amount: Number(expense.amount ?? 0),
+    currency: currencyByOrder.get(expense.order_id) ?? "KES",
+    date: expense.created_at,
+    note: expense.description,
+  }));
+
+  let adInsights: Awaited<
+    ReturnType<typeof syncDailyGearAdsManager>
+  >["accounts"][number]["insights"] = [];
+  let adSyncError: string | null = null;
+  let adSync: Awaited<ReturnType<typeof syncDailyGearAdsManager>> | null = null;
+  try {
+    adSync = await syncDailyGearAdsManager({
+      datePreset: request.datePreset,
+      timeRange:
+        request.from || request.until ? { since: request.from, until: request.until } : undefined,
+      includeInsights: request.includeInsights,
+      maxPages: request.maxPages,
+      forceRefresh: request.forceRefresh,
+    });
+    adInsights = adSync.accounts.flatMap((account) => account.insights);
+  } catch (error) {
+    adSyncError = error instanceof Error ? error.message : "Meta Ads spend is unavailable.";
+  }
 
   const financials = calculateDailyGearProfitAndCashFlow({
     orders: (orderRows ?? []) as Order[],
     orderItems: (itemRows ?? []) as OrderItem[],
+    orderExpenses,
     adInsights,
     cashEvents: request.cashEvents,
     from: request.from,
     until: request.until,
   });
 
+  if (adSyncError) financials.dataQuality.warnings.push(adSyncError);
+
+  const emptyCache = {
+    hit: false,
+    fetchedAt: new Date().toISOString(),
+    expiresAt: new Date().toISOString(),
+    ttlMs: 0,
+  };
   return {
     financials,
     meta: {
       readOnly: true,
-      source: "meta-graph-api",
-      accountCount: adSync.accounts.length,
-      campaignCount: adSync.accounts.reduce(
-        (count, account) => count + account.campaigns.length,
-        0,
-      ),
-      adSetCount: adSync.accounts.reduce((count, account) => count + account.adSets.length, 0),
-      adCount: adSync.accounts.reduce((count, account) => count + account.ads.length, 0),
+      source: adSync ? "meta-graph-api" : "unavailable",
+      available: Boolean(adSync),
+      error: adSyncError,
+      accountCount: adSync?.accounts.length ?? 0,
+      campaignCount:
+        adSync?.accounts.reduce((count, account) => count + account.campaigns.length, 0) ?? 0,
+      adSetCount:
+        adSync?.accounts.reduce((count, account) => count + account.adSets.length, 0) ?? 0,
+      adCount: adSync?.accounts.reduce((count, account) => count + account.ads.length, 0) ?? 0,
       insightCount: adInsights.length,
-      cache: adSync.cache,
+      cache: adSync?.cache ?? emptyCache,
     },
   };
 }

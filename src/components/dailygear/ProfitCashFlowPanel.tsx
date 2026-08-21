@@ -166,7 +166,7 @@ export function ProfitCashFlowPanel() {
         {loading ? (
           <div className="flex min-h-44 items-center justify-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
-            Loading RLS-scoped orders and Meta Spend…
+            Loading orders, fulfilment costs and Meta Spend…
           </div>
         ) : error ? (
           <div className="rounded-2xl border border-amber-300/60 bg-amber-50/70 p-4 text-sm dark:border-amber-500/30 dark:bg-amber-950/20">
@@ -184,6 +184,22 @@ export function ProfitCashFlowPanel() {
           </div>
         ) : financials ? (
           <>
+            {!response.meta.available ? (
+              <div className="rounded-2xl border border-amber-300/60 bg-amber-50/70 p-4 text-sm dark:border-amber-500/30 dark:bg-amber-950/20">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                  <div>
+                    <p className="font-semibold">Meta spend is unavailable</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Revenue, COGS, fulfilment expenses and cash flow below come from DailyGear and
+                      Money Center records. Operating profit excludes Meta spend until the server
+                      Meta token and Ads Manager read permission are configured; no spend value is
+                      estimated.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <Metric
                 label="Revenue"
@@ -197,8 +213,12 @@ export function ProfitCashFlowPanel() {
                 tone={financials.operatingProfit >= 0 ? "positive" : "negative"}
               />
               <Metric
-                label="Spend"
-                value={money(financials.adSpend, financials.currency)}
+                label={response.meta.available ? "Spend" : "Spend (unavailable)"}
+                value={
+                  response.meta.available
+                    ? money(financials.adSpend, financials.currency)
+                    : "Data not available"
+                }
                 icon={Megaphone}
               />
               <Metric
@@ -283,7 +303,9 @@ export function ProfitCashFlowPanel() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-              <Badge variant="secondary">Read-only Meta sync</Badge>
+              <Badge variant="secondary">
+                {response.meta.available ? "Read-only Meta sync" : "Meta sync unavailable"}
+              </Badge>
               <Badge variant="outline">{response.meta.cache.hit ? "Cached" : "Fresh"}</Badge>
               <span>Auto-updates every minute</span>
               <span>

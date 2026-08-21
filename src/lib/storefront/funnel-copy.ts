@@ -3,6 +3,8 @@ export interface FunnelLandingBenefit {
   body: string;
 }
 
+import type { Product } from "@/lib/dailygear/types";
+
 export interface FunnelLandingContent {
   eyebrow: string;
   headline: string;
@@ -100,6 +102,56 @@ export function defaultFunnelLandingContent(productName: string): FunnelLandingC
     deliveryNote:
       "Delivery and payment options are confirmed in DailyGear checkout before you place the order.",
     ctaLabel: isCarryProduct ? "Choose this bag" : "Continue to checkout",
+  };
+}
+
+/**
+ * Creates a product-specific AIDA draft from the canonical catalogue record.
+ * It intentionally uses only fields already maintained and verified in DailyGear;
+ * it does not invent product specifications, warranties or delivery promises.
+ */
+export function improvedFunnelLandingContent(
+  product: Pick<Product, "name" | "sku" | "description" | "short_description" | "seo_description">,
+): FunnelLandingContent {
+  const productName = clean(product.name, "Your DailyGear product", MAX_SHORT_TEXT);
+  const verifiedDescription = clean(
+    product.seo_description ?? product.short_description ?? product.description,
+    `${productName}. Review the verified details, available options and checkout information before you order.`,
+  );
+  const skuProof = product.sku?.trim()
+    ? `SKU ${product.sku.trim()}`
+    : "Product details shown clearly";
+
+  return {
+    eyebrow: "DailyGear product edit",
+    headline: `Choose ${productName} with the details in view.`,
+    subheadline: verifiedDescription,
+    benefits: [
+      {
+        title: "Start with verified details",
+        body: verifiedDescription,
+      },
+      {
+        title: "Review the available option",
+        body: "Choose an available colour, size or SKU where the catalogue provides one before continuing.",
+      },
+      {
+        title: "Keep the order path clear",
+        body: "The product, price and delivery or payment note stay visible before you submit the order.",
+      },
+      {
+        title: "Decide with confidence",
+        body: "DailyGear checks availability again in the shared checkout before an order is created.",
+      },
+    ],
+    proof: [
+      "Verified DailyGear catalogue details",
+      skuProof,
+      "Availability checked before checkout",
+    ],
+    deliveryNote:
+      "Delivery and payment options are confirmed in DailyGear checkout before you place the order.",
+    ctaLabel: "Review and order",
   };
 }
 

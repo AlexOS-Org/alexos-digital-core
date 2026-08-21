@@ -26,6 +26,7 @@ export type StorefrontSettings = Pick<
   | "slug"
   | "name"
   | "tagline"
+  | "meta_pixel_id"
   | "support_email"
   | "support_phone"
   | "whatsapp"

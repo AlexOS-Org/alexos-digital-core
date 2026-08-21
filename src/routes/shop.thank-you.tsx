@@ -10,16 +10,23 @@ import type {
   PublicFunnelStep,
 } from "@/lib/storefront/funnel.server";
 import { cartStore } from "@/lib/storefront/cart";
+import { trackMetaPixel } from "@/lib/storefront/meta-pixel";
 
 interface ThankYouSearch {
   order?: string;
   funnel?: string;
+  value?: number;
+  currency?: string;
+  contentIds?: string;
 }
 
 export const Route = createFileRoute("/shop/thank-you")({
   validateSearch: (search: Record<string, unknown>): ThankYouSearch => ({
     order: typeof search.order === "string" ? search.order : undefined,
     funnel: typeof search.funnel === "string" ? search.funnel : undefined,
+    value: typeof search.value === "number" ? search.value : undefined,
+    currency: typeof search.currency === "string" ? search.currency : undefined,
+    contentIds: typeof search.contentIds === "string" ? search.contentIds : undefined,
   }),
   head: () => ({
     meta: [
@@ -42,7 +49,13 @@ function offerPrice(product: PublicFunnelProduct) {
 
 function ThankYou() {
   const navigate = useNavigate();
-  const { order, funnel: funnelSlug } = Route.useSearch() as ThankYouSearch;
+  const {
+    order,
+    funnel: funnelSlug,
+    value,
+    currency,
+    contentIds,
+  } = Route.useSearch() as ThankYouSearch;
   const loadFunnel = useServerFn(loadPublicFunnel);
   const [funnel, setFunnel] = useState<PublicFunnel | null>(null);
   const [offerIndex, setOfferIndex] = useState(0);
@@ -77,7 +90,19 @@ function ThankYou() {
     setOfferIndex(0);
   }, [funnel?.id]);
 
+  useEffect(() => {
+    if (!order || value == null || !currency) return;
+    trackMetaPixel("Purchase", {
+      content_ids: contentIds ? contentIds.split(",").filter(Boolean) : undefined,
+      content_type: "product",
+      currency,
+      num_items: contentIds ? contentIds.split(",").filter(Boolean).length : undefined,
+      value,
+    });
+  }, [contentIds, currency, order, value]);
+
   function acceptOffer(step: PublicFunnelStep, product: PublicFunnelProduct) {
+    if (!funnel) return;
     cartStore.add(
       {
         productId: product.id,
@@ -93,7 +118,7 @@ function ThankYou() {
       },
       1,
     );
-    navigate({ to: "/shop/checkout", search: { funnel: funnel?.slug } });
+    navigate({ to: "/shop/checkout", search: { funnel: funnel.slug } });
   }
 
   return (

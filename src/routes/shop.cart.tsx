@@ -29,6 +29,7 @@ function CartPage() {
       : threshold > 0 && cart.subtotal >= threshold
         ? 0
         : Number(store?.flat_shipping_fee ?? 0);
+  const funnelSlug = cart.items.find((line) => line.funnelSlug)?.funnelSlug ?? undefined;
 
   if (cart.items.length === 0) {
     return (
@@ -164,14 +165,7 @@ function CartPage() {
             <span>{formatMoney(cart.subtotal + shipping, currency)}</span>
           </div>
           <Button asChild size="lg" className="w-full rounded-xl">
-            <Link
-              to="/shop/checkout"
-              search={
-                cart.items.find((line) => line.funnelSlug)?.funnelSlug
-                  ? { funnel: cart.items.find((line) => line.funnelSlug)?.funnelSlug }
-                  : {}
-              }
-            >
+            <Link to="/shop/checkout" search={funnelSlug ? { funnel: funnelSlug } : {}}>
               Checkout
             </Link>
           </Button>

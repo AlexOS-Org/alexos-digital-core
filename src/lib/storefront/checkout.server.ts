@@ -191,6 +191,60 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
     await markCartSessionConvertedImpl(input.storeSlug, input.recoveryToken);
   }
 
+  const { data: storefront } = await supabaseAdmin
+    .from("dg_storefronts")
+    .select("support_email")
+    .eq("slug", input.storeSlug)
+    .maybeSingle();
+  const { data: createdOrder } = await supabaseAdmin
+    .from("dg_orders")
+    .select("id")
+    .eq("order_number", result.orderNumber)
+    .maybeSingle();
+  const { data: createdItems } = createdOrder
+    ? await supabaseAdmin
+        .from("dg_order_items")
+        .select("name,sku,quantity,total")
+        .eq("order_id", createdOrder.id)
+    : { data: null };
+  try {
+    const { sendOrderNotifications } = await import("@/server/notifications/order-email");
+    const notification = await sendOrderNotifications({
+      orderNumber: result.orderNumber,
+      total: Number(result.total ?? 0),
+      currency: typeof result.currency === "string" ? result.currency : "KES",
+      paymentMethod: input.paymentMethod,
+      customerName: [input.firstName, input.lastName].filter(Boolean).join(" "),
+      customerEmail: input.email ?? null,
+      customerPhone: input.phone,
+      county: input.county,
+      town: input.town,
+      address: input.address,
+      deliveryDetails: input.deliveryDetails ?? null,
+      ownerEmail: storefront?.support_email ?? null,
+      items:
+        createdItems?.map((item) => ({
+          name: item.name,
+          sku: item.sku,
+          quantity: Number(item.quantity ?? 0),
+          lineTotal: Number(item.total ?? 0),
+        })) ??
+        input.items.map((item) => ({
+          name: item.productId,
+          sku: item.variantId ?? null,
+          quantity: item.quantity,
+          lineTotal: 0,
+        })),
+    });
+    if (!notification.sent)
+      console.warn(`[DailyGear] Order notification skipped: ${notification.reason}`);
+  } catch (notificationError) {
+    console.warn(
+      "[DailyGear] Order created but notification delivery failed",
+      notificationError instanceof Error ? notificationError.message : notificationError,
+    );
+  }
+
   return {
     orderNumber: result.orderNumber,
     total: Number(result.total ?? 0),

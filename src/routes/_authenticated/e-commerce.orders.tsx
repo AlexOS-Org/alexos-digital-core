@@ -6,6 +6,7 @@ import {
   Clock,
   DollarSign,
   Edit3,
+  PackageCheck,
   ShoppingCart,
   Search,
 } from "lucide-react";
@@ -26,6 +27,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCommerceData } from "@/lib/dailygear/useCommerceData";
 import { useUpdateOrderStatus } from "@/lib/dailygear/api";
 import { OrderEditDialog } from "@/components/dailygear/OrderEditDialog";
+import { OrderFulfilmentDialog } from "@/components/dailygear/OrderFulfilmentDialog";
 import {
   DG_CURRENCY,
   ORDER_STATUS_FLOW,
@@ -76,6 +78,7 @@ function OrdersPage() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<Order["status"] | "all">("all");
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
+  const [fulfillingOrder, setFulfillingOrder] = useState<Order | null>(null);
 
   const summary = useMemo(() => {
     const now = new Date();
@@ -247,15 +250,28 @@ function OrdersPage() {
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="whitespace-nowrap text-xs"
-                          onClick={() => setEditingOrder(order)}
-                        >
-                          <Edit3 className="mr-1 h-3.5 w-3.5" />
-                          Edit details
-                        </Button>
+                        <div className="flex flex-col items-start gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="whitespace-nowrap text-xs"
+                            onClick={() => setEditingOrder(order)}
+                          >
+                            <Edit3 className="mr-1 h-3.5 w-3.5" />
+                            Edit details
+                          </Button>
+                          {order.status === "new" || order.status === "processing" ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="whitespace-nowrap text-xs"
+                              onClick={() => setFulfillingOrder(order)}
+                            >
+                              <PackageCheck className="mr-1 h-3.5 w-3.5" />
+                              Record costs & fulfil
+                            </Button>
+                          ) : null}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -265,6 +281,14 @@ function OrdersPage() {
           </div>
         </Card>
       )}
+
+      <OrderFulfilmentDialog
+        open={Boolean(fulfillingOrder)}
+        onOpenChange={(open) => {
+          if (!open) setFulfillingOrder(null);
+        }}
+        order={fulfillingOrder}
+      />
 
       <OrderEditDialog
         open={Boolean(editingOrder)}

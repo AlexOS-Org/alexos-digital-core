@@ -322,18 +322,18 @@ export function useUpdateOrderDetails() {
         p_order_id: input.orderId,
         p_status: input.status,
         p_payment_status: input.paymentStatus,
-        p_payment_method: input.paymentMethod,
-        p_shipping_method: input.shippingMethod,
-        p_shipping_address: input.shippingAddress,
-        p_shipping_country: input.shippingCountry,
-        p_shipping_county: input.shippingCounty,
-        p_shipping_town: input.shippingTown,
-        p_shipping_address_details: input.shippingAddressDetails,
-        p_shipping_zone: input.shippingZone,
-        p_tracking_number: input.trackingNumber,
-        p_notes: input.notes,
-        p_internal_notes: input.internalNotes,
-        p_customer: input.customer,
+        p_payment_method: input.paymentMethod ?? undefined,
+        p_shipping_method: input.shippingMethod ?? undefined,
+        p_shipping_address: input.shippingAddress ?? undefined,
+        p_shipping_country: input.shippingCountry ?? undefined,
+        p_shipping_county: input.shippingCounty ?? undefined,
+        p_shipping_town: input.shippingTown ?? undefined,
+        p_shipping_address_details: input.shippingAddressDetails ?? undefined,
+        p_shipping_zone: input.shippingZone ?? undefined,
+        p_tracking_number: input.trackingNumber ?? undefined,
+        p_notes: input.notes ?? undefined,
+        p_internal_notes: input.internalNotes ?? undefined,
+        p_customer: input.customer ?? undefined,
       });
       if (error) throw error;
       return data;
@@ -341,6 +341,73 @@ export function useUpdateOrderDetails() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["dailygear"] });
       toast.success("Order details updated");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+}
+
+export interface OrderExpense {
+  id: string;
+  user_id: string;
+  order_id: string;
+  cost_type: "purchase_cost" | "delivery" | "other";
+  amount: number;
+  account_id: string | null;
+  description: string | null;
+  money_transaction_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export function useOrderExpenses(orderId?: string) {
+  return useQuery({
+    queryKey: ["dailygear", "dg_order_expenses", orderId],
+    enabled: Boolean(orderId),
+    queryFn: async () => {
+      if (!orderId) return [] as OrderExpense[];
+      const { data, error } = await supabase
+        .from("dg_order_expenses")
+        .select("*")
+        .eq("order_id", orderId)
+        .order("cost_type");
+      if (error) throw error;
+      return (data ?? []) as OrderExpense[];
+    },
+  });
+}
+
+export interface OrderFulfilmentInput {
+  orderId: string;
+  purchaseCost: number;
+  deliveryCost: number;
+  otherCost: number;
+  accountId: string | null;
+  otherDescription: string | null;
+  nextStatus: Order["status"] | null;
+}
+
+export function useRecordOrderFulfilment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: OrderFulfilmentInput) => {
+      const { data, error } = await supabase.rpc("dg_record_order_fulfilment", {
+        p_order_id: input.orderId,
+        p_purchase_cost: input.purchaseCost,
+        p_delivery_cost: input.deliveryCost,
+        p_other_cost: input.otherCost,
+        p_account_id: input.accountId ?? undefined,
+        p_other_description: input.otherDescription ?? undefined,
+        p_next_status: input.nextStatus ?? undefined,
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["dailygear"] });
+      qc.invalidateQueries({ queryKey: ["transactions"] });
+      qc.invalidateQueries({ queryKey: ["accounts"] });
+      qc.invalidateQueries({ queryKey: ["account_balances"] });
+      toast.success("Fulfilment costs recorded");
     },
     onError: (error: Error) => toast.error(error.message),
   });

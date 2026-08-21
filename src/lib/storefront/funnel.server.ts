@@ -6,6 +6,8 @@ export interface PublicFunnelProduct {
   slug: string | null;
   description: string | null;
   shortDescription: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
   price: number;
   salePrice: number | null;
   currency: string;
@@ -91,7 +93,7 @@ export async function loadPublicFunnelImpl(slug: string): Promise<PublicFunnel |
   const { data: product, error: productError } = await supabaseAdmin
     .from("dg_products")
     .select(
-      "id,name,slug,description,short_description,price,sale_price,currency,images,sku,stock_quantity,attributes,status,availability_confirmed,category_id,deleted_at,user_id",
+      "id,name,slug,description,short_description,seo_title,seo_description,price,sale_price,currency,images,sku,stock_quantity,attributes,status,availability_confirmed,category_id,deleted_at,user_id",
     )
     .eq("id", funnel.product_id)
     .eq("user_id", funnel.user_id)
@@ -128,7 +130,7 @@ export async function loadPublicFunnelImpl(slug: string): Promise<PublicFunnel |
     ? await supabaseAdmin
         .from("dg_products")
         .select(
-          "id,name,slug,description,short_description,price,sale_price,currency,images,sku,stock_quantity,attributes,status,availability_confirmed,category_id,deleted_at,user_id",
+          "id,name,slug,description,short_description,seo_title,seo_description,price,sale_price,currency,images,sku,stock_quantity,attributes,status,availability_confirmed,category_id,deleted_at,user_id",
         )
         .in("id", offerProductIds)
         .eq("user_id", funnel.user_id)
@@ -174,6 +176,8 @@ export async function loadPublicFunnelImpl(slug: string): Promise<PublicFunnel |
       slug: product.slug,
       description: product.description,
       shortDescription: product.short_description,
+      seoTitle: product.seo_title,
+      seoDescription: product.seo_description,
       price: Number(product.price ?? 0),
       salePrice: product.sale_price == null ? null : Number(product.sale_price),
       currency: product.currency ?? "KES",
@@ -188,6 +192,8 @@ export async function loadPublicFunnelImpl(slug: string): Promise<PublicFunnel |
       slug: offerProduct.slug,
       description: offerProduct.description,
       shortDescription: offerProduct.short_description,
+      seoTitle: offerProduct.seo_title,
+      seoDescription: offerProduct.seo_description,
       price: Number(offerProduct.price ?? 0),
       salePrice: offerProduct.sale_price == null ? null : Number(offerProduct.sale_price),
       currency: offerProduct.currency ?? "KES",

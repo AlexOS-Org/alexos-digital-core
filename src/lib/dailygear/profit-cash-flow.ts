@@ -22,9 +22,20 @@ export interface DailyGearCashFlowEvent {
   note?: string | null;
 }
 
+export interface DailyGearOrderExpense {
+  id: string;
+  orderId: string;
+  costType: "purchase_cost" | "delivery" | "other";
+  amount: number;
+  currency: string;
+  date: string;
+  note?: string | null;
+}
+
 export interface DailyGearProfitCashFlowInput {
   orders: Order[];
   orderItems: OrderItem[];
+  orderExpenses?: DailyGearOrderExpense[];
   adInsights: NormalizedMetaInsight[];
   /** Explicit cash movements override inferred paid-order receipts. */
   cashEvents?: DailyGearCashFlowEvent[];
@@ -117,6 +128,7 @@ function currenciesFrom(
   orders: Order[],
   insights: NormalizedMetaInsight[],
   cashEvents: DailyGearCashFlowEvent[],
+  orderExpenses: DailyGearOrderExpense[],
 ): string[] {
   return [
     ...new Set(
@@ -124,6 +136,7 @@ function currenciesFrom(
         ...orders.map((order) => order.currency),
         ...insights.map((row) => row.currency),
         ...cashEvents.map((event) => event.currency),
+        ...orderExpenses.map((expense) => expense.currency),
       ].filter((currency): currency is string => Boolean(currency)),
     ),
   ];
@@ -147,7 +160,12 @@ export function calculateDailyGearProfitAndCashFlow(
   );
   const recognizedOrderIds = new Set(recognizedOrders.map((order) => order.id));
   const items = input.orderItems.filter((item) => recognizedOrderIds.has(item.order_id));
+  const orderExpenses = (input.orderExpenses ?? []).filter(
+    (expense) =>
+      recognizedOrderIds.has(expense.orderId) && inPeriod(expense.date, input.from, input.until),
+  );
   const cogsByOrder = new Map<string, number>();
+  const purchaseCostByOrder = new Map<string, number>();
   let missingCogsItemCount = 0;
 
   for (const item of items) {
@@ -155,6 +173,11 @@ export function calculateDailyGearProfitAndCashFlow(
     if (unitCost <= 0) missingCogsItemCount += 1;
     addToMap(cogsByOrder, item.order_id, unitCost * num(item.quantity));
   }
+  for (const expense of orderExpenses) {
+    if (expense.costType === "purchase_cost")
+      addToMap(purchaseCostByOrder, expense.orderId, num(expense.amount));
+  }
+  for (const [orderId, purchaseCost] of purchaseCostByOrder) cogsByOrder.set(orderId, purchaseCost);
 
   const adRows = input.adInsights.filter((row) => inPeriod(row.date, input.from, input.until));
   const adSpendByDate = new Map<string, number>();
@@ -170,6 +193,14 @@ export function calculateDailyGearProfitAndCashFlow(
   const deliveryCostsByDate = new Map<string, number>();
   const supplierPaymentsByDate = new Map<string, number>();
   const otherOutflowsByDate = new Map<string, number>();
+
+  for (const expense of orderExpenses) {
+    const day = dateOnly(expense.date);
+    if (expense.costType === "delivery") addToMap(deliveryCostsByDate, day, num(expense.amount));
+    if (expense.costType === "other") addToMap(otherOutflowsByDate, day, num(expense.amount));
+    if (expense.costType === "purchase_cost")
+      addToMap(supplierPaymentsByDate, day, num(expense.amount));
+  }
 
   if (hasExplicitReceipts) {
     for (const event of explicitEvents) {
@@ -226,6 +257,7 @@ export function calculateDailyGearProfitAndCashFlow(
     ...recognizedOrders.map((order) => dateOnly(order.placed_at)),
     ...adRows.map((row) => dateOnly(row.date)),
     ...explicitEvents.map((event) => dateOnly(event.date)),
+    ...orderExpenses.map((expense) => dateOnly(expense.date)),
   ]);
 
   const daily = [...dates].sort().map((date) => {
@@ -270,13 +302,13 @@ export function calculateDailyGearProfitAndCashFlow(
     };
   });
 
-  const currencies = currenciesFrom(orders, adRows, explicitEvents);
+  const currencies = currenciesFrom(orders, adRows, explicitEvents, orderExpenses);
   const warnings: string[] = [];
   if (currencies.length > 1)
     warnings.push(
       "Multiple currencies are present; totals must not be combined without FX conversion.",
     );
-  if (missingCogsItemCount > 0)
+  if (missingCogsItemCount > 0 && purchaseCostByOrder.size === 0)
     warnings.push(
       `${missingCogsItemCount} recognized order item(s) have zero or missing unit cost.`,
     );
