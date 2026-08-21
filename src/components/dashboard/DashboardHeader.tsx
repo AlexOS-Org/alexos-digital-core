@@ -1,20 +1,19 @@
-import { Bell, Sparkles, BookOpen, Quote, Bot, ArrowUpRight, Palette, Clock3 } from "lucide-react";
+import { Bell, Sparkles, BookOpen, Quote, Bot, ArrowUpRight, Clock3 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { getDailyInspiration } from "@/lib/dashboard/inspiration";
 import { DashboardWeather } from "@/components/dashboard/DashboardWeather";
+import { useTheme } from "@/components/theme/ThemeProvider";
+import { getVisualTheme } from "@/components/theme/visual-themes";
 import alexosMountainWide from "@/assets/visuals/alexos-mountain-dusk-wide.webp";
 import alexosMountainMobile from "@/assets/visuals/alexos-mountain-mobile.webp";
 
 type Atmosphere = "auto" | "morning" | "day" | "evening" | "night";
 type TimeFormat = "12h" | "24h";
-type Backdrop = "mountains" | "gradient";
-
 const ATMOSPHERE_KEY = "alexos-dashboard-atmosphere";
 const TIME_FORMAT_KEY = "alexos-dashboard-time-format";
-const BACKDROP_KEY = "alexos-dashboard-backdrop";
 
 function getTimeAtmosphere(hour: number): Exclude<Atmosphere, "auto"> {
   if (hour >= 5 && hour < 11) return "morning";
@@ -77,11 +76,6 @@ export function DashboardHeader() {
     if (typeof window === "undefined") return "24h";
     return window.localStorage.getItem(TIME_FORMAT_KEY) === "12h" ? "12h" : "24h";
   });
-  const [backdrop, setBackdrop] = useState<Backdrop>(() => {
-    if (typeof window === "undefined") return "mountains";
-    return window.localStorage.getItem(BACKDROP_KEY) === "gradient" ? "gradient" : "mountains";
-  });
-  const [showAtmosphereMenu, setShowAtmosphereMenu] = useState(false);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
@@ -91,6 +85,8 @@ export function DashboardHeader() {
   const hour = now.getHours();
   const activeAtmosphere = atmosphere === "auto" ? getTimeAtmosphere(hour) : atmosphere;
   const visual = getAtmosphereStyle(activeAtmosphere);
+  const { visualTheme } = useTheme();
+  const backdrop = getVisualTheme(visualTheme).backdrop;
   const greeting = getGreeting(hour);
   const today = now.toLocaleDateString("en-KE", {
     weekday: "long",
@@ -100,21 +96,10 @@ export function DashboardHeader() {
   });
   const inspiration = getDailyInspiration();
 
-  const setAtmospherePreference = (value: Atmosphere) => {
-    setAtmosphere(value);
-    window.localStorage.setItem(ATMOSPHERE_KEY, value);
-    setShowAtmosphereMenu(false);
-  };
-
   const toggleTimeFormat = () => {
     const next: TimeFormat = timeFormat === "12h" ? "24h" : "12h";
     setTimeFormat(next);
     window.localStorage.setItem(TIME_FORMAT_KEY, next);
-  };
-
-  const setBackdropPreference = (value: Backdrop) => {
-    setBackdrop(value);
-    window.localStorage.setItem(BACKDROP_KEY, value);
   };
 
   return (
@@ -172,50 +157,6 @@ export function DashboardHeader() {
               >
                 <Clock3 className="h-5 w-5" />
               </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="border border-white/15 bg-black/20 text-white backdrop-blur-md hover:bg-white/10 hover:text-white"
-                aria-label="Change dashboard atmosphere"
-                aria-expanded={showAtmosphereMenu}
-                onClick={() => setShowAtmosphereMenu((open) => !open)}
-              >
-                <Palette className="h-5 w-5" />
-              </Button>
-              {showAtmosphereMenu && (
-                <div className="absolute right-0 top-12 z-40 w-44 rounded-2xl border border-white/10 bg-[#09152d]/95 p-2 shadow-2xl backdrop-blur-xl">
-                  <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-white/45">
-                    Atmosphere
-                  </p>
-                  {(["auto", "morning", "day", "evening", "night"] as Atmosphere[]).map(
-                    (option) => (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => setAtmospherePreference(option)}
-                        className={`w-full rounded-xl px-2 py-2 text-left text-xs transition-colors ${atmosphere === option ? "bg-white/10 text-white" : "text-white/65 hover:bg-white/5 hover:text-white"}`}
-                      >
-                        {option === "auto"
-                          ? "Auto · Follow time"
-                          : option[0].toUpperCase() + option.slice(1)}
-                      </button>
-                    ),
-                  )}
-                  <p className="mt-2 border-t border-white/10 px-2 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wider text-white/45">
-                    Backdrop
-                  </p>
-                  {(["mountains", "gradient"] as Backdrop[]).map((option) => (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => setBackdropPreference(option)}
-                      className={`w-full rounded-xl px-2 py-2 text-left text-xs transition-colors ${backdrop === option ? "bg-white/10 text-white" : "text-white/65 hover:bg-white/5 hover:text-white"}`}
-                    >
-                      {option === "mountains" ? "Mountain ridges" : "Colour field"}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 

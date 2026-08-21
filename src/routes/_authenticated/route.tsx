@@ -1,11 +1,10 @@
-import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { SupabaseConfigBanner } from "@/components/SupabaseConfigBanner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { modules } from "@/lib/modules";
-import { VisualThemePicker } from "@/components/theme/VisualThemePicker";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -64,8 +63,14 @@ function AuthenticatedLayout() {
                 ))}
               </div>
             </div>
-            <div className="ml-auto flex items-center gap-1">
-              <VisualThemePicker />
+            <div className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="hidden sm:inline">Settings control appearance</span>
+              <Link
+                to="/settings"
+                className="rounded-lg px-2 py-1.5 font-medium text-primary hover:bg-primary/10"
+              >
+                Settings
+              </Link>
             </div>
           </header>
           {/* Extra bottom padding on mobile so content clears the bottom nav */}

@@ -1,6 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { AlertTriangle, CheckCircle2, Package, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  CheckCircle2,
+  ClipboardCheck,
+  Package,
+  Pencil,
+  Plus,
+  Search,
+  ShieldCheck,
+  Trash2,
+} from "lucide-react";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { StatusBadge } from "@/components/dailygear/StatusBadge";
 import { ProductFormDialog } from "@/components/dailygear/ProductFormDialog";
@@ -92,20 +103,84 @@ function ProductsPage() {
       {isLoading && <Skeleton className="h-64 w-full rounded-2xl" />}
 
       {!isLoading && filtered.length === 0 && (
-        <Card className="rounded-2xl border-dashed">
-          <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
-            <Package className="h-6 w-6 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
-              {products.length
-                ? "No products match your search."
-                : "Add your first product to start tracking revenue and stock."}
-            </p>
+        <Card className="relative overflow-hidden rounded-[1.75rem] border-primary/20 bg-gradient-to-br from-card via-card to-primary/[0.07] shadow-[0_22px_60px_-36px_var(--alexos-glow)]">
+          <div className="alexos-visual-strip absolute inset-x-0 top-0 h-1 opacity-90" />
+          <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
+          <CardContent className="relative p-5 sm:p-8">
+            {products.length ? (
+              <div className="flex items-center gap-3">
+                <Package className="h-6 w-6 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">No products match your search.</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex items-start gap-3">
+                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary ring-1 ring-inset ring-primary/15">
+                      <Package className="h-5 w-5" />
+                    </span>
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+                        Current catalogue
+                      </p>
+                      <h2 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">
+                        No current product records yet
+                      </h2>
+                      <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+                        Add a real DailyGear item with its current price, source evidence, images
+                        and stock. Historical ad names alone are not enough to publish a product.
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    className="shrink-0 rounded-xl"
+                    onClick={() => {
+                      setEditing(null);
+                      setOpen(true);
+                    }}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add real product
+                  </Button>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <SetupStep
+                    icon={ClipboardCheck}
+                    title="Verify the source"
+                    detail="Current supplier or first-party record"
+                  />
+                  <SetupStep
+                    icon={ShieldCheck}
+                    title="Pass the stock gate"
+                    detail="At least 15 units per SKU or colour variant"
+                  />
+                  <SetupStep
+                    icon={CheckCircle2}
+                    title="Publish with confidence"
+                    detail="Availability, SEO copy and imagery confirmed"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2 rounded-2xl border border-amber-500/20 bg-amber-500/[0.06] p-4 text-sm sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-amber-800 dark:text-amber-200">
+                    Keep new items as drafts until every publication gate passes.
+                  </p>
+                  <Link
+                    to="/e-commerce/settings"
+                    className="inline-flex items-center text-xs font-semibold text-primary hover:underline"
+                  >
+                    Review store settings <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
 
       {!isLoading && filtered.length > 0 && (
-        <Card className="rounded-2xl overflow-hidden">
+        <Card className="overflow-hidden rounded-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
@@ -113,9 +188,9 @@ function ProductsPage() {
                   <th className="px-4 py-3 font-medium">Product</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium">Readiness</th>
-                  <th className="px-4 py-3 font-medium text-right">Price</th>
-                  <th className="px-4 py-3 font-medium text-right">Cost</th>
-                  <th className="px-4 py-3 font-medium text-right">Stock</th>
+                  <th className="px-4 py-3 text-right font-medium">Price</th>
+                  <th className="px-4 py-3 text-right font-medium">Cost</th>
+                  <th className="px-4 py-3 text-right font-medium">Stock</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
@@ -157,7 +232,7 @@ function ProductsPage() {
                         {money(Number(p.cost_price))}
                       </td>
                       <td
-                        className={`px-4 py-3 text-right ${low ? "text-destructive font-medium" : ""}`}
+                        className={`px-4 py-3 text-right ${low ? "font-medium text-destructive" : ""}`}
                       >
                         {p.stock_quantity}
                       </td>
@@ -170,10 +245,16 @@ function ProductsPage() {
                               setEditing(p);
                               setOpen(true);
                             }}
+                            aria-label={`Edit ${p.name}`}
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <Button size="icon" variant="ghost" onClick={() => remove.mutate(p.id)}>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => remove.mutate(p.id)}
+                            aria-label={`Delete ${p.name}`}
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -188,6 +269,28 @@ function ProductsPage() {
       )}
 
       <ProductFormDialog open={open} onOpenChange={setOpen} product={editing} />
+    </div>
+  );
+}
+
+function SetupStep({
+  icon: Icon,
+  title,
+  detail,
+}: {
+  icon: typeof ClipboardCheck;
+  title: string;
+  detail: string;
+}) {
+  return (
+    <div className="flex items-start gap-3 rounded-2xl border border-border/60 bg-background/45 p-3.5">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+        <Icon className="h-4 w-4" />
+      </span>
+      <div>
+        <p className="text-sm font-semibold">{title}</p>
+        <p className="mt-1 text-xs leading-5 text-muted-foreground">{detail}</p>
+      </div>
     </div>
   );
 }

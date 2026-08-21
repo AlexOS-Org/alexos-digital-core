@@ -1,27 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowLeft,
-  Bell,
-  Palette,
-  Lock,
-  Database,
-  Globe,
-  Save,
-  Check,
-  Sun,
-  Moon,
-  Smartphone,
-} from "lucide-react";
+import { ArrowLeft, Bell, Palette, Lock, Database, Globe, Save, Check } from "lucide-react";
 import { useState } from "react";
-import { useTheme } from "@/components/theme/ThemeProvider";
+import { VisualThemePicker } from "@/components/theme/VisualThemePicker";
 
 export const Route = createFileRoute("/_authenticated/settings")({ component: Settings });
 
 function Settings() {
   const [saved, setSaved] = useState(false);
-  const { theme, resolvedTheme, setTheme } = useTheme();
   const handleSave = () => {
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -126,36 +113,17 @@ function Settings() {
             Appearance
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-5">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Theme</label>
-            <div className="grid grid-cols-3 gap-2">
-              <ThemeOption
-                active={theme === "system"}
-                onClick={() => setTheme("system")}
-                icon={Smartphone}
-                title="System"
-              />
-              <ThemeOption
-                active={theme === "light"}
-                onClick={() => setTheme("light")}
-                icon={Sun}
-                title="Light"
-              />
-              <ThemeOption
-                active={theme === "dark"}
-                onClick={() => setTheme("dark")}
-                icon={Moon}
-                title="Dark"
-              />
+        <CardContent>
+          <div className="rounded-2xl border border-primary/15 bg-primary/[0.04] p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold">Command-center style</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  Select the AlexOS or DailyGear visual preset, custom accent and appearance mode.
+                </p>
+              </div>
+              <VisualThemePicker />
             </div>
-            <p className="text-xs text-muted-foreground">
-              System is recommended. AlexOS follows your phone or device appearance and changes
-              automatically when your device changes.
-            </p>
-            <p className="text-xs font-medium text-primary">
-              Currently showing {resolvedTheme === "dark" ? "Dark" : "Light"} mode.
-            </p>
           </div>
         </CardContent>
       </Card>
@@ -228,30 +196,6 @@ function Settings() {
         </Button>
       </div>
     </div>
-  );
-}
-
-function ThemeOption({
-  active,
-  onClick,
-  icon: Icon,
-  title,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: typeof Smartphone;
-  title: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`flex flex-col items-center gap-2 rounded-xl border p-3 text-sm font-medium transition-all ${active ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/20" : "border-border bg-background text-foreground hover:border-primary/40"}`}
-    >
-      <Icon className="h-5 w-5" />
-      <span>{title}</span>
-    </button>
   );
 }
 
