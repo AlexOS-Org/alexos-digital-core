@@ -6,6 +6,7 @@ import {
   Brain,
   CheckCircle2,
   CircleDollarSign,
+  ExternalLink,
   PackageSearch,
   RefreshCw,
   ShieldCheck,
@@ -337,6 +338,70 @@ function AurenPage() {
                 <div className="rounded-2xl border border-violet-500/15 bg-background/60 p-5 text-sm leading-7 whitespace-pre-line">
                   {response.summary}
                 </div>
+              </CardContent>
+            </Card>
+          ) : null}
+
+          {advisory.externalContext.length > 0 ? (
+            <Card className="rounded-3xl border-border/60 soft-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <ShieldCheck className="h-4 w-4 text-primary" /> Public context and source
+                  coverage
+                  <Badge variant="outline" className="ml-auto text-xs">
+                    Background only
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-3 md:grid-cols-3">
+                {advisory.externalContext.map((context) => (
+                  <div
+                    key={context.business}
+                    className="rounded-2xl border border-border/60 bg-card/70 p-4"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold">{context.business}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{context.sourceTitle}</p>
+                      </div>
+                      <Badge
+                        variant={
+                          context.status === "verified_brand_context" ? "secondary" : "outline"
+                        }
+                      >
+                        {context.status === "verified_brand_context" ? "Reviewed" : "Source needed"}
+                      </Badge>
+                    </div>
+                    {context.facts.length > 0 ? (
+                      <ul className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
+                        {context.facts.map((fact) => (
+                          <li key={fact}>• {fact}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                        No entity-verified public facts were added. Auren will rely on internal
+                        records for this business.
+                      </p>
+                    )}
+                    {context.sourceUrl ? (
+                      <a
+                        href={context.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                      >
+                        View public source <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    ) : null}
+                    <p className="mt-3 text-[11px] leading-5 text-muted-foreground">
+                      Retrieved {context.retrievedAt.slice(0, 10)} · {context.confidence} confidence
+                    </p>
+                    <p className="mt-2 text-[11px] leading-5 text-muted-foreground">
+                      Limitation: {context.limitations[0]}
+                    </p>
+                  </div>
+                ))}
               </CardContent>
             </Card>
           ) : null}

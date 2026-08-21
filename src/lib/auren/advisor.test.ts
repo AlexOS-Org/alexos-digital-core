@@ -107,4 +107,18 @@ describe("Auren advisory contract", () => {
     expect(advisory.forecasts.income.base).toBeNull();
     expect(advisory.forecasts.income.method).toBe("insufficient_data");
   });
+  it("adds reviewed public context without changing operational totals", () => {
+    const advisory = buildAurenAdvisory(fixture());
+    expect(advisory.externalContext.find((item) => item.business === "DailyGear")).toMatchObject({
+      status: "verified_brand_context",
+      sourceUrl: "https://dailygear.co.ke/",
+    });
+    expect(advisory.verified.income).toBe(14000);
+    expect(advisory.forecasts.income.base).toBe(30000);
+  });
+  it("does not expose business public context in personal scope", () => {
+    const input = fixture();
+    input.request = { period: "last_30d", scope: "personal", horizonDays: 30 };
+    expect(buildAurenAdvisory(input).externalContext).toHaveLength(0);
+  });
 });

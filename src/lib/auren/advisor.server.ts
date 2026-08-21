@@ -4,6 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 import type { DashboardSnapshot } from "@/lib/dashboard/types";
 import { computeDashboardMetrics } from "@/lib/dashboard/calculations";
 import { generateSignals } from "@/lib/intelligence/signals";
+import { getAurenPublicContext, type AurenPublicContextRecord } from "./public-context";
 
 const AI_MODEL = "@cf/meta/llama-3.2-3b-instruct";
 const MAX_ROWS = 5000;
@@ -127,6 +128,7 @@ export interface AurenAdvisorySnapshot {
   };
   businesses: AurenBusinessSummary[];
   recommendations: AurenRecommendation[];
+  externalContext: AurenPublicContextRecord[];
   dataQuality: {
     warnings: string[];
     sourceRows: Record<string, number>;
@@ -557,6 +559,7 @@ export function buildAurenAdvisory(input: AurenAdvisoryInput): AurenAdvisorySnap
       input.dailyGear,
       warnings,
     ),
+    externalContext: getAurenPublicContext(input.request.scope),
     dataQuality: {
       warnings,
       sourceRows: {
@@ -594,6 +597,8 @@ function advisoryPrompt(advisory: AurenAdvisorySnapshot) {
     "Use only values and names in the JSON. Never invent causes, numbers, customers, products, market facts or certainty.",
     "Forecast ranges are operating scenarios, not guaranteed predictions and not statistical confidence intervals.",
     "Distinguish verified values from recommendations. If a value is null or dataQuality warns about coverage, say that the data is not sufficient.",
+    "External context is background only. It cannot prove current stock, orders, revenue, prices, demand, customer behavior or financial performance.",
+    "When external context has a source URL, identify it as public context and do not present it as a live AlexOS record. When a source is missing, say that entity-verified public context is unavailable.",
     "Use exactly these three labels, each on its own line: Read: ; Risk: ; Next move: . Keep each line under 180 characters.",
     `Advisory JSON: ${JSON.stringify(advisory)}`,
   ].join("\n");
