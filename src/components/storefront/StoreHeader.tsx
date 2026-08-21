@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/lib/storefront/cart";
 import type { Storefront, StoreCategory } from "@/lib/storefront/api";
+import { DAILYGEAR_LOGO, DAILYGEAR_NAME } from "@/lib/storefront/brand";
 
 const LINKS = [
   { to: "/shop", label: "Home", exact: true },
@@ -35,9 +36,9 @@ export function StoreHeader({
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
+    <header className="dailygear-store-header sticky top-0 z-40 border-b backdrop-blur-xl">
       {store?.announcement ? (
-        <div className="bg-primary px-4 py-2 text-center text-xs font-medium text-primary-foreground">
+        <div className="dailygear-store-announcement px-4 py-2 text-center text-xs font-semibold">
           {store.announcement}
         </div>
       ) : null}
@@ -92,14 +93,18 @@ export function StoreHeader({
           </Sheet>
 
           <Link to="/shop" className="flex min-w-0 items-center gap-2.5">
-            <span
-              aria-hidden="true"
-              className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-primary text-xs font-black text-primary-foreground shadow-sm"
-            >
-              DG
+            <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-black/5">
+              <img
+                src={store?.logo_url ?? DAILYGEAR_LOGO}
+                alt=""
+                aria-hidden="true"
+                width={76}
+                height={40}
+                className="h-full w-full object-contain"
+              />
             </span>
             <span className="truncate text-base font-black tracking-tight sm:text-lg">
-              {store?.name ?? "DailyGear"}
+              {store?.name ?? DAILYGEAR_NAME}
             </span>
           </Link>
         </div>
@@ -119,7 +124,7 @@ export function StoreHeader({
 
         <div className="flex shrink-0 items-center gap-1">
           <nav className="mr-2 hidden items-center gap-1 lg:flex">
-            {LINKS.slice(1).map((l) => (
+            {LINKS.slice(1, 4).map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
@@ -157,20 +162,20 @@ export function StoreHeader({
       </form>
 
       {categories.length ? (
-        <div className="hidden border-t lg:block">
+        <div className="dailygear-store-category-rail hidden border-t lg:block">
           <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-4 py-2">
             <Link
               to="/shop/products"
-              className="whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+              className="whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-primary/10"
             >
-              All products
+              Browse all
             </Link>
-            {categories.slice(0, 10).map((c) => (
+            {categories.slice(0, 8).map((c) => (
               <Link
                 key={c.id}
                 to="/shop/products"
                 search={{ category: c.id }}
-                className="whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+                className="whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-primary/10 hover:text-foreground"
               >
                 {c.name}
               </Link>

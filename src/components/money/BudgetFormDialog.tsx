@@ -69,8 +69,12 @@ export function BudgetFormDialog({ open, onOpenChange, month, editing }: Props) 
 
         <div className="space-y-5">
           <div className="space-y-2">
-            <Label>Month</Label>
+            <Label>Starts in</Label>
             <Input value={monthLabel(month)} disabled />
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              This monthly limit will repeat automatically in future months. Spending and remaining
+              balance are recalculated for each month.
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -91,7 +95,7 @@ export function BudgetFormDialog({ open, onOpenChange, month, editing }: Props) 
           </div>
 
           <div className="space-y-2">
-            <Label>Monthly Limit</Label>
+            <Label>Recurring Monthly Limit</Label>
             <Input
               type="number"
               step="0.01"

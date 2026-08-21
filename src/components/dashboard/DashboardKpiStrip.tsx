@@ -87,9 +87,9 @@ export function DashboardKpiStrip() {
     <section aria-labelledby="dashboard-kpi-title" className="space-y-3">
       <div className="flex items-end justify-between gap-3">
         <div>
-          <p className="dashboard-eyebrow">At a glance</p>
+          <p className="dashboard-eyebrow">Command snapshot</p>
           <h2 id="dashboard-kpi-title" className="mt-1 text-xl font-semibold tracking-tight">
-            Know where you stand.
+            The four signals to check first.
           </h2>
         </div>
         <Link

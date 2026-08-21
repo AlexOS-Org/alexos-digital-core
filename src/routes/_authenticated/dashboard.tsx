@@ -1,4 +1,3 @@
-import { Component, type ErrorInfo, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -20,7 +19,11 @@ import {
 } from "@/components/dashboard/MobileCommandCenter";
 import { MobileDashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DashboardKpiStrip } from "@/components/dashboard/DashboardKpiStrip";
+import { AlexosDashboardFooter } from "@/components/dashboard/AlexosDashboardFooter";
+import { Component, ErrorInfo, ReactNode } from "react";
+
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: Dashboard });
+
 class DashboardPanelBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   state = { hasError: false };
   static getDerivedStateFromError() {
@@ -44,12 +47,14 @@ class DashboardPanelBoundary extends Component<{ children: ReactNode }, { hasErr
     return this.props.children;
   }
 }
+
 function SafePanel({ children }: { children: ReactNode }) {
   return <DashboardPanelBoundary>{children}</DashboardPanelBoundary>;
 }
+
 function MobileDashboard() {
   return (
-    <div className="space-y-5 pb-24">
+    <div className="space-y-5 pb-10">
       <MobileDashboardHeader />
       <MobileAurenBriefing />
       <SafePanel>
@@ -63,6 +68,7 @@ function MobileDashboard() {
       <SafePanel>
         <RecentActivity />
       </SafePanel>
+      <AlexosDashboardFooter />
     </div>
   );
 }
@@ -71,6 +77,7 @@ function Dashboard() {
   const navModules = modules.filter((m) => m.url !== "/dashboard");
   const isMobile = useIsMobile();
   if (isMobile) return <MobileDashboard />;
+
   return (
     <div className="relative space-y-6 pb-10 animate-in fade-in duration-500">
       <SafePanel>
@@ -231,6 +238,7 @@ function Dashboard() {
           </Tabs>
         </section>
       </SafePanel>
+      <AlexosDashboardFooter />
     </div>
   );
 }

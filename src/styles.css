@@ -318,6 +318,32 @@
     background: color-mix(in oklch, var(--color-card) 82%, var(--alexos-blue) 18%);
     border-color: color-mix(in oklch, var(--color-border) 70%, var(--alexos-blue) 30%);
   }
+
+  .alexos-dashboard-footer {
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      color-mix(in oklch, var(--color-muted) 45%, transparent)
+    );
+    border-top: 1px solid var(--color-border);
+  }
+
+  .alexos-footer-brand {
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--alexos-blue), var(--alexos-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .alexos-inspiration-card {
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .alexos-inspiration-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px -10px var(--alexos-glow);
+  }
 }
 
 @theme {
@@ -677,5 +703,65 @@
       color-mix(in oklch, var(--background) 10%, transparent),
       transparent
     );
+  }
+}
+
+
+@layer utilities {
+  .dailygear-store-header {
+    background: color-mix(in oklch, var(--color-background) 92%, var(--alexos-green) 8%);
+    border-color: color-mix(in oklch, var(--color-border) 72%, var(--alexos-green) 28%);
+    box-shadow: 0 12px 28px -24px var(--alexos-glow);
+  }
+
+  .dailygear-store-announcement {
+    background: color-mix(in oklch, var(--alexos-blue-dark) 94%, var(--alexos-green) 6%);
+    color: var(--color-primary-foreground);
+  }
+
+  .dailygear-store-category-rail {
+    background: color-mix(in oklch, var(--color-card) 88%, var(--alexos-green) 12%);
+    border-color: color-mix(in oklch, var(--color-border) 72%, var(--alexos-green) 28%);
+  }
+
+  .dailygear-store-hero-panel {
+    background:
+      radial-gradient(
+        circle at 88% 10%,
+        color-mix(in oklch, var(--alexos-amber) 25%, transparent),
+        transparent 22rem
+      ),
+      linear-gradient(
+        135deg,
+        color-mix(in oklch, var(--alexos-blue-dark) 92%, var(--color-background)),
+        color-mix(in oklch, var(--alexos-green-dark) 70%, var(--alexos-blue-dark))
+      );
+  }
+
+  .dailygear-store-hero-media {
+    background: color-mix(in oklch, var(--color-muted) 78%, var(--alexos-green) 22%);
+  }
+
+  .dailygear-store-footer {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in oklch, var(--color-muted) 34%, transparent),
+        color-mix(in oklch, var(--color-background) 96%, var(--alexos-green) 4%)
+      );
+  }
+
+  .dailygear-product-media {
+    background: color-mix(in oklch, var(--color-muted) 84%, var(--alexos-green) 16%);
+  }
+
+  .dailygear-product-cta {
+    background: linear-gradient(135deg, var(--alexos-blue-dark), var(--alexos-green-dark));
+    color: var(--color-primary-foreground);
+    box-shadow: 0 14px 28px -20px var(--alexos-glow);
+  }
+
+  .dailygear-product-cta:hover {
+    background: linear-gradient(135deg, var(--alexos-green-dark), var(--alexos-blue-dark));
   }
 }

@@ -58,7 +58,7 @@ function StoreHome() {
     <div className="mx-auto max-w-7xl px-4 pb-16 pt-5 sm:pt-8 4k:max-w-[1800px] 4k:px-8">
       <section className="relative isolate overflow-hidden rounded-[2rem] border bg-card shadow-[0_24px_80px_-48px_hsl(var(--foreground)/0.55)]">
         <div className="grid lg:grid-cols-[1.02fr_0.98fr]">
-          <div className="relative flex min-h-[470px] flex-col justify-between overflow-hidden bg-primary p-6 text-primary-foreground sm:p-10 lg:min-h-[560px] lg:p-12">
+          <div className="dailygear-store-hero-panel relative flex min-h-[470px] flex-col justify-between overflow-hidden p-6 text-primary-foreground sm:p-10 lg:min-h-[560px] lg:p-12">
             <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full border border-primary-foreground/10 bg-primary-foreground/10 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-28 -left-24 h-80 w-80 rounded-full border border-primary-foreground/10 bg-primary-foreground/10 blur-3xl" />
             <div className="relative space-y-6">
@@ -117,7 +117,7 @@ function StoreHome() {
             </div>
           </div>
 
-          <div className="relative min-h-[330px] overflow-hidden bg-muted lg:min-h-[560px]">
+          <div className="dailygear-store-hero-media relative min-h-[330px] overflow-hidden lg:min-h-[560px]">
             <picture className="block h-full w-full">
               <source media="(max-width: 640px)" srcSet={dailyGearHeroPremiumMobile} />
               <img

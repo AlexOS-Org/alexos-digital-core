@@ -111,8 +111,10 @@ export function DashboardHeader() {
             <p className="mt-3 max-w-2xl text-[15px] leading-6 text-white/90 sm:mt-4 sm:text-lg sm:leading-7">
               You know what matters. Now let’s move it forward.
             </p>
-            <DashboardWeather />
-            <div className="mt-5 flex flex-wrap gap-2">
+            <div className="mt-4">
+              <DashboardWeather />
+            </div>
+            <div className="mt-6 flex flex-wrap gap-2">
               <Button asChild className="bg-white text-slate-950 shadow-lg hover:bg-slate-100">
                 <Link to="/auren">
                   <Sparkles className="mr-2 h-4 w-4 text-[var(--alexos-purple)]" />
@@ -131,7 +133,9 @@ export function DashboardHeader() {
           </div>
         </div>
       </section>
-      <DailyInspirationCards />
+      <div className="mt-6">
+        <DailyInspirationCards />
+      </div>
     </div>
   );
 }
@@ -195,7 +199,9 @@ export function MobileDashboardHeader() {
             <p className="mt-2 max-w-[28rem] text-sm leading-5 text-white/90">
               You know what matters. Now let’s move it forward.
             </p>
-            <DashboardWeather />
+            <div className="mt-3">
+              <DashboardWeather />
+            </div>
             <Button
               asChild
               className="mt-4 h-10 rounded-xl bg-white px-4 text-slate-950 shadow-lg hover:bg-slate-100"
@@ -208,7 +214,9 @@ export function MobileDashboardHeader() {
           </div>
         </div>
       </section>
-      <DailyInspirationCards />
+      <div className="mt-4">
+        <DailyInspirationCards />
+      </div>
     </div>
   );
 }

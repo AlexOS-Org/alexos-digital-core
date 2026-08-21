@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Mail, MapPin, Phone, ShieldCheck, Truck, Undo2 } from "lucide-react";
+import { Mail, MessageCircle, Phone, ShieldCheck, Truck, Undo2 } from "lucide-react";
 import type { Storefront } from "@/lib/storefront/api";
+import { DAILYGEAR_LOGO, DAILYGEAR_NAME } from "@/lib/storefront/brand";
 
 const TRUST = [
   { icon: Truck, title: "Fast delivery", copy: "Dispatched within 24 hours" },
@@ -10,7 +11,7 @@ const TRUST = [
 
 export function StoreFooter({ store }: { store: Storefront | null }) {
   return (
-    <footer className="mt-16 border-t bg-muted/30">
+    <footer className="dailygear-store-footer mt-14 border-t">
       <div className="mx-auto max-w-7xl px-4 py-10">
         <div className="grid gap-4 sm:grid-cols-3">
           {TRUST.map((t) => (
@@ -26,9 +27,21 @@ export function StoreFooter({ store }: { store: Storefront | null }) {
 
         <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-3">
-            <p className="text-base font-black tracking-tight">{store?.name ?? "DailyGear"}</p>
-            <p className="text-sm text-muted-foreground">
-              {store?.tagline ?? "Everyday essentials, delivered with care."}
+            <div className="flex items-center gap-3">
+              <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
+                <img
+                  src={store?.logo_url ?? DAILYGEAR_LOGO}
+                  alt=""
+                  aria-hidden="true"
+                  width={92}
+                  height={48}
+                  className="h-full w-full object-contain"
+                />
+              </span>
+              <p className="text-base font-black tracking-tight">{store?.name ?? DAILYGEAR_NAME}</p>
+            </div>
+            <p className="max-w-xs text-sm leading-6 text-muted-foreground">
+              {store?.tagline ?? "Smart, convenient gear for the way your day moves."}
             </p>
           </div>
 
@@ -90,7 +103,7 @@ export function StoreFooter({ store }: { store: Storefront | null }) {
             ) : null}
             {store?.whatsapp ? (
               <p className="flex items-start gap-2 text-muted-foreground">
-                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" /> WhatsApp {store.whatsapp}
+                <MessageCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> WhatsApp {store.whatsapp}
               </p>
             ) : null}
           </div>
@@ -98,7 +111,7 @@ export function StoreFooter({ store }: { store: Storefront | null }) {
 
         <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t pt-6 text-xs text-muted-foreground sm:flex-row">
           <p>
-            © {new Date().getFullYear()} {store?.name ?? "DailyGear"}. All rights reserved.
+            © {new Date().getFullYear()} {store?.name ?? DAILYGEAR_NAME}. All rights reserved.
           </p>
           <div className="flex gap-4">
             <Link

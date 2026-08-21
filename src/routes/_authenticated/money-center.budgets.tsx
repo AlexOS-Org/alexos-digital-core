@@ -33,7 +33,7 @@ function BudgetsPage() {
   const { data: txs = [] } = useTransactions({
     type: "expense",
     from: monthStart,
-    to: monthEnd,
+    toExclusive: monthEnd,
   });
 
   const spentByCat = useMemo(() => {
@@ -66,7 +66,8 @@ function BudgetsPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Budgets</h1>
           <p className="text-sm text-muted-foreground">
-            Monthly limits per category. Resets each month; past months preserved.
+            Recurring monthly limits per category. The limit rolls forward automatically; monthly
+            spending resets to zero when you change months.
           </p>
         </div>
         <Button onClick={openNew} className="rounded-xl">
@@ -137,7 +138,8 @@ function BudgetsPage() {
       <div className="grid gap-3 grid-cols-1 md:grid-cols-2">
         {budgets.length === 0 && (
           <div className="col-span-full text-sm text-muted-foreground border border-dashed rounded-2xl p-8 text-center">
-            No budgets for {monthLabel(month)}. Create one to start tracking.
+            No recurring budgets are available for {monthLabel(month)}. Create one to set a limit
+            that will continue into future months.
           </div>
         )}
         {budgets.map((b) => {
@@ -152,7 +154,12 @@ function BudgetsPage() {
                   <div>
                     <div className="font-medium">{b.category}</div>
                     <div className="text-xs text-muted-foreground">
-                      {formatMoney(spent)} of {formatMoney(b.amount)}
+                      {formatMoney(spent)} of {formatMoney(b.amount)} this month
+                    </div>
+                    <div className="text-[11px] text-muted-foreground/80">
+                      {b.month === month
+                        ? "Started this month"
+                        : `Recurring from ${monthLabel(b.month)}`}
                     </div>
                   </div>
                   <Badge variant={over ? "destructive" : pct > 80 ? "secondary" : "default"}>

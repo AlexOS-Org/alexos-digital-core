@@ -8,6 +8,7 @@ import {
   formatMoney,
   isOnSale,
   productImage,
+  productSecondaryImage,
   type StoreProduct,
 } from "@/lib/storefront/api";
 
@@ -20,6 +21,7 @@ interface Props {
 export function ProductCard({ product, currency }: Props) {
   const price = effectivePrice(product);
   const image = productImage(product);
+  const secondaryImage = productSecondaryImage(product);
   const soldOut = Number(product.stock_quantity) <= 0;
 
   return (
@@ -27,7 +29,7 @@ export function ProductCard({ product, currency }: Props) {
       <Link
         to="/shop/product/$id"
         params={{ id: product.id }}
-        className="relative block aspect-square overflow-hidden bg-muted"
+        className="dailygear-product-media relative block aspect-square overflow-hidden bg-muted"
       >
         {image ? (
           <ResponsiveProductImage
@@ -43,6 +45,16 @@ export function ProductCard({ product, currency }: Props) {
             <ShoppingBag className="h-10 w-10" />
           </div>
         )}
+        {secondaryImage ? (
+          <ResponsiveProductImage
+            src={secondaryImage}
+            alt={`${product.name} alternate view`}
+            width={800}
+            height={800}
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          />
+        ) : null}
         <div className="absolute left-3 top-3 flex flex-col gap-1">
           {isOnSale(product) ? <Badge className="rounded-full">Sale</Badge> : null}
           {soldOut ? (
@@ -53,7 +65,7 @@ export function ProductCard({ product, currency }: Props) {
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col gap-3 p-4">
+      <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
         <div className="min-w-0 space-y-1">
           <Link
             to="/shop/product/$id"
@@ -78,7 +90,7 @@ export function ProductCard({ product, currency }: Props) {
             : "View current stock and choose any available size or colour."}
         </p>
 
-        <Button asChild className="mt-auto w-full rounded-xl">
+        <Button asChild className="dailygear-product-cta mt-auto w-full rounded-xl">
           <Link to="/shop/product/$id" params={{ id: product.id }}>
             {soldOut ? "View details" : "View details & options"}
           </Link>

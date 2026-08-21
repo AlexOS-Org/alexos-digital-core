@@ -7,7 +7,7 @@ export function DailyInspirationCards() {
 
   return (
     <section className="grid gap-4 lg:grid-cols-2" aria-label="Daily inspiration">
-      <Card className="rounded-3xl border-border/60 bg-gradient-to-br from-emerald-50/90 to-background shadow-sm dark:from-emerald-950/45">
+      <Card className="alexos-inspiration-card h-full rounded-3xl border-border/60 bg-gradient-to-br from-emerald-50/90 to-background shadow-sm dark:from-emerald-950/45">
         <CardContent className="p-5 sm:p-6">
           <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
             <BookOpen className="h-4 w-4" aria-hidden="true" />
@@ -20,7 +20,7 @@ export function DailyInspirationCards() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-3xl border-border/60 bg-gradient-to-br from-violet-50/80 to-background shadow-sm dark:from-violet-950/45">
+      <Card className="alexos-inspiration-card h-full rounded-3xl border-border/60 bg-gradient-to-br from-violet-50/80 to-background shadow-sm dark:from-violet-950/45">
         <CardContent className="p-5 sm:p-6">
           <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-violet-700 dark:text-violet-300">
             <Quote className="h-4 w-4" aria-hidden="true" />

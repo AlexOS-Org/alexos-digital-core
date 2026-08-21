@@ -176,6 +176,11 @@ export function productImage(product: Pick<StoreProduct, "images">) {
   return images[0] ?? null;
 }
 
+export function productSecondaryImage(product: Pick<StoreProduct, "images">) {
+  const images = (product.images ?? []) as string[];
+  return images[1] ?? null;
+}
+
 export function formatMoney(value: number, currency = "KES") {
   return `${currency} ${Number(value).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 }

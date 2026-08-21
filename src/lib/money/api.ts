@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { carryForwardBudgets } from "./budget-calculations";
 
 export interface Account {
   id: string;
@@ -149,6 +150,7 @@ export interface TxFilter {
   accountId?: string;
   from?: string;
   to?: string;
+  toExclusive?: string;
   search?: string;
   limit?: number;
 }
@@ -166,7 +168,8 @@ export function useTransactions(filter: TxFilter = {}) {
       if (filter.accountId)
         q = q.or(`account_id.eq.${filter.accountId},transfer_account_id.eq.${filter.accountId}`);
       if (filter.from) q = q.gte("occurred_at", filter.from);
-      if (filter.to) q = q.lte("occurred_at", filter.to);
+      if (filter.toExclusive) q = q.lt("occurred_at", filter.toExclusive);
+      else if (filter.to) q = q.lte("occurred_at", filter.to);
       if (filter.search)
         q = q.or(
           `description.ilike.%${filter.search}%,reference.ilike.%${filter.search}%,category.ilike.%${filter.search}%,source.ilike.%${filter.search}%`,
@@ -238,11 +241,10 @@ export function useBudgets(month: string) {
       const { data, error } = await supabase
         .from("budgets")
         .select("*")
-        .is("deleted_at", null)
-        .eq("month", month)
+        .order("month", { ascending: false })
         .order("category");
       if (error) throw error;
-      return (data ?? []) as Budget[];
+      return carryForwardBudgets((data ?? []) as Budget[], month);
     },
   });
 }
