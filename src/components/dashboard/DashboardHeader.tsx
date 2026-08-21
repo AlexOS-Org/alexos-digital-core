@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { DashboardWeather } from "@/components/dashboard/DashboardWeather";
+import { DailyInspirationCards } from "@/components/dashboard/DailyInspirationCards";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { getVisualTheme } from "@/components/theme/visual-themes";
 import alexosMountainWide from "@/assets/visuals/alexos-mountain-dusk-wide.webp";
@@ -162,6 +163,7 @@ export function DashboardHeader() {
           </div>
         </div>
       </section>
+      <DailyInspirationCards />
     </div>
   );
 }
@@ -242,6 +244,7 @@ export function MobileDashboardHeader() {
           </div>
         </div>
       </section>
+      <DailyInspirationCards />
     </div>
   );
 }
