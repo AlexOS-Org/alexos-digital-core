@@ -22,31 +22,6 @@ function getGreeting(hour: number) {
   if (hour < 18) return "Good afternoon";
   return "Good evening";
 }
-function getAtmosphereStyle(atmosphere: string) {
-  const styles = {
-    morning: {
-      background: "linear-gradient(145deg, #365d68 0%, #4d8b82 42%, #d4a56f 70%, #294f63 100%)",
-      sun: "rgba(255, 218, 143, 0.96)",
-      horizon: "linear-gradient(180deg, rgba(54,52,73,0) 0%, rgba(18,35,48,0.72) 100%)",
-    },
-    day: {
-      background: "linear-gradient(145deg, #164f58 0%, #2f8f78 44%, #91c9b5 74%, #326b73 100%)",
-      sun: "rgba(255, 245, 201, 0.98)",
-      horizon: "linear-gradient(180deg, rgba(26,59,73,0) 0%, rgba(12,36,53,0.58) 100%)",
-    },
-    evening: {
-      background: "linear-gradient(145deg, #183b46 0%, #426d67 34%, #b86f55 65%, #252c4e 100%)",
-      sun: "rgba(255, 184, 119, 0.98)",
-      horizon: "linear-gradient(180deg, rgba(45,35,67,0) 0%, rgba(17,22,47,0.82) 100%)",
-    },
-    night: {
-      background: "linear-gradient(145deg, #050b1d 0%, #111c3c 45%, #27224f 72%, #071126 100%)",
-      sun: "rgba(216, 225, 255, 0.86)",
-      horizon: "linear-gradient(180deg, rgba(4,10,29,0) 0%, rgba(3,8,23,0.9) 100%)",
-    },
-  } as const;
-  return styles[atmosphere as keyof typeof styles] ?? styles.night;
-}
 function formatTime(date: Date, timeFormat: TimeFormat) {
   return date.toLocaleTimeString("en-KE", {
     hour: "2-digit",
@@ -63,7 +38,6 @@ export function DashboardHeader() {
   const { visualTheme } = useTheme();
   const selectedTheme = getVisualTheme(visualTheme);
   const activeAtmosphere = getTimeAtmosphere(now.getHours());
-  const visual = getAtmosphereStyle(activeAtmosphere);
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
     return () => window.clearInterval(timer);
@@ -83,8 +57,8 @@ export function DashboardHeader() {
   return (
     <div>
       <section
-        className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/15 text-white shadow-[0_24px_70px_-30px_rgba(37,99,235,0.42)] transition-[background] duration-[1800ms] ease-in-out sm:min-h-[330px]"
-        style={{ background: visual.background }}
+        data-atmosphere={activeAtmosphere}
+        className="alexos-dashboard-hero relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/15 text-white shadow-[0_24px_70px_-30px_var(--alexos-glow)] transition-[background] duration-[1800ms] ease-in-out sm:min-h-[330px]"
       >
         {selectedTheme.backdrop === "mountains" ? (
           <picture className="alexos-dashboard-backdrop pointer-events-none absolute inset-0 block">
@@ -98,19 +72,13 @@ export function DashboardHeader() {
             />
           </picture>
         ) : null}
-        <div className="pointer-events-none absolute -left-20 top-8 h-44 w-44 rounded-full bg-emerald-300/15 blur-3xl" />
-        <div className="pointer-events-none absolute left-[35%] -top-16 h-52 w-52 rounded-full bg-violet-400/15 blur-3xl" />
-        <div className="pointer-events-none absolute -right-16 bottom-4 h-64 w-64 rounded-full bg-cyan-300/15 blur-3xl" />
-        <div
-          className="pointer-events-none absolute right-[12%] top-[13%] h-20 w-20 rounded-full opacity-90 blur-[1px] transition-all duration-[1800ms] sm:h-28 sm:w-28"
-          style={{ background: visual.sun, boxShadow: `0 0 70px 18px ${visual.sun}` }}
-        />
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
-          style={{ background: visual.horizon }}
-        />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_20%,rgba(139,92,246,0.22),transparent_30%),radial-gradient(circle_at_35%_100%,rgba(16,185,129,0.18),transparent_34%)]" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#061126]/80 via-[#071329]/15 to-transparent" />
+        <div className="alexos-dashboard-orb alexos-dashboard-orb-left pointer-events-none absolute -left-20 top-8 h-44 w-44 rounded-full blur-3xl" />
+        <div className="alexos-dashboard-orb alexos-dashboard-orb-center pointer-events-none absolute left-[35%] -top-16 h-52 w-52 rounded-full blur-3xl" />
+        <div className="alexos-dashboard-orb alexos-dashboard-orb-right pointer-events-none absolute -right-16 bottom-4 h-64 w-64 rounded-full blur-3xl" />
+        <div className="alexos-dashboard-sun pointer-events-none absolute right-[12%] top-[13%] h-20 w-20 rounded-full opacity-90 blur-[1px] transition-all duration-[1800ms] sm:h-28 sm:w-28" />
+        <div className="alexos-dashboard-horizon pointer-events-none absolute inset-x-0 bottom-0 h-1/2" />
+        <div className="alexos-dashboard-radial pointer-events-none absolute inset-0" />
+        <div className="alexos-dashboard-overlay pointer-events-none absolute inset-0" />
         <div className="relative flex min-h-[360px] flex-col justify-between p-5 sm:min-h-[330px] sm:p-8 lg:p-10">
           <div className="flex items-start justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
@@ -172,7 +140,6 @@ export function MobileDashboardHeader() {
   const { visualTheme } = useTheme();
   const selectedTheme = getVisualTheme(visualTheme);
   const atmosphere = getTimeAtmosphere(now.getHours());
-  const visual = getAtmosphereStyle(atmosphere);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
@@ -190,8 +157,8 @@ export function MobileDashboardHeader() {
   return (
     <div className="space-y-4">
       <section
-        className="relative min-h-[250px] overflow-hidden rounded-[1.9rem] border border-white/15 p-5 text-white shadow-[0_22px_58px_-30px_var(--alexos-glow)]"
-        style={{ background: visual.background }}
+        data-atmosphere={atmosphere}
+        className="alexos-dashboard-hero relative min-h-[250px] overflow-hidden rounded-[1.9rem] border border-white/15 p-5 text-white shadow-[0_22px_58px_-30px_var(--alexos-glow)]"
       >
         {selectedTheme.backdrop === "mountains" ? (
           <picture className="pointer-events-none absolute inset-0 block">
@@ -205,12 +172,9 @@ export function MobileDashboardHeader() {
             />
           </picture>
         ) : null}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#061126]/85 via-[#071329]/20 to-transparent" />
-        <div className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-white/15 blur-3xl" />
-        <div
-          className="pointer-events-none absolute right-[13%] top-[16%] h-14 w-14 rounded-full blur-[1px]"
-          style={{ background: visual.sun, boxShadow: `0 0 45px 12px ${visual.sun}` }}
-        />
+        <div className="alexos-dashboard-overlay pointer-events-none absolute inset-0" />
+        <div className="alexos-dashboard-orb alexos-dashboard-orb-right pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full blur-3xl" />
+        <div className="alexos-dashboard-sun pointer-events-none absolute right-[13%] top-[16%] h-14 w-14 rounded-full blur-[1px]" />
         <div className="relative flex min-h-[210px] flex-col justify-between">
           <div className="flex items-center justify-between gap-2">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-[10px] font-semibold backdrop-blur-md">

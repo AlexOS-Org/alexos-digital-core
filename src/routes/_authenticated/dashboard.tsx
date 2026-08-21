@@ -19,6 +19,7 @@ import {
   MobileRevenueToday,
 } from "@/components/dashboard/MobileCommandCenter";
 import { MobileDashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { DashboardKpiStrip } from "@/components/dashboard/DashboardKpiStrip";
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: Dashboard });
 class DashboardPanelBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   state = { hasError: false };
@@ -74,6 +75,9 @@ function Dashboard() {
     <div className="relative space-y-6 pb-10 animate-in fade-in duration-500">
       <SafePanel>
         <DashboardHeader />
+      </SafePanel>
+      <SafePanel>
+        <DashboardKpiStrip />
       </SafePanel>
       <SafePanel>
         <section className="relative overflow-hidden rounded-[1.75rem] border border-primary/15 bg-gradient-to-r from-primary/[0.08] via-background to-[var(--alexos-purple)]/[0.08] p-5 shadow-[0_20px_50px_-35px_var(--alexos-glow)] sm:p-6">

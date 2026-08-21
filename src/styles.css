@@ -442,3 +442,162 @@
     ),
     var(--color-background);
 }
+
+@layer utilities {
+  .dashboard-eyebrow {
+    color: var(--primary);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .dashboard-kpi-card {
+    --dashboard-kpi-accent: var(--primary);
+    position: relative;
+    isolation: isolate;
+    border-color: color-mix(in oklch, var(--color-border) 72%, var(--dashboard-kpi-accent) 28%);
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--color-card) 94%, var(--dashboard-kpi-accent) 6%),
+      var(--color-card)
+    );
+    box-shadow: 0 16px 36px -26px color-mix(in oklch, var(--dashboard-kpi-accent) 55%, transparent);
+  }
+
+  .dashboard-kpi-card::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0 0 auto;
+    height: 0.22rem;
+    background: linear-gradient(90deg, var(--dashboard-kpi-accent), var(--primary));
+    content: "";
+  }
+
+  .dashboard-kpi-card[data-tone="blue"] {
+    --dashboard-kpi-accent: var(--alexos-blue);
+  }
+
+  .dashboard-kpi-card[data-tone="green"] {
+    --dashboard-kpi-accent: var(--alexos-green);
+  }
+
+  .dashboard-kpi-card[data-tone="purple"] {
+    --dashboard-kpi-accent: var(--alexos-purple);
+  }
+
+  .dashboard-kpi-card[data-tone="amber"] {
+    --dashboard-kpi-accent: var(--alexos-amber);
+  }
+
+  .dashboard-kpi-label {
+    color: var(--color-muted-foreground);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .dashboard-kpi-icon {
+    color: var(--dashboard-kpi-accent);
+    background: color-mix(in oklch, var(--dashboard-kpi-accent) 12%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--dashboard-kpi-accent) 20%, transparent);
+  }
+}
+
+@layer utilities {
+  .alexos-dashboard-hero {
+    background: linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--alexos-blue-dark) 82%, var(--background)),
+      color-mix(in oklch, var(--alexos-green-dark) 72%, var(--alexos-blue-dark)),
+      color-mix(in oklch, var(--alexos-purple-dark) 70%, var(--background))
+    );
+  }
+
+  .alexos-dashboard-hero[data-atmosphere="morning"] {
+    background: linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--alexos-blue-dark) 72%, var(--background)),
+      color-mix(in oklch, var(--alexos-green) 62%, var(--alexos-blue-dark)),
+      color-mix(in oklch, var(--alexos-amber) 45%, var(--alexos-purple-dark))
+    );
+  }
+
+  .alexos-dashboard-hero[data-atmosphere="day"] {
+    background: linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--alexos-blue-dark) 68%, var(--background)),
+      color-mix(in oklch, var(--alexos-green) 72%, var(--alexos-blue-dark)),
+      color-mix(in oklch, var(--alexos-green) 48%, var(--alexos-blue-dark))
+    );
+  }
+
+  .alexos-dashboard-hero[data-atmosphere="evening"] {
+    background: linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--alexos-blue-dark) 64%, var(--background)),
+      color-mix(in oklch, var(--alexos-amber) 54%, var(--alexos-blue-dark)),
+      color-mix(in oklch, var(--alexos-purple-dark) 72%, var(--background))
+    );
+  }
+
+  .alexos-dashboard-hero[data-atmosphere="night"] {
+    background: linear-gradient(
+      145deg,
+      var(--background),
+      color-mix(in oklch, var(--alexos-blue-dark) 72%, var(--background)),
+      color-mix(in oklch, var(--alexos-purple-dark) 74%, var(--background))
+    );
+  }
+
+  .alexos-dashboard-orb-left {
+    background: color-mix(in oklch, var(--alexos-green) 18%, transparent);
+  }
+
+  .alexos-dashboard-orb-center {
+    background: color-mix(in oklch, var(--alexos-purple) 18%, transparent);
+  }
+
+  .alexos-dashboard-orb-right {
+    background: color-mix(in oklch, var(--alexos-blue) 18%, transparent);
+  }
+
+  .alexos-dashboard-sun {
+    background: color-mix(in oklch, var(--alexos-amber) 82%, white 18%);
+    box-shadow: 0 0 70px 18px color-mix(in oklch, var(--alexos-amber) 52%, transparent);
+  }
+
+  .alexos-dashboard-horizon {
+    background: linear-gradient(
+      180deg,
+      transparent,
+      color-mix(in oklch, var(--background) 74%, transparent)
+    );
+  }
+
+  .alexos-dashboard-radial {
+    background:
+      radial-gradient(
+        circle at 78% 20%,
+        color-mix(in oklch, var(--alexos-purple) 22%, transparent),
+        transparent 30%
+      ),
+      radial-gradient(
+        circle at 35% 100%,
+        color-mix(in oklch, var(--alexos-green) 18%, transparent),
+        transparent 34%
+      );
+  }
+
+  .alexos-dashboard-overlay {
+    background: linear-gradient(
+      to top,
+      color-mix(in oklch, var(--background) 82%, transparent),
+      color-mix(in oklch, var(--background) 10%, transparent),
+      transparent
+    );
+  }
+}
