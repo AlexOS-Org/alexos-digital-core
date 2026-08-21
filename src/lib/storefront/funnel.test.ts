@@ -19,6 +19,9 @@ describe("native DailyGear funnel validation", () => {
       email: "alex@example.com",
       phone: "0712345678",
       address: "Nairobi",
+      country: "Kenya",
+      county: "Nairobi",
+      town: "Nairobi",
       paymentMethod: "cod",
       items: [
         {

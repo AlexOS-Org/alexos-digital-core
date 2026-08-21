@@ -75,10 +75,12 @@ import { Route as AuthenticatedPeopleIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedPeopleLeadsRouteImport } from './routes/_authenticated/people.leads'
 import { Route as ApiMetaAdsWebhookRouteImport } from './routes/api/meta/ads-webhook'
 import { Route as ApiScheduledAbandonedCartRouteImport } from './routes/api/scheduled/abandoned-cart'
+import { Route as ShopCategorySlugRouteImport } from './routes/shop.category.$slug'
 import { Route as ShopPoliciesSlugRouteImport } from './routes/shop.policies.$slug'
 import { Route as ShopProductIdRouteImport } from './routes/shop.product.$id'
 import { Route as AuthenticatedPeopleContactsIdRouteImport } from './routes/_authenticated/people.contacts.$id'
 import { Route as AuthenticatedPeopleLeadsIdRouteImport } from './routes/_authenticated/people.leads.$id'
+import { Route as ShopCategorySlugSubcategoryRouteImport } from './routes/shop.category.$slug.$subcategory'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -444,6 +446,11 @@ const ApiScheduledAbandonedCartRoute =
     path: '/api/scheduled/abandoned-cart',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ShopCategorySlugRoute = ShopCategorySlugRouteImport.update({
+  id: '/category/$slug',
+  path: '/category/$slug',
+  getParentRoute: () => ShopRoute,
+} as any)
 const ShopPoliciesSlugRoute = ShopPoliciesSlugRouteImport.update({
   id: '/policies/$slug',
   path: '/policies/$slug',
@@ -465,6 +472,12 @@ const AuthenticatedPeopleLeadsIdRoute =
     id: '/$id',
     path: '/$id',
     getParentRoute: () => AuthenticatedPeopleLeadsRoute,
+  } as any)
+const ShopCategorySlugSubcategoryRoute =
+  ShopCategorySlugSubcategoryRouteImport.update({
+    id: '/$subcategory',
+    path: '/$subcategory',
+    getParentRoute: () => ShopCategorySlugRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -530,6 +543,7 @@ export interface FileRoutesByFullPath {
   '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
   '/api/meta/ads-webhook': typeof ApiMetaAdsWebhookRoute
   '/api/scheduled/abandoned-cart': typeof ApiScheduledAbandonedCartRoute
+  '/shop/category/$slug': typeof ShopCategorySlugRouteWithChildren
   '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
   '/shop/product/$id': typeof ShopProductIdRoute
   '/e-commerce/': typeof AuthenticatedECommerceIndexRoute
@@ -537,6 +551,7 @@ export interface FileRoutesByFullPath {
   '/people/': typeof AuthenticatedPeopleIndexRoute
   '/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
   '/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
+  '/shop/category/$slug/$subcategory': typeof ShopCategorySlugSubcategoryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -597,6 +612,7 @@ export interface FileRoutesByTo {
   '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
   '/api/meta/ads-webhook': typeof ApiMetaAdsWebhookRoute
   '/api/scheduled/abandoned-cart': typeof ApiScheduledAbandonedCartRoute
+  '/shop/category/$slug': typeof ShopCategorySlugRouteWithChildren
   '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
   '/shop/product/$id': typeof ShopProductIdRoute
   '/e-commerce': typeof AuthenticatedECommerceIndexRoute
@@ -604,6 +620,7 @@ export interface FileRoutesByTo {
   '/people': typeof AuthenticatedPeopleIndexRoute
   '/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
   '/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
+  '/shop/category/$slug/$subcategory': typeof ShopCategorySlugSubcategoryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -670,6 +687,7 @@ export interface FileRoutesById {
   '/_authenticated/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
   '/api/meta/ads-webhook': typeof ApiMetaAdsWebhookRoute
   '/api/scheduled/abandoned-cart': typeof ApiScheduledAbandonedCartRoute
+  '/shop/category/$slug': typeof ShopCategorySlugRouteWithChildren
   '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
   '/shop/product/$id': typeof ShopProductIdRoute
   '/_authenticated/e-commerce/': typeof AuthenticatedECommerceIndexRoute
@@ -677,6 +695,7 @@ export interface FileRoutesById {
   '/_authenticated/people/': typeof AuthenticatedPeopleIndexRoute
   '/_authenticated/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
   '/_authenticated/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
+  '/shop/category/$slug/$subcategory': typeof ShopCategorySlugSubcategoryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -743,6 +762,7 @@ export interface FileRouteTypes {
     | '/people/leads'
     | '/api/meta/ads-webhook'
     | '/api/scheduled/abandoned-cart'
+    | '/shop/category/$slug'
     | '/shop/policies/$slug'
     | '/shop/product/$id'
     | '/e-commerce/'
@@ -750,6 +770,7 @@ export interface FileRouteTypes {
     | '/people/'
     | '/people/contacts/$id'
     | '/people/leads/$id'
+    | '/shop/category/$slug/$subcategory'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -810,6 +831,7 @@ export interface FileRouteTypes {
     | '/people/leads'
     | '/api/meta/ads-webhook'
     | '/api/scheduled/abandoned-cart'
+    | '/shop/category/$slug'
     | '/shop/policies/$slug'
     | '/shop/product/$id'
     | '/e-commerce'
@@ -817,6 +839,7 @@ export interface FileRouteTypes {
     | '/people'
     | '/people/contacts/$id'
     | '/people/leads/$id'
+    | '/shop/category/$slug/$subcategory'
   id:
     | '__root__'
     | '/'
@@ -882,6 +905,7 @@ export interface FileRouteTypes {
     | '/_authenticated/people/leads'
     | '/api/meta/ads-webhook'
     | '/api/scheduled/abandoned-cart'
+    | '/shop/category/$slug'
     | '/shop/policies/$slug'
     | '/shop/product/$id'
     | '/_authenticated/e-commerce/'
@@ -889,6 +913,7 @@ export interface FileRouteTypes {
     | '/_authenticated/people/'
     | '/_authenticated/people/contacts/$id'
     | '/_authenticated/people/leads/$id'
+    | '/shop/category/$slug/$subcategory'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1365,6 +1390,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiScheduledAbandonedCartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop/category/$slug': {
+      id: '/shop/category/$slug'
+      path: '/category/$slug'
+      fullPath: '/shop/category/$slug'
+      preLoaderRoute: typeof ShopCategorySlugRouteImport
+      parentRoute: typeof ShopRoute
+    }
     '/shop/policies/$slug': {
       id: '/shop/policies/$slug'
       path: '/policies/$slug'
@@ -1392,6 +1424,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/people/leads/$id'
       preLoaderRoute: typeof AuthenticatedPeopleLeadsIdRouteImport
       parentRoute: typeof AuthenticatedPeopleLeadsRoute
+    }
+    '/shop/category/$slug/$subcategory': {
+      id: '/shop/category/$slug/$subcategory'
+      path: '/$subcategory'
+      fullPath: '/shop/category/$slug/$subcategory'
+      preLoaderRoute: typeof ShopCategorySlugSubcategoryRouteImport
+      parentRoute: typeof ShopCategorySlugRoute
     }
   }
 }
@@ -1574,6 +1613,17 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface ShopCategorySlugRouteChildren {
+  ShopCategorySlugSubcategoryRoute: typeof ShopCategorySlugSubcategoryRoute
+}
+
+const ShopCategorySlugRouteChildren: ShopCategorySlugRouteChildren = {
+  ShopCategorySlugSubcategoryRoute: ShopCategorySlugSubcategoryRoute,
+}
+
+const ShopCategorySlugRouteWithChildren =
+  ShopCategorySlugRoute._addFileChildren(ShopCategorySlugRouteChildren)
+
 interface ShopRouteChildren {
   ShopAboutRoute: typeof ShopAboutRoute
   ShopCartRoute: typeof ShopCartRoute
@@ -1584,6 +1634,7 @@ interface ShopRouteChildren {
   ShopThankYouRoute: typeof ShopThankYouRoute
   ShopTrackRoute: typeof ShopTrackRoute
   ShopIndexRoute: typeof ShopIndexRoute
+  ShopCategorySlugRoute: typeof ShopCategorySlugRouteWithChildren
   ShopPoliciesSlugRoute: typeof ShopPoliciesSlugRoute
   ShopProductIdRoute: typeof ShopProductIdRoute
 }
@@ -1598,6 +1649,7 @@ const ShopRouteChildren: ShopRouteChildren = {
   ShopThankYouRoute: ShopThankYouRoute,
   ShopTrackRoute: ShopTrackRoute,
   ShopIndexRoute: ShopIndexRoute,
+  ShopCategorySlugRoute: ShopCategorySlugRouteWithChildren,
   ShopPoliciesSlugRoute: ShopPoliciesSlugRoute,
   ShopProductIdRoute: ShopProductIdRoute,
 }

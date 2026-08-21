@@ -28,6 +28,7 @@ export function StoreHeader({
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const topLevelCategories = categories.filter((category) => category.parent_id === null);
 
   function search(event: React.FormEvent) {
     event.preventDefault();
@@ -71,16 +72,16 @@ export function StoreHeader({
                   Track order
                 </Link>
               </nav>
-              {categories.length ? (
+              {topLevelCategories.length ? (
                 <div className="mt-6 space-y-1">
                   <p className="px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     Categories
                   </p>
-                  {categories.slice(0, 8).map((c) => (
+                  {topLevelCategories.map((c) => (
                     <Link
                       key={c.id}
-                      to="/shop/products"
-                      search={{ category: c.id }}
+                      to="/shop/category/$slug"
+                      params={{ slug: c.slug ?? c.id }}
                       onClick={() => setOpen(false)}
                       className="block rounded-xl px-3 py-2 text-sm hover:bg-muted"
                     >
@@ -161,7 +162,7 @@ export function StoreHeader({
         </div>
       </form>
 
-      {categories.length ? (
+      {topLevelCategories.length ? (
         <div className="dailygear-store-category-rail hidden border-t lg:block">
           <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-4 py-2">
             <Link
@@ -170,11 +171,11 @@ export function StoreHeader({
             >
               Browse all
             </Link>
-            {categories.slice(0, 8).map((c) => (
+            {topLevelCategories.map((c) => (
               <Link
                 key={c.id}
-                to="/shop/products"
-                search={{ category: c.id }}
+                to="/shop/category/$slug"
+                params={{ slug: c.slug ?? c.id }}
                 className="whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-primary/10 hover:text-foreground"
               >
                 {c.name}

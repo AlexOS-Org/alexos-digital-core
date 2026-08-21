@@ -16,6 +16,7 @@ import { placeGuestOrder } from "@/lib/storefront/checkout.functions";
 import { loadPublicFunnel } from "@/lib/storefront/funnel.functions";
 import type { PublicFunnel } from "@/lib/storefront/funnel.server";
 import { readFunnelAttribution } from "@/lib/storefront/funnel-session";
+import { KENYA_COUNTIES, townsForCounty } from "@/lib/storefront/kenya-locations";
 
 interface CheckoutSearch {
   recovery?: string;
@@ -52,7 +53,6 @@ function CheckoutPage() {
   const threshold = Number(store?.free_shipping_threshold ?? 0);
   const shipping =
     threshold > 0 && cart.subtotal >= threshold ? 0 : Number(store?.flat_shipping_fee ?? 0);
-
   const [recoveryToken, setRecoveryToken] = useState<string | null>(search.recovery ?? null);
   const [funnelContext, setFunnelContext] = useState<PublicFunnel | null>(null);
   const [orderBumpAccepted, setOrderBumpAccepted] = useState(false);
@@ -66,10 +66,16 @@ function CheckoutPage() {
     email: "",
     phone: "",
     address: "",
+    country: "Kenya",
+    county: "",
+    town: "",
+    deliveryDetails: "",
     city: "",
     notes: "",
     paymentMethod: "cod",
   });
+  const selectedCounty = KENYA_COUNTIES.find((county) => county.name === form.county);
+  const availableTowns = townsForCounty(selectedCounty?.slug);
 
   useEffect(() => {
     const funnelSlug = search.funnel;
@@ -145,6 +151,10 @@ function CheckoutPage() {
       ),
     );
   }, [cart.items, orderBump]);
+
+  function updateCounty(county: string) {
+    setForm((previous) => ({ ...previous, county, town: "", city: "" }));
+  }
 
   function toggleOrderBump(checked: boolean) {
     if (!orderBump || !orderBumpProduct) return;
@@ -356,9 +366,64 @@ function CheckoutPage() {
                   in your bag.
                 </p>
               ) : null}
+              <div className="space-y-1.5">
+                <Label htmlFor="country">Country</Label>
+                <select
+                  id="country"
+                  value={form.country}
+                  disabled
+                  className="h-10 w-full rounded-xl border bg-muted px-3 text-sm outline-none"
+                >
+                  <option value="Kenya">Kenya</option>
+                </select>
+                <p className="text-xs text-muted-foreground">
+                  DailyGear currently delivers within Kenya.
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="county">
+                  County <span className="text-destructive">*</span>
+                </Label>
+                <select
+                  id="county"
+                  required
+                  value={form.county}
+                  onChange={(event) => updateCounty(event.target.value)}
+                  className="h-10 w-full rounded-xl border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="">Select county</option>
+                  {KENYA_COUNTIES.map((county) => (
+                    <option key={county.code} value={county.name}>
+                      {county.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="town">
+                  Town <span className="text-destructive">*</span>
+                </Label>
+                <select
+                  id="town"
+                  required
+                  disabled={!form.county}
+                  value={form.town}
+                  onChange={(event) =>
+                    setForm({ ...form, town: event.target.value, city: event.target.value })
+                  }
+                  className="h-10 w-full rounded-xl border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <option value="">{form.county ? "Select town" : "Select a county first"}</option>
+                  {availableTowns.map((town) => (
+                    <option key={town} value={town}>
+                      {town}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="address">
-                  Delivery address <span className="text-destructive">*</span>
+                  Street, building, house or shop number <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="address"
@@ -368,13 +433,15 @@ function CheckoutPage() {
                   onChange={(e) => setForm({ ...form, address: e.target.value })}
                 />
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="city">City / town (optional)</Label>
-                <Input
-                  id="city"
-                  autoComplete="address-level2"
-                  value={form.city}
-                  onChange={(e) => setForm({ ...form, city: e.target.value })}
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="delivery-details">
+                  Estate, landmark or delivery instructions (optional)
+                </Label>
+                <Textarea
+                  id="delivery-details"
+                  value={form.deliveryDetails}
+                  onChange={(e) => setForm({ ...form, deliveryDetails: e.target.value })}
+                  placeholder="For example: estate name, nearest landmark or delivery instructions"
                 />
               </div>
               <div className="space-y-1.5 sm:col-span-2">

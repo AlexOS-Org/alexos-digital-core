@@ -1,6 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Check, GitBranch, Plus, Save, Trash2, Zap } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUp,
+  Check,
+  GitBranch,
+  Plus,
+  Save,
+  Trash2,
+  Zap,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -59,6 +69,17 @@ type OfferConfig = {
   downsellProductId: string;
 };
 
+type FlowStepType = "landing" | "checkout" | "order_bump" | "upsell" | "downsell" | "thank_you";
+
+const DEFAULT_FLOW_ORDER: FlowStepType[] = [
+  "landing",
+  "checkout",
+  "order_bump",
+  "upsell",
+  "downsell",
+  "thank_you",
+];
+
 const EMPTY_FORM: FormState = {
   name: "",
   slug: "",
@@ -89,8 +110,19 @@ function slugify(value: string) {
     .slice(0, 120);
 }
 
-function stepFor(steps: FunnelStep[], type: string) {
+function stepFor(steps: FunnelStep[], type: FlowStepType) {
   return steps.find((step) => step.step_type === type && step.enabled);
+}
+
+function stepLabel(type: FlowStepType) {
+  return {
+    landing: "Landing page",
+    checkout: "Checkout",
+    order_bump: "Order bump",
+    upsell: "Upsell",
+    downsell: "Downsell",
+    thank_you: "Thank-you",
+  }[type];
 }
 
 function FunnelsPage() {
@@ -104,6 +136,7 @@ function FunnelsPage() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [landing, setLanding] = useState<FunnelLandingContent>(EMPTY_LANDING);
   const [offers, setOffers] = useState<OfferConfig>(EMPTY_OFFERS);
+  const [flowOrder, setFlowOrder] = useState<FlowStepType[]>(DEFAULT_FLOW_ORDER);
   const stepsQuery = useFunnelSteps(selectedId ?? undefined);
   const saveFunnel = useSaveFunnel();
   const saveStep = useSaveFunnelStep();
@@ -140,6 +173,14 @@ function FunnelsPage() {
       downsell: Boolean(stepFor(steps, "downsell")),
       downsellProductId: stepFor(steps, "downsell")?.product_id ?? "",
     });
+    const savedOrder = steps
+      .filter((step) => step.enabled && DEFAULT_FLOW_ORDER.includes(step.step_type as FlowStepType))
+      .sort((a, b) => a.position - b.position)
+      .map((step) => step.step_type as FlowStepType);
+    setFlowOrder([
+      ...savedOrder,
+      ...DEFAULT_FLOW_ORDER.filter((stepType) => !savedOrder.includes(stepType)),
+    ]);
     setLanding(
       parseFunnelLandingContent(
         stepFor(steps, "landing")?.body,
@@ -153,10 +194,65 @@ function FunnelsPage() {
     setForm(EMPTY_FORM);
     setLanding(EMPTY_LANDING);
     setOffers(EMPTY_OFFERS);
+    setFlowOrder(DEFAULT_FLOW_ORDER);
+  }
+
+  function startFromProduct(product: (typeof products)[number]) {
+    setSelectedId(null);
+    setForm({
+      ...EMPTY_FORM,
+      name: `${product.name} funnel`,
+      slug: slugify(product.name),
+      productId: product.id,
+    });
+    setLanding(defaultFunnelLandingContent(product.name));
+    setOffers(EMPTY_OFFERS);
+    setFlowOrder(DEFAULT_FLOW_ORDER);
+    toast.success(`Landing template opened for ${product.name}`);
   }
 
   function selectFunnel(funnel: Funnel) {
     setSelectedId(funnel.id);
+  }
+
+  function isFlowEnabled(stepType: FlowStepType) {
+    return (
+      stepType === "landing" ||
+      stepType === "checkout" ||
+      stepType === "thank_you" ||
+      (stepType === "order_bump" && offers.orderBump) ||
+      (stepType === "upsell" && offers.upsell) ||
+      (stepType === "downsell" && offers.downsell)
+    );
+  }
+
+  function getActiveFlowOrder() {
+    const postPurchase = flowOrder.filter(
+      (stepType) => (stepType === "upsell" || stepType === "downsell") && isFlowEnabled(stepType),
+    );
+    return [
+      "landing",
+      "checkout",
+      ...(offers.orderBump ? ["order_bump" as const] : []),
+      ...postPurchase,
+      "thank_you",
+    ] as FlowStepType[];
+  }
+
+  function moveFlowStep(stepType: FlowStepType, direction: -1 | 1) {
+    if (stepType !== "upsell" && stepType !== "downsell") return;
+    const active = flowOrder.filter(
+      (candidate) =>
+        (candidate === "upsell" || candidate === "downsell") && isFlowEnabled(candidate),
+    );
+    const activeIndex = active.indexOf(stepType);
+    const swapIndex = activeIndex + direction;
+    if (activeIndex < 0 || swapIndex < 0 || swapIndex >= active.length) return;
+    const next = [...flowOrder];
+    const fromIndex = next.indexOf(stepType);
+    const toIndex = next.indexOf(active[swapIndex]);
+    [next[fromIndex], next[toIndex]] = [next[toIndex], next[fromIndex]];
+    setFlowOrder(next);
   }
 
   async function save() {
@@ -199,56 +295,53 @@ function FunnelsPage() {
         thank_you_body: form.thankYouBody.trim() || null,
       });
 
-      const nextSteps = [
-        {
-          step_type: "landing",
-          title: landing.headline,
-          body: serializeFunnelLandingContent(landing),
-          product_id: null,
-        },
-        {
-          step_type: "checkout",
-          title: "Fast guest checkout",
-          body: "The existing DailyGear checkout with server-side price and stock verification.",
-          product_id: null,
-        },
-        ...(offers.orderBump
-          ? [
-              {
-                step_type: "order_bump",
-                title: "Add this useful extra",
-                body: "Optional add-on shown inside checkout.",
-                product_id: offers.orderBumpProductId,
-              },
-            ]
-          : []),
-        ...(offers.upsell
-          ? [
-              {
-                step_type: "upsell",
-                title: "Add another DailyGear essential",
-                body: "Optional post-purchase offer. Payment remains explicit unless a provider confirms one-click capability.",
-                product_id: offers.upsellProductId,
-              },
-            ]
-          : []),
-        ...(offers.downsell
-          ? [
-              {
-                step_type: "downsell",
-                title: "A simpler alternative",
-                body: "Optional fallback shown only when the upsell is declined.",
-                product_id: offers.downsellProductId,
-              },
-            ]
-          : []),
-        {
-          step_type: "thank_you",
-          title: form.thankYouHeading.trim() || "Thank you for your DailyGear order",
-          body: form.thankYouBody.trim() || null,
-          product_id: null,
-        },
-      ];
+      const enabledFlow = getActiveFlowOrder();
+      const nextSteps = enabledFlow.map((step_type) => {
+        switch (step_type) {
+          case "landing":
+            return {
+              step_type,
+              title: landing.headline,
+              body: serializeFunnelLandingContent(landing),
+              product_id: null,
+            };
+          case "checkout":
+            return {
+              step_type,
+              title: "Fast guest checkout",
+              body: "The existing DailyGear checkout with server-side price and stock verification.",
+              product_id: null,
+            };
+          case "order_bump":
+            return {
+              step_type,
+              title: "Add this useful extra",
+              body: "Optional add-on shown inside checkout.",
+              product_id: offers.orderBumpProductId,
+            };
+          case "upsell":
+            return {
+              step_type,
+              title: "Add another DailyGear essential",
+              body: "Optional post-purchase offer. Payment remains explicit unless a provider confirms one-click capability.",
+              product_id: offers.upsellProductId,
+            };
+          case "downsell":
+            return {
+              step_type,
+              title: "A simpler alternative",
+              body: "Optional fallback shown only when the upsell is declined.",
+              product_id: offers.downsellProductId,
+            };
+          case "thank_you":
+            return {
+              step_type,
+              title: form.thankYouHeading.trim() || "Thank you for your DailyGear order",
+              body: form.thankYouBody.trim() || null,
+              product_id: null,
+            };
+        }
+      });
       const existingSteps = stepsQuery.data ?? [];
       const desiredIds = new Set<string>();
       for (const [position, step] of nextSteps.entries()) {
@@ -289,6 +382,7 @@ function FunnelsPage() {
   }
 
   const loading = storeLoading || productsLoading || funnelsLoading;
+  const activeFlow = getActiveFlowOrder();
 
   return (
     <div className="space-y-6">
@@ -360,9 +454,39 @@ function FunnelsPage() {
             {loading ? (
               <p className="text-sm text-muted-foreground">Loading funnel configurations…</p>
             ) : funnels.length === 0 ? (
-              <div className="rounded-2xl border border-dashed p-4 text-sm text-muted-foreground">
-                No funnel configurations yet. Create one when a verified product is ready for a
-                campaign.
+              <div className="space-y-4 rounded-2xl border border-dashed p-4">
+                <div>
+                  <p className="text-sm font-semibold">No saved funnel configurations yet.</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    The landing experiences below are editable templates from the existing DailyGear
+                    catalogue. Opening one does not create a product, order or public funnel until
+                    you save it.
+                  </p>
+                </div>
+                {products.length ? (
+                  <div className="space-y-2">
+                    <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                      Catalogue landing templates
+                    </p>
+                    {products.map((product) => (
+                      <button
+                        key={product.id}
+                        type="button"
+                        onClick={() => startFromProduct(product)}
+                        className="flex w-full items-center justify-between gap-3 rounded-xl border bg-card px-3 py-2 text-left text-sm transition hover:border-primary hover:bg-primary/5"
+                      >
+                        <span className="min-w-0 truncate font-medium">{product.name}</span>
+                        <Badge variant={product.status === "active" ? "secondary" : "outline"}>
+                          {product.status}
+                        </Badge>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    No catalogue products are available to use as a landing template.
+                  </p>
+                )}
               </div>
             ) : (
               funnels.map((funnel) => {
@@ -602,6 +726,55 @@ function FunnelsPage() {
                     />
                   ))}
                 </div>
+              </div>
+            </section>
+
+            <section className="space-y-3 rounded-2xl border bg-muted/25 p-4">
+              <div>
+                <h3 className="text-sm font-semibold">Journey flow</h3>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  The landing page and shared checkout remain the canonical first handoff. Add
+                  optional offers below, then reorder their explicit post-purchase sequence.
+                </p>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {activeFlow.map((stepType, index) => (
+                  <div
+                    key={stepType}
+                    className="flex items-center gap-2 rounded-2xl border bg-card p-3"
+                  >
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-xl bg-primary/10 text-xs font-bold text-primary">
+                      {index + 1}
+                    </span>
+                    <span className="min-w-0 flex-1 text-sm font-semibold">
+                      {stepLabel(stepType)}
+                    </span>
+                    <div className="flex shrink-0 gap-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => moveFlowStep(stepType, -1)}
+                        disabled={stepType !== "upsell" && stepType !== "downsell"}
+                        aria-label={`Move ${stepLabel(stepType)} up`}
+                      >
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => moveFlowStep(stepType, 1)}
+                        disabled={stepType !== "upsell" && stepType !== "downsell"}
+                        aria-label={`Move ${stepLabel(stepType)} down`}
+                      >
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
 

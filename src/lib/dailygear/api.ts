@@ -275,6 +275,11 @@ export interface DraftOrder {
   discount: number;
   tax: number;
   shipping_address: string | null;
+  shipping_country?: string | null;
+  shipping_county?: string | null;
+  shipping_town?: string | null;
+  shipping_address_details?: string | null;
+  shipping_zone?: string | null;
   notes: string | null;
   items: DraftOrderItem[];
 }
@@ -310,6 +315,11 @@ export function useSaveOrderWithItems() {
         discount: draft.discount,
         tax: draft.tax,
         shipping_address: draft.shipping_address,
+        shipping_country: draft.shipping_country ?? null,
+        shipping_county: draft.shipping_county ?? null,
+        shipping_town: draft.shipping_town ?? null,
+        shipping_address_details: draft.shipping_address_details ?? null,
+        shipping_zone: draft.shipping_zone ?? null,
         notes: draft.notes,
         subtotal,
         total,

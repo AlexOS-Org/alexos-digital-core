@@ -45,7 +45,7 @@ function ThankYou() {
   const { order, funnel: funnelSlug } = Route.useSearch() as ThankYouSearch;
   const loadFunnel = useServerFn(loadPublicFunnel);
   const [funnel, setFunnel] = useState<PublicFunnel | null>(null);
-  const [upsellDeclined, setUpsellDeclined] = useState(false);
+  const [offerIndex, setOfferIndex] = useState(0);
   const [loadingOffer, setLoadingOffer] = useState(Boolean(funnelSlug));
 
   useEffect(() => {
@@ -63,14 +63,19 @@ function ThankYou() {
     };
   }, [funnelSlug, loadFunnel]);
 
-  const upsellStep =
-    funnel?.steps.find((step) => step.stepType === "upsell" && step.productId) ?? null;
-  const downsellStep =
-    funnel?.steps.find((step) => step.stepType === "downsell" && step.productId) ?? null;
-  const activeOfferStep = upsellDeclined ? downsellStep : upsellStep;
+  const postPurchaseSteps = (funnel?.steps ?? [])
+    .filter(
+      (step) => (step.stepType === "upsell" || step.stepType === "downsell") && step.productId,
+    )
+    .sort((a, b) => a.position - b.position);
+  const activeOfferStep = postPurchaseSteps[offerIndex] ?? null;
   const activeOfferProduct = activeOfferStep
     ? (funnel?.offerProducts.find((product) => product.id === activeOfferStep.productId) ?? null)
     : null;
+
+  useEffect(() => {
+    setOfferIndex(0);
+  }, [funnel?.id]);
 
   function acceptOffer(step: PublicFunnelStep, product: PublicFunnelProduct) {
     cartStore.add(
@@ -124,7 +129,9 @@ function ThankYou() {
             </span>
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
-                {upsellDeclined ? "A simpler alternative" : "One more useful option"}
+                {activeOfferStep.stepType === "downsell"
+                  ? "A simpler alternative"
+                  : "One more useful option"}
               </p>
               <h2 className="mt-1 text-xl font-black">
                 {activeOfferStep.title ?? activeOfferProduct.name}
@@ -145,15 +152,13 @@ function ThankYou() {
                 >
                   Add to this journey <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-                {!upsellDeclined ? (
-                  <Button
-                    variant="ghost"
-                    className="rounded-xl"
-                    onClick={() => setUpsellDeclined(true)}
-                  >
-                    No thanks
-                  </Button>
-                ) : null}
+                <Button
+                  variant="ghost"
+                  className="rounded-xl"
+                  onClick={() => setOfferIndex((current) => current + 1)}
+                >
+                  No thanks
+                </Button>
               </div>
               <p className="mt-3 text-xs text-muted-foreground">
                 This is optional. Accepting it opens the existing checkout for an explicit review;

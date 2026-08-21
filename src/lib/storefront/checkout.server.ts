@@ -24,6 +24,10 @@ export interface GuestOrderInput {
   email?: string | null;
   phone: string;
   address: string;
+  country: string;
+  county: string;
+  town: string;
+  deliveryDetails?: string | null;
   city?: string | null;
   notes?: string | null;
   paymentMethod: string;
@@ -46,6 +50,10 @@ export function validateGuestOrder(raw: unknown): GuestOrderInput {
   const firstName = text(input["firstName"], 80);
   const phone = text(input["phone"], 40);
   const address = text(input["address"], 400);
+  const country = text(input["country"], 80);
+  const county = text(input["county"], 100);
+  const town = text(input["town"], 100);
+  const deliveryDetails = text(input["deliveryDetails"], 500);
   const storeSlug = text(input["storeSlug"], 80);
   const paymentMethod = text(input["paymentMethod"], 40) || "cod";
   const items = Array.isArray(input["items"]) ? input["items"] : [];
@@ -53,6 +61,10 @@ export function validateGuestOrder(raw: unknown): GuestOrderInput {
   if (!firstName) throw new Error("First name is required.");
   if (phone.length < 7) throw new Error("A valid phone number is required.");
   if (!address) throw new Error("A delivery address is required.");
+  if (country.toLowerCase() !== "kenya")
+    throw new Error("DailyGear currently delivers within Kenya only.");
+  if (!county) throw new Error("Select a delivery county.");
+  if (!town) throw new Error("Select a delivery town.");
   if (!storeSlug) throw new Error("Store could not be identified.");
   if (!PAYMENT_METHODS.has(paymentMethod)) throw new Error("Unsupported payment method.");
   if (items.length === 0) throw new Error("Your cart is empty.");
@@ -112,7 +124,11 @@ export function validateGuestOrder(raw: unknown): GuestOrderInput {
     email: email || null,
     phone,
     address,
-    city: text(input["city"], 80) || null,
+    country: "Kenya",
+    county,
+    town,
+    deliveryDetails: deliveryDetails || null,
+    city: town,
     notes: text(input["notes"], 800) || null,
     paymentMethod,
     items: parsed,
@@ -134,7 +150,11 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
     p_email: input.email ?? null,
     p_phone: input.phone,
     p_address: input.address,
-    p_city: input.city ?? null,
+    p_city: input.town,
+    p_country: input.country,
+    p_county: input.county,
+    p_town: input.town,
+    p_delivery_details: input.deliveryDetails ?? null,
     p_notes: input.notes ?? null,
     p_payment_method: input.paymentMethod,
     p_items: input.items as unknown as Json,

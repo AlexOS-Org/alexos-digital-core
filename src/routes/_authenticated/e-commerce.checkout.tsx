@@ -30,6 +30,7 @@ import {
   SALES_CHANNELS,
 } from "@/lib/dailygear/constants";
 import type { Order, PaymentStatus } from "@/lib/dailygear/types";
+import { KENYA_COUNTIES, townsForCounty } from "@/lib/storefront/kenya-locations";
 
 const COUPONS: Record<string, number> = {
   SAVE5: 0.05,
@@ -81,6 +82,7 @@ function CheckoutPage() {
   const [shippingAddress, setShippingAddress] = useState("");
   const [county, setCounty] = useState("");
   const [town, setTown] = useState("");
+  const [shippingDetails, setShippingDetails] = useState("");
   const [couponCode, setCouponCode] = useState("");
   const [couponMessage, setCouponMessage] = useState<string | null>(null);
   const [discount, setDiscount] = useState(0);
@@ -107,6 +109,7 @@ function CheckoutPage() {
   );
   const total = Math.max(0, subtotal + Number(shippingFee) + Number(tax) - Number(discount));
 
+  const availableTowns = townsForCounty(KENYA_COUNTIES.find((item) => item.name === county)?.slug);
   const ready = cart.items.length > 0 && cart.items.some((item) => item.product_id);
 
   const applyCoupon = () => {
@@ -161,7 +164,13 @@ function CheckoutPage() {
 
   const handleSubmit = async () => {
     if (!ready) return;
-    const shipping = [shippingAddress.trim(), town.trim(), county.trim()]
+    const shipping = [
+      shippingDetails.trim(),
+      shippingAddress.trim(),
+      town.trim(),
+      county.trim(),
+      "Kenya",
+    ]
       .filter(Boolean)
       .join(", ");
     const draft: DraftOrder = {
@@ -175,6 +184,10 @@ function CheckoutPage() {
       discount,
       tax,
       shipping_address: shipping || null,
+      shipping_country: "Kenya",
+      shipping_county: county.trim() || null,
+      shipping_town: town.trim() || null,
+      shipping_address_details: shippingDetails.trim() || null,
       notes,
       items: cart.items.map((item) => ({
         product_id: item.product_id,
@@ -348,24 +361,51 @@ function CheckoutPage() {
               <CardTitle>Shipping & contact</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">Country: Kenya</p>
+              <select
+                value={county}
+                onChange={(event) => {
+                  setCounty(event.target.value);
+                  setTown("");
+                }}
+                className="h-10 w-full rounded-xl border bg-background px-3 text-sm"
+              >
+                <option value="">Select county</option>
+                {KENYA_COUNTIES.map((item) => (
+                  <option key={item.code} value={item.name}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={town}
+                disabled={!county}
+                onChange={(event) => setTown(event.target.value)}
+                className="h-10 w-full rounded-xl border bg-background px-3 text-sm disabled:opacity-60"
+              >
+                <option value="">{county ? "Select town" : "Select a county first"}</option>
+                {availableTowns.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
               <Input
                 value={shippingAddress}
                 onChange={(e) => setShippingAddress(e.target.value)}
-                placeholder="Street address"
+                placeholder="Street, building, house or shop number"
               />
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Input value={town} onChange={(e) => setTown(e.target.value)} placeholder="Town" />
-                <Input
-                  value={county}
-                  onChange={(e) => setCounty(e.target.value)}
-                  placeholder="County"
-                />
-              </div>
+              <Textarea
+                value={shippingDetails}
+                onChange={(e) => setShippingDetails(e.target.value)}
+                rows={3}
+                placeholder="Estate, landmark or delivery instructions"
+              />
               <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={4}
-                placeholder="Order notes, delivery instructions or customer comments"
+                placeholder="Order notes or customer comments"
               />
             </CardContent>
           </Card>

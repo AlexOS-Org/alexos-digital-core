@@ -1060,8 +1060,10 @@ export type Database = {
           attributes: Json
           city: string | null
           country: string | null
+          county: string | null
           created_at: string
           deleted_at: string | null
+          delivery_details: string | null
           email: string | null
           first_name: string
           id: string
@@ -1069,6 +1071,7 @@ export type Database = {
           notes: string | null
           phone: string | null
           tags: string[]
+          town: string | null
           updated_at: string
           user_id: string
         }
@@ -1077,8 +1080,10 @@ export type Database = {
           attributes?: Json
           city?: string | null
           country?: string | null
+          county?: string | null
           created_at?: string
           deleted_at?: string | null
+          delivery_details?: string | null
           email?: string | null
           first_name: string
           id?: string
@@ -1086,6 +1091,7 @@ export type Database = {
           notes?: string | null
           phone?: string | null
           tags?: string[]
+          town?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1094,8 +1100,10 @@ export type Database = {
           attributes?: Json
           city?: string | null
           country?: string | null
+          county?: string | null
           created_at?: string
           deleted_at?: string | null
+          delivery_details?: string | null
           email?: string | null
           first_name?: string
           id?: string
@@ -1103,6 +1111,7 @@ export type Database = {
           notes?: string | null
           phone?: string | null
           tags?: string[]
+          town?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1451,8 +1460,13 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["dg_payment_status"]
           placed_at: string
           shipping_address: string | null
+          shipping_address_details: string | null
+          shipping_country: string | null
+          shipping_county: string | null
           shipping_fee: number
           shipping_method: string | null
+          shipping_town: string | null
+          shipping_zone: string | null
           status: Database["public"]["Enums"]["dg_order_status"]
           subtotal: number
           tax: number
@@ -1478,8 +1492,13 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["dg_payment_status"]
           placed_at?: string
           shipping_address?: string | null
+          shipping_address_details?: string | null
+          shipping_country?: string | null
+          shipping_county?: string | null
           shipping_fee?: number
           shipping_method?: string | null
+          shipping_town?: string | null
+          shipping_zone?: string | null
           status?: Database["public"]["Enums"]["dg_order_status"]
           subtotal?: number
           tax?: number
@@ -1505,8 +1524,13 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["dg_payment_status"]
           placed_at?: string
           shipping_address?: string | null
+          shipping_address_details?: string | null
+          shipping_country?: string | null
+          shipping_county?: string | null
           shipping_fee?: number
           shipping_method?: string | null
+          shipping_town?: string | null
+          shipping_zone?: string | null
           status?: Database["public"]["Enums"]["dg_order_status"]
           subtotal?: number
           tax?: number
@@ -2711,6 +2735,9 @@ export type Database = {
           p_address: string
           p_attribution?: Json
           p_city: string
+          p_country: string
+          p_county: string
+          p_delivery_details: string
           p_email: string
           p_first_name: string
           p_funnel_id?: string
@@ -2720,6 +2747,7 @@ export type Database = {
           p_payment_method: string
           p_phone: string
           p_store_slug: string
+          p_town: string
         }
         Returns: Json
       }
@@ -2731,6 +2759,10 @@ export type Database = {
       dg_reserve_variant_stock: {
         Args: { p_product_id: string; p_qty: number; p_variant_id: string }
         Returns: boolean
+      }
+      dg_seed_default_categories: {
+        Args: { _user_id: string }
+        Returns: undefined
       }
       next_order_number: { Args: never; Returns: string }
     }
