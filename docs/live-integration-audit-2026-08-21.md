@@ -23,3 +23,13 @@ Do not present a Pixel ID, follower count, Ads Library duration, Meta spend, or 
 Meta’s current developer reference documents `fbq('track')` standard events including `ViewContent`, `AddToCart`, `InitiateCheckout` and `Purchase`. `InitiateCheckout` supports `content_ids`, `contents`, `currency`, `num_items` and `value`; `Purchase` requires `currency` and `value`, and supports product identifiers and contents. The implementation will use these standard names and real cart/order values only.
 
 Reference: https://developers.facebook.com/documentation/meta-pixel/reference
+
+## Live storefront smoke test
+
+The browser opened https://dailygear.co.ke/shop successfully after a command-line request returned Cloudflare HTTP 403. The live page title is “DailyGear — Everyday essentials, delivered”; the visible navigation includes Shop, About, Help and the cart, and the rendered hero shows the DailyGear visual theme with “Explore the collection” and “Track an order” actions. The page also exposes the public customer flow cards for review, checkout and order tracking. This confirms the public domain is serving the storefront in a browser session, while the curl 403 should be treated as a Cloudflare bot/edge policy difference rather than proof that the Worker is down.
+
+## Authenticated live workspace verification
+
+The browser opened https://dailygear.co.ke/e-commerce/orders in an authenticated session. The Orders workspace showed one live order, the existing Edit details action and the AlexOS/DailyGear navigation. The order currently displayed as Delivered and Paid, reflecting the owner’s current production state; no order was modified during this verification.
+
+The browser opened https://dailygear.co.ke/e-commerce/funnels in the same authenticated session. The page showed the published Children School Backpack funnel, a product selector containing the active catalogue, the **Improve for this product** control, the landing-step CTA editor, the three-step Landing → Checkout → Thank-you flow and the save configuration action. The live page text at the captured viewport did not show the external preview link because the saved funnel’s editor panel is below the initial viewport; no save action was taken.
