@@ -97,13 +97,11 @@ describe("Auren advisory contract", () => {
   });
   it("flags negative cash pressure and withholds thin-data forecasts", () => {
     const input = fixture();
-    input.transactions = input.transactions
-      .slice(0, 2)
-      .map((row) => ({
-        ...row,
-        amount: row.type === "income" ? 300 : 600,
-        occurred_at: input.now?.toISOString() ?? "2026-08-21T12:00:00.000Z",
-      }));
+    input.transactions = input.transactions.slice(0, 2).map((row) => ({
+      ...row,
+      amount: row.type === "income" ? 300 : 600,
+      occurred_at: input.now?.toISOString() ?? "2026-08-21T12:00:00.000Z",
+    }));
     const advisory = buildAurenAdvisory(input);
     expect(advisory.outlook).toBe("under_pressure");
     expect(advisory.forecasts.income.base).toBeNull();
