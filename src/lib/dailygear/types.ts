@@ -33,6 +33,28 @@ export type OrderInsert = TablesInsert<"dg_orders">;
 export type OrderItem = Tables<"dg_order_items">;
 export type OrderEvent = Tables<"dg_order_events">;
 export type StockMovement = Tables<"dg_stock_movements">;
+export type Funnel = Tables<"dg_funnels">;
+export type FunnelStep = Tables<"dg_funnel_steps">;
+export type OrderAttribution = Tables<"dg_order_attribution">;
+
+export type FunnelStatus = Funnel["status"];
+export type FunnelStepType = FunnelStep["step_type"];
+export type FunnelOfferRole = "primary" | "order_bump" | "upsell" | "downsell";
+
+export interface FunnelAttribution {
+  source?: string;
+  medium?: string;
+  campaign?: string;
+  campaignId?: string;
+  adSet?: string;
+  adSetId?: string;
+  ad?: string;
+  adId?: string;
+  creative?: string;
+  creativeId?: string;
+  landingPage?: string;
+  destinationUrl?: string;
+}
 
 export type ProductStatus = Product["status"];
 export type OrderStatus = Order["status"];

@@ -1,4 +1,5 @@
 import type { Database, Json } from "@/integrations/supabase/types";
+import type { FunnelAttribution, FunnelOfferRole } from "@/lib/dailygear/types";
 import { markCartSessionConvertedImpl } from "./cart-session.server";
 
 /**
@@ -12,6 +13,8 @@ export interface GuestOrderLineInput {
   productId: string;
   variantId?: string | null;
   quantity: number;
+  offerRole?: FunnelOfferRole;
+  funnelStepId?: string | null;
 }
 
 export interface GuestOrderInput {
@@ -26,9 +29,13 @@ export interface GuestOrderInput {
   paymentMethod: string;
   items: GuestOrderLineInput[];
   recoveryToken?: string | null;
+  funnelId?: string | null;
+  attribution?: FunnelAttribution | null;
 }
 
 const PAYMENT_METHODS = new Set(["cod", "mpesa", "card", "bank_transfer"]);
+const OFFER_ROLES = new Set<FunnelOfferRole>(["primary", "order_bump", "upsell", "downsell"]);
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function text(value: unknown, max = 200) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
@@ -60,10 +67,43 @@ export function validateGuestOrder(raw: unknown): GuestOrderInput {
       throw new Error("Item quantity is out of range.");
     }
     const variantId = text(line["variantId"], 60);
-    return { productId, variantId: variantId || null, quantity: Math.floor(quantity) };
+    const rawOfferRole = text(line["offerRole"], 20);
+    const offerRole = OFFER_ROLES.has(rawOfferRole as FunnelOfferRole)
+      ? (rawOfferRole as FunnelOfferRole)
+      : "primary";
+    const rawFunnelStepId = text(line["funnelStepId"], 80);
+    const funnelStepId = UUID_RE.test(rawFunnelStepId) ? rawFunnelStepId : null;
+    return {
+      productId,
+      variantId: variantId || null,
+      quantity: Math.floor(quantity),
+      offerRole,
+      funnelStepId: offerRole === "primary" ? null : funnelStepId,
+    };
   });
 
   const email = text(input["email"], 160);
+  const rawFunnelId = text(input["funnelId"], 80);
+  const funnelId = UUID_RE.test(rawFunnelId) ? rawFunnelId : null;
+  const attributionInput = (input["attribution"] ?? {}) as Record<string, unknown>;
+  const attribution: FunnelAttribution = {
+    source: text(attributionInput["source"], 160) || undefined,
+    medium: text(attributionInput["medium"], 160) || undefined,
+    campaign: text(attributionInput["campaign"], 160) || undefined,
+    campaignId: text(attributionInput["campaignId"], 160) || undefined,
+    adSet: text(attributionInput["adSet"], 160) || undefined,
+    adSetId: text(attributionInput["adSetId"], 160) || undefined,
+    ad: text(attributionInput["ad"], 160) || undefined,
+    adId: text(attributionInput["adId"], 160) || undefined,
+    creative: text(attributionInput["creative"], 160) || undefined,
+    creativeId: text(attributionInput["creativeId"], 160) || undefined,
+    landingPage: text(attributionInput["landingPage"], 1000) || undefined,
+    destinationUrl: text(attributionInput["destinationUrl"], 1000) || undefined,
+  };
+
+  if (parsed.some((item) => item.offerRole !== "primary") && !funnelId) {
+    throw new Error("Offer context is missing. Please reopen the campaign page.");
+  }
 
   return {
     storeSlug,
@@ -79,6 +119,8 @@ export function validateGuestOrder(raw: unknown): GuestOrderInput {
     recoveryToken: /^[a-f0-9]{64}$/i.test(text(input["recoveryToken"], 100))
       ? text(input["recoveryToken"], 100).toLowerCase()
       : null,
+    funnelId,
+    attribution: funnelId ? attribution : null,
   };
 }
 
@@ -96,6 +138,8 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
     p_notes: input.notes ?? null,
     p_payment_method: input.paymentMethod,
     p_items: input.items as unknown as Json,
+    p_funnel_id: input.funnelId ?? null,
+    p_attribution: (input.attribution ?? {}) as unknown as Json,
   } as unknown as GuestOrderRpcArgs;
   const { data, error } = await supabaseAdmin.rpc("dg_create_guest_order", rpcArgs);
   if (error) throw error;
@@ -106,7 +150,9 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
     subtotal?: unknown;
     shippingFee?: unknown;
     currency?: unknown;
+    funnelId?: unknown;
   } | null;
+
   if (!result || typeof result.orderNumber !== "string") {
     throw new Error("The order was not created. Please try again.");
   }
@@ -121,6 +167,7 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
     subtotal: Number(result.subtotal ?? 0),
     shippingFee: Number(result.shippingFee ?? 0),
     currency: typeof result.currency === "string" ? result.currency : "KES",
+    funnelId: typeof result.funnelId === "string" ? result.funnelId : null,
   };
 }
 

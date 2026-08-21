@@ -1,8 +1,9 @@
 import { useCallback, useSyncExternalStore } from "react";
+import type { FunnelOfferRole } from "@/lib/dailygear/types";
 
 /**
- * Guest cart — a tiny localStorage-backed store shared by every storefront
- * route. Deliberately framework-free so the header badge, cart page and
+ * Guest cart — a tiny localStorage-backed store shared by every storefront route.
+Deliberately framework-free so the header badge, cart page and
  * checkout all read the same snapshot without prop drilling or context.
  */
 export interface CartLine {
@@ -14,6 +15,8 @@ export interface CartLine {
   image: string | null;
   quantity: number;
   maxQuantity: number;
+  offerRole?: FunnelOfferRole;
+  funnelStepId?: string | null;
 }
 
 const KEY = "dailygear.cart.v1";
@@ -57,8 +60,8 @@ const EMPTY: CartLine[] = [];
 const getSnapshot = () => (hydrated ? lines : EMPTY);
 const getServerSnapshot = () => EMPTY;
 
-function keyOf(line: Pick<CartLine, "productId" | "variantId">) {
-  return `${line.productId}::${line.variantId ?? ""}`;
+function keyOf(line: Pick<CartLine, "productId" | "variantId" | "offerRole" | "funnelStepId">) {
+  return `${line.productId}::${line.variantId ?? ""}::${line.offerRole ?? "primary"}::${line.funnelStepId ?? ""}`;
 }
 
 export const cartStore = {
@@ -80,16 +83,23 @@ export const cartStore = {
       .filter((line) => line.productId && line.quantity > 0)
       .map((line) => ({
         ...line,
+        offerRole: line.offerRole ?? "primary",
         quantity: Math.max(1, Math.min(Math.floor(line.quantity), Math.max(1, line.maxQuantity))),
       }));
+
     persist();
     emit();
   },
-  setQuantity(productId: string, variantId: string | null, quantity: number) {
+  setQuantity(
+    productId: string,
+    variantId: string | null,
+    quantity: number,
+    offerRole: FunnelOfferRole = "primary",
+  ) {
     hydrate();
     lines = lines
       .map((l) =>
-        keyOf(l) === keyOf({ productId, variantId })
+        keyOf(l) === keyOf({ productId, variantId, offerRole })
           ? { ...l, quantity: Math.max(0, Math.min(quantity, Math.max(1, l.maxQuantity))) }
           : l,
       )
@@ -97,9 +107,9 @@ export const cartStore = {
     persist();
     emit();
   },
-  remove(productId: string, variantId: string | null) {
+  remove(productId: string, variantId: string | null, offerRole: FunnelOfferRole = "primary") {
     hydrate();
-    lines = lines.filter((l) => keyOf(l) !== keyOf({ productId, variantId }));
+    lines = lines.filter((l) => keyOf(l) !== keyOf({ productId, variantId, offerRole }));
     persist();
     emit();
   },

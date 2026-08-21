@@ -130,19 +130,11 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
   const { visualTheme } = useTheme();
   const selectedVisualTheme = getVisualTheme(visualTheme);
   const isMountainPreset = selectedVisualTheme.backdrop === "mountains";
-  const isDailyGearPreset = selectedVisualTheme.accent === "red";
-  const heroTone = isDailyGearPreset
-    ? "bg-[#1b171b]"
-    : selectedVisualTheme.backdrop === "gradient"
-      ? "bg-gradient-to-br from-[#0b1730] via-[#15234b] to-[#25133e]"
-      : "bg-[#0c2340]";
 
   return (
-    <section
-      className={`rise-in relative overflow-hidden rounded-[1.75rem] border border-white/15 p-5 text-white shadow-[0_24px_70px_-30px_rgba(239,68,68,0.34)] sm:p-7 ${heroTone}`}
-    >
+    <section className="dailygear-workspace-hero rise-in relative overflow-hidden rounded-[1.75rem] border border-white/15 p-5 text-white shadow-[0_24px_70px_-30px_var(--alexos-glow)] sm:p-7">
       {isMountainPreset ? (
-        <picture className="pointer-events-none absolute inset-0 block">
+        <picture className="pointer-events-none absolute inset-0 z-0 block">
           <source media="(max-width: 640px)" srcSet={dailyGearMountainMobile} />
           <img
             src={dailyGearMountainWide}
@@ -153,9 +145,9 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
           />
         </picture>
       ) : null}
-      <div
-        className={`pointer-events-none absolute inset-0 ${isDailyGearPreset ? "bg-[linear-gradient(100deg,rgba(24,17,22,0.96),rgba(55,23,31,0.8),rgba(24,17,22,0.46)]" : "bg-[linear-gradient(100deg,rgba(6,21,43,0.95),rgba(7,28,55,0.68),rgba(6,21,43,0.35)]"}`}
-      />
+      <div className="dailygear-hero-overlay pointer-events-none absolute inset-0 z-[1]" />
+      <div className="dailygear-hero-grid pointer-events-none absolute inset-0 z-[1]" />
+      <div className="dailygear-hero-orb pointer-events-none absolute -right-10 -top-12 z-[1] h-40 w-40 rounded-full blur-2xl" />
       <div className="relative z-10 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:flex-wrap sm:justify-between">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
@@ -185,7 +177,27 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
           </div>
         )}
       </div>
+      {!compactMode && (
+        <div className="relative z-10 mt-6 grid max-w-2xl grid-cols-3 gap-2 sm:gap-3">
+          <HeroMetric label="Revenue · 30d" value={money(kpis.revenue)} />
+          <HeroMetric label="Orders · 30d" value={String(kpis.orders)} />
+          <HeroMetric label="Inventory value" value={money(kpis.inventoryValue)} />
+        </div>
+      )}
     </section>
+  );
+}
+
+function HeroMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/15 bg-white/[0.08] px-3 py-2.5 shadow-inner shadow-white/[0.04] backdrop-blur-md">
+      <p className="truncate text-[9px] font-semibold uppercase tracking-[0.14em] text-white/60">
+        {label}
+      </p>
+      <p className="mt-1 truncate text-sm font-black tabular-nums text-white sm:text-base">
+        {value}
+      </p>
+    </div>
   );
 }
 

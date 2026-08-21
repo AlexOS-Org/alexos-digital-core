@@ -1,9 +1,12 @@
 import type { Json } from "@/integrations/supabase/types";
+import type { FunnelOfferRole } from "@/lib/dailygear/types";
 
 export interface CartRecoveryLineInput {
   productId: string;
   variantId: string | null;
   quantity: number;
+  offerRole?: FunnelOfferRole;
+  funnelStepId?: string | null;
 }
 
 export interface SaveCartSessionInput {
@@ -27,6 +30,8 @@ export interface RecoveryCartLine {
   image: string | null;
   quantity: number;
   maxQuantity: number;
+  offerRole?: FunnelOfferRole;
+  funnelStepId?: string | null;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -53,10 +58,23 @@ function normalizeItems(value: unknown): CartRecoveryLineInput[] {
     const productId = validId(item["productId"]);
     const variantId = validId(item["variantId"]) || null;
     const quantity = Number(item["quantity"]);
+    const rawOfferRole = text(item["offerRole"], 20);
+    const offerRole: FunnelOfferRole = ["primary", "order_bump", "upsell", "downsell"].includes(
+      rawOfferRole,
+    )
+      ? (rawOfferRole as FunnelOfferRole)
+      : "primary";
+    const funnelStepId = validId(item["funnelStepId"]) || null;
     if (!productId || !Number.isFinite(quantity) || quantity < 1 || quantity > 999) {
       throw new Error("An item in your bag is invalid.");
     }
-    return { productId, variantId, quantity: Math.floor(quantity) };
+    return {
+      productId,
+      variantId,
+      quantity: Math.floor(quantity),
+      offerRole,
+      funnelStepId,
+    };
   });
 }
 
@@ -168,6 +186,8 @@ async function resolveRecoveryItems(
       image: variant?.image_url ?? images[0] ?? null,
       quantity,
       maxQuantity,
+      offerRole: item.offerRole ?? "primary",
+      funnelStepId: item.funnelStepId ?? null,
     });
   }
 

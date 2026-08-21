@@ -13,14 +13,19 @@ import { cartStore, useCart } from "@/lib/storefront/cart";
 import { formatMoney, useStorefront } from "@/lib/storefront/api";
 import { loadCartSession, saveCartSession } from "@/lib/storefront/cart-session.functions";
 import { placeGuestOrder } from "@/lib/storefront/checkout.functions";
+import { loadPublicFunnel } from "@/lib/storefront/funnel.functions";
+import type { PublicFunnel } from "@/lib/storefront/funnel.server";
+import { readFunnelAttribution } from "@/lib/storefront/funnel-session";
 
 interface CheckoutSearch {
   recovery?: string;
+  funnel?: string;
 }
 
 export const Route = createFileRoute("/shop/checkout")({
   validateSearch: (search: Record<string, unknown>): CheckoutSearch => ({
     recovery: typeof search["recovery"] === "string" ? search["recovery"] : undefined,
+    funnel: typeof search["funnel"] === "string" ? search["funnel"] : undefined,
   }),
   head: () => ({
     meta: [
@@ -41,6 +46,7 @@ function CheckoutPage() {
   const { data: store } = useStorefront();
   const submit = useServerFn(placeGuestOrder);
   const loadRecovery = useServerFn(loadCartSession);
+  const loadFunnel = useServerFn(loadPublicFunnel);
   const saveRecovery = useServerFn(saveCartSession);
   const currency = store?.currency ?? "KES";
   const threshold = Number(store?.free_shipping_threshold ?? 0);
@@ -48,6 +54,8 @@ function CheckoutPage() {
     threshold > 0 && cart.subtotal >= threshold ? 0 : Number(store?.flat_shipping_fee ?? 0);
 
   const [recoveryToken, setRecoveryToken] = useState<string | null>(search.recovery ?? null);
+  const [funnelContext, setFunnelContext] = useState<PublicFunnel | null>(null);
+  const [orderBumpAccepted, setOrderBumpAccepted] = useState(false);
   const [recoveryState, setRecoveryState] = useState<"idle" | "loading" | "loaded" | "unavailable">(
     search.recovery ? "loading" : "idle",
   );
@@ -62,6 +70,25 @@ function CheckoutPage() {
     notes: "",
     paymentMethod: "cod",
   });
+
+  useEffect(() => {
+    const funnelSlug = search.funnel;
+    if (!funnelSlug) {
+      setFunnelContext(null);
+      return;
+    }
+    let cancelled = false;
+    void loadFunnel({ data: { slug: funnelSlug } })
+      .then((funnel) => {
+        if (!cancelled) setFunnelContext(funnel);
+      })
+      .catch(() => {
+        if (!cancelled) toast.error("This campaign context is no longer available.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [loadFunnel, search.funnel]);
 
   useEffect(() => {
     const token = search.recovery;
@@ -94,6 +121,54 @@ function CheckoutPage() {
     };
   }, [loadRecovery, search.recovery]);
 
+  const orderBump = funnelContext?.steps.find(
+    (step) => step.stepType === "order_bump" && step.productId,
+  );
+  const orderBumpProduct = orderBump
+    ? (funnelContext?.offerProducts.find((product) => product.id === orderBump.productId) ?? null)
+    : null;
+  const orderBumpPrice = orderBumpProduct
+    ? orderBumpProduct.salePrice != null &&
+      orderBumpProduct.salePrice > 0 &&
+      orderBumpProduct.salePrice < orderBumpProduct.price
+      ? orderBumpProduct.salePrice
+      : orderBumpProduct.price
+    : 0;
+
+  useEffect(() => {
+    setOrderBumpAccepted(
+      Boolean(
+        orderBump &&
+        cart.items.some(
+          (item) => item.offerRole === "order_bump" && item.productId === orderBump.productId,
+        ),
+      ),
+    );
+  }, [cart.items, orderBump]);
+
+  function toggleOrderBump(checked: boolean) {
+    if (!orderBump || !orderBumpProduct) return;
+    if (checked) {
+      cartStore.add(
+        {
+          productId: orderBumpProduct.id,
+          variantId: null,
+          name: orderBumpProduct.name,
+          sku: orderBumpProduct.sku,
+          price: orderBumpPrice,
+          image: orderBumpProduct.images[0] ?? null,
+          maxQuantity: orderBumpProduct.stockQuantity,
+          offerRole: "order_bump",
+          funnelStepId: orderBump.id,
+        },
+        1,
+      );
+    } else {
+      cartStore.remove(orderBumpProduct.id, null, "order_bump");
+    }
+    setOrderBumpAccepted(checked);
+  }
+
   async function captureCartSession(optIn = reminderOptIn) {
     if (!optIn || !store?.slug || !form.email || cart.items.length === 0) return recoveryToken;
     try {
@@ -111,6 +186,8 @@ function CheckoutPage() {
             productId: item.productId,
             variantId: item.variantId,
             quantity: item.quantity,
+            offerRole: item.offerRole,
+            funnelStepId: item.funnelStepId,
           })),
         },
       });
@@ -134,13 +211,20 @@ function CheckoutPage() {
             productId: l.productId,
             variantId: l.variantId,
             quantity: l.quantity,
+            offerRole: l.offerRole,
+            funnelStepId: l.funnelStepId,
           })),
           recoveryToken: submittedRecoveryToken ?? recoveryToken,
+          funnelId: funnelContext?.id ?? null,
+          attribution: funnelContext ? readFunnelAttribution() : null,
         },
       }),
     onSuccess: (result) => {
       cart.clear();
-      navigate({ to: "/shop/thank-you", search: { order: result.orderNumber } });
+      navigate({
+        to: "/shop/thank-you",
+        search: { order: result.orderNumber, funnel: funnelContext?.slug },
+      });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -304,6 +388,30 @@ function CheckoutPage() {
             </div>
           </section>
 
+          {orderBump && orderBumpProduct ? (
+            <section className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="checkout-order-bump"
+                  checked={orderBumpAccepted}
+                  onCheckedChange={(checked) => toggleOrderBump(checked === true)}
+                />
+                <div className="min-w-0 flex-1">
+                  <Label
+                    htmlFor="checkout-order-bump"
+                    className="cursor-pointer text-sm font-semibold"
+                  >
+                    Add {orderBumpProduct.name} to this order
+                  </Label>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    Optional add-on · {formatMoney(orderBumpPrice, currency)}. It will be reviewed
+                    as part of this same order and can be declined.
+                  </p>
+                </div>
+              </div>
+            </section>
+          ) : null}
+
           <section className="space-y-4 rounded-2xl border bg-card p-5">
             <h2 className="text-sm font-semibold">Payment method</h2>
             <RadioGroup
@@ -331,7 +439,7 @@ function CheckoutPage() {
           <h2 className="text-sm font-semibold">Order summary</h2>
           {cart.items.map((l) => (
             <div
-              key={`${l.productId}-${l.variantId ?? ""}`}
+              key={`${l.productId}-${l.variantId ?? ""}-${l.offerRole ?? "primary"}`}
               className="flex justify-between gap-3 text-sm"
             >
               <span className="min-w-0 truncate text-muted-foreground">

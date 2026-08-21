@@ -33,6 +33,7 @@ import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedVehicleSalesRouteImport } from './routes/_authenticated/vehicle-sales'
+import { Route as FunnelSlugRouteImport } from './routes/funnel.$slug'
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as ShopAboutRouteImport } from './routes/shop.about'
 import { Route as ShopCartRouteImport } from './routes/shop.cart'
@@ -49,6 +50,7 @@ import { Route as AuthenticatedECommerceCheckoutRouteImport } from './routes/_au
 import { Route as AuthenticatedECommerceCompetitorsRouteImport } from './routes/_authenticated/e-commerce.competitors'
 import { Route as AuthenticatedECommerceCustomersRouteImport } from './routes/_authenticated/e-commerce.customers'
 import { Route as AuthenticatedECommerceEvidenceRouteImport } from './routes/_authenticated/e-commerce.evidence'
+import { Route as AuthenticatedECommerceFunnelsRouteImport } from './routes/_authenticated/e-commerce.funnels'
 import { Route as AuthenticatedECommerceInventoryRouteImport } from './routes/_authenticated/e-commerce.inventory'
 import { Route as AuthenticatedECommerceLandingPagesRouteImport } from './routes/_authenticated/e-commerce.landing-pages'
 import { Route as AuthenticatedECommerceMarketRouteImport } from './routes/_authenticated/e-commerce.market'
@@ -201,6 +203,11 @@ const AuthenticatedVehicleSalesRoute =
     path: '/vehicle-sales',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const FunnelSlugRoute = FunnelSlugRouteImport.update({
+  id: '/funnel/$slug',
+  path: '/funnel/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopIndexRoute = ShopIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -286,6 +293,12 @@ const AuthenticatedECommerceEvidenceRoute =
   AuthenticatedECommerceEvidenceRouteImport.update({
     id: '/evidence',
     path: '/evidence',
+    getParentRoute: () => AuthenticatedECommerceRoute,
+  } as any)
+const AuthenticatedECommerceFunnelsRoute =
+  AuthenticatedECommerceFunnelsRouteImport.update({
+    id: '/funnels',
+    path: '/funnels',
     getParentRoute: () => AuthenticatedECommerceRoute,
   } as any)
 const AuthenticatedECommerceInventoryRoute =
@@ -478,6 +491,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/funnel/$slug': typeof FunnelSlugRoute
   '/shop/about': typeof ShopAboutRoute
   '/shop/cart': typeof ShopCartRoute
   '/shop/checkout': typeof ShopCheckoutRoute
@@ -493,6 +507,7 @@ export interface FileRoutesByFullPath {
   '/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
   '/e-commerce/customers': typeof AuthenticatedECommerceCustomersRoute
   '/e-commerce/evidence': typeof AuthenticatedECommerceEvidenceRoute
+  '/e-commerce/funnels': typeof AuthenticatedECommerceFunnelsRoute
   '/e-commerce/inventory': typeof AuthenticatedECommerceInventoryRoute
   '/e-commerce/landing-pages': typeof AuthenticatedECommerceLandingPagesRoute
   '/e-commerce/market': typeof AuthenticatedECommerceMarketRoute
@@ -543,6 +558,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/funnel/$slug': typeof FunnelSlugRoute
   '/shop/about': typeof ShopAboutRoute
   '/shop/cart': typeof ShopCartRoute
   '/shop/checkout': typeof ShopCheckoutRoute
@@ -558,6 +574,7 @@ export interface FileRoutesByTo {
   '/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
   '/e-commerce/customers': typeof AuthenticatedECommerceCustomersRoute
   '/e-commerce/evidence': typeof AuthenticatedECommerceEvidenceRoute
+  '/e-commerce/funnels': typeof AuthenticatedECommerceFunnelsRoute
   '/e-commerce/inventory': typeof AuthenticatedECommerceInventoryRoute
   '/e-commerce/landing-pages': typeof AuthenticatedECommerceLandingPagesRoute
   '/e-commerce/market': typeof AuthenticatedECommerceMarketRoute
@@ -614,6 +631,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/funnel/$slug': typeof FunnelSlugRoute
   '/shop/about': typeof ShopAboutRoute
   '/shop/cart': typeof ShopCartRoute
   '/shop/checkout': typeof ShopCheckoutRoute
@@ -629,6 +647,7 @@ export interface FileRoutesById {
   '/_authenticated/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
   '/_authenticated/e-commerce/customers': typeof AuthenticatedECommerceCustomersRoute
   '/_authenticated/e-commerce/evidence': typeof AuthenticatedECommerceEvidenceRoute
+  '/_authenticated/e-commerce/funnels': typeof AuthenticatedECommerceFunnelsRoute
   '/_authenticated/e-commerce/inventory': typeof AuthenticatedECommerceInventoryRoute
   '/_authenticated/e-commerce/landing-pages': typeof AuthenticatedECommerceLandingPagesRoute
   '/_authenticated/e-commerce/market': typeof AuthenticatedECommerceMarketRoute
@@ -685,6 +704,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/vehicle-sales'
+    | '/funnel/$slug'
     | '/shop/about'
     | '/shop/cart'
     | '/shop/checkout'
@@ -700,6 +720,7 @@ export interface FileRouteTypes {
     | '/e-commerce/competitors'
     | '/e-commerce/customers'
     | '/e-commerce/evidence'
+    | '/e-commerce/funnels'
     | '/e-commerce/inventory'
     | '/e-commerce/landing-pages'
     | '/e-commerce/market'
@@ -750,6 +771,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/vehicle-sales'
+    | '/funnel/$slug'
     | '/shop/about'
     | '/shop/cart'
     | '/shop/checkout'
@@ -765,6 +787,7 @@ export interface FileRouteTypes {
     | '/e-commerce/competitors'
     | '/e-commerce/customers'
     | '/e-commerce/evidence'
+    | '/e-commerce/funnels'
     | '/e-commerce/inventory'
     | '/e-commerce/landing-pages'
     | '/e-commerce/market'
@@ -820,6 +843,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/tasks'
     | '/_authenticated/vehicle-sales'
+    | '/funnel/$slug'
     | '/shop/about'
     | '/shop/cart'
     | '/shop/checkout'
@@ -835,6 +859,7 @@ export interface FileRouteTypes {
     | '/_authenticated/e-commerce/competitors'
     | '/_authenticated/e-commerce/customers'
     | '/_authenticated/e-commerce/evidence'
+    | '/_authenticated/e-commerce/funnels'
     | '/_authenticated/e-commerce/inventory'
     | '/_authenticated/e-commerce/landing-pages'
     | '/_authenticated/e-commerce/market'
@@ -871,6 +896,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ShopRoute: typeof ShopRouteWithChildren
+  FunnelSlugRoute: typeof FunnelSlugRoute
   ApiMetaAdsWebhookRoute: typeof ApiMetaAdsWebhookRoute
   ApiScheduledAbandonedCartRoute: typeof ApiScheduledAbandonedCartRoute
 }
@@ -1045,6 +1071,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVehicleSalesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/funnel/$slug': {
+      id: '/funnel/$slug'
+      path: '/funnel/$slug'
+      fullPath: '/funnel/$slug'
+      preLoaderRoute: typeof FunnelSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/': {
       id: '/shop/'
       path: '/'
@@ -1155,6 +1188,13 @@ declare module '@tanstack/react-router' {
       path: '/evidence'
       fullPath: '/e-commerce/evidence'
       preLoaderRoute: typeof AuthenticatedECommerceEvidenceRouteImport
+      parentRoute: typeof AuthenticatedECommerceRoute
+    }
+    '/_authenticated/e-commerce/funnels': {
+      id: '/_authenticated/e-commerce/funnels'
+      path: '/funnels'
+      fullPath: '/e-commerce/funnels'
+      preLoaderRoute: typeof AuthenticatedECommerceFunnelsRouteImport
       parentRoute: typeof AuthenticatedECommerceRoute
     }
     '/_authenticated/e-commerce/inventory': {
@@ -1376,6 +1416,7 @@ interface AuthenticatedECommerceRouteChildren {
   AuthenticatedECommerceCompetitorsRoute: typeof AuthenticatedECommerceCompetitorsRoute
   AuthenticatedECommerceCustomersRoute: typeof AuthenticatedECommerceCustomersRoute
   AuthenticatedECommerceEvidenceRoute: typeof AuthenticatedECommerceEvidenceRoute
+  AuthenticatedECommerceFunnelsRoute: typeof AuthenticatedECommerceFunnelsRoute
   AuthenticatedECommerceInventoryRoute: typeof AuthenticatedECommerceInventoryRoute
   AuthenticatedECommerceLandingPagesRoute: typeof AuthenticatedECommerceLandingPagesRoute
   AuthenticatedECommerceMarketRoute: typeof AuthenticatedECommerceMarketRoute
@@ -1397,6 +1438,7 @@ const AuthenticatedECommerceRouteChildren: AuthenticatedECommerceRouteChildren =
       AuthenticatedECommerceCompetitorsRoute,
     AuthenticatedECommerceCustomersRoute: AuthenticatedECommerceCustomersRoute,
     AuthenticatedECommerceEvidenceRoute: AuthenticatedECommerceEvidenceRoute,
+    AuthenticatedECommerceFunnelsRoute: AuthenticatedECommerceFunnelsRoute,
     AuthenticatedECommerceInventoryRoute: AuthenticatedECommerceInventoryRoute,
     AuthenticatedECommerceLandingPagesRoute:
       AuthenticatedECommerceLandingPagesRoute,
@@ -1567,6 +1609,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ShopRoute: ShopRouteWithChildren,
+  FunnelSlugRoute: FunnelSlugRoute,
   ApiMetaAdsWebhookRoute: ApiMetaAdsWebhookRoute,
   ApiScheduledAbandonedCartRoute: ApiScheduledAbandonedCartRoute,
 }

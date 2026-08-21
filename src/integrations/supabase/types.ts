@@ -1108,6 +1108,207 @@ export type Database = {
         }
         Relationships: []
       }
+      dg_funnel_steps: {
+        Row: {
+          body: string | null
+          created_at: string
+          discount_type: string
+          discount_value: number
+          enabled: boolean
+          funnel_id: string
+          id: string
+          position: number
+          product_id: string | null
+          step_type: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          enabled?: boolean
+          funnel_id: string
+          id?: string
+          position: number
+          product_id?: string | null
+          step_type: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          enabled?: boolean
+          funnel_id?: string
+          id?: string
+          position?: number
+          product_id?: string | null
+          step_type?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dg_funnel_steps_funnel_id_fkey"
+            columns: ["funnel_id"]
+            isOneToOne: false
+            referencedRelation: "dg_funnels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dg_funnel_steps_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dg_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dg_funnels: {
+        Row: {
+          created_at: string
+          id: string
+          landing_path: string | null
+          name: string
+          product_id: string
+          slug: string
+          status: string
+          storefront_id: string
+          thank_you_body: string | null
+          thank_you_heading: string | null
+          traffic_source: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          landing_path?: string | null
+          name: string
+          product_id: string
+          slug: string
+          status?: string
+          storefront_id: string
+          thank_you_body?: string | null
+          thank_you_heading?: string | null
+          traffic_source?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          landing_path?: string | null
+          name?: string
+          product_id?: string
+          slug?: string
+          status?: string
+          storefront_id?: string
+          thank_you_body?: string | null
+          thank_you_heading?: string | null
+          traffic_source?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dg_funnels_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "dg_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dg_funnels_storefront_id_fkey"
+            columns: ["storefront_id"]
+            isOneToOne: false
+            referencedRelation: "dg_storefronts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dg_order_attribution: {
+        Row: {
+          ad: string | null
+          ad_id: string | null
+          ad_set: string | null
+          ad_set_id: string | null
+          campaign: string | null
+          campaign_id: string | null
+          created_at: string
+          creative: string | null
+          creative_id: string | null
+          destination_url: string | null
+          funnel_id: string | null
+          id: string
+          landing_page: string | null
+          medium: string | null
+          order_id: string
+          source: string | null
+          user_id: string
+        }
+        Insert: {
+          ad?: string | null
+          ad_id?: string | null
+          ad_set?: string | null
+          ad_set_id?: string | null
+          campaign?: string | null
+          campaign_id?: string | null
+          created_at?: string
+          creative?: string | null
+          creative_id?: string | null
+          destination_url?: string | null
+          funnel_id?: string | null
+          id?: string
+          landing_page?: string | null
+          medium?: string | null
+          order_id: string
+          source?: string | null
+          user_id: string
+        }
+        Update: {
+          ad?: string | null
+          ad_id?: string | null
+          ad_set?: string | null
+          ad_set_id?: string | null
+          campaign?: string | null
+          campaign_id?: string | null
+          created_at?: string
+          creative?: string | null
+          creative_id?: string | null
+          destination_url?: string | null
+          funnel_id?: string | null
+          id?: string
+          landing_page?: string | null
+          medium?: string | null
+          order_id?: string
+          source?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dg_order_attribution_funnel_id_fkey"
+            columns: ["funnel_id"]
+            isOneToOne: false
+            referencedRelation: "dg_funnels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dg_order_attribution_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "dg_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dg_order_events: {
         Row: {
           body: string | null
@@ -1153,8 +1354,10 @@ export type Database = {
         Row: {
           created_at: string
           discount: number
+          funnel_step_id: string | null
           id: string
           name: string
+          offer_role: string
           order_id: string
           product_id: string | null
           quantity: number
@@ -1168,8 +1371,10 @@ export type Database = {
         Insert: {
           created_at?: string
           discount?: number
+          funnel_step_id?: string | null
           id?: string
           name: string
+          offer_role?: string
           order_id: string
           product_id?: string | null
           quantity?: number
@@ -1183,8 +1388,10 @@ export type Database = {
         Update: {
           created_at?: string
           discount?: number
+          funnel_step_id?: string | null
           id?: string
           name?: string
+          offer_role?: string
           order_id?: string
           product_id?: string | null
           quantity?: number
@@ -1196,6 +1403,13 @@ export type Database = {
           variant_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "dg_order_items_funnel_step_id_fkey"
+            columns: ["funnel_step_id"]
+            isOneToOne: false
+            referencedRelation: "dg_funnel_steps"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "dg_order_items_order_id_fkey"
             columns: ["order_id"]
@@ -1228,6 +1442,7 @@ export type Database = {
           deleted_at: string | null
           delivered_at: string | null
           discount: number
+          funnel_id: string | null
           id: string
           internal_notes: string | null
           notes: string | null
@@ -1254,6 +1469,7 @@ export type Database = {
           deleted_at?: string | null
           delivered_at?: string | null
           discount?: number
+          funnel_id?: string | null
           id?: string
           internal_notes?: string | null
           notes?: string | null
@@ -1280,6 +1496,7 @@ export type Database = {
           deleted_at?: string | null
           delivered_at?: string | null
           discount?: number
+          funnel_id?: string | null
           id?: string
           internal_notes?: string | null
           notes?: string | null
@@ -1304,6 +1521,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "dg_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dg_orders_funnel_id_fkey"
+            columns: ["funnel_id"]
+            isOneToOne: false
+            referencedRelation: "dg_funnels"
             referencedColumns: ["id"]
           },
         ]
@@ -2485,9 +2709,11 @@ export type Database = {
       dg_create_guest_order: {
         Args: {
           p_address: string
+          p_attribution?: Json
           p_city: string
           p_email: string
           p_first_name: string
+          p_funnel_id?: string
           p_items: Json
           p_last_name: string
           p_notes: string

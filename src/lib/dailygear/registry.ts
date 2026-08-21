@@ -14,6 +14,7 @@ import {
   Truck,
   Wallet,
   FileCheck,
+  GitBranch,
   type LucideIcon,
 } from "lucide-react";
 
@@ -125,6 +126,13 @@ export const DAILYGEAR_SECTIONS: DailyGearSection[] = [
     description: "Generated product pages, copy blocks and SEO metadata.",
     group: "Growth",
     preview: true,
+  },
+  {
+    to: "/e-commerce/funnels",
+    label: "Funnels",
+    icon: GitBranch,
+    description: "Configure product journeys, offers and attribution handoffs.",
+    group: "Growth",
   },
   {
     to: "/e-commerce/ads",

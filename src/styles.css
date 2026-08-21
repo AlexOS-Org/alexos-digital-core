@@ -240,6 +240,84 @@
   .alexos-glow {
     box-shadow: 0 18px 55px -32px var(--alexos-glow);
   }
+
+  .dailygear-workspace-hero {
+    background:
+      radial-gradient(
+        circle at 88% 10%,
+        color-mix(in oklch, var(--alexos-amber) 30%, transparent),
+        transparent 24%
+      ),
+      radial-gradient(
+        circle at 55% 112%,
+        color-mix(in oklch, var(--alexos-purple) 32%, transparent),
+        transparent 42%
+      ),
+      linear-gradient(
+        135deg,
+        color-mix(in oklch, var(--alexos-blue-dark) 84%, var(--color-background)),
+        color-mix(in oklch, var(--alexos-purple-dark) 75%, var(--color-background))
+      );
+  }
+
+  .dailygear-workspace-hero::after {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        115deg,
+        color-mix(in oklch, var(--alexos-blue-dark) 78%, transparent),
+        transparent 54%
+      ),
+      radial-gradient(
+        circle at 14% 30%,
+        color-mix(in oklch, var(--alexos-green) 18%, transparent),
+        transparent 20rem
+      );
+    content: "";
+    pointer-events: none;
+  }
+
+  .dailygear-hero-overlay {
+    background: linear-gradient(
+      100deg,
+      color-mix(in oklch, var(--alexos-blue-dark) 92%, transparent),
+      color-mix(in oklch, var(--alexos-purple-dark) 66%, transparent) 58%,
+      transparent
+    );
+  }
+
+  .dailygear-hero-grid {
+    background-image:
+      linear-gradient(color-mix(in oklch, var(--color-card) 12%, transparent) 1px, transparent 1px),
+      linear-gradient(
+        90deg,
+        color-mix(in oklch, var(--color-card) 12%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 32px 32px;
+    mask-image: linear-gradient(90deg, black, transparent 78%);
+    opacity: 0.24;
+  }
+
+  .dailygear-hero-orb {
+    background: color-mix(in oklch, var(--alexos-amber) 55%, transparent);
+    box-shadow: 0 0 80px 20px color-mix(in oklch, var(--alexos-amber) 35%, transparent);
+  }
+
+  .dailygear-workspace-card {
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--color-card) 96%, var(--alexos-green) 4%),
+      var(--color-card)
+    );
+    box-shadow: 0 20px 48px -34px var(--alexos-glow);
+  }
+
+  .dailygear-kpi-card {
+    background: color-mix(in oklch, var(--color-card) 82%, var(--alexos-blue) 18%);
+    border-color: color-mix(in oklch, var(--color-border) 70%, var(--alexos-blue) 30%);
+  }
 }
 
 @theme {

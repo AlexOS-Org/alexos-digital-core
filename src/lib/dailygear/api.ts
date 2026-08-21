@@ -14,6 +14,8 @@ import type {
   OrderEvent,
   StockMovement,
   ProductEvidence,
+  Funnel,
+  FunnelStep,
 } from "./types";
 
 /**
@@ -35,7 +37,9 @@ type DgTable =
   | "dg_order_items"
   | "dg_order_events"
   | "dg_stock_movements"
-  | "dg_product_evidence";
+  | "dg_product_evidence"
+  | "dg_funnels"
+  | "dg_funnel_steps";
 
 const SOFT_DELETE_TABLES = new Set<DgTable>([
   "dg_categories",
@@ -175,6 +179,12 @@ export const stockMovementsResource = createResource<StockMovement>("dg_stock_mo
 export const productEvidenceResource = createResource<ProductEvidence>("dg_product_evidence", {
   orderBy: { column: "created_at", ascending: false },
 });
+export const funnelsResource = createResource<Funnel>("dg_funnels", {
+  orderBy: { column: "created_at", ascending: false },
+});
+export const funnelStepsResource = createResource<FunnelStep>("dg_funnel_steps", {
+  orderBy: { column: "position", ascending: true },
+});
 
 /* ── Convenience hooks ────────────────────────────────────────── */
 
@@ -205,6 +215,13 @@ export const useProductEvidence = (productId?: string) =>
 export const useSaveProductEvidence = () => productEvidenceResource.useSave("Evidence record");
 export const useDeleteProductEvidence = () => productEvidenceResource.useRemove("Evidence record");
 export const useVariants = variantsResource.useList;
+export const useFunnels = funnelsResource.useList;
+export const useSaveFunnel = () => funnelsResource.useSave("Funnel");
+export const useDeleteFunnel = () => funnelsResource.useRemove("Funnel");
+export const useFunnelSteps = (funnelId?: string) =>
+  funnelStepsResource.useList(funnelId ? { funnel_id: funnelId } : undefined, Boolean(funnelId));
+export const useSaveFunnelStep = () => funnelStepsResource.useSave("Funnel step");
+export const useDeleteFunnelStep = () => funnelStepsResource.useRemove("Funnel step");
 
 /** Order status change + timeline entry, kept out of the components. */
 export function useUpdateOrderStatus() {
