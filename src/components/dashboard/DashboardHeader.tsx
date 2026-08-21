@@ -124,7 +124,7 @@ export function DashboardHeader() {
         style={{ background: visual.background }}
       >
         {backdrop === "mountains" ? (
-          <picture className="pointer-events-none absolute inset-0 block">
+          <picture className="alexos-dashboard-backdrop pointer-events-none absolute inset-0 block">
             <source media="(max-width: 640px)" srcSet={alexosMountainMobile} />
             <img
               src={alexosMountainWide}
