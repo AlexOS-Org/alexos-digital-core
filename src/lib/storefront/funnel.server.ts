@@ -78,6 +78,16 @@ export async function loadPublicFunnelImpl(slug: string): Promise<PublicFunnel |
   if (funnelError) throw funnelError;
   if (!funnel) return null;
 
+  const { data: storefront, error: storefrontError } = await supabaseAdmin
+    .from("dg_storefronts")
+    .select("id")
+    .eq("id", funnel.storefront_id)
+    .eq("user_id", funnel.user_id)
+    .eq("published", true)
+    .maybeSingle();
+  if (storefrontError) throw storefrontError;
+  if (!storefront) return null;
+
   const { data: product, error: productError } = await supabaseAdmin
     .from("dg_products")
     .select(
