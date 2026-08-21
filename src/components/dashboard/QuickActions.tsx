@@ -16,49 +16,49 @@ const actions = [
     title: "Add Transaction",
     icon: Receipt,
     to: "/money-center",
-    color: "bg-sky-50 text-sky-600 ring-sky-100",
+    color: "bg-alexos-blue/12 text-alexos-blue ring-alexos-blue/20",
   },
   {
     title: "New Customer",
     icon: UserPlus,
     to: "/people",
-    color: "bg-emerald-50 text-emerald-600 ring-emerald-100",
+    color: "bg-success/12 text-success ring-success/20",
   },
   {
     title: "Create Task",
     icon: Plus,
     to: "/tasks",
-    color: "bg-violet-50 text-violet-600 ring-violet-100",
+    color: "bg-alexos-purple/12 text-alexos-purple ring-alexos-purple/20",
   },
   {
     title: "Schedule",
     icon: CalendarPlus,
     to: "/calendar",
-    color: "bg-rose-50 text-rose-600 ring-rose-100",
+    color: "bg-alexos-coral/12 text-alexos-coral ring-alexos-coral/20",
   },
   {
     title: "Goals",
     icon: Target,
     to: "/goals",
-    color: "bg-amber-50 text-amber-600 ring-amber-100",
+    color: "bg-alexos-amber/12 text-alexos-amber ring-alexos-amber/20",
   },
   {
     title: "Debt",
     icon: Wallet,
     to: "/debt-management",
-    color: "bg-orange-50 text-orange-600 ring-orange-100",
+    color: "bg-orange-400/12 text-orange-300 ring-orange-300/20",
   },
   {
     title: "Documents",
     icon: FileText,
     to: "/documents",
-    color: "bg-slate-50 text-slate-600 ring-slate-100",
+    color: "bg-slate-400/12 text-slate-300 ring-slate-300/20",
   },
 ];
 
 export function QuickActions() {
   return (
-    <section className="space-y-4">
+    <section className="space-y-4 rounded-[1.5rem] border border-border/50 bg-card/35 p-4 sm:p-5">
       <div className="flex items-end justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -79,7 +79,7 @@ export function QuickActions() {
       >
         {actions.map((action) => (
           <Link key={action.title} to={action.to} className="min-w-[142px] snap-start sm:min-w-0">
-            <Card className="h-full cursor-pointer rounded-2xl border-border/60 bg-card/90 transition-all hover:-translate-y-0.5 hover:shadow-lg">
+            <Card className="h-full cursor-pointer rounded-2xl border-border/60 bg-card/85 shadow-[0_12px_28px_-22px_var(--alexos-glow)] transition-all hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-[0_18px_34px_-22px_var(--alexos-glow)]">
               <CardContent className="flex min-h-[128px] flex-col items-center justify-center gap-3 p-4">
                 <div
                   className={`flex h-12 w-12 items-center justify-center rounded-2xl ring-1 ${action.color}`}

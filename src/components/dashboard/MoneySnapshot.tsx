@@ -95,6 +95,7 @@ export default function MoneySnapshot() {
       icon: Wallet,
       subtitle: "All accounts",
       accent: "from-emerald-500 to-teal-400",
+      iconClass: "bg-emerald-500/12 text-emerald-400 ring-emerald-400/15",
     },
     {
       title: "Personal Cash",
@@ -102,6 +103,7 @@ export default function MoneySnapshot() {
       icon: UserRound,
       subtitle: `Debt ${formatMoney(personalDebt)}`,
       accent: "from-sky-500 to-cyan-400",
+      iconClass: "bg-sky-500/12 text-sky-400 ring-sky-400/15",
     },
     {
       title: "Business Cash",
@@ -109,6 +111,7 @@ export default function MoneySnapshot() {
       icon: Briefcase,
       subtitle: `Debt ${formatMoney(businessDebt)}`,
       accent: "from-violet-500 to-indigo-400",
+      iconClass: "bg-violet-500/12 text-violet-400 ring-violet-400/15",
     },
     {
       title: "Net Worth",
@@ -116,6 +119,7 @@ export default function MoneySnapshot() {
       icon: Landmark,
       subtitle: "Cash less outstanding debt",
       accent: netWorth >= 0 ? "from-violet-500 to-indigo-400" : "from-red-400 to-rose-300",
+      iconClass: "bg-indigo-500/12 text-indigo-400 ring-indigo-400/15",
     },
     {
       title: "Operating Income",
@@ -123,6 +127,7 @@ export default function MoneySnapshot() {
       icon: TrendingUp,
       subtitle: "This month · loans excluded",
       accent: "from-emerald-500 to-teal-400",
+      iconClass: "bg-emerald-500/12 text-emerald-400 ring-emerald-400/15",
     },
     {
       title: "Expenses",
@@ -130,6 +135,7 @@ export default function MoneySnapshot() {
       icon: TrendingDown,
       subtitle: "This month",
       accent: "from-amber-400 to-orange-300",
+      iconClass: "bg-amber-400/12 text-amber-300 ring-amber-300/15",
     },
     {
       title: "Loan Proceeds",
@@ -137,6 +143,7 @@ export default function MoneySnapshot() {
       icon: ArrowDownCircle,
       subtitle: "Cash received · not income",
       accent: "from-orange-400 to-red-300",
+      iconClass: "bg-orange-400/12 text-orange-300 ring-orange-300/15",
     },
   ];
 
@@ -159,7 +166,9 @@ export default function MoneySnapshot() {
                     </p>
                     <p className="mt-3 text-2xl font-bold tracking-tight">{card.value}</p>
                   </div>
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/[0.07] text-primary">
+                  <div
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ring-1 ring-inset ${card.iconClass}`}
+                  >
                     <Icon className="h-5 w-5" />
                   </div>
                 </div>

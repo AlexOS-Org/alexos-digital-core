@@ -117,7 +117,7 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   return (
-    <section className="rise-in relative overflow-hidden rounded-3xl border border-white/15 bg-[#0c2340] p-5 text-white soft-shadow sm:p-7">
+    <section className="rise-in relative overflow-hidden rounded-[1.75rem] border border-white/15 bg-[#0c2340] p-5 text-white shadow-[0_24px_70px_-30px_rgba(239,68,68,0.34)] sm:p-7">
       <picture className="pointer-events-none absolute inset-0 block">
         <source media="(max-width: 640px)" srcSet={dailyGearMountainMobile} />
         <img
@@ -137,7 +137,7 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
           <h1 className="mt-1 truncate text-xl font-black tracking-tight sm:text-3xl">
             {greeting}, here is your store
           </h1>
-          <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
+          <p className="mt-1 text-xs text-white/70 sm:text-sm">
             {new Date().toLocaleDateString(undefined, {
               weekday: "long",
               day: "numeric",
@@ -171,11 +171,9 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
 
 function MiniStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-card/70 px-3.5 py-3 backdrop-blur">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-        {label}
-      </p>
-      <p className="mt-0.5 text-lg font-bold tabular-nums">{value}</p>
+    <div className="rounded-2xl border border-white/10 bg-white/[0.08] px-3.5 py-3 shadow-inner shadow-white/[0.04] backdrop-blur-md">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-white/60">{label}</p>
+      <p className="mt-0.5 text-lg font-bold tabular-nums text-white">{value}</p>
     </div>
   );
 }
@@ -263,8 +261,9 @@ function MobileDashboard(p: Panels) {
           ].map((s) => (
             <div
               key={s.label}
-              className="w-36 rounded-2xl border border-border/60 bg-card px-4 py-3 soft-shadow"
+              className="relative w-36 overflow-hidden rounded-2xl border border-border/60 bg-card/90 px-4 py-3 shadow-[0_12px_30px_-22px_var(--alexos-glow)] backdrop-blur-sm"
             >
+              <span className="alexos-visual-strip absolute inset-x-0 top-0 h-px opacity-80" />
               <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                 {s.label}
               </p>

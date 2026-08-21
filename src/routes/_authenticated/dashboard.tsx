@@ -72,6 +72,18 @@ function Dashboard() {
         </section>
       </SafePanel>
       <SafePanel>
+        <section className="space-y-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Money</p>
+            <h2 className="text-2xl font-semibold tracking-tight">Know where you stand.</h2>
+            <p className="text-sm text-muted-foreground">
+              Cash, commitments and financial momentum — without the noise.
+            </p>
+          </div>
+          <MoneySnapshot />
+        </section>
+      </SafePanel>
+      <SafePanel>
         <TodaysMission />
       </SafePanel>
       <SafePanel>
@@ -86,18 +98,6 @@ function Dashboard() {
             <p className="text-sm text-muted-foreground">Signals first. Noise later.</p>
           </div>
           <IntelligenceFeed />
-        </section>
-      </SafePanel>
-      <SafePanel>
-        <section className="space-y-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Money</p>
-            <h2 className="text-2xl font-semibold tracking-tight">Know where you stand.</h2>
-            <p className="text-sm text-muted-foreground">
-              Cash, commitments and financial momentum — without the noise.
-            </p>
-          </div>
-          <MoneySnapshot />
         </section>
       </SafePanel>
       <SafePanel>

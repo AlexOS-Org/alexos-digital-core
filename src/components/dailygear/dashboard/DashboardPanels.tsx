@@ -50,26 +50,33 @@ function PanelShell({
   className?: string;
 }) {
   return (
-    <Card className={cn("h-full rounded-3xl border-border/60 soft-shadow", className)}>
-      <CardHeader className="flex flex-row items-center justify-between gap-3 pb-3">
+    <Card
+      className={cn(
+        "group relative h-full overflow-hidden rounded-[1.5rem] border-border/60 bg-card/85 shadow-[0_14px_38px_-28px_var(--alexos-glow)] backdrop-blur-sm transition-shadow duration-300 hover:shadow-[0_20px_46px_-28px_var(--alexos-glow)]",
+        className,
+      )}
+    >
+      <div className="alexos-visual-strip absolute inset-x-0 top-0 h-px opacity-80" />
+      <CardHeader className="relative flex flex-row items-center justify-between gap-3 pb-3">
         <CardTitle className="flex min-w-0 items-center gap-2 text-sm font-semibold">
-          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-inset ring-primary/10">
             <Icon className="h-3.5 w-3.5" />
           </span>
           <span className="truncate">{title}</span>
         </CardTitle>
         {action}
       </CardHeader>
-      <CardContent className="pt-0">{children}</CardContent>
+      <CardContent className="relative pt-0">{children}</CardContent>
     </Card>
   );
 }
 
 function EmptyRow({ label }: { label: string }) {
   return (
-    <p className="rounded-2xl border border-dashed border-border/70 px-4 py-8 text-center text-xs text-muted-foreground">
-      {label}
-    </p>
+    <div className="rounded-2xl border border-dashed border-primary/20 bg-primary/[0.03] px-4 py-8 text-center">
+      <PackageSearch className="mx-auto h-5 w-5 text-primary/55" aria-hidden="true" />
+      <p className="mt-2 text-xs text-muted-foreground">{label}</p>
+    </div>
   );
 }
 
@@ -130,7 +137,7 @@ export function LiveOrderFeed({
           {rows.map((o) => (
             <li
               key={o.id}
-              className="flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5 transition-colors hover:bg-muted/60"
+              className="flex items-center justify-between gap-3 rounded-2xl border border-transparent px-3 py-2.5 transition-colors hover:border-primary/10 hover:bg-primary/[0.04]"
             >
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">

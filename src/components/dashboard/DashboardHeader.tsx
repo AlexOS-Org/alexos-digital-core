@@ -1,6 +1,7 @@
 import { Bell, Sparkles, BookOpen, Quote, Bot, ArrowUpRight, Palette, Clock3 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { getDailyInspiration } from "@/lib/dashboard/inspiration";
 import { DashboardWeather } from "@/components/dashboard/DashboardWeather";
@@ -230,9 +231,11 @@ export function DashboardHeader() {
             </p>
             <DashboardWeather />
             <div className="mt-5 flex gap-2">
-              <Button className="bg-white text-slate-950 shadow-lg hover:bg-slate-100">
-                <Sparkles className="mr-2 h-4 w-4 text-[var(--alexos-purple)]" />
-                Auren
+              <Button asChild className="bg-white text-slate-950 shadow-lg hover:bg-slate-100">
+                <Link to="/auren">
+                  <Sparkles className="mr-2 h-4 w-4 text-[var(--alexos-purple)]" />
+                  Auren
+                </Link>
               </Button>
               <Button
                 size="icon"
@@ -269,11 +272,14 @@ export function DashboardHeader() {
               </div>
             </div>
             <Button
+              asChild
               variant="ghost"
               className="w-fit text-violet-200 hover:bg-white/5 hover:text-white"
             >
-              Open Auren
-              <ArrowUpRight className="ml-2 h-4 w-4" />
+              <Link to="/auren">
+                Open Auren
+                <ArrowUpRight className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
           </div>
         </CardContent>
