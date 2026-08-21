@@ -5,13 +5,28 @@ import {
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
-  PointerSensor,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  defaultKeyboardCoordinateGetter,
   useSensor,
   useSensors,
   useDraggable,
   useDroppable,
+  type DraggableAttributes,
+  type DraggableSyntheticListeners,
 } from "@dnd-kit/core";
-import { Plus, KanbanSquare, Calendar, Percent, DollarSign, Target, Trophy } from "lucide-react";
+import {
+  Plus,
+  KanbanSquare,
+  Calendar,
+  Percent,
+  DollarSign,
+  Target,
+  Trophy,
+  GripVertical,
+} from "lucide-react";
+import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -92,7 +107,11 @@ function LeadsPipelinePage() {
     };
   }, [leads, totals.won]);
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: defaultKeyboardCoordinateGetter }),
+  );
 
   const onDragStart = (e: DragStartEvent) => {
     const lead = leads.find((l) => l.id === e.active.id);
@@ -183,7 +202,18 @@ function LeadsPipelinePage() {
           </CardContent>
         </Card>
       ) : (
-        <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <DndContext
+          sensors={sensors}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+          onDragCancel={() => setActiveLead(null)}
+          accessibility={{
+            screenReaderInstructions: {
+              draggable:
+                "Focus a lead drag handle and press Space to pick it up. Use the arrow keys to move it, press Space to drop it, or press Escape to cancel.",
+            },
+          }}
+        >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
             {LEAD_STAGES.map((s) => (
               <StageColumn
@@ -260,6 +290,8 @@ function StageColumn({
   return (
     <div
       ref={setNodeRef}
+      role="region"
+      aria-label={`${label} stage, ${leads.length} opportunities`}
       className={cn(
         "flex flex-col rounded-2xl border bg-muted/30 min-h-[500px] transition-colors",
         isOver && "bg-primary/5 border-primary/50",
@@ -298,10 +330,19 @@ function StageColumn({
 }
 
 function DraggableLead({ lead, contactName }: { lead: Lead; contactName?: string }) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: lead.id });
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, isDragging, transform } =
+    useDraggable({ id: lead.id });
+  const style = transform ? { transform: CSS.Translate.toString(transform) } : undefined;
+
   return (
-    <div ref={setNodeRef} {...listeners} {...attributes} className={cn(isDragging && "opacity-40")}>
-      <LeadCard lead={lead} contactName={contactName} />
+    <div ref={setNodeRef} style={style} className={cn("touch-pan-y", isDragging && "opacity-40")}>
+      <LeadCard
+        lead={lead}
+        contactName={contactName}
+        dragAttributes={attributes}
+        dragListeners={listeners}
+        setActivatorNodeRef={setActivatorNodeRef}
+      />
     </div>
   );
 }
@@ -310,40 +351,63 @@ function LeadCard({
   lead,
   contactName,
   dragging,
+  dragAttributes,
+  dragListeners,
+  setActivatorNodeRef,
 }: {
   lead: Lead;
   contactName?: string;
   dragging?: boolean;
+  dragAttributes?: DraggableAttributes;
+  dragListeners?: DraggableSyntheticListeners;
+  setActivatorNodeRef?: (element: HTMLElement | null) => void;
 }) {
+  const hasDragHandle = Boolean(dragAttributes && dragListeners && setActivatorNodeRef);
+
   return (
-    <Link
-      to="/people/leads/$id"
-      params={{ id: lead.id }}
-      onClick={(e) => {
-        if (dragging) e.preventDefault();
-      }}
+    <div
       className={cn(
-        "block rounded-xl border bg-card p-3 shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing",
+        "rounded-xl border bg-card p-3 shadow-sm transition-all hover:shadow-md",
         dragging && "shadow-lg ring-1 ring-primary",
       )}
     >
-      <div className="font-medium text-sm line-clamp-2">{lead.title}</div>
-      {contactName ? (
-        <div className="text-xs text-muted-foreground mt-0.5">{contactName}</div>
-      ) : null}
-      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-        <span className="inline-flex items-center gap-1">
-          <DollarSign className="h-3 w-3" /> {formatCurrency(Number(lead.value ?? 0))}
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <Percent className="h-3 w-3" /> {lead.probability}%
-        </span>
-        {lead.expected_close_date ? (
-          <span className="inline-flex items-center gap-1">
-            <Calendar className="h-3 w-3" /> {lead.expected_close_date}
-          </span>
+      <div className="flex items-start gap-2">
+        {hasDragHandle ? (
+          <button
+            ref={setActivatorNodeRef}
+            type="button"
+            {...dragAttributes}
+            {...dragListeners}
+            aria-label={`Drag opportunity: ${lead.title}`}
+            className="touch-none mt-0.5 inline-flex h-8 w-8 shrink-0 cursor-grab items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing"
+          >
+            <GripVertical className="h-4 w-4" aria-hidden="true" />
+          </button>
         ) : null}
+        <Link
+          to="/people/leads/$id"
+          params={{ id: lead.id }}
+          className="min-w-0 flex-1 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <div className="font-medium text-sm line-clamp-2">{lead.title}</div>
+          {contactName ? (
+            <div className="text-xs text-muted-foreground mt-0.5">{contactName}</div>
+          ) : null}
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1">
+              <DollarSign className="h-3 w-3" /> {formatCurrency(Number(lead.value ?? 0))}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Percent className="h-3 w-3" /> {lead.probability}%
+            </span>
+            {lead.expected_close_date ? (
+              <span className="inline-flex items-center gap-1">
+                <Calendar className="h-3 w-3" /> {lead.expected_close_date}
+              </span>
+            ) : null}
+          </div>
+        </Link>
       </div>
-    </Link>
+    </div>
   );
 }
