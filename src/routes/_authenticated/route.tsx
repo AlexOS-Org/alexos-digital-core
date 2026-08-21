@@ -1,3 +1,4 @@
+import { Bell, ShoppingBag, Sparkles } from "lucide-react";
 import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { SupabaseConfigBanner } from "@/components/SupabaseConfigBanner";
@@ -19,6 +20,52 @@ export const Route = createFileRoute("/_authenticated")({
   },
   component: AuthenticatedLayout,
 });
+
+function MobileWorkspaceHeader({
+  isDailyGearRoute,
+  currentTitle,
+}: {
+  isDailyGearRoute: boolean;
+  currentTitle?: string;
+}) {
+  const Icon = isDailyGearRoute ? ShoppingBag : Sparkles;
+  const title = isDailyGearRoute ? "DailyGear" : currentTitle === "Dashboard" ? "Auren" : "AlexOS";
+  const subtitle = isDailyGearRoute
+    ? "Sell more. Grow daily."
+    : title === "Auren"
+      ? "AI assistant"
+      : "Business OS";
+  return (
+    <header className="sticky top-0 z-20 flex h-[4.5rem] items-center gap-3 border-b border-border/60 bg-background/90 px-4 backdrop-blur-xl md:hidden">
+      <SidebarTrigger className="tap-target rounded-xl" />
+      <div className="flex min-w-0 flex-1 items-center gap-2.5">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--alexos-purple)] to-[var(--alexos-blue)] text-white shadow-lg shadow-[var(--alexos-glow)]">
+          <Icon className="h-[18px] w-[18px]" />
+        </div>
+        <div className="min-w-0 leading-tight">
+          <p className="truncate text-sm font-bold tracking-tight">{title}</p>
+          <p className="truncate text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            {subtitle}
+          </p>
+        </div>
+      </div>
+      <Link
+        to="/notifications"
+        className="tap-target grid place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        aria-label="Notifications"
+      >
+        <Bell className="h-[19px] w-[19px]" />
+      </Link>
+      <Link
+        to="/settings"
+        className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[var(--alexos-blue)] to-[var(--alexos-purple)] text-[11px] font-bold text-white shadow-md"
+        aria-label="Open settings"
+      >
+        AO
+      </Link>
+    </header>
+  );
+}
 
 function AuthenticatedLayout() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
@@ -47,7 +94,7 @@ function AuthenticatedLayout() {
       <div className="min-h-screen flex w-full bg-background text-foreground transition-colors duration-300">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border/70 bg-background/80 px-4 backdrop-blur-xl sm:px-6">
+          <header className="sticky top-0 z-20 hidden h-16 items-center gap-3 border-b border-border/70 bg-background/80 px-4 backdrop-blur-xl sm:px-6 md:flex">
             <SidebarTrigger className="tap-target rounded-xl" />
             <div className="min-w-0">
               <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
@@ -73,6 +120,10 @@ function AuthenticatedLayout() {
               </Link>
             </div>
           </header>
+          <MobileWorkspaceHeader
+            isDailyGearRoute={isDailyGearRoute}
+            currentTitle={current?.title}
+          />
           {/* Extra bottom padding on mobile so content clears the bottom nav */}
           <SupabaseConfigBanner />
           <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">

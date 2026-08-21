@@ -187,31 +187,6 @@ export function MobileDashboardHeader() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3 px-1">
-        <SidebarTrigger className="tap-target rounded-xl" />
-        <div className="flex min-w-0 flex-1 items-center gap-2.5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--alexos-purple)] to-[var(--alexos-blue)] text-white shadow-lg shadow-[var(--alexos-glow)]">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          <div className="min-w-0 leading-tight">
-            <p className="truncate text-sm font-bold tracking-tight">Auren</p>
-            <p className="truncate text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              AI assistant
-            </p>
-          </div>
-        </div>
-        <Link
-          to="/notifications"
-          className="tap-target grid place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          aria-label="Notifications"
-        >
-          <Bell className="h-[19px] w-[19px]" />
-        </Link>
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[var(--alexos-blue)] to-[var(--alexos-purple)] text-xs font-bold text-white shadow-md">
-          AO
-        </div>
-      </div>
-
       <section
         className="relative min-h-[250px] overflow-hidden rounded-[1.9rem] border border-white/15 p-5 text-white shadow-[0_22px_58px_-30px_var(--alexos-glow)]"
         style={{ background: visual.background }}
