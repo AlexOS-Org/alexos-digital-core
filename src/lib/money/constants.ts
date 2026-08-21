@@ -53,6 +53,7 @@ export const EXPENSE_CATEGORIES = [
   "Water",
   "WiFi",
   "Internet",
+  "Airtime",
   "Facebook Ads",
   "Google Ads",
   "Business",
