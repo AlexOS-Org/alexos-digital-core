@@ -28,6 +28,8 @@ import { DG_CURRENCY } from "@/lib/dailygear/constants";
 import { useDeviceTier } from "@/hooks/use-device-tier";
 import dailyGearMountainWide from "@/assets/visuals/dailygear-mountain-golden-wide.webp";
 import dailyGearMountainMobile from "@/assets/visuals/dailygear-mountain-mobile.webp";
+import { useTheme } from "@/components/theme/ThemeProvider";
+import { getVisualTheme } from "@/components/theme/visual-themes";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/")({
   head: () => ({
@@ -115,20 +117,35 @@ type Panels = {
 function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boolean }) {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const { visualTheme } = useTheme();
+  const selectedVisualTheme = getVisualTheme(visualTheme);
+  const isMountainPreset = selectedVisualTheme.backdrop === "mountains";
+  const isDailyGearPreset = selectedVisualTheme.accent === "red";
+  const heroTone = isDailyGearPreset
+    ? "bg-[#1b171b]"
+    : selectedVisualTheme.backdrop === "gradient"
+      ? "bg-gradient-to-br from-[#0b1730] via-[#15234b] to-[#25133e]"
+      : "bg-[#0c2340]";
 
   return (
-    <section className="rise-in relative overflow-hidden rounded-[1.75rem] border border-white/15 bg-[#0c2340] p-5 text-white shadow-[0_24px_70px_-30px_rgba(239,68,68,0.34)] sm:p-7">
-      <picture className="pointer-events-none absolute inset-0 block">
-        <source media="(max-width: 640px)" srcSet={dailyGearMountainMobile} />
-        <img
-          src={dailyGearMountainWide}
-          alt=""
-          aria-hidden="true"
-          decoding="async"
-          className="h-full w-full object-cover opacity-55"
-        />
-      </picture>
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(100deg,rgba(6,21,43,0.95),rgba(7,28,55,0.68),rgba(6,21,43,0.35))]" />
+    <section
+      className={`rise-in relative overflow-hidden rounded-[1.75rem] border border-white/15 p-5 text-white shadow-[0_24px_70px_-30px_rgba(239,68,68,0.34)] sm:p-7 ${heroTone}`}
+    >
+      {isMountainPreset ? (
+        <picture className="pointer-events-none absolute inset-0 block">
+          <source media="(max-width: 640px)" srcSet={dailyGearMountainMobile} />
+          <img
+            src={dailyGearMountainWide}
+            alt=""
+            aria-hidden="true"
+            decoding="async"
+            className="h-full w-full object-cover opacity-55"
+          />
+        </picture>
+      ) : null}
+      <div
+        className={`pointer-events-none absolute inset-0 ${isDailyGearPreset ? "bg-[linear-gradient(100deg,rgba(24,17,22,0.96),rgba(55,23,31,0.8),rgba(24,17,22,0.46)]" : "bg-[linear-gradient(100deg,rgba(6,21,43,0.95),rgba(7,28,55,0.68),rgba(6,21,43,0.35)]"}`}
+      />
       <div className="relative z-10 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:flex-wrap sm:justify-between">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">

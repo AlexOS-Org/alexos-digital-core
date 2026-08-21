@@ -323,3 +323,122 @@
     animation: none;
   }
 }
+
+/* ── User-selectable visual themes ───────────────────────────── */
+:root {
+  --alexos-custom-accent: #4f7cff;
+}
+:root[data-visual-theme="midnight"] {
+  --alexos-blue: oklch(0.58 0.2 255);
+  --alexos-purple: oklch(0.62 0.22 292);
+  --alexos-green: oklch(0.62 0.17 155);
+  --primary: var(--alexos-blue);
+  --ring: var(--alexos-blue);
+  --sidebar-primary: var(--alexos-blue);
+  --sidebar-ring: var(--alexos-blue);
+}
+.dark[data-visual-theme="midnight"] {
+  --alexos-blue: oklch(0.72 0.18 255);
+  --alexos-purple: oklch(0.72 0.19 292);
+  --alexos-green: oklch(0.72 0.17 155);
+  --primary: var(--alexos-blue);
+  --primary-foreground: oklch(0.12 0.025 265);
+  --ring: var(--alexos-blue);
+  --sidebar-primary: var(--alexos-blue);
+  --sidebar-ring: var(--alexos-blue);
+  --background: oklch(0.08 0.025 255);
+  --card: oklch(0.12 0.035 255);
+  --popover: oklch(0.12 0.035 255);
+  --sidebar: oklch(0.06 0.03 255);
+  --sidebar-accent: oklch(0.17 0.045 255);
+  --sidebar-border: oklch(1 0 0 / 10%);
+}
+:root[data-visual-theme="aurora"] {
+  --alexos-blue: oklch(0.58 0.2 255);
+  --alexos-purple: oklch(0.62 0.24 300);
+  --alexos-green: oklch(0.62 0.18 170);
+  --primary: var(--alexos-purple);
+  --ring: var(--alexos-purple);
+  --sidebar-primary: var(--alexos-purple);
+  --sidebar-ring: var(--alexos-purple);
+}
+.dark[data-visual-theme="aurora"] {
+  --alexos-blue: oklch(0.7 0.18 255);
+  --alexos-purple: oklch(0.74 0.2 300);
+  --alexos-green: oklch(0.72 0.18 170);
+  --primary: var(--alexos-purple);
+  --primary-foreground: oklch(0.12 0.025 265);
+  --ring: var(--alexos-purple);
+  --sidebar-primary: var(--alexos-purple);
+  --sidebar-ring: var(--alexos-purple);
+}
+:root[data-visual-theme="dailygear"] {
+  --alexos-blue: oklch(0.58 0.2 255);
+  --alexos-purple: oklch(0.62 0.2 20);
+  --alexos-green: oklch(0.6 0.22 28);
+  --primary: var(--alexos-green);
+  --ring: var(--alexos-green);
+  --sidebar-primary: var(--alexos-green);
+  --sidebar-ring: var(--alexos-green);
+}
+.dark[data-visual-theme="dailygear"] {
+  --alexos-blue: oklch(0.68 0.18 255);
+  --alexos-purple: oklch(0.7 0.19 20);
+  --alexos-green: oklch(0.68 0.22 28);
+  --primary: var(--alexos-green);
+  --primary-foreground: oklch(0.99 0 0);
+  --ring: var(--alexos-green);
+  --sidebar-primary: var(--alexos-green);
+  --sidebar-ring: var(--alexos-green);
+  --background: oklch(0.08 0.02 255);
+  --card: oklch(0.12 0.025 255);
+  --popover: oklch(0.12 0.025 255);
+  --sidebar: oklch(0.055 0.025 255);
+  --sidebar-accent: oklch(0.17 0.03 255);
+  --sidebar-border: oklch(1 0 0 / 10%);
+}
+:root[data-visual-theme="paper"] {
+  --alexos-blue: oklch(0.54 0.2 255);
+  --alexos-purple: oklch(0.58 0.2 292);
+  --alexos-green: oklch(0.57 0.17 155);
+  --primary: var(--alexos-green);
+  --ring: var(--alexos-green);
+  --sidebar-primary: var(--alexos-green);
+  --sidebar-ring: var(--alexos-green);
+  --background: oklch(0.98 0.006 155);
+  --card: oklch(1 0 0);
+  --popover: oklch(1 0 0);
+}
+:root[data-visual-theme="custom"] {
+  --alexos-green: var(--alexos-custom-accent);
+  --primary: var(--alexos-custom-accent);
+  --ring: var(--alexos-custom-accent);
+  --sidebar-primary: var(--alexos-custom-accent);
+  --sidebar-ring: var(--alexos-custom-accent);
+}
+.dark[data-visual-theme="custom"] {
+  --alexos-green: var(--alexos-custom-accent);
+  --primary: var(--alexos-custom-accent);
+  --primary-foreground: oklch(0.99 0 0);
+  --ring: var(--alexos-custom-accent);
+  --sidebar-primary: var(--alexos-custom-accent);
+  --sidebar-ring: var(--alexos-custom-accent);
+}
+:root[data-visual-theme="paper"] .alexos-dashboard-backdrop,
+:root[data-visual-theme="aurora"] .alexos-dashboard-backdrop,
+:root[data-visual-theme="dailygear"] .alexos-dashboard-backdrop,
+:root[data-visual-theme="custom"] .alexos-dashboard-backdrop {
+  display: none;
+}
+:root[data-visual-theme="paper"] body {
+  background: var(--color-background);
+}
+:root[data-visual-theme="dailygear"] body {
+  background:
+    radial-gradient(
+      circle at 92% 4%,
+      color-mix(in oklch, var(--alexos-green) 7%, transparent),
+      transparent 28rem
+    ),
+    var(--color-background);
+}

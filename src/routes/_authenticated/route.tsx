@@ -5,6 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { modules } from "@/lib/modules";
+import { VisualThemePicker } from "@/components/theme/VisualThemePicker";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -44,11 +45,11 @@ function AuthenticatedLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className="min-h-screen flex w-full bg-background text-foreground transition-colors duration-300">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-14 border-b border-border bg-card/50 backdrop-blur flex items-center gap-3 px-4 sticky top-0 z-10">
-            <SidebarTrigger />
+          <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border/70 bg-background/80 px-4 backdrop-blur-xl sm:px-6">
+            <SidebarTrigger className="tap-target rounded-xl" />
             <div className="min-w-0">
               <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
                 {current?.group ?? "Workspace"}
@@ -62,6 +63,9 @@ function AuthenticatedLayout() {
                   </span>
                 ))}
               </div>
+            </div>
+            <div className="ml-auto flex items-center gap-1">
+              <VisualThemePicker />
             </div>
           </header>
           {/* Extra bottom padding on mobile so content clears the bottom nav */}
