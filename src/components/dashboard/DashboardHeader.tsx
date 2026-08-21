@@ -6,8 +6,8 @@ import { DashboardWeather } from "@/components/dashboard/DashboardWeather";
 import { DailyInspirationCards } from "@/components/dashboard/DailyInspirationCards";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { getVisualTheme } from "@/components/theme/visual-themes";
-import alexosMountainWide from "@/assets/visuals/alexos-mountain-dusk-wide.webp";
-import alexosMountainMobile from "@/assets/visuals/alexos-mountain-mobile.webp";
+import alexosCommandCenterWide from "@/assets/visuals/alexos-command-center-wide.jpg";
+import alexosCommandCenterMobile from "@/assets/visuals/alexos-command-center-mobile.jpg";
 
 type TimeFormat = "12h" | "24h";
 const TIME_FORMAT_KEY = "alexos-dashboard-time-format";
@@ -88,9 +88,9 @@ export function DashboardHeader() {
       >
         {selectedTheme.backdrop === "mountains" ? (
           <picture className="alexos-dashboard-backdrop pointer-events-none absolute inset-0 block">
-            <source media="(max-width: 640px)" srcSet={alexosMountainMobile} />
+            <source media="(max-width: 640px)" srcSet={alexosCommandCenterMobile} />
             <img
-              src={alexosMountainWide}
+              src={alexosCommandCenterWide}
               alt=""
               aria-hidden="true"
               fetchPriority="high"
@@ -195,9 +195,9 @@ export function MobileDashboardHeader() {
       >
         {selectedTheme.backdrop === "mountains" ? (
           <picture className="pointer-events-none absolute inset-0 block">
-            <source media="(max-width: 640px)" srcSet={alexosMountainMobile} />
+            <source media="(max-width: 640px)" srcSet={alexosCommandCenterMobile} />
             <img
-              src={alexosMountainWide}
+              src={alexosCommandCenterWide}
               alt=""
               aria-hidden="true"
               decoding="async"

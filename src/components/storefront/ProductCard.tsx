@@ -16,7 +16,7 @@ interface Props {
   currency: string;
 }
 
-/** Retail product tile — image, price, stock signal and a one-tap add. */
+/** Retail product tile — exact stored image, price, stock signal and detail entry. */
 export function ProductCard({ product, currency }: Props) {
   const price = effectivePrice(product);
   const image = productImage(product);
@@ -75,7 +75,7 @@ export function ProductCard({ product, currency }: Props) {
         <p className="text-xs leading-relaxed text-muted-foreground">
           {soldOut
             ? "This listing is currently unavailable."
-            : "View current stock and choose any available size or colour."}
+            : "View current stock and choose any available size or colour."
         </p>
 
         <Button asChild className="mt-auto w-full rounded-xl">
