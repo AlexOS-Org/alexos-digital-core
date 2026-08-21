@@ -7,7 +7,6 @@ import {
   Radar,
   Swords,
   Megaphone,
-  LayoutTemplate,
   Sparkles,
   BarChart3,
   Settings,
@@ -120,18 +119,10 @@ export const DAILYGEAR_SECTIONS: DailyGearSection[] = [
     group: "Growth",
   },
   {
-    to: "/e-commerce/landing-pages",
-    label: "Landing Pages",
-    icon: LayoutTemplate,
-    description: "Generated product pages, copy blocks and SEO metadata.",
-    group: "Growth",
-    preview: true,
-  },
-  {
     to: "/e-commerce/funnels",
     label: "Funnels",
     icon: GitBranch,
-    description: "Configure product journeys, offers and attribution handoffs.",
+    description: "Build landing pages, offers and attribution handoffs into one customer journey.",
     group: "Growth",
   },
   {

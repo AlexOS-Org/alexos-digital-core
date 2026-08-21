@@ -12,6 +12,7 @@ import type {
 } from "@/lib/storefront/funnel.server";
 import { rememberFunnelAttribution } from "@/lib/storefront/funnel-session";
 import { cartStore } from "@/lib/storefront/cart";
+import { parseFunnelLandingContent } from "@/lib/storefront/funnel-copy";
 
 interface FunnelSearch {
   utm_source?: string;
@@ -121,6 +122,12 @@ function FunnelPage() {
   }, [load, search, slug]);
 
   const product = funnel?.product ?? null;
+  const landingCopy = product
+    ? parseFunnelLandingContent(
+        funnel?.steps.find((step) => step.stepType === "landing")?.body,
+        product.name,
+      )
+    : null;
   const productVariants = useMemo(
     () =>
       funnel?.variants.filter(
@@ -192,20 +199,41 @@ function FunnelPage() {
               DailyGear offer
             </Badge>
             <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-primary">
-              {funnel.name}
+              {landingCopy?.eyebrow ?? funnel.name}
             </p>
             <h1 className="mt-3 max-w-3xl text-4xl font-black tracking-tight sm:text-6xl">
-              {product.name}
+              {landingCopy?.headline ?? product.name}
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-white/75 sm:text-lg">
-              {product.shortDescription ??
+              {landingCopy?.subheadline ??
+                product.shortDescription ??
                 product.description ??
                 "A focused DailyGear offer with clear product information and a fast path to checkout."}
             </p>
             <div className="mt-7 flex flex-wrap gap-2 text-xs text-white/75">
-              <TrustMini icon={<ShieldCheck className="h-4 w-4" />} text="Secure guest checkout" />
-              <TrustMini icon={<Truck className="h-4 w-4" />} text="Kenya delivery" />
-              <TrustMini icon={<Zap className="h-4 w-4" />} text="Stock checked at order" />
+              {(
+                landingCopy?.proof ?? [
+                  "Secure guest checkout",
+                  "Kenya delivery",
+                  "Stock checked at order",
+                ]
+              )
+                .slice(0, 3)
+                .map((point, index) => (
+                  <TrustMini
+                    key={`${point}-${index}`}
+                    icon={
+                      index === 0 ? (
+                        <ShieldCheck className="h-4 w-4" />
+                      ) : index === 1 ? (
+                        <Truck className="h-4 w-4" />
+                      ) : (
+                        <Zap className="h-4 w-4" />
+                      )
+                    }
+                    text={point}
+                  />
+                ))}
             </div>
           </div>
           <div className="rounded-[2rem] border border-white/15 bg-white/[0.08] p-3 shadow-2xl backdrop-blur-md">
@@ -231,26 +259,38 @@ function FunnelPage() {
       <section className="mx-auto grid max-w-6xl gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[1fr_22rem] lg:py-14">
         <div>
           <div className="grid gap-4 sm:grid-cols-3">
-            {["Canonical product", "Clear offer", "Existing checkout"].map((item) => (
-              <div key={item} className="rounded-2xl border bg-card p-4 shadow-sm">
-                <Check className="h-4 w-4 text-primary" />
-                <p className="mt-2 text-sm font-semibold">{item}</p>
-              </div>
-            ))}
+            {(landingCopy?.proof ?? ["Canonical product", "Clear offer", "Existing checkout"])
+              .slice(0, 3)
+              .map((item) => (
+                <div key={item} className="rounded-2xl border bg-card p-4 shadow-sm">
+                  <Check className="h-4 w-4 text-primary" />
+                  <p className="mt-2 text-sm font-semibold">{item}</p>
+                </div>
+              ))}
           </div>
           <div className="mt-8 rounded-3xl border bg-card p-5 shadow-sm sm:p-7">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
-              What you should know
+              Why it fits your day
             </p>
             <h2 className="mt-2 text-2xl font-black tracking-tight">
-              {product.name}, presented clearly.
+              {landingCopy?.headline ?? `${product.name}, presented clearly.`}
             </h2>
-            <p className="mt-3 whitespace-pre-line text-sm leading-7 text-muted-foreground">
-              {product.description ??
+            <p className="mt-3 text-sm leading-7 text-muted-foreground">
+              {landingCopy?.subheadline ??
+                product.description ??
                 product.shortDescription ??
                 "Product information will appear here once it is confirmed in the DailyGear catalogue."}
             </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {(landingCopy?.benefits ?? []).map((benefit) => (
+                <div key={benefit.title} className="rounded-2xl border bg-muted/25 p-4">
+                  <p className="font-semibold">{benefit.title}</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{benefit.body}</p>
+                </div>
+              ))}
+            </div>
           </div>
+
           {bumpProduct ? (
             <div className="mt-4 rounded-3xl border border-primary/20 bg-primary/5 p-5">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
@@ -321,12 +361,12 @@ function FunnelPage() {
             disabled={maxQuantity < 1}
             onClick={addToCheckout}
           >
-            {maxQuantity < 1 ? "Out of stock" : "Continue to checkout"}
+            {maxQuantity < 1 ? "Out of stock" : (landingCopy?.ctaLabel ?? "Continue to checkout")}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
           <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
-            Payment and delivery options are confirmed in DailyGear checkout. No payment is treated
-            as settled until confirmed.
+            {landingCopy?.deliveryNote ??
+              "Payment and delivery options are confirmed in DailyGear checkout. No payment is treated as settled until confirmed."}
           </p>
         </aside>
       </section>

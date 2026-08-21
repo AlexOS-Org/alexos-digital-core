@@ -19,6 +19,12 @@ import {
   useSaveFunnelStep,
 } from "@/lib/dailygear/api";
 import type { Funnel, FunnelStep } from "@/lib/dailygear/types";
+import {
+  defaultFunnelLandingContent,
+  parseFunnelLandingContent,
+  serializeFunnelLandingContent,
+  type FunnelLandingContent,
+} from "@/lib/storefront/funnel-copy";
 import { formatMoney, useStorefront } from "@/lib/storefront/api";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/funnels")({
@@ -72,6 +78,8 @@ const EMPTY_OFFERS: OfferConfig = {
   downsellProductId: "",
 };
 
+const EMPTY_LANDING = defaultFunnelLandingContent("Your DailyGear essential");
+
 function slugify(value: string) {
   return value
     .trim()
@@ -94,6 +102,7 @@ function FunnelsPage() {
   );
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [landing, setLanding] = useState<FunnelLandingContent>(EMPTY_LANDING);
   const [offers, setOffers] = useState<OfferConfig>(EMPTY_OFFERS);
   const stepsQuery = useFunnelSteps(selectedId ?? undefined);
   const saveFunnel = useSaveFunnel();
@@ -131,11 +140,18 @@ function FunnelsPage() {
       downsell: Boolean(stepFor(steps, "downsell")),
       downsellProductId: stepFor(steps, "downsell")?.product_id ?? "",
     });
-  }, [selectedId, stepsQuery.data]);
+    setLanding(
+      parseFunnelLandingContent(
+        stepFor(steps, "landing")?.body,
+        selectedProduct?.name ?? "Your DailyGear essential",
+      ),
+    );
+  }, [selectedId, stepsQuery.data, selectedProduct?.name]);
 
   function startNew() {
     setSelectedId(null);
     setForm(EMPTY_FORM);
+    setLanding(EMPTY_LANDING);
     setOffers(EMPTY_OFFERS);
   }
 
@@ -186,8 +202,8 @@ function FunnelsPage() {
       const nextSteps = [
         {
           step_type: "landing",
-          title: "Product landing page",
-          body: "Canonical product details, imagery and availability.",
+          title: landing.headline,
+          body: serializeFunnelLandingContent(landing),
           product_id: null,
         },
         {
@@ -472,6 +488,122 @@ function FunnelsPage() {
                 </select>
               </div>
             </div>
+
+            <section className="space-y-4 rounded-2xl border bg-muted/25 p-4">
+              <div>
+                <h3 className="text-sm font-semibold">Landing page content</h3>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  This is the landing step of the funnel. Keep the promise clear, use only verified
+                  product details and let the same checkout handle the order.
+                </p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="landing-eyebrow">Eyebrow</Label>
+                  <Input
+                    id="landing-eyebrow"
+                    value={landing.eyebrow}
+                    onChange={(event) =>
+                      setLanding((previous) => ({ ...previous, eyebrow: event.target.value }))
+                    }
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="landing-cta">Primary CTA</Label>
+                  <Input
+                    id="landing-cta"
+                    value={landing.ctaLabel}
+                    onChange={(event) =>
+                      setLanding((previous) => ({ ...previous, ctaLabel: event.target.value }))
+                    }
+                  />
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label htmlFor="landing-headline">Headline</Label>
+                  <Input
+                    id="landing-headline"
+                    value={landing.headline}
+                    onChange={(event) =>
+                      setLanding((previous) => ({ ...previous, headline: event.target.value }))
+                    }
+                  />
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label htmlFor="landing-subheadline">Subheadline</Label>
+                  <Textarea
+                    id="landing-subheadline"
+                    value={landing.subheadline}
+                    onChange={(event) =>
+                      setLanding((previous) => ({ ...previous, subheadline: event.target.value }))
+                    }
+                  />
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label htmlFor="landing-delivery">Delivery and payment note</Label>
+                  <Textarea
+                    id="landing-delivery"
+                    value={landing.deliveryNote}
+                    onChange={(event) =>
+                      setLanding((previous) => ({ ...previous, deliveryNote: event.target.value }))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {landing.benefits.map((benefit, index) => (
+                  <div
+                    key={`landing-benefit-${index}`}
+                    className="space-y-2 rounded-2xl border bg-card p-3"
+                  >
+                    <Label htmlFor={`landing-benefit-title-${index}`}>Benefit {index + 1}</Label>
+                    <Input
+                      id={`landing-benefit-title-${index}`}
+                      value={benefit.title}
+                      onChange={(event) =>
+                        setLanding((previous) => ({
+                          ...previous,
+                          benefits: previous.benefits.map((item, itemIndex) =>
+                            itemIndex === index ? { ...item, title: event.target.value } : item,
+                          ),
+                        }))
+                      }
+                    />
+                    <Textarea
+                      aria-label={`Benefit ${index + 1} explanation`}
+                      value={benefit.body}
+                      onChange={(event) =>
+                        setLanding((previous) => ({
+                          ...previous,
+                          benefits: previous.benefits.map((item, itemIndex) =>
+                            itemIndex === index ? { ...item, body: event.target.value } : item,
+                          ),
+                        }))
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-2">
+                <Label>Trust points</Label>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {landing.proof.map((point, index) => (
+                    <Input
+                      key={`landing-proof-${index}`}
+                      aria-label={`Trust point ${index + 1}`}
+                      value={point}
+                      onChange={(event) =>
+                        setLanding((previous) => ({
+                          ...previous,
+                          proof: previous.proof.map((item, itemIndex) =>
+                            itemIndex === index ? event.target.value : item,
+                          ),
+                        }))
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+            </section>
 
             <section className="space-y-3 rounded-2xl border bg-muted/25 p-4">
               <div className="flex items-center gap-2">
