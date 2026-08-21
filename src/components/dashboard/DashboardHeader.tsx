@@ -6,8 +6,8 @@ import { DashboardWeather } from "@/components/dashboard/DashboardWeather";
 import { DailyInspirationCards } from "@/components/dashboard/DailyInspirationCards";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { getVisualTheme } from "@/components/theme/visual-themes";
-import alexosCommandCenterWide from "@/assets/visuals/alexos-command-center-wide.jpg";
-import alexosCommandCenterMobile from "@/assets/visuals/alexos-command-center-mobile.jpg";
+import alexosCommandCenterWide from "@/assets/visuals/alexos-command-center-wide.webp";
+import alexosCommandCenterMobile from "@/assets/visuals/alexos-command-center-mobile.webp";
 
 type TimeFormat = "12h" | "24h";
 const TIME_FORMAT_KEY = "alexos-dashboard-time-format";

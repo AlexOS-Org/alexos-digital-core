@@ -63,20 +63,12 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="alexos-sidebar-sheen border-r border-sidebar-border">
       <SidebarHeader className="border-b border-sidebar-border/70 bg-sidebar/80">
         <Link
-          to={isDailyGearRoute ? "/e-commerce" : "/dashboard"}
+          to="/dashboard"
           onClick={closeSidebar}
           className="flex min-w-0 items-center gap-2 px-2 py-2 text-sidebar-foreground"
+          aria-label="Open AlexOS dashboard"
         >
-          {isDailyGearRoute ? (
-            <>
-              <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-red-500 text-xs font-black text-white shadow-lg shadow-red-500/20">
-                DG
-              </div>
-              {!collapsed && <DailyGearBrand compact tone="sidebar" />}
-            </>
-          ) : (
-            <AlexOSLogo compact showWordmark={!collapsed} />
-          )}
+          <AlexOSLogo compact showWordmark={!collapsed} />
         </Link>
       </SidebarHeader>
 
@@ -174,6 +166,21 @@ export function AppSidebar() {
         {/* ── DailyGear contextual workspace ─────────── */}
         {currentPath.startsWith("/e-commerce") ? (
           <SidebarGroup>
+            <div className="px-2 pb-2">
+              {collapsed ? (
+                <div
+                  className="grid h-9 w-9 place-items-center rounded-xl bg-red-500 text-xs font-black text-white shadow-lg shadow-red-500/20"
+                  aria-label="DailyGear workspace"
+                  title="DailyGear workspace"
+                >
+                  DG
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-sidebar-border/70 bg-sidebar-accent/40 px-3 py-2.5">
+                  <DailyGearBrand compact tone="sidebar" />
+                </div>
+              )}
+            </div>
             {!collapsed && (
               <SidebarGroupLabel className="text-sidebar-foreground/55">
                 DailyGear workspace

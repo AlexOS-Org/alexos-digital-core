@@ -5,7 +5,6 @@ import { SupabaseConfigBanner } from "@/components/SupabaseConfigBanner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
-import { DailyGearBrand } from "@/components/dailygear/DailyGearBrand";
 import { modules } from "@/lib/modules";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -41,27 +40,22 @@ function MobileWorkspaceHeader({
       <SidebarTrigger
         className={`tap-target rounded-xl ${isDailyGearRoute ? "text-white hover:bg-white/10 hover:text-white" : ""}`}
       />
-      {isDailyGearRoute ? (
-        <Link
-          to="/e-commerce"
-          className="relative z-10 flex min-w-0 flex-1 justify-center rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b11]"
-          aria-label="Open DailyGear overview"
-        >
-          <DailyGearBrand />
-        </Link>
-      ) : (
-        <div className="flex min-w-0 flex-1 items-center gap-2.5">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--alexos-purple)] to-[var(--alexos-blue)] text-white shadow-lg shadow-[var(--alexos-glow)]">
-            <Sparkles className="h-[18px] w-[18px]" />
-          </div>
-          <div className="min-w-0 leading-tight">
-            <p className="truncate text-sm font-bold tracking-tight">{title}</p>
-            <p className="truncate text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              {subtitle}
-            </p>
-          </div>
+      <div className="flex min-w-0 flex-1 items-center gap-2.5">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--alexos-purple)] to-[var(--alexos-blue)] text-white shadow-lg shadow-[var(--alexos-glow)]">
+          <Sparkles className="h-[18px] w-[18px]" />
         </div>
-      )}
+        <div className="min-w-0 leading-tight">
+          <p className="truncate text-sm font-bold tracking-tight">{title}</p>
+          <p className="truncate text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            {subtitle}
+          </p>
+        </div>
+        {isDailyGearRoute ? (
+          <span className="ml-1 truncate rounded-full border border-white/15 bg-white/10 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/75">
+            DailyGear
+          </span>
+        ) : null}
+      </div>
       <Link
         to="/notifications"
         className={`tap-target grid place-items-center rounded-xl transition-colors ${isDailyGearRoute ? "text-white/75 hover:bg-white/10 hover:text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
@@ -71,10 +65,10 @@ function MobileWorkspaceHeader({
       </Link>
       <Link
         to="/settings"
-        className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-[11px] font-bold shadow-md ${isDailyGearRoute ? "bg-red-500 text-white shadow-red-500/25" : "bg-gradient-to-br from-[var(--alexos-blue)] to-[var(--alexos-purple)] text-white"}`}
+        className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[var(--alexos-blue)] to-[var(--alexos-purple)] text-[11px] font-bold text-white shadow-md shadow-[var(--alexos-glow)]"
         aria-label="Open settings"
       >
-        {isDailyGearRoute ? "DG" : "AO"}
+        AO
       </Link>
     </header>
   );

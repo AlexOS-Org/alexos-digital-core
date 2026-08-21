@@ -17,8 +17,8 @@ import { StoreConfidenceStrip } from "@/components/storefront/StoreConfidenceStr
 import { StoreJourneyGuide } from "@/components/storefront/StoreJourneyGuide";
 import { StoreVisualValueGrid } from "@/components/storefront/StoreVisualValueGrid";
 import { useStoreCategories, useStoreProducts, useStorefront } from "@/lib/storefront/api";
-import dailyGearHeroPremiumWide from "@/assets/visuals/dailygear-hero-premium-wide.jpg";
-import dailyGearHeroPremiumMobile from "@/assets/visuals/dailygear-hero-premium-mobile.jpg";
+import dailyGearHeroPremiumWide from "@/assets/visuals/dailygear-hero-premium-wide.webp";
+import dailyGearHeroPremiumMobile from "@/assets/visuals/dailygear-hero-premium-mobile.webp";
 
 export const Route = createFileRoute("/shop/")({
   head: () => ({
@@ -171,7 +171,6 @@ function StoreHome() {
           </Link>
         ))}
       </section>
-
 
       {primaryCategories.length ? (
         <section className="mt-14 space-y-4">
