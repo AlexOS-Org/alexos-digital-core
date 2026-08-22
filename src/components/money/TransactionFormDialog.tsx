@@ -43,7 +43,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
   const [source, setSource] = useState<string>(INCOME_SOURCES[0]);
   const [description, setDescription] = useState("");
   const [reference, setReference] = useState("");
-  const [scope, setScope] = useState<"personal" | "business">("personal");
+  const [scope, setScope] = useState<"personal" | "business" | "shared">("personal");
   const [businessId, setBusinessId] = useState("");
   const [expenseType, setExpenseType] = useState("other");
 
@@ -77,7 +77,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       setSource(editing.source ?? INCOME_SOURCES[0]);
       setDescription(editing.description ?? "");
       setReference(editing.reference ?? "");
-      setScope(editing.business_id ? "business" : "personal");
+      setScope(editing.expense_type === "shared_living" || editing.category?.endsWith(" — Shared") ? "shared" : editing.business_id ? "business" : "personal");
       setBusinessId(editing.business_id ?? "");
       setExpenseType(editing.expense_type ?? "other");
     } else {
@@ -118,7 +118,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       description: description || null,
       reference: reference || null,
       business_id: mode === "expense" && scope === "business" ? businessId : null,
-      expense_type: mode === "expense" ? expenseType : null,
+      expense_type: mode === "expense" ? (scope === "shared" ? "shared_living" : expenseType) : null,
     });
     onOpenChange(false);
   };
@@ -208,13 +208,14 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
                 <Label>Expense scope</Label>
                 <Select
                   value={scope}
-                  onValueChange={(value) => setScope(value as "personal" | "business")}
+                  onValueChange={(value) => setScope(value as "personal" | "business" | "shared")}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="personal">Personal expense</SelectItem>
+                    <SelectItem value="shared">Shared household/business expense</SelectItem>
                     <SelectItem value="business">Business expense</SelectItem>
                   </SelectContent>
                 </Select>
