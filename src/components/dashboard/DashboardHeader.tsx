@@ -84,7 +84,8 @@ export function DashboardHeader() {
               alt=""
               aria-hidden="true"
               fetchPriority="high"
-              className="h-full w-full object-cover object-center opacity-85"
+              sizes="(max-width: 640px) 100vw, (max-width: 1280px) 90vw, 1200px"
+              className="block h-full w-full max-w-none object-cover object-center opacity-85"
             />
           </picture>
         ) : null}
@@ -202,7 +203,8 @@ export function MobileDashboardHeader() {
               alt=""
               aria-hidden="true"
               decoding="async"
-              className="h-full w-full object-cover object-center opacity-65"
+              sizes="100vw"
+              className="block h-full w-full max-w-none object-cover object-center opacity-65"
             />
           </picture>
         ) : null}
