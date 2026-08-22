@@ -152,16 +152,20 @@ export function useStoreProducts(userId: string | undefined, filters: ProductFil
   });
 }
 
-export function useStoreProduct(id: string | undefined) {
+export function useStoreProduct(idOrSlug: string | undefined) {
   return useQuery({
-    queryKey: [...STORE_KEY, "product", id],
-    enabled: Boolean(id),
+    queryKey: [...STORE_KEY, "product", idOrSlug],
+    enabled: Boolean(idOrSlug),
     staleTime: 60_000,
     queryFn: async () => {
+      const isUuid =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+          idOrSlug!,
+        );
       const { data, error } = await supabase
         .from("dg_products")
         .select(PRODUCT_COLUMNS)
-        .eq("id", id!)
+        .eq(isUuid ? "id" : "slug", idOrSlug!)
         .eq("status", "active")
         .is("deleted_at", null)
         .maybeSingle();
