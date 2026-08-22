@@ -6,6 +6,8 @@ import { useAccountBalances, useAccounts, useExpected, useTransactions } from "@
 import { useBills } from "@/lib/money/bills";
 import { ACCOUNT_ICONS } from "@/lib/money/constants";
 import { formatDate, formatMoney, formatTime } from "@/lib/money/format";
+import { getAccountThemeId } from "@/lib/money/account-theme";
+import { getAccountLogo } from "@/lib/money/account-branding";
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -215,21 +217,46 @@ function MoneyDashboard() {
             const bal = balances.find((b) => b.account_id === a.id);
             const Icon = ACCOUNT_ICONS[a.icon] ?? Wallet;
             const state = getAccountState(a);
+            const themeId = getAccountThemeId(a.name);
+            const logo = getAccountLogo(a.name);
             return (
               <Card
                 key={a.id}
                 data-status={state.low ? "low" : "healthy"}
-                className="money-account-card overflow-hidden rounded-[1.5rem] shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+                data-account-theme={themeId}
+                data-account-warning={state.low ? "true" : "false"}
+                className={cn(
+                  "money-account-card overflow-hidden rounded-[1.5rem] shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md",
+                  state.low && "money-account-card--warning",
+                )}
               >
-                <CardContent className="p-5">
+                <CardContent className="money-account-card__content p-5">
+                  <div className="money-account-card__glow" aria-hidden="true" />
+                  {logo && (
+                    <img
+                      src={logo}
+                      alt=""
+                      aria-hidden="true"
+                      className="money-account-card__watermark"
+                    />
+                  )}
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       <div
                         className={cn(
-                          "money-account-icon grid h-11 w-11 shrink-0 place-items-center rounded-2xl",
+                          "money-account-card__logo money-account-icon grid h-11 w-11 shrink-0 place-items-center rounded-2xl border",
+                          state.low && "money-account-card__logo--warning",
                         )}
                       >
-                        <Icon className="h-5 w-5" />
+                        {logo ? (
+                          <img
+                            src={logo}
+                            alt={`${a.name} logo`}
+                            className="h-8 w-8 object-contain"
+                          />
+                        ) : (
+                          <Icon className="h-5 w-5" />
+                        )}
                       </div>
                       <div className="min-w-0">
                         <div className="truncate text-sm font-semibold">{a.name}</div>
@@ -243,18 +270,19 @@ function MoneyDashboard() {
                   <div
                     className={cn(
                       "mt-5 rounded-2xl px-4 py-3",
-                      "money-account-balance rounded-2xl px-4 py-3",
+                      "money-account-card__balance money-account-balance rounded-2xl px-4 py-3",
                     )}
                   >
                     <div
                       className={cn(
-                        "money-account-balance-value text-2xl font-semibold tracking-tight",
+                        "money-account-card__amount money-account-balance-value text-2xl font-semibold tracking-tight",
+                        state.low && "money-account-card__amount--warning",
                       )}
                     >
                       {formatMoney(state.balance, a.currency)}
                     </div>
                     {state.low ? (
-                      <div className="money-account-status mt-1 text-[11px]">
+                      <div className="money-account-card__warning money-account-status mt-1 text-[11px]">
                         Below {formatMoney(state.threshold!, a.currency)} comfort level
                       </div>
                     ) : (

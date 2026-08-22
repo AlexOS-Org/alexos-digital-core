@@ -6,18 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { useAccountBalances, useAccounts, useArchiveAccount, type Account } from "@/lib/money/api";
 import { ACCOUNT_ICONS } from "@/lib/money/constants";
 import { formatMoney } from "@/lib/money/format";
+import { getAccountThemeId } from "@/lib/money/account-theme";
 import { AccountFormDialog } from "@/components/money/AccountFormDialog";
 import { Archive, ArchiveRestore, Pencil, Plus, Wallet, CircleAlert } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { CryptoHoldingsPanel } from "@/components/money/CryptoHoldingsPanel";
-import mpesaLogo from "@/assets/branding/accounts/mpesa.png";
-import kcbLogo from "@/assets/branding/accounts/kcb.png";
-import imBankLogo from "@/assets/branding/accounts/im-bank.jpg";
-import sbmLogo from "@/assets/branding/accounts/sbm.png";
-import binanceLogo from "@/assets/branding/accounts/binance.png";
-import cashLogo from "@/assets/branding/accounts/cash.png";
+import { getAccountLogo } from "@/lib/money/account-branding";
 
 const LOW_BALANCE_THRESHOLDS = {
   mobileMoney: 500,
@@ -32,30 +28,18 @@ export const Route = createFileRoute("/_authenticated/money-center/accounts")({
 });
 
 function accountTheme(name: string) {
-  const value = name.toLowerCase();
-  if (/m[- ]?pesa/.test(value))
-    return { id: "mpesa", threshold: LOW_BALANCE_THRESHOLDS.mobileMoney };
-  if (/kcb/.test(value)) return { id: "kcb", threshold: LOW_BALANCE_THRESHOLDS.bank };
-  if (/i&m|im bank/.test(value)) return { id: "im", threshold: LOW_BALANCE_THRESHOLDS.bank };
-  if (/sbm/.test(value)) return { id: "sbm", threshold: LOW_BALANCE_THRESHOLDS.bank };
-  if (/salary/.test(value)) return { id: "salary", threshold: LOW_BALANCE_THRESHOLDS.salary };
-  if (/binance|crypto/.test(value))
-    return { id: "binance", threshold: LOW_BALANCE_THRESHOLDS.crypto };
-  if (/cash/.test(value)) return { id: "cash", threshold: LOW_BALANCE_THRESHOLDS.cash };
-  if (/airtel/.test(value)) return { id: "airtel", threshold: LOW_BALANCE_THRESHOLDS.mobileMoney };
-  return { id: "default", threshold: LOW_BALANCE_THRESHOLDS.bank };
-}
-
-function accountLogo(name: string) {
-  const value = name.toLowerCase();
-  if (/m[- ]?pesa/.test(value)) return mpesaLogo;
-  if (/kcb/.test(value)) return kcbLogo;
-  if (/i&m|im bank/.test(value)) return imBankLogo;
-  if (/sbm/.test(value)) return sbmLogo;
-  if (/binance|crypto/.test(value)) return binanceLogo;
-  if (/cash/.test(value)) return cashLogo;
-  if (/salary/.test(value)) return cashLogo;
-  return null;
+  const id = getAccountThemeId(name);
+  const threshold =
+    id === "mpesa" || id === "airtel" || id === "cash"
+      ? LOW_BALANCE_THRESHOLDS.mobileMoney
+      : id === "salary"
+        ? LOW_BALANCE_THRESHOLDS.salary
+        : id === "binance"
+          ? LOW_BALANCE_THRESHOLDS.crypto
+          : id === "default"
+            ? null
+            : LOW_BALANCE_THRESHOLDS.bank;
+  return { id, threshold };
 }
 
 function AccountsPage() {
@@ -121,9 +105,9 @@ function AccountsPage() {
             >
               <CardContent className="money-account-card__content space-y-4 p-5 pt-6 sm:p-6 sm:pt-7">
                 <div className="money-account-card__glow" aria-hidden="true" />
-                {accountLogo(a.name) && (
+                {getAccountLogo(a.name) && (
                   <img
-                    src={accountLogo(a.name)!}
+                    src={getAccountLogo(a.name)!}
                     alt=""
                     aria-hidden="true"
                     className="money-account-card__watermark"
@@ -137,9 +121,9 @@ function AccountsPage() {
                         isLowBalance && "money-account-card__logo--warning",
                       )}
                     >
-                      {accountLogo(a.name) ? (
+                      {getAccountLogo(a.name) ? (
                         <img
-                          src={accountLogo(a.name)!}
+                          src={getAccountLogo(a.name)!}
                           alt={`${a.name} logo`}
                           className="h-12 w-12 rounded-xl object-contain drop-shadow-md"
                           loading="lazy"

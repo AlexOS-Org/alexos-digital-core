@@ -1245,17 +1245,20 @@
   .money-account-card__action:hover {
     background: color-mix(in oklch, var(--account-accent) 15%, var(--card));
   }
+  .money-account-card .money-account-icon {
+    color: var(--account-accent);
+    background: color-mix(in oklch, var(--account-accent) 12%, var(--card));
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--account-accent) 24%, transparent);
+  }
+  .money-account-card .money-account-balance {
+    background: color-mix(in oklch, var(--account-accent) 9%, var(--card));
+  }
   .money-account-card--warning {
-    --account-accent: var(--destructive);
-    border-color: color-mix(in oklch, var(--destructive) 72%, var(--border));
-    background: linear-gradient(
-      135deg,
-      color-mix(in oklch, var(--destructive) 18%, var(--card)),
-      var(--card)
-    );
+    /* Preserve the institution surface; warnings belong to the figures and copy. */
+    border-color: color-mix(in oklch, var(--account-accent) 42%, var(--border));
   }
   .money-account-card__logo--warning {
-    border-color: color-mix(in oklch, var(--destructive) 60%, var(--border));
+    border-color: color-mix(in oklch, var(--account-accent) 42%, var(--border));
   }
   .money-account-card__amount--warning,
   .money-account-card__warning,
