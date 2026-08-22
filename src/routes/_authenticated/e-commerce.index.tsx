@@ -9,6 +9,7 @@ import {
   ShoppingCart,
   TrendingUp,
   Users,
+  WalletCards,
 } from "lucide-react";
 import { KpiCard } from "@/components/dailygear/KpiCard";
 import { IntelligencePanel } from "@/components/dailygear/IntelligencePanel";
@@ -40,6 +41,7 @@ import dailyGearMountainWide from "@/assets/visuals/dailygear-mountain-golden-wi
 import dailyGearMountainMobile from "@/assets/visuals/dailygear-mountain-mobile.webp";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { getVisualTheme } from "@/components/theme/visual-themes";
+import { debtRemaining, useDebts } from "@/lib/debts/api";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/")({
   head: () => ({
@@ -184,6 +186,58 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
           <HeroMetric label="Inventory value" value={money(kpis.inventoryValue)} />
         </div>
       )}
+    </section>
+  );
+}
+
+function FacebookAdsBalanceCard() {
+  const { data: debts = [], isLoading } = useDebts();
+  const balances = debts.filter((debt) => {
+    if (debt.financial_scope !== "business") return false;
+    const searchable =
+      `${debt.name} ${debt.category ?? ""} ${debt.business_name ?? ""}`.toLowerCase();
+    return (
+      searchable.includes("facebook") ||
+      searchable.includes("meta ads") ||
+      searchable.includes("advertising")
+    );
+  });
+  const remaining = balances.reduce((sum, debt) => sum + debtRemaining(debt), 0);
+  const isSettled = balances.length > 0 && remaining <= 0;
+  return (
+    <section
+      data-status={isSettled ? "paid" : balances.length === 0 ? "unconfigured" : "outstanding"}
+      className="dailygear-liability-card relative overflow-hidden rounded-[1.35rem] border p-4 sm:p-5"
+    >
+      <span className="dailygear-liability-strip absolute inset-x-0 top-0 h-1" />
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            Facebook advertising balance
+          </p>
+          <h2 className="mt-1 text-lg font-bold tracking-tight">
+            {isLoading ? "Loading…" : money(remaining)}
+          </h2>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {balances.length === 0
+              ? "Add a business debt named Facebook Ads to track this separately from operating cash."
+              : isSettled
+                ? "Settled. This tracker does not post to operating accounts."
+                : "Tracked liability only; record payments in Debt Management to reduce the balance."}
+          </p>
+        </div>
+        <div className="dailygear-liability-icon grid h-10 w-10 shrink-0 place-items-center rounded-xl">
+          <WalletCards className="h-5 w-5" />
+        </div>
+      </div>
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <span className="dailygear-liability-status rounded-full px-2.5 py-1 text-[11px] font-semibold">
+          {isSettled ? "Paid" : balances.length === 0 ? "Not configured" : "Outstanding"}
+        </span>
+        <Button asChild variant="outline" size="sm" className="rounded-xl">
+          <Link to="/debt-management">Manage balance</Link>
+        </Button>
+      </div>
     </section>
   );
 }
@@ -449,6 +503,7 @@ function MobileDashboard(p: Panels) {
   return (
     <div className="space-y-4 pb-40">
       <Hero kpis={p.kpis} compactMode />
+      <FacebookAdsBalanceCard />
       <MobileStoreOverview kpis={p.kpis} trend={p.trend} loading={p.loading} />
       <MobileFocus {...p} />
 
@@ -479,6 +534,7 @@ function StandardDashboard(p: Panels & { tablet?: boolean }) {
   return (
     <div className="space-y-5">
       <Hero kpis={p.kpis} />
+      <FacebookAdsBalanceCard />
       <CatalogueReadinessCard products={p.products} loading={p.loading} />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -530,6 +586,7 @@ function WideDashboard(p: Panels & { dense?: boolean }) {
   return (
     <div className="space-y-6">
       <Hero kpis={p.kpis} />
+      <FacebookAdsBalanceCard />
       <CatalogueReadinessCard products={p.products} loading={p.loading} />
 
       <div className={p.dense ? "grid gap-5 grid-cols-8" : "grid gap-5 grid-cols-4"}>

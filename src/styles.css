@@ -839,6 +839,50 @@
     --dashboard-kpi-accent: var(--destructive);
   }
 
+  .dailygear-liability-card {
+    --dailygear-liability-accent: var(--alexos-amber);
+    border-color: color-mix(
+      in oklch,
+      var(--color-border) 70%,
+      var(--dailygear-liability-accent) 30%
+    );
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--color-card) 94%, var(--dailygear-liability-accent) 6%),
+      var(--color-card)
+    );
+    box-shadow: 0 16px 36px -28px
+      color-mix(in oklch, var(--dailygear-liability-accent) 55%, transparent);
+  }
+
+  .dailygear-liability-card[data-status="paid"] {
+    --dailygear-liability-accent: var(--alexos-green);
+  }
+
+  .dailygear-liability-card[data-status="outstanding"] {
+    --dailygear-liability-accent: var(--alexos-amber);
+  }
+
+  .dailygear-liability-card[data-status="unconfigured"] {
+    --dailygear-liability-accent: var(--alexos-blue);
+  }
+
+  .dailygear-liability-strip {
+    background: linear-gradient(90deg, var(--dailygear-liability-accent), var(--primary));
+  }
+
+  .dailygear-liability-icon {
+    color: var(--dailygear-liability-accent);
+    background: color-mix(in oklch, var(--dailygear-liability-accent) 12%, transparent);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in oklch, var(--dailygear-liability-accent) 22%, transparent);
+  }
+
+  .dailygear-liability-status {
+    color: color-mix(in oklch, var(--dailygear-liability-accent) 72%, var(--foreground));
+    background: color-mix(in oklch, var(--dailygear-liability-accent) 12%, transparent);
+  }
+
   .money-kpi-card {
     --money-accent: var(--primary);
     border-color: color-mix(in oklch, var(--color-border) 72%, var(--money-accent) 28%);
