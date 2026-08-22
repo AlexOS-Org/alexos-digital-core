@@ -39,3 +39,7 @@ The browser opened https://dailygear.co.ke/e-commerce/funnels in the same authen
 The authorized Gmail connector is now bound to dailygear.co.ke@gmail.com. A read-only inbox search found no usable Meta Pixel ID, Resend API key or email-provider configuration. It did surface a Meta for Business message about Pixel enhancements, but not the account’s numeric Pixel identifier. The mailbox also reports approximately 1% storage remaining, which may affect email reliability.
 
 The authorized Meta Ads Manager connector exposes the Daily Gear 2025 ad account (`act_753805746633479`) with currency KES and historical ad/campaign data, but the account-object response does not expose a Pixel ID. The canonical Cloudflare Worker secret metadata currently contains only `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY` and `SUPABASE_URL`; `META_ACCESS_TOKEN`, `RESEND_API_KEY` and `DAILYGEAR_EMAIL_FROM` are absent. No secret values were read or written.
+
+## Pixel activation verification
+
+The production `dg_storefronts` row for `dailygear` now contains a numeric `meta_pixel_id`, confirming that the admin setting was saved. The public storefront https://dailygear.co.ke/shop loaded successfully in the browser with the DailyGear navigation, cart and themed storefront content. The browser smoke test confirms the live page is serving the current deployment; client-side Pixel event execution still requires browser-console or Meta Test Events verification.
