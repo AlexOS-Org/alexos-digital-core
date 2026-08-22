@@ -55,6 +55,8 @@ export default {
   async scheduled() {
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { processAbandonedCartFollowUps } =
+        await import("@/server/notifications/cart-recovery-email");
       const { error } = await supabaseAdmin.rpc(
         "money_post_due_salary_schedules" as never,
         {
@@ -62,7 +64,11 @@ export default {
         } as never,
       );
       if (error) throw error;
-      console.info("Scheduled salary posting completed", { runDate: nairobiDateKey() });
+      const recovery = await processAbandonedCartFollowUps(25);
+      console.info("Scheduled salary and cart recovery jobs completed", {
+        runDate: nairobiDateKey(),
+        recovery,
+      });
     } catch (error) {
       console.error("Scheduled salary posting failed", error);
       throw error;

@@ -22,6 +22,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cartStore, useCart } from "@/lib/storefront/cart";
 import { formatMoney, useStorefront } from "@/lib/storefront/api";
 import { loadCartSession, saveCartSession } from "@/lib/storefront/cart-session.functions";
+import { readCheckoutProfile, saveCheckoutProfile } from "@/lib/storefront/checkout-profile";
 import { placeGuestOrder } from "@/lib/storefront/checkout.functions";
 import { loadPublicFunnel } from "@/lib/storefront/funnel.functions";
 import type { PublicFunnel } from "@/lib/storefront/funnel.server";
@@ -151,6 +152,8 @@ function CheckoutPage() {
     search.recovery ? "loading" : "idle",
   );
   const [reminderOptIn, setReminderOptIn] = useState(false);
+  const [rememberDetails, setRememberDetails] = useState(false);
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const [townInputMode, setTownInputMode] = useState<"list" | "manual">("list");
   const [form, setForm] = useState({
     firstName: "",
@@ -168,6 +171,25 @@ function CheckoutPage() {
   });
   const selectedCounty = KENYA_COUNTIES.find((county) => county.name === form.county);
   const availableTowns = townsForCounty(selectedCounty?.slug);
+
+  useEffect(() => {
+    if (search.recovery) return;
+    const profile = readCheckoutProfile();
+    if (!profile) return;
+    setForm((previous) => ({
+      ...previous,
+      firstName: profile.firstName || previous.firstName,
+      lastName: profile.lastName || previous.lastName,
+      email: profile.email || previous.email,
+      phone: profile.phone || previous.phone,
+      address: profile.address || previous.address,
+      county: profile.county || previous.county,
+      town: profile.town || previous.town,
+      city: profile.town || previous.city,
+      deliveryDetails: profile.deliveryDetails || previous.deliveryDetails,
+    }));
+    setProfileLoaded(true);
+  }, [search.recovery]);
 
   useEffect(() => {
     const funnelSlug = search.funnel;
@@ -338,6 +360,18 @@ function CheckoutPage() {
         .map((line) => line.sku ?? line.productId)
         .filter(Boolean)
         .join(",");
+      if (rememberDetails) {
+        saveCheckoutProfile({
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          phone: form.phone,
+          address: form.address,
+          county: form.county,
+          town: form.town,
+          deliveryDetails: form.deliveryDetails,
+        });
+      }
       cart.clear();
       navigate({
         to: "/shop/thank-you",
@@ -457,6 +491,12 @@ function CheckoutPage() {
                   onBlur={() => void captureCartSession()}
                 />
               </div>
+              {profileLoaded ? (
+                <p className="text-xs text-emerald-700 sm:col-span-2">
+                  Your saved delivery details were filled on this device. Review them before
+                  ordering.
+                </p>
+              ) : null}
               <div className="flex items-start gap-3 rounded-xl bg-muted/60 p-3 sm:col-span-2">
                 <Checkbox
                   id="checkout-reminder"
@@ -472,6 +512,20 @@ function CheckoutPage() {
                   className="cursor-pointer text-xs leading-relaxed"
                 >
                   Email me one reminder if I leave checkout before ordering. This is optional.
+                </Label>
+              </div>
+              <div className="flex items-start gap-3 rounded-xl bg-muted/60 p-3 sm:col-span-2">
+                <Checkbox
+                  id="checkout-remember-details"
+                  checked={rememberDetails}
+                  onCheckedChange={(checked) => setRememberDetails(checked === true)}
+                />
+                <Label
+                  htmlFor="checkout-remember-details"
+                  className="cursor-pointer text-xs leading-relaxed"
+                >
+                  Remember my delivery details on this device for faster checkout next time. You can
+                  clear them in your browser settings.
                 </Label>
               </div>
               {recoveryState === "loaded" ? (
