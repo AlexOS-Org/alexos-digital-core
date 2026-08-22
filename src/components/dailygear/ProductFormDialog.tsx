@@ -23,6 +23,7 @@ import {
   useBrands,
   useCategories,
   useSaveProduct,
+  useSaveVariant,
   useSuppliers,
   useVariants,
 } from "@/lib/dailygear/api";
@@ -50,6 +51,107 @@ const EMPTY = {
   supplier_id: "",
   images: "",
 };
+
+function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> }) {
+  const saveVariant = useSaveVariant();
+  const [drafts, setDrafts] = useState<Record<string, { color: string; sex: string; imageUrl: string; sku: string; stock: string; available: boolean }>>({});
+
+  function draftFor(variant: Record<string, unknown>) {
+    const id = String(variant.id ?? "");
+    const options = (variant.options && typeof variant.options === "object" ? variant.options : {}) as Record<string, unknown>;
+    return drafts[id] ?? {
+      color: String(variant.color ?? options.color ?? ""),
+      sex: String(options.sex ?? "Unisex"),
+      imageUrl: String(variant.image_url ?? ""),
+      sku: String(variant.sku ?? ""),
+      stock: String(variant.stock_quantity ?? "0"),
+      available: variant.availability_confirmed === true,
+    };
+  }
+
+  function update(id: string, patch: Partial<ReturnType<typeof draftFor>>) {
+    setDrafts((current) => ({ ...current, [id]: { ...draftFor(variants.find((variant) => String(variant.id) === id) ?? {}), ...patch } }));
+  }
+
+  async function saveOne(variant: Record<string, unknown>) {
+    const id = String(variant.id ?? "");
+    const draft = draftFor(variant);
+    let existingOptions: Record<string, unknown> = {};
+    if (variant.options && typeof variant.options === "object") existingOptions = variant.options as Record<string, unknown>;
+    await saveVariant.mutateAsync({
+      id,
+      color: draft.color.trim() || null,
+      image_url: draft.imageUrl.trim() || null,
+      sku: draft.sku.trim() || null,
+      stock_quantity: Number(draft.stock) || 0,
+      availability_confirmed: draft.available,
+      options: { ...existingOptions, color: draft.color.trim() || undefined, sex: draft.sex || "Unisex" },
+    });
+  }
+
+  if (!variants.length) return null;
+  return (
+    <div className="rounded-2xl border border-border/70 bg-muted/20 p-4 sm:col-span-2">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold">Colour and audience variants</p>
+          <p className="mt-1 text-xs text-muted-foreground">Edit each variant’s colour, sex/gender audience, external image, SKU, quantity, and customer visibility. Unavailable variants remain visible here but are hidden from the storefront.</p>
+        </div>
+        <span className="rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary">{variants.length} variant{variants.length === 1 ? "" : "s"}</span>
+      </div>
+      <div className="mt-4 space-y-3">
+        {variants.map((variant) => {
+          const id = String(variant.id ?? "");
+          const draft = draftFor(variant);
+          return (
+            <div key={id} className="grid gap-3 rounded-xl border border-border/60 bg-background/70 p-3 md:grid-cols-6 md:items-end">
+              <div className="md:col-span-2">
+                <Label className="text-xs">Variant name</Label>
+                <p className="mt-1 text-sm font-medium">{String(variant.name ?? "Unnamed variant")}</p>
+              </div>
+              <div>
+                <Label className="text-xs">Colour</Label>
+                <Input value={draft.color} onChange={(event) => update(id, { color: event.target.value })} placeholder="Blue" />
+              </div>
+              <div>
+                <Label className="text-xs">Sex / audience</Label>
+                <Select value={draft.sex} onValueChange={(value) => update(id, { sex: value })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Unisex">Unisex</SelectItem>
+                    <SelectItem value="Boy">Boy</SelectItem>
+                    <SelectItem value="Girl">Girl</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs">Stock</Label>
+                <Input type="number" min="0" value={draft.stock} onChange={(event) => update(id, { stock: event.target.value })} />
+              </div>
+              <div className="md:col-span-2">
+                <Label className="text-xs">External variant image URL</Label>
+                <Input value={draft.imageUrl} onChange={(event) => update(id, { imageUrl: event.target.value })} placeholder="https://…" />
+              </div>
+              <div>
+                <Label className="text-xs">SKU</Label>
+                <Input value={draft.sku} onChange={(event) => update(id, { sku: event.target.value })} placeholder="DG-YJ-BLU" />
+              </div>
+              <div className="flex items-center gap-2 md:col-span-2">
+                <Button type="button" size="sm" variant={draft.available ? "default" : "outline"} onClick={() => update(id, { available: !draft.available })}>
+                  {draft.available ? "Available to customers" : "Hidden / out of stock"}
+                </Button>
+                <Button type="button" size="sm" variant="secondary" disabled={saveVariant.isPending} onClick={() => saveOne(variant)}>
+                  Save variant
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export function ProductFormDialog({
   open,
@@ -355,6 +457,8 @@ export function ProductFormDialog({
               placeholder="A concise, search-friendly product promise."
             />
           </div>
+
+          <VariantEditor variants={variants as unknown as Array<Record<string, unknown>>} />
 
           <div className="space-y-2 sm:col-span-2">
             <Label>External product image URLs</Label>
