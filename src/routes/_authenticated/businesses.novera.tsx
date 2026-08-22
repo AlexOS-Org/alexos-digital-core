@@ -1,21 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Gem } from "lucide-react";
-import { AlexOSEmptyState } from "@/components/alexos-empty-state";
+import { NoveraWorkspacePage } from "@/components/novera/NoveraWorkspacePage";
 
 export const Route = createFileRoute("/_authenticated/businesses/novera")({
-  component: NoveraPage,
+  component: NoveraWorkspacePage,
   head: () => ({
-    meta: [{ title: "Novera · AlexOS" }],
+    meta: [
+      { title: "Novera · AlexOS" },
+      {
+        name: "description",
+        content: "Novera business operations and growth workspace.",
+      },
+    ],
   }),
 });
-
-function NoveraPage() {
-  return (
-    <AlexOSEmptyState
-      title="Novera"
-      description="Business operations and growth for Novera. Connect live workspace data to bring this view online."
-      icon={Gem}
-      statusLabel="Workspace preparing"
-    />
-  );
-}
