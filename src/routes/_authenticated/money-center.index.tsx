@@ -108,44 +108,6 @@ function MoneyDashboard() {
     },
   ];
 
-  const toneStyles: Record<string, { strip: string; icon: string; soft: string }> = {
-    emerald: {
-      strip: "from-emerald-500 to-teal-400",
-      icon: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-      soft: "bg-emerald-50/60 dark:bg-emerald-950/15",
-    },
-    green: {
-      strip: "from-green-500 to-emerald-400",
-      icon: "bg-green-500/10 text-green-600 dark:text-green-400",
-      soft: "bg-green-50/60 dark:bg-green-950/15",
-    },
-    amber: {
-      strip: "from-amber-400 to-orange-300",
-      icon: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-      soft: "bg-amber-50/60 dark:bg-amber-950/15",
-    },
-    teal: {
-      strip: "from-teal-500 to-cyan-400",
-      icon: "bg-teal-500/10 text-teal-600 dark:text-teal-400",
-      soft: "bg-teal-50/60 dark:bg-teal-950/15",
-    },
-    rose: {
-      strip: "from-rose-400 to-red-300",
-      icon: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
-      soft: "bg-rose-50/60 dark:bg-rose-950/15",
-    },
-    violet: {
-      strip: "from-violet-500 to-indigo-400",
-      icon: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
-      soft: "bg-violet-50/60 dark:bg-violet-950/15",
-    },
-    orange: {
-      strip: "from-orange-400 to-amber-300",
-      icon: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
-      soft: "bg-orange-50/60 dark:bg-orange-950/15",
-    },
-  };
-
   return (
     <div className="space-y-7">
       <Card className="relative overflow-hidden rounded-[2rem] border-0 bg-gradient-to-br from-emerald-700 via-teal-700 to-slate-800 text-white shadow-[0_24px_70px_-35px_rgba(16,185,129,0.65)]">
@@ -206,16 +168,13 @@ function MoneyDashboard() {
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {kpis.map((k) => {
           const Icon = k.icon;
-          const styles = toneStyles[k.tone];
           return (
             <Card
               key={k.label}
-              className={cn(
-                "group relative overflow-hidden rounded-[1.5rem] border-border/60 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md",
-                styles.soft,
-              )}
+              data-tone={k.tone}
+              className="money-kpi-card group relative overflow-hidden rounded-[1.5rem] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
             >
-              <div className={cn("absolute inset-x-0 top-0 h-1 bg-gradient-to-r", styles.strip)} />
+              <div className="money-kpi-strip absolute inset-x-0 top-0 h-1" />
               <CardContent className="p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -226,7 +185,7 @@ function MoneyDashboard() {
                       {formatMoney(k.value)}
                     </p>
                   </div>
-                  <div className={cn("grid h-11 w-11 place-items-center rounded-2xl", styles.icon)}>
+                  <div className="money-kpi-icon grid h-11 w-11 place-items-center rounded-2xl">
                     <Icon className="h-5 w-5" />
                   </div>
                 </div>
@@ -259,20 +218,15 @@ function MoneyDashboard() {
             return (
               <Card
                 key={a.id}
-                className={cn(
-                  "rounded-[1.5rem] overflow-hidden border-border/60 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md",
-                  state.low && "border-red-200/80 dark:border-red-900/40",
-                )}
+                data-status={state.low ? "low" : "healthy"}
+                className="money-account-card overflow-hidden rounded-[1.5rem] shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
               >
                 <CardContent className="p-5">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       <div
                         className={cn(
-                          "grid h-11 w-11 shrink-0 place-items-center rounded-2xl",
-                          state.low
-                            ? "bg-red-50 text-red-500 dark:bg-red-950/25"
-                            : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+                          "money-account-icon grid h-11 w-11 shrink-0 place-items-center rounded-2xl",
                         )}
                       >
                         <Icon className="h-5 w-5" />
@@ -289,28 +243,27 @@ function MoneyDashboard() {
                   <div
                     className={cn(
                       "mt-5 rounded-2xl px-4 py-3",
-                      state.low ? "bg-red-50/60 dark:bg-red-950/15" : "bg-background/70",
+                      "money-account-balance rounded-2xl px-4 py-3",
                     )}
                   >
                     <div
                       className={cn(
-                        "text-2xl font-semibold tracking-tight",
-                        state.low && "text-red-600/90 dark:text-red-400/90",
+                        "money-account-balance-value text-2xl font-semibold tracking-tight",
                       )}
                     >
                       {formatMoney(state.balance, a.currency)}
                     </div>
                     {state.low ? (
-                      <div className="mt-1 text-[11px] text-red-600/70 dark:text-red-400/70">
+                      <div className="money-account-status mt-1 text-[11px]">
                         Below {formatMoney(state.threshold!, a.currency)} comfort level
                       </div>
                     ) : (
                       <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
-                        <span className="flex items-center gap-1 text-emerald-600/80">
+                        <span className="money-inflow flex items-center gap-1">
                           <ArrowDownRight className="h-3 w-3" />
                           {formatMoney(bal?.money_in ?? 0, a.currency)}
                         </span>
-                        <span className="flex items-center gap-1 text-rose-500/75">
+                        <span className="money-outflow flex items-center gap-1">
                           <ArrowUpRight className="h-3 w-3" />
                           {formatMoney(bal?.money_out ?? 0, a.currency)}
                         </span>

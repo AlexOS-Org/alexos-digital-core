@@ -671,6 +671,21 @@
   --sidebar-primary: var(--alexos-custom-accent);
   --sidebar-ring: var(--alexos-custom-accent);
 }
+:root[data-visual-theme="custom"] {
+  --alexos-green: var(--alexos-custom-accent);
+  --primary: var(--alexos-custom-accent);
+  --ring: var(--alexos-custom-accent);
+  --sidebar-primary: var(--alexos-custom-accent);
+  --sidebar-ring: var(--alexos-custom-accent);
+  --card: color-mix(in oklch, var(--alexos-custom-surface) 92%, white 8%);
+  --popover: color-mix(in oklch, var(--alexos-custom-surface) 92%, white 8%);
+  --sidebar: var(--alexos-custom-sidebar);
+  --sidebar-accent: color-mix(
+    in oklch,
+    var(--alexos-custom-sidebar) 82%,
+    var(--alexos-custom-accent) 18%
+  );
+}
 .dark[data-visual-theme="custom"] {
   --alexos-green: var(--alexos-custom-accent);
   --primary: var(--alexos-custom-accent);
@@ -678,6 +693,15 @@
   --ring: var(--alexos-custom-accent);
   --sidebar-primary: var(--alexos-custom-accent);
   --sidebar-ring: var(--alexos-custom-accent);
+  --background: color-mix(in oklch, var(--alexos-custom-surface) 78%, black 22%);
+  --card: color-mix(in oklch, var(--alexos-custom-surface) 90%, white 10%);
+  --popover: color-mix(in oklch, var(--alexos-custom-surface) 90%, white 10%);
+  --sidebar: var(--alexos-custom-sidebar);
+  --sidebar-accent: color-mix(
+    in oklch,
+    var(--alexos-custom-sidebar) 78%,
+    var(--alexos-custom-accent) 22%
+  );
 }
 :root[data-visual-theme="paper"] .alexos-dashboard-backdrop,
 :root[data-visual-theme="aurora"] .alexos-dashboard-backdrop,
@@ -813,6 +837,77 @@
 
   .dashboard-kpi-card[data-tone="danger"] {
     --dashboard-kpi-accent: var(--destructive);
+  }
+
+  .money-kpi-card {
+    --money-accent: var(--primary);
+    border-color: color-mix(in oklch, var(--color-border) 72%, var(--money-accent) 28%);
+    background: linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--color-card) 92%, var(--money-accent) 8%),
+      var(--color-card)
+    );
+  }
+
+  .money-kpi-card[data-tone="emerald"],
+  .money-kpi-card[data-tone="green"],
+  .money-account-card[data-status="healthy"] {
+    --money-accent: var(--alexos-green);
+  }
+
+  .money-kpi-card[data-tone="amber"],
+  .money-kpi-card[data-tone="orange"] {
+    --money-accent: var(--alexos-amber);
+  }
+
+  .money-kpi-card[data-tone="teal"] {
+    --money-accent: var(--alexos-blue);
+  }
+
+  .money-kpi-card[data-tone="violet"] {
+    --money-accent: var(--alexos-purple);
+  }
+
+  .money-kpi-card[data-tone="rose"],
+  .money-account-card[data-status="low"] {
+    --money-accent: var(--destructive);
+  }
+
+  .money-kpi-strip {
+    background: linear-gradient(
+      90deg,
+      var(--money-accent),
+      color-mix(in oklch, var(--money-accent) 45%, var(--primary))
+    );
+  }
+
+  .money-kpi-icon,
+  .money-account-icon {
+    color: var(--money-accent);
+    background: color-mix(in oklch, var(--money-accent) 12%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--money-accent) 22%, transparent);
+  }
+
+  .money-account-card {
+    --money-accent: var(--primary);
+    border-color: color-mix(in oklch, var(--color-border) 72%, var(--money-accent) 28%);
+    background: color-mix(in oklch, var(--color-card) 96%, var(--money-accent) 4%);
+  }
+
+  .money-account-balance {
+    background: color-mix(in oklch, var(--money-accent) 7%, var(--color-background));
+  }
+
+  .money-account-balance-value,
+  .money-account-status {
+    color: color-mix(in oklch, var(--money-accent) 85%, var(--color-foreground));
+  }
+
+  .money-inflow {
+    color: var(--alexos-green);
+  }
+  .money-outflow {
+    color: var(--destructive);
   }
 
   .dashboard-kpi-label {
