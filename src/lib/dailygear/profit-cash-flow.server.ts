@@ -117,6 +117,10 @@ export async function calculateDailyGearProfitCashFlowForUser(
     .from("dg_order_expenses")
     .select("id,order_id,cost_type,amount,created_at,description,money_transaction_id")
     .eq("user_id", context.userId);
+  const paymentQuery = context.supabase
+    .from("dg_order_payments")
+    .select("id,order_id,amount,paid_at,transaction_id")
+    .eq("user_id", context.userId);
   const businessExpenseQuery = context.supabase
     .from("transactions")
     .select("id,occurred_at,amount,description,source,financial_scope,status,deleted_at")
@@ -129,15 +133,28 @@ export async function calculateDailyGearProfitCashFlowForUser(
     { data: orderRows, error: orderError },
     { data: itemRows, error: itemError },
     { data: expenseRows, error: expenseError },
+    { data: paymentRows, error: paymentError },
     { data: businessExpenseRows, error: businessExpenseError },
-  ] = await Promise.all([orderQuery, itemQuery, expenseQuery, businessExpenseQuery]);
+  ] = await Promise.all([orderQuery, itemQuery, expenseQuery, paymentQuery, businessExpenseQuery]);
   if (orderError) throw orderError;
   if (itemError) throw itemError;
   if (expenseError) throw expenseError;
+  if (paymentError) throw paymentError;
   if (businessExpenseError) throw businessExpenseError;
   const currencyByOrder = new Map(
     (orderRows ?? []).map((order) => [order.id, order.currency ?? "KES"]),
   );
+  const orderPayments: DailyGearCashFlowEvent[] = (paymentRows ?? [])
+    .filter((payment) => currencyByOrder.has(payment.order_id))
+    .map((payment) => ({
+      id: payment.id,
+      date: payment.paid_at,
+      type: "customer_receipt" as const,
+      amount: Number(payment.amount ?? 0),
+      currency: currencyByOrder.get(payment.order_id) ?? "KES",
+      orderId: payment.order_id,
+      note: payment.transaction_id,
+    }));
   const orderExpenses: DailyGearOrderExpense[] = (expenseRows ?? []).map((expense) => ({
     id: expense.id,
     orderId: expense.order_id,
@@ -186,7 +203,7 @@ export async function calculateDailyGearProfitCashFlowForUser(
     orderExpenses,
     businessExpenses,
     adInsights,
-    cashEvents: request.cashEvents,
+    cashEvents: [...orderPayments, ...(request.cashEvents ?? [])],
     from: request.from,
     until: request.until,
   });

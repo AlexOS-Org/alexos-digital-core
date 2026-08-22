@@ -1427,6 +1427,48 @@ export type Database = {
           },
         ]
       }
+      dg_order_payments: {
+        Row: {
+          account_id: string
+          amount: number
+          created_at: string
+          id: string
+          money_transaction_id: string | null
+          notes: string | null
+          order_id: string
+          paid_at: string
+          payment_method: string
+          transaction_id: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          created_at?: string
+          id?: string
+          money_transaction_id?: string | null
+          notes?: string | null
+          order_id: string
+          paid_at?: string
+          payment_method?: string
+          transaction_id: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          created_at?: string
+          id?: string
+          money_transaction_id?: string | null
+          notes?: string | null
+          order_id?: string
+          paid_at?: string
+          payment_method?: string
+          transaction_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       dg_order_items: {
         Row: {
           created_at: string

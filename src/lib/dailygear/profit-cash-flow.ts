@@ -204,6 +204,11 @@ export function calculateDailyGearProfitAndCashFlow(
     inPeriod(event.date, input.from, input.until),
   );
   const hasExplicitReceipts = explicitEvents.some((event) => event.type === "customer_receipt");
+  const explicitReceiptOrderIds = new Set(
+    explicitEvents
+      .filter((event) => event.type === "customer_receipt" && event.orderId)
+      .map((event) => event.orderId as string),
+  );
   const hasExplicitDeliveryPayments = explicitEvents.some(
     (event) => event.type === "delivery_payment",
   );
@@ -235,23 +240,23 @@ export function calculateDailyGearProfitAndCashFlow(
     addToMap(businessExpensesByDate, dateOnly(expense.date), num(expense.amount));
   }
 
-  if (hasExplicitReceipts) {
-    for (const event of explicitEvents) {
-      const day = dateOnly(event.date);
-      if (event.type === "customer_receipt") addToMap(cashReceivedByDate, day, num(event.amount));
-      if (event.type === "customer_refund") addToMap(cashOutflowsByDate, day, num(event.amount));
-      if (event.type === "payment_fee") addToMap(paymentFeesByDate, day, num(event.amount));
-      if (event.type === "delivery_payment") addToMap(deliveryCostsByDate, day, num(event.amount));
-      if (event.type === "supplier_payment")
-        addToMap(supplierPaymentsByDate, day, num(event.amount));
-      if (event.type === "other_operating_outflow")
-        addToMap(otherOutflowsByDate, day, num(event.amount));
-    }
-  } else {
-    for (const order of recognizedOrders) {
-      if (CASH_RECEIPT_STATUSES.includes(order.payment_status)) {
-        addToMap(cashReceivedByDate, dateOnly(order.placed_at), num(order.total));
-      }
+  for (const event of explicitEvents) {
+    const day = dateOnly(event.date);
+    if (event.type === "customer_receipt") addToMap(cashReceivedByDate, day, num(event.amount));
+    if (event.type === "customer_refund") addToMap(cashOutflowsByDate, day, num(event.amount));
+    if (event.type === "payment_fee") addToMap(paymentFeesByDate, day, num(event.amount));
+    if (event.type === "delivery_payment") addToMap(deliveryCostsByDate, day, num(event.amount));
+    if (event.type === "supplier_payment") addToMap(supplierPaymentsByDate, day, num(event.amount));
+    if (event.type === "other_operating_outflow")
+      addToMap(otherOutflowsByDate, day, num(event.amount));
+  }
+
+  for (const order of recognizedOrders) {
+    if (
+      CASH_RECEIPT_STATUSES.includes(order.payment_status) &&
+      !explicitReceiptOrderIds.has(order.id)
+    ) {
+      addToMap(cashReceivedByDate, dateOnly(order.placed_at), num(order.total));
     }
   }
 
