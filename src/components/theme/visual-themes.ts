@@ -8,6 +8,11 @@ export type VisualThemeId =
   | "plum"
   | "copper"
   | "sage"
+  | "opsmind"
+  | "droneview"
+  | "pulseai"
+  | "pricepilot"
+  | "finai"
   | "custom";
 export type VisualBackdrop = "mountains" | "gradient" | "none";
 export type VisualTheme = {
@@ -95,6 +100,46 @@ export const VISUAL_THEMES: Record<VisualThemeId, VisualTheme> = {
     backdrop: "gradient",
     accent: "green",
     preview: { start: "#102d2a", end: "#326154", accent: "#8fe3ba" },
+  },
+  opsmind: {
+    id: "opsmind",
+    label: "OpsMind Command",
+    description: "Black glass command centre with electric violet signals",
+    backdrop: "gradient",
+    accent: "purple",
+    preview: { start: "#07070b", end: "#22113e", accent: "#c855ff" },
+  },
+  droneview: {
+    id: "droneview",
+    label: "DroneView Ember",
+    description: "Smoky operations view with ember-orange alerts and telemetry",
+    backdrop: "mountains",
+    accent: "amber",
+    preview: { start: "#171312", end: "#5b2b1b", accent: "#ff8a4c" },
+  },
+  pulseai: {
+    id: "pulseai",
+    label: "PulseAI Warm Light",
+    description: "Cream analytics workspace with soft peach chart emphasis",
+    backdrop: "none",
+    accent: "amber",
+    preview: { start: "#fffaf2", end: "#f8ded1", accent: "#e9792c" },
+  },
+  pricepilot: {
+    id: "pricepilot",
+    label: "PricePilot Lavender",
+    description: "Airy watchlist workspace with lavender performance cues",
+    backdrop: "none",
+    accent: "purple",
+    preview: { start: "#f4f2f8", end: "#ffffff", accent: "#8b5cf6" },
+  },
+  finai: {
+    id: "finai",
+    label: "FinAI Neon Ledger",
+    description: "Deep navy finance wall with cyan and pink movement signals",
+    backdrop: "gradient",
+    accent: "blue",
+    preview: { start: "#071126", end: "#142461", accent: "#44d9ff" },
   },
   custom: {
     id: "custom",

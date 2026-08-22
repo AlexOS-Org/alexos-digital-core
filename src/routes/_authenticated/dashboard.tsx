@@ -68,7 +68,7 @@ function DashboardSectionRail() {
   return (
     <nav
       aria-label="Dashboard sections"
-      className="sticky top-3 z-20 flex flex-col gap-2 rounded-2xl border border-border/60 bg-card/85 p-2 shadow-sm backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
+      className="dashboard-surface sticky top-3 z-20 flex flex-col gap-2 rounded-2xl p-2 sm:flex-row sm:items-center sm:justify-between"
     >
       <span className="shrink-0 px-2 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
         Jump to a working view
@@ -90,7 +90,7 @@ function DashboardSectionRail() {
 
 function MobileDashboard() {
   return (
-    <div className="space-y-5 pb-10">
+    <div className="dashboard-canvas space-y-5 pb-10">
       <MobileDashboardHeader />
       <MobileAurenBriefing />
       <SafePanel>
@@ -117,7 +117,7 @@ function Dashboard() {
   if (isMobile) return <MobileDashboard />;
 
   return (
-    <div className="relative space-y-6 pb-10 animate-in fade-in duration-500">
+    <div className="dashboard-canvas relative space-y-6 pb-10 animate-in fade-in duration-500">
       <SafePanel>
         <DashboardHeader />
       </SafePanel>
@@ -126,7 +126,7 @@ function Dashboard() {
       </SafePanel>
       <DashboardSectionRail />
       <SafePanel>
-        <section className="relative overflow-hidden rounded-[1.75rem] border border-primary/15 bg-gradient-to-r from-primary/[0.08] via-background to-[var(--alexos-purple)]/[0.08] p-5 shadow-[0_20px_50px_-35px_var(--alexos-glow)] sm:p-6">
+        <section className="dashboard-feature-surface relative overflow-hidden rounded-[1.75rem] p-5 sm:p-6">
           <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
           <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.75fr)] lg:items-center">
             <div>
@@ -150,7 +150,7 @@ function Dashboard() {
           <SafePanel>
             <section
               id="dashboard-money"
-              className="alexos-surface scroll-mt-24 rounded-[1.75rem] border border-border/60 p-5 shadow-[0_18px_50px_-35px_var(--alexos-glow)] sm:p-6"
+              className="dashboard-surface scroll-mt-24 rounded-[1.75rem] p-5 sm:p-6"
             >
               <div className="mb-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
@@ -166,7 +166,7 @@ function Dashboard() {
               <MoneySnapshot />
               <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,1.45fr)_minmax(260px,0.55fr)]">
                 <MoneyFlowChart />
-                <div className="rounded-[1.75rem] border border-border/60 bg-card/70 p-5 shadow-sm sm:p-6">
+                <div className="dashboard-surface-muted rounded-[1.75rem] p-5 sm:p-6">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
                     Reading the numbers
                   </p>
@@ -217,7 +217,7 @@ function Dashboard() {
             </section>
             <section id="dashboard-auren" className="scroll-mt-24">
               <SafePanel>
-                <section className="relative h-full overflow-hidden rounded-[1.75rem] border border-[var(--alexos-purple)]/20 bg-gradient-to-br from-[var(--alexos-purple)]/[0.12] via-card to-primary/[0.05] p-4 shadow-[0_18px_50px_-35px_var(--alexos-glow)] sm:p-5 lg:p-6">
+                <section className="dashboard-feature-surface relative h-full overflow-hidden rounded-[1.75rem] p-4 sm:p-5 lg:p-6">
                   <div className="pointer-events-none absolute -right-14 -top-16 h-40 w-40 rounded-full bg-[var(--alexos-purple)]/15 blur-3xl" />
                   <div className="relative mb-3 flex items-center justify-between gap-3 sm:mb-4">
                     <div>
@@ -253,7 +253,7 @@ function Dashboard() {
           <SafePanel>
             <section
               id="dashboard-business"
-              className="relative scroll-mt-24 overflow-hidden rounded-[1.75rem] border border-primary/15 bg-gradient-to-br from-card via-card to-primary/[0.08] p-5 shadow-[0_18px_50px_-35px_var(--alexos-glow)] sm:p-6"
+              className="dashboard-surface relative scroll-mt-24 overflow-hidden rounded-[1.75rem] p-5 sm:p-6"
             >
               <div className="alexos-visual-strip absolute inset-x-0 top-0 h-1 opacity-80" />
               <div className="relative mb-4">
@@ -280,7 +280,7 @@ function Dashboard() {
       <SafePanel>
         <section
           id="dashboard-modules"
-          className="scroll-mt-24 space-y-5 rounded-[1.75rem] border border-border/60 bg-card/45 p-5 shadow-sm sm:p-6"
+          className="dashboard-surface scroll-mt-24 space-y-5 rounded-[1.75rem] p-5 sm:p-6"
         >
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -310,7 +310,7 @@ function Dashboard() {
                     .filter((m) => m.group === group)
                     .map((m) => (
                       <Link key={m.url} to={m.url} className="group">
-                        <Card className="h-full rounded-3xl border-border/60 bg-card/80 transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5">
+                        <Card className="dashboard-surface h-full rounded-3xl transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5">
                           <CardContent className="space-y-4 p-5">
                             <div className="flex items-center justify-between">
                               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-[var(--alexos-purple)]/15 text-primary ring-1 ring-primary/10">

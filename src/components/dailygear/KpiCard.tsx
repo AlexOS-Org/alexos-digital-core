@@ -44,7 +44,10 @@ export function KpiCard({
   const styles = toneStyles[tone];
 
   return (
-    <Card className="group relative overflow-hidden rounded-[1.35rem] border-border/60 bg-card/85 shadow-[0_14px_38px_-28px_var(--alexos-glow)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-[0_20px_42px_-25px_var(--alexos-glow)]">
+    <Card
+      data-tone={tone === "positive" ? "green" : tone === "warning" ? "danger" : "blue"}
+      className="dashboard-kpi-card group relative overflow-hidden rounded-[1.35rem] backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-[0_20px_42px_-25px_var(--alexos-glow)]"
+    >
       <div
         className={cn(
           "absolute inset-x-0 top-0 h-px bg-gradient-to-r opacity-90 transition-opacity group-hover:opacity-100",

@@ -39,7 +39,7 @@ export default function MoneyFlowChart() {
   }, [transactions]);
 
   return (
-    <Card className="rounded-[1.75rem] border-border/60 bg-card/80 shadow-sm">
+    <Card className="dashboard-surface rounded-[1.75rem]">
       <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-2">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
@@ -61,7 +61,10 @@ export default function MoneyFlowChart() {
             aria-label="Loading cash flow chart"
           />
         ) : (
-          <div className="h-56 w-full" aria-label="Six-month income and expense chart">
+          <div
+            className="dashboard-chart-grid h-56 w-full rounded-2xl px-2 pt-2"
+            aria-label="Six-month income and expense chart"
+          >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={chartData}

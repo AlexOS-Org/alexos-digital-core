@@ -100,6 +100,13 @@
   --sidebar-accent-foreground: oklch(0.98 0 0);
   --sidebar-border: oklch(0.3 0.04 270);
   --sidebar-ring: var(--alexos-green);
+  --dashboard-panel-bg: color-mix(in oklch, var(--card) 80%, transparent);
+  --dashboard-panel-strong: color-mix(in oklch, var(--card) 92%, transparent);
+  --dashboard-panel-muted: color-mix(in oklch, var(--card) 56%, transparent);
+  --dashboard-glass-border: color-mix(in oklch, var(--border) 74%, transparent);
+  --dashboard-glass-shadow: 0 24px 64px -38px
+    color-mix(in oklch, var(--foreground) 38%, transparent);
+  --dashboard-grid-line: color-mix(in oklch, var(--foreground) 8%, transparent);
 }
 
 .dark {
@@ -146,6 +153,12 @@
   --sidebar-accent-foreground: oklch(0.98 0.005 155);
   --sidebar-border: oklch(1 0 0 / 15%);
   --sidebar-ring: var(--alexos-green);
+  --dashboard-panel-bg: color-mix(in oklch, var(--card) 68%, transparent);
+  --dashboard-panel-strong: color-mix(in oklch, var(--card) 84%, transparent);
+  --dashboard-panel-muted: color-mix(in oklch, var(--card) 40%, transparent);
+  --dashboard-glass-border: color-mix(in oklch, var(--border) 84%, transparent);
+  --dashboard-glass-shadow: 0 24px 64px -34px color-mix(in oklch, black 72%, transparent);
+  --dashboard-grid-line: color-mix(in oklch, white 10%, transparent);
 }
 
 @layer base {
@@ -206,6 +219,8 @@
 
   .alexos-sidebar-sheen {
     background: color-mix(in oklch, var(--color-sidebar) 62%, transparent);
+    backdrop-filter: blur(24px) saturate(150%);
+    box-shadow: 18px 0 60px -46px color-mix(in oklch, var(--sidebar-primary) 75%, transparent);
   }
 
   .alexos-sidebar-backdrop {
@@ -387,6 +402,69 @@
     background: color-mix(in oklch, var(--color-card) 72%, transparent);
     backdrop-filter: blur(18px) saturate(150%);
     border: 1px solid color-mix(in oklch, var(--color-border) 70%, transparent);
+  }
+
+  .dashboard-canvas {
+    position: relative;
+    isolation: isolate;
+    background:
+      radial-gradient(
+        circle at 8% 0%,
+        color-mix(in oklch, var(--primary) 9%, transparent),
+        transparent 28rem
+      ),
+      radial-gradient(
+        circle at 96% 18%,
+        color-mix(in oklch, var(--alexos-purple) 8%, transparent),
+        transparent 26rem
+      ),
+      var(--color-background);
+  }
+
+  .dashboard-surface {
+    background: var(--dashboard-panel-bg);
+    border: 1px solid var(--dashboard-glass-border);
+    box-shadow: var(--dashboard-glass-shadow);
+    backdrop-filter: blur(20px) saturate(145%);
+  }
+
+  .dashboard-surface-muted {
+    background: var(--dashboard-panel-muted);
+    border: 1px solid color-mix(in oklch, var(--dashboard-glass-border) 75%, transparent);
+    backdrop-filter: blur(16px) saturate(135%);
+  }
+
+  .dashboard-hero-frame {
+    border: 1px solid color-mix(in oklch, white 16%, var(--dashboard-glass-border));
+    box-shadow:
+      0 24px 70px -38px color-mix(in oklch, var(--primary) 46%, transparent),
+      inset 0 1px 0 color-mix(in oklch, white 18%, transparent);
+    backdrop-filter: blur(22px) saturate(145%);
+  }
+
+  .dashboard-feature-surface {
+    background:
+      radial-gradient(
+        circle at 85% 0%,
+        color-mix(in oklch, var(--primary) 14%, transparent),
+        transparent 22rem
+      ),
+      linear-gradient(
+        135deg,
+        color-mix(in oklch, var(--dashboard-panel-strong) 86%, var(--primary) 14%),
+        var(--dashboard-panel-bg)
+      );
+    border: 1px solid color-mix(in oklch, var(--dashboard-glass-border) 88%, var(--primary) 12%);
+    box-shadow: var(--dashboard-glass-shadow);
+    backdrop-filter: blur(24px) saturate(150%);
+  }
+
+  .dashboard-chart-grid {
+    background-image:
+      linear-gradient(var(--dashboard-grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--dashboard-grid-line) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: linear-gradient(180deg, black, transparent 92%);
   }
 
   .soft-shadow {
@@ -652,6 +730,222 @@
   --sidebar: oklch(0.13 0.04 155);
   --sidebar-accent: oklch(0.25 0.06 155);
 }
+/* ── Premium reference-inspired dashboard presets ───────────── */
+:root[data-visual-theme="opsmind"] {
+  --alexos-blue: oklch(0.66 0.2 255);
+  --alexos-purple: oklch(0.7 0.25 305);
+  --alexos-green: oklch(0.68 0.18 160);
+  --alexos-amber: oklch(0.78 0.18 84);
+  --primary: var(--alexos-purple);
+  --ring: var(--alexos-purple);
+  --sidebar-primary: var(--alexos-purple);
+  --sidebar-ring: var(--alexos-purple);
+  --background: oklch(0.08 0.02 285);
+  --foreground: oklch(0.97 0.01 285);
+  --card: oklch(0.13 0.028 285);
+  --card-foreground: oklch(0.97 0.01 285);
+  --popover: oklch(0.15 0.03 285);
+  --popover-foreground: oklch(0.97 0.01 285);
+  --secondary: oklch(0.18 0.035 285);
+  --muted: oklch(0.18 0.03 285);
+  --muted-foreground: oklch(0.76 0.025 285);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --sidebar: oklch(0.055 0.018 285);
+  --sidebar-accent: oklch(0.15 0.035 285);
+  --sidebar-border: oklch(1 0 0 / 14%);
+  --dashboard-grid-line: color-mix(in oklch, var(--alexos-purple) 15%, transparent);
+}
+
+.dark[data-visual-theme="opsmind"] {
+  --background: oklch(0.055 0.015 285);
+  --card: oklch(0.105 0.025 285);
+  --popover: oklch(0.12 0.028 285);
+  --sidebar: oklch(0.035 0.012 285);
+  --sidebar-accent: oklch(0.13 0.03 285);
+}
+
+:root[data-visual-theme="droneview"] {
+  --alexos-blue: oklch(0.62 0.15 245);
+  --alexos-purple: oklch(0.64 0.18 28);
+  --alexos-green: oklch(0.64 0.16 145);
+  --alexos-amber: oklch(0.74 0.2 55);
+  --primary: var(--alexos-amber);
+  --ring: var(--alexos-amber);
+  --sidebar-primary: var(--alexos-amber);
+  --sidebar-ring: var(--alexos-amber);
+  --background: oklch(0.14 0.025 35);
+  --foreground: oklch(0.96 0.012 55);
+  --card: oklch(0.2 0.035 35);
+  --card-foreground: oklch(0.96 0.012 55);
+  --popover: oklch(0.22 0.04 35);
+  --popover-foreground: oklch(0.96 0.012 55);
+  --secondary: oklch(0.25 0.04 35);
+  --muted: oklch(0.24 0.035 35);
+  --muted-foreground: oklch(0.78 0.025 50);
+  --border: oklch(1 0 0 / 14%);
+  --input: oklch(1 0 0 / 16%);
+  --sidebar: oklch(0.09 0.022 35);
+  --sidebar-accent: oklch(0.2 0.045 35);
+  --sidebar-border: oklch(1 0 0 / 15%);
+  --dashboard-grid-line: color-mix(in oklch, var(--alexos-amber) 15%, transparent);
+}
+
+.dark[data-visual-theme="droneview"] {
+  --background: oklch(0.09 0.02 35);
+  --card: oklch(0.15 0.03 35);
+  --popover: oklch(0.17 0.035 35);
+  --sidebar: oklch(0.06 0.018 35);
+  --sidebar-accent: oklch(0.16 0.035 35);
+}
+
+:root[data-visual-theme="pulseai"] {
+  --alexos-blue: oklch(0.6 0.16 235);
+  --alexos-purple: oklch(0.68 0.17 320);
+  --alexos-green: oklch(0.62 0.16 160);
+  --alexos-amber: oklch(0.68 0.17 55);
+  --primary: var(--alexos-amber);
+  --ring: var(--alexos-amber);
+  --sidebar-primary: var(--alexos-amber);
+  --sidebar-ring: var(--alexos-amber);
+  --background: oklch(0.975 0.018 75);
+  --foreground: oklch(0.22 0.025 55);
+  --card: oklch(0.995 0.004 75);
+  --card-foreground: oklch(0.22 0.025 55);
+  --popover: oklch(0.995 0.004 75);
+  --popover-foreground: oklch(0.22 0.025 55);
+  --secondary: oklch(0.95 0.02 75);
+  --muted: oklch(0.94 0.018 75);
+  --muted-foreground: oklch(0.48 0.025 55);
+  --border: oklch(0.87 0.035 55);
+  --input: oklch(0.9 0.03 55);
+  --sidebar: oklch(0.25 0.04 55);
+  --sidebar-accent: oklch(0.32 0.055 55);
+  --sidebar-border: oklch(0.4 0.04 55);
+  --dashboard-grid-line: color-mix(in oklch, var(--alexos-amber) 12%, transparent);
+}
+
+.dark[data-visual-theme="pulseai"] {
+  --background: oklch(0.15 0.025 55);
+  --foreground: oklch(0.97 0.01 75);
+  --card: oklch(0.21 0.035 55);
+  --popover: oklch(0.23 0.04 55);
+  --sidebar: oklch(0.1 0.02 55);
+  --sidebar-accent: oklch(0.2 0.04 55);
+}
+
+:root[data-visual-theme="pricepilot"] {
+  --alexos-blue: oklch(0.6 0.15 235);
+  --alexos-purple: oklch(0.62 0.21 300);
+  --alexos-green: oklch(0.62 0.15 160);
+  --alexos-amber: oklch(0.72 0.14 75);
+  --primary: var(--alexos-purple);
+  --ring: var(--alexos-purple);
+  --sidebar-primary: var(--alexos-purple);
+  --sidebar-ring: var(--alexos-purple);
+  --background: oklch(0.95 0.008 285);
+  --foreground: oklch(0.2 0.025 285);
+  --card: oklch(1 0.002 285);
+  --card-foreground: oklch(0.2 0.025 285);
+  --popover: oklch(1 0.002 285);
+  --popover-foreground: oklch(0.2 0.025 285);
+  --secondary: oklch(0.96 0.01 285);
+  --muted: oklch(0.93 0.012 285);
+  --muted-foreground: oklch(0.48 0.02 285);
+  --border: oklch(0.86 0.018 285);
+  --input: oklch(0.89 0.015 285);
+  --sidebar: oklch(0.22 0.035 285);
+  --sidebar-accent: oklch(0.3 0.06 285);
+  --sidebar-border: oklch(0.38 0.04 285);
+  --dashboard-grid-line: color-mix(in oklch, var(--alexos-purple) 10%, transparent);
+}
+
+.dark[data-visual-theme="pricepilot"] {
+  --background: oklch(0.13 0.025 285);
+  --foreground: oklch(0.97 0.008 285);
+  --card: oklch(0.19 0.035 285);
+  --popover: oklch(0.21 0.04 285);
+  --sidebar: oklch(0.09 0.02 285);
+  --sidebar-accent: oklch(0.2 0.05 285);
+}
+
+:root[data-visual-theme="finai"] {
+  --alexos-blue: oklch(0.74 0.18 220);
+  --alexos-purple: oklch(0.7 0.21 285);
+  --alexos-green: oklch(0.72 0.18 170);
+  --alexos-amber: oklch(0.78 0.17 82);
+  --alexos-coral: oklch(0.72 0.2 345);
+  --primary: var(--alexos-blue);
+  --ring: var(--alexos-blue);
+  --sidebar-primary: var(--alexos-purple);
+  --sidebar-ring: var(--alexos-purple);
+  --background: oklch(0.1 0.04 255);
+  --foreground: oklch(0.97 0.01 220);
+  --card: oklch(0.16 0.055 255);
+  --card-foreground: oklch(0.97 0.01 220);
+  --popover: oklch(0.18 0.06 255);
+  --popover-foreground: oklch(0.97 0.01 220);
+  --secondary: oklch(0.21 0.06 255);
+  --muted: oklch(0.2 0.05 255);
+  --muted-foreground: oklch(0.78 0.025 220);
+  --border: oklch(1 0 0 / 14%);
+  --input: oklch(1 0 0 / 17%);
+  --sidebar: oklch(0.06 0.03 255);
+  --sidebar-accent: oklch(0.14 0.055 255);
+  --sidebar-border: oklch(1 0 0 / 15%);
+  --dashboard-grid-line: color-mix(in oklch, var(--alexos-blue) 16%, transparent);
+}
+
+.dark[data-visual-theme="finai"] {
+  --background: oklch(0.06 0.03 255);
+  --card: oklch(0.12 0.045 255);
+  --popover: oklch(0.14 0.05 255);
+  --sidebar: oklch(0.035 0.02 255);
+  --sidebar-accent: oklch(0.11 0.045 255);
+}
+
+:root[data-visual-theme="opsmind"] body,
+:root[data-visual-theme="droneview"] body,
+:root[data-visual-theme="finai"] body {
+  background:
+    radial-gradient(
+      circle at 12% 8%,
+      color-mix(in oklch, var(--primary) 13%, transparent),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 90% 18%,
+      color-mix(in oklch, var(--alexos-purple) 12%, transparent),
+      transparent 26rem
+    ),
+    var(--color-background);
+}
+
+:root[data-visual-theme="pulseai"] body {
+  background:
+    radial-gradient(
+      circle at 12% 4%,
+      color-mix(in oklch, var(--alexos-amber) 9%, transparent),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 92% 12%,
+      color-mix(in oklch, var(--alexos-purple) 8%, transparent),
+      transparent 24rem
+    ),
+    var(--color-background);
+}
+
+:root[data-visual-theme="pricepilot"] body {
+  background:
+    radial-gradient(
+      circle at 90% 5%,
+      color-mix(in oklch, var(--alexos-purple) 7%, transparent),
+      transparent 26rem
+    ),
+    var(--color-background);
+}
+
 :root[data-visual-theme="paper"] {
   --alexos-blue: oklch(0.54 0.2 255);
   --alexos-purple: oklch(0.58 0.2 292);

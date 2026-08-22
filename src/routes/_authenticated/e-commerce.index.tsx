@@ -134,7 +134,7 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
   const isMountainPreset = selectedVisualTheme.backdrop === "mountains";
 
   return (
-    <section className="dailygear-workspace-hero rise-in relative overflow-hidden rounded-[1.75rem] border border-white/15 p-5 text-white shadow-[0_24px_70px_-30px_var(--alexos-glow)] sm:p-7">
+    <section className="dashboard-hero-frame dailygear-workspace-hero rise-in relative overflow-hidden rounded-[1.75rem] p-5 text-white sm:p-7">
       {isMountainPreset ? (
         <picture className="pointer-events-none absolute inset-0 z-0 block">
           <source media="(max-width: 640px)" srcSet={dailyGearMountainMobile} />
@@ -501,7 +501,7 @@ function KpiWall({ kpis, loading }: { kpis: Panels["kpis"]; loading: boolean }) 
 
 function MobileDashboard(p: Panels) {
   return (
-    <div className="space-y-4 pb-40">
+    <div className="dashboard-canvas space-y-4 pb-40">
       <Hero kpis={p.kpis} compactMode />
       <FacebookAdsBalanceCard />
       <MobileStoreOverview kpis={p.kpis} trend={p.trend} loading={p.loading} />
@@ -532,7 +532,7 @@ function MobileDashboard(p: Panels) {
 
 function StandardDashboard(p: Panels & { tablet?: boolean }) {
   return (
-    <div className="space-y-5">
+    <div className="dashboard-canvas space-y-5">
       <Hero kpis={p.kpis} />
       <FacebookAdsBalanceCard />
       <CatalogueReadinessCard products={p.products} loading={p.loading} />
@@ -572,7 +572,7 @@ function StandardDashboard(p: Panels & { tablet?: boolean }) {
         <BusinessCalendar orders={p.orders} />
       </div>
 
-      <section>
+      <section className="dashboard-surface rounded-[1.75rem] p-5 sm:p-6">
         <h2 className="mb-3 text-lg font-semibold tracking-tight">Operating signals</h2>
         <IntelligencePanel kind="market" ctx={p.ctx} ready={!p.loading} />
       </section>
@@ -584,7 +584,7 @@ function StandardDashboard(p: Panels & { tablet?: boolean }) {
 
 function WideDashboard(p: Panels & { dense?: boolean }) {
   return (
-    <div className="space-y-6">
+    <div className="dashboard-canvas space-y-6">
       <Hero kpis={p.kpis} />
       <FacebookAdsBalanceCard />
       <CatalogueReadinessCard products={p.products} loading={p.loading} />
@@ -666,7 +666,7 @@ function WideDashboard(p: Panels & { dense?: boolean }) {
         </div>
       )}
 
-      <section>
+      <section className="dashboard-surface rounded-[1.75rem] p-5 sm:p-6">
         <h2 className="mb-3 text-lg font-semibold tracking-tight">Operating signals</h2>
         <IntelligencePanel kind="market" ctx={p.ctx} ready={!p.loading} />
       </section>
