@@ -11,7 +11,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "./ThemeProvider";
 import { getVisualTheme, VISUAL_THEMES, type VisualThemeId } from "./visual-themes";
-import { DASHBOARD_SCENES, type DashboardSceneId } from "./visual-scenes";
+import {
+  DASHBOARD_SCENES,
+  GREETING_TRIGGERS,
+  type DashboardSceneId,
+  type GreetingTriggerId,
+} from "./visual-scenes";
 export function VisualThemePicker() {
   const {
     theme,
@@ -27,6 +32,8 @@ export function VisualThemePicker() {
     setCustomSidebar,
     dashboardScene,
     setDashboardScene,
+    greetingTrigger,
+    setGreetingTrigger,
   } = useTheme();
   const selected = getVisualTheme(visualTheme);
 
@@ -40,6 +47,7 @@ export function VisualThemePicker() {
         resolvedMode: resolvedTheme,
         visualTheme,
         dashboardScene,
+        greetingTrigger,
         customAccent,
         customSurface,
         customSidebar,
@@ -148,6 +156,28 @@ export function VisualThemePicker() {
                 <span className="block text-xs font-medium">{scene.label}</span>
                 <span className="block truncate text-[10px] text-muted-foreground">
                   {scene.description}
+                </span>
+              </span>
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel className="px-2 py-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+          Automatic scene trigger
+        </DropdownMenuLabel>
+        <p className="px-2 pb-2 text-[11px] leading-4 text-muted-foreground">
+          Weather and geolocation use permission-based browser signals; time is the safe fallback.
+        </p>
+        <DropdownMenuRadioGroup
+          value={greetingTrigger}
+          onValueChange={(value) => setGreetingTrigger(value as GreetingTriggerId)}
+        >
+          {Object.values(GREETING_TRIGGERS).map((trigger) => (
+            <DropdownMenuRadioItem key={trigger.id} value={trigger.id} className="rounded-xl py-2">
+              <span className="min-w-0">
+                <span className="block text-xs font-medium">{trigger.label}</span>
+                <span className="block truncate text-[10px] text-muted-foreground">
+                  {trigger.description}
                 </span>
               </span>
             </DropdownMenuRadioItem>

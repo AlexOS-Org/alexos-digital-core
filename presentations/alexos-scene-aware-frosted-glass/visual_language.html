@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; }
+    .slide-container { width: 1280px; min-height: 720px; background: #070b18; color: #f8fafc; position: relative; overflow: hidden; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    .slide-container::after { content: ""; position: absolute; right: -190px; top: -170px; width: 640px; height: 640px; border-radius: 50%; background: radial-gradient(circle, rgba(124,74,255,0.18), transparent 66%); }
+    .page { position: relative; z-index: 1; display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 66px; min-height: 720px; padding: 62px 72px 8px 78px; }
+    .kicker { color: #9ca3ff; font-size: 12px; font-weight: 750; letter-spacing: .18em; text-transform: uppercase; }
+    h2 { margin: 22px 0 10px; max-width: 480px; font-size: 43px; line-height: 1.08; letter-spacing: -.045em; }
+    .intro { max-width: 490px; color: #a9b5ce; font-size: 16px; line-height: 1.55; }
+    .principles { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
+    .principle { display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: start; }
+    .num { width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid rgba(159,119,255,.55); border-radius: 50%; color: #d3b8ff; background: rgba(146,86,255,.13); font-size: 12px; font-weight: 700; }
+    .principle strong { display: block; font-size: 14px; }
+    .principle p { margin-top: 3px; color: #8391ad; font-size: 12px; line-height: 1.45; }
+    .visual { position: relative; min-height: 420px; }
+    .frame { position: absolute; inset: 18px 0 12px 0; border: 1px solid rgba(186,196,230,.24); border-radius: 28px; background: rgba(255,255,255,.035); box-shadow: 0 30px 70px -44px rgba(99,68,230,.65); padding: 12px; }
+    .frame-top { display: flex; justify-content: space-between; color: #94a3bf; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .status { color: #67e8f9; }
+    .center { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: center; margin-top: 14px; }
+    .ring { width: 160px; height: 160px; margin: auto; border-radius: 50%; border: 1px solid rgba(184,132,255,.8); background: radial-gradient(circle, rgba(183,121,255,.44), rgba(55,24,104,.16) 48%, transparent 50%); box-shadow: 0 0 70px rgba(165,93,255,.42), inset 0 0 32px rgba(118,90,255,.4); position: relative; }
+    .ring::before { content: ""; position: absolute; inset: 18px 38px; border: 1px solid rgba(113,220,255,.6); border-radius: 50%; transform: rotate(35deg); }
+    .metric { border: 1px solid rgba(255,255,255,.13); border-radius: 18px; background: rgba(7,11,24,.7); padding: 12px; }
+    .metric + .metric { margin-top: 8px; }
+    .metric span { color: #8090ac; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
+    .metric strong { display: block; margin-top: 8px; font-size: 26px; letter-spacing: -.04em; }
+    .metric em { color: #61e1c4; font-size: 11px; font-style: normal; }
+    .bars { display: flex; align-items: end; gap: 7px; height: 56px; margin-top: 16px; padding: 0 4px; }
+    .bar { flex: 1; background: linear-gradient(180deg, #c55cff, #6230bc); border-radius: 4px 4px 0 0; }
+    .bar:nth-child(1){height: 28%;}.bar:nth-child(2){height: 56%;}.bar:nth-child(3){height: 42%;}.bar:nth-child(4){height: 77%;}.bar:nth-child(5){height: 92%;}.bar:nth-child(6){height: 66%;}.bar:nth-child(7){height: 100%;}
+    .caption { position: absolute; left: 20px; bottom: 12px; color: #8190ab; font-size: 11px; }
+    .caption b { color: #d7dfff; font-weight: 650; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="page">
+      <section>
+        <div class="kicker">01 · Visual language</div>
+        <h2>Make operational data feel calm, deep, and immediately legible.</h2>
+        <p class="intro">The system borrows the confidence of premium command centres while keeping AlexOS practical: clear hierarchy first, atmosphere second, decoration last.</p>
+        <div class="principles">
+          <div class="principle"><span class="num">01</span><div><strong>Atmospheric canvases</strong><p>Layered gradients and lightweight scenes establish context without competing with the data.</p></div></div>
+          <div class="principle"><span class="num">02</span><div><strong>Frosted surfaces</strong><p>Translucent panels, blur, and thin borders create depth while preserving a spacious composition.</p></div></div>
+          <div class="principle"><span class="num">03</span><div><strong>Signal hierarchy</strong><p>Primary metrics stand out; supporting explanations, labels, and status signals stay quiet.</p></div></div>
+          <div class="principle"><span class="num">04</span><div><strong>Semantic colour</strong><p>Theme accents adapt the interface, while red remains reserved for warnings and danger states.</p></div></div>
+        </div>
+      </section>
+      <section class="visual">
+        <div class="frame">
+          <div class="frame-top"><span>AlexOS visual operating system</span><span class="status">● live surface</span></div>
+          <div class="center"><div class="ring" aria-hidden="true"></div><div><div class="metric"><span>Surface token</span><strong>Glass</strong><em>22px blur · 1px border</em></div><div class="metric"><span>Signal language</span><strong>5 roles</strong><em>primary to alert</em></div></div></div>
+          <div class="bars" aria-label="Decorative chart bars"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+          <div class="caption"><b>One visual language</b> · AlexOS · DailyGear · Money Center · Auren</div>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

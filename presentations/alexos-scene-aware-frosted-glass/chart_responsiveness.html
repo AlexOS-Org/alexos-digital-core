@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    .slide-container { width: 1280px; min-height: 720px; background: #070b18; color: #f8fafc; position: relative; overflow: hidden; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    .slide-container::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 10% 10%, rgba(68, 217, 255, 0.1), transparent 30%); }
+    .page { position: relative; z-index: 1; min-height: 720px; padding: 60px 80px 20px 80px; display: flex; flex-direction: column; }
+    .kicker { color: #9ca3ff; font-size: 12px; font-weight: 750; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 12px; }
+    h2 { font-size: 42px; line-height: 1.1; letter-spacing: -.05em; margin-bottom: 30px; }
+    
+    .matrix-container { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; background: rgba(255, 255, 255, 0.03); padding: 20px; margin-bottom: 40px; }
+    .matrix-header { display: grid; grid-template-columns: 180px repeat(5, 1fr); gap: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: #71809c; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
+    .matrix-row { display: grid; grid-template-columns: 180px repeat(5, 1fr); gap: 15px; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); align-items: center; }
+    .theme-name { font-size: 13px; font-weight: 600; color: #cbd5e1; }
+    .token-chip { height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #07111f; text-transform: lowercase; }
+    
+    .purple { background: #a855f7; } .blue { background: #38bdf8; } .green { background: #34d399; } .amber { background: #f59e0b; } .coral { background: #fb7185; }
+
+    .bottom-section { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; flex-grow: 1; }
+    .chart-box { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 20px; height: 280px; }
+    .info-box { display: flex; flex-direction: column; justify-content: center; }
+    .info-item { margin-bottom: 20px; }
+    .info-item h4 { font-size: 14px; color: #9ca3ff; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .info-item p { font-size: 15px; color: #94a3b8; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="page">
+      <div class="kicker">04 · Responsiveness</div>
+      <h2>Chart Palettes and Responsive Money Flow</h2>
+      
+      <div class="matrix-container">
+        <div class="matrix-header">
+          <span>Theme Family</span>
+          <span>Series 1</span>
+          <span>Series 2</span>
+          <span>Series 3</span>
+          <span>Series 4</span>
+          <span>Series 5</span>
+        </div>
+        <div class="matrix-row">
+          <span class="theme-name">OpsMind Command</span>
+          <div class="token-chip purple">Purple</div>
+          <div class="token-chip blue">Blue</div>
+          <div class="token-chip green">Green</div>
+          <div class="token-chip amber">Amber</div>
+          <div class="token-chip coral">Coral</div>
+        </div>
+        <div class="matrix-row">
+          <span class="theme-name">DroneView Ember</span>
+          <div class="token-chip amber">Amber</div>
+          <div class="token-chip coral">Coral</div>
+          <div class="token-chip blue">Blue</div>
+          <div class="token-chip green">Green</div>
+          <div class="token-chip purple">Purple</div>
+        </div>
+        <div class="matrix-row">
+          <span class="theme-name">PulseAI Warm Light</span>
+          <div class="token-chip amber">Amber</div>
+          <div class="token-chip coral">Coral</div>
+          <div class="token-chip blue">Blue</div>
+          <div class="token-chip green">Green</div>
+          <div class="token-chip purple">Purple</div>
+        </div>
+        <div class="matrix-row">
+          <span class="theme-name">FinAI Neon Ledger</span>
+          <div class="token-chip blue">Blue</div>
+          <div class="token-chip purple">Purple</div>
+          <div class="token-chip coral">Coral</div>
+          <div class="token-chip green">Green</div>
+          <div class="token-chip amber">Amber</div>
+        </div>
+      </div>
+
+      <div class="bottom-section">
+        <div class="chart-box">
+          <div style="height: 240px;"><canvas id="responsiveChart"></canvas></div>
+        </div>
+        <div class="info-box">
+          <div class="info-item">
+            <h4>Implementation Contract</h4>
+            <p>Money Flow charts use <code>min-w-0</code> and <code>ResponsiveContainer</code> to prevent overflow. Heights are locked to specific breakpoint targets.</p>
+          </div>
+          <div class="info-item">
+            <h4>Breakpoint Targets</h4>
+            <p>Mobile: 208px · Tablet: 240px · Desktop: 256px. This ensures consistent visual weight across all device tiers.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ctx = document.getElementById('responsiveChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Mobile', 'Tablet', 'Desktop', 'Ultrawide'],
+        datasets: [{
+          label: 'Chart Height (px)',
+          data: [208, 240, 256, 256],
+          backgroundColor: ['#44d9ff', '#a855f7', '#34d399', '#f59e0b'],
+          borderRadius: 8,
+          barThickness: 40
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: 'Responsive Height Contract', color: '#f8fafc', font: { size: 14, weight: 'bold' }, padding: { bottom: 20 } }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 300,
+            grid: { color: 'rgba(255, 255, 255, 0.1)', drawBorder: false },
+            ticks: { color: '#94a3b8', font: { size: 10 } }
+          },
+          x: {
+            grid: { display: false },
+            ticks: { color: '#cbd5e1', font: { size: 11, weight: '600' } }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

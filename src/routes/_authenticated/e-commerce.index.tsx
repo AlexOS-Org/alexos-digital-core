@@ -39,9 +39,10 @@ import { DG_CURRENCY } from "@/lib/dailygear/constants";
 import { useDeviceTier } from "@/hooks/use-device-tier";
 import dailyGearMountainWide from "@/assets/visuals/dailygear-mountain-golden-wide.webp";
 import dailyGearMountainMobile from "@/assets/visuals/dailygear-mountain-mobile.webp";
+import { useLocalWeather } from "@/components/dashboard/greeting-context";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { getVisualTheme } from "@/components/theme/visual-themes";
-import { getActiveDashboardScene } from "@/components/theme/visual-scenes";
+import { getGreetingScene } from "@/components/theme/visual-scenes";
 import { debtRemaining, useDebts } from "@/lib/debts/api";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/")({
@@ -131,9 +132,21 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
   const [now, setNow] = useState(() => new Date());
   const hour = now.getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
-  const { visualTheme, dashboardScene } = useTheme();
+  const { visualTheme, dashboardScene, greetingTrigger } = useTheme();
   const selectedVisualTheme = getVisualTheme(visualTheme);
-  const activeScene = getActiveDashboardScene(dashboardScene, hour, selectedVisualTheme.backdrop);
+  const localWeather = useLocalWeather();
+  const activeScene =
+    dashboardScene === "auto"
+      ? getGreetingScene(
+          greetingTrigger,
+          hour,
+          selectedVisualTheme.backdrop,
+          localWeather.weather
+            ? { weatherCode: localWeather.weather.weatherCode, night: localWeather.night }
+            : null,
+          localWeather.location,
+        )
+      : dashboardScene;
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
@@ -143,6 +156,15 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
 
   return (
     <section
+      data-atmosphere={
+        hour >= 5 && hour < 11
+          ? "morning"
+          : hour >= 11 && hour < 17
+            ? "day"
+            : hour >= 17 && hour < 21
+              ? "evening"
+              : "night"
+      }
       data-scene={activeScene}
       className="dashboard-hero-frame dailygear-workspace-hero rise-in relative overflow-hidden rounded-[1.75rem] p-5 text-white sm:p-7"
     >

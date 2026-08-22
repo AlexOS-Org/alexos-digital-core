@@ -1,19 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
 import { Cloud, CloudSun, Droplets, Moon, Sun, Sunrise, Sunset, Wind } from "lucide-react";
-
-type WeatherData = {
-  temperature: number;
-  apparentTemperature: number;
-  weatherCode: number;
-  cloudCover: number;
-  windSpeed: number;
-  precipitation: number;
-  sunrise: string;
-  sunset: string;
-};
-
-const FALLBACK = { latitude: -1.286389, longitude: 36.817223, label: "Nairobi" };
-const WEATHER_HOST = ["https://api", "open-meteo.com/v1/forecast"].join(".");
+import type { LocalWeatherSnapshot } from "@/components/dashboard/greeting-context";
 
 function weatherLabel(code: number) {
   if (code === 0) return "Clear sky";
@@ -42,74 +28,16 @@ function formatClock(value: string) {
   });
 }
 
-export function DashboardWeather() {
-  const [location, setLocation] = useState(FALLBACK);
-  const [weather, setWeather] = useState<WeatherData | null>(null);
-
-  useEffect(() => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) =>
-        setLocation({
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-          label: "Your location",
-        }),
-      () => undefined,
-      { enableHighAccuracy: false, timeout: 5000, maximumAge: 30 * 60 * 1000 },
-    );
-  }, []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const url = new URL(WEATHER_HOST);
-    url.search = new URLSearchParams({
-      latitude: String(location.latitude),
-      longitude: String(location.longitude),
-      current:
-        "temperature_2m,apparent_temperature,weather_code,cloud_cover,wind_speed_10m,precipitation",
-      daily: "sunrise,sunset",
-      timezone: "auto",
-      forecast_days: "1",
-    }).toString();
-
-    fetch(url, { signal: controller.signal })
-      .then((response) =>
-        response.ok ? response.json() : Promise.reject(new Error("Weather unavailable")),
-      )
-      .then((data) =>
-        setWeather({
-          temperature: data.current.temperature_2m,
-          apparentTemperature: data.current.apparent_temperature,
-          weatherCode: data.current.weather_code,
-          cloudCover: data.current.cloud_cover,
-          windSpeed: data.current.wind_speed_10m,
-          precipitation: data.current.precipitation,
-          sunrise: data.daily.sunrise[0],
-          sunset: data.daily.sunset[0],
-        }),
-      )
-      .catch(() => undefined);
-
-    return () => controller.abort();
-  }, [location.latitude, location.longitude]);
-
-  const daylight = useMemo(() => {
-    if (!weather) return null;
-    const now = new Date();
-    const sunrise = new Date(weather.sunrise);
-    const sunset = new Date(weather.sunset);
-    return { sunrise, sunset, night: now < sunrise || now >= sunset };
-  }, [weather]);
-
-  if (!weather || !daylight) return null;
+export function DashboardWeather({ snapshot }: { snapshot: LocalWeatherSnapshot }) {
+  const { weather, night } = snapshot;
+  if (!weather || night === null) return null;
 
   return (
     <div className="mt-5 flex flex-wrap items-center gap-2 text-xs text-white/75">
       <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 backdrop-blur-md">
-        <WeatherIcon code={weather.weatherCode} night={daylight.night} />
+        <WeatherIcon code={weather.weatherCode} night={night} />
         <span className="font-medium text-white">{Math.round(weather.temperature)}°C</span>
-        <span>{daylight.night ? "Night sky" : weatherLabel(weather.weatherCode)}</span>
+        <span>{night ? "Night sky" : weatherLabel(weather.weatherCode)}</span>
       </div>
       <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 backdrop-blur-md">
         {weather.cloudCover >= 60 ? (

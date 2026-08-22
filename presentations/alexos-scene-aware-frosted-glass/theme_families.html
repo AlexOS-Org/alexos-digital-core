@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; }
+    html,body { margin: 0; }
+    .slide-container { width: 1280px; min-height: 720px; background: #070b18; color: #f8fafc; position: relative; overflow: hidden; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    .slide-container::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 90% 18%, rgba(93,69,220,.18), transparent 26rem); }
+    .page { position: relative; z-index: 1; min-height: 720px; padding: 58px 70px 22px 78px; }
+    .kicker { color: #9ca3ff; font-size: 12px; font-weight: 750; letter-spacing: .18em; text-transform: uppercase; }
+    h2 { margin: 18px 0 8px; font-size: 41px; line-height: 1.08; letter-spacing: -.05em; }
+    .sub { color: #9aa7c1; font-size: 15px; line-height: 1.45; }
+    .matrix { margin-top: 16px; border: 1px solid rgba(186,196,230,.18); border-radius: 22px; background: rgba(255,255,255,.035); padding: 8px 12px; }
+    .head, .row { display: grid; grid-template-columns: 190px 265px 1fr; gap: 12px; align-items: center; }
+    .head { color: #71809c; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; padding: 0 6px 6px; }
+    .row { min-height: 50px; border-top: 1px solid rgba(255,255,255,.08); padding: 6px; }
+    .name { font-weight: 700; font-size: 14px; }
+    .desc { color: #7d8ba6; font-size: 11px; margin-top: 4px; line-height: 1.35; }
+    .swatch { height: 34px; border-radius: 12px; border: 1px solid rgba(255,255,255,.2); position: relative; }
+    .swatch::after { content: "accent"; position: absolute; right: 9px; top: 9px; color: rgba(255,255,255,.78); font-size: 9px; text-transform: uppercase; letter-spacing: .12em; }
+    .ops { background: linear-gradient(110deg, #07070b, #22113e); box-shadow: inset -3px 0 #c855ff; }
+    .drone { background: linear-gradient(110deg, #171312, #5b2b1b); box-shadow: inset -3px 0 #ff8a4c; }
+    .pulse { background: linear-gradient(110deg, #fffaf2, #f8ded1); box-shadow: inset -3px 0 #e9792c; }
+    .price { background: linear-gradient(110deg, #f4f2f8, #ffffff); box-shadow: inset -3px 0 #8b5cf6; }
+    .fin { background: linear-gradient(110deg, #071126, #142461); box-shadow: inset -3px 0 #44d9ff; }
+    .roles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .role { min-height: 32px; border-radius: 9px; padding: 5px 6px; font-size: 9px; font-weight: 700; text-align: center; color: #07111f; }
+    .role small { display: block; margin-top: 3px; font-size: 7px; opacity: .75; font-weight: 550; }
+    .purple { background: #a855f7; }.blue { background: #38bdf8; }.green { background: #34d399; }.amber { background: #f59e0b; }.coral { background: #fb7185; }
+    .footer { display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; margin-top: 12px; }
+    .callout { border: 1px solid rgba(103,232,249,.2); border-radius: 16px; background: rgba(19,61,82,.23); padding: 10px 12px; }
+    .callout strong { color: #67e8f9; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
+    .callout p { margin-top: 6px; color: #b5c1d6; font-size: 12px; line-height: 1.45; }
+    .legend { padding: 4px 2px; color: #8996b0; font-size: 11px; line-height: 1.55; }
+    code { color: #d8c7ff; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="page">
+      <div class="kicker">02 · Theme families</div>
+      <h2>Five looks. One predictable chart contract.</h2>
+      <p class="sub">Each preset changes the atmosphere and accent family while keeping semantic series roles stable.</p>
+      <section class="matrix">
+        <div class="head"><span>Theme family</span><span>Canvas + accent</span><span>Chart series 1 → 5</span></div>
+        <div class="row"><div><div class="name">OpsMind Command</div><div class="desc">Black glass · electric violet</div></div><div class="swatch ops"></div><div class="roles"><div class="role purple">purple<small>primary</small></div><div class="role blue">blue<small>secondary</small></div><div class="role green">green<small>context</small></div><div class="role amber">amber<small>warning</small></div><div class="role coral">coral<small>alert</small></div></div></div>
+        <div class="row"><div><div class="name">DroneView Ember</div><div class="desc">Smoke · ember telemetry</div></div><div class="swatch drone"></div><div class="roles"><div class="role amber">amber<small>primary</small></div><div class="role coral">coral<small>secondary</small></div><div class="role blue">blue<small>context</small></div><div class="role green">green<small>warning</small></div><div class="role purple">purple<small>alert</small></div></div></div>
+        <div class="row"><div><div class="name">PulseAI Warm Light</div><div class="desc">Cream · peach analytics</div></div><div class="swatch pulse"></div><div class="roles"><div class="role amber">amber<small>primary</small></div><div class="role coral">coral<small>secondary</small></div><div class="role blue">blue<small>context</small></div><div class="role green">green<small>warning</small></div><div class="role purple">purple<small>alert</small></div></div></div>
+        <div class="row"><div><div class="name">PricePilot Lavender</div><div class="desc">Airy white · lavender trend</div></div><div class="swatch price"></div><div class="roles"><div class="role purple">purple<small>primary</small></div><div class="role blue">blue<small>secondary</small></div><div class="role green">green<small>context</small></div><div class="role amber">amber<small>warning</small></div><div class="role coral">coral<small>alert</small></div></div></div>
+        <div class="row"><div><div class="name">FinAI Neon Ledger</div><div class="desc">Deep navy · cyan movement</div></div><div class="swatch fin"></div><div class="roles"><div class="role blue">blue<small>primary</small></div><div class="role purple">purple<small>secondary</small></div><div class="role coral">coral<small>context</small></div><div class="role green">green<small>warning</small></div><div class="role amber">amber<small>alert</small></div></div></div>
+      </section>
+      <div class="footer"><div class="callout"><strong>Token rule</strong><p>Use <code>--chart-1</code> through <code>--chart-5</code> and <code>--dashboard-grid-line</code>. Never hardcode chart colours inside a module.</p></div><div class="legend">The role names are semantic. The active preset supplies the final rendered hues, borders, surfaces, and glow intensity.</div></div>
+    </div>
+  </div>
+</body>
+</html>

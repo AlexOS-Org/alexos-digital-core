@@ -1,0 +1,78 @@
+{
+  "project_info": {
+    "title": "AlexOS Scene-Aware Frosted-Glass Design System",
+    "created": 1787431419.892,
+    "last_updated": 1787431703.398,
+    "total_slides": 6
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "visual_language",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "theme_families",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "scene_triggers",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "chart_responsiveness",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "delivery_status",
+      "state": "edited",
+      "pageNum": 6
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "AlexOS Scene-Aware Frosted-Glass Design System",
+      "summary": "Executive overview of the visual system update across AlexOS and DailyGear, including premium glass surfaces, selectable scenes, and chart-forward dashboards.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "visual_language",
+      "title": "A Premium Command-Centre Visual Language",
+      "summary": "Summarize the attached-reference-inspired design principles: atmospheric canvases, frosted panels, clear hierarchy, semantic signals, and restrained depth.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "theme_families",
+      "title": "Five Theme Families, One Token Contract",
+      "summary": "Compare OpsMind, DroneView, PulseAI, PricePilot, and FinAI preset families and show how each maps to shared chart-series roles.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "scene_triggers",
+      "title": "Scenes That Respond to Context",
+      "summary": "Explain manual scene selection plus time, local weather, and browser-approved geolocation triggers with safe fallback behavior.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "chart_responsiveness",
+      "title": "Chart Palettes and Responsive Money Flow",
+      "summary": "Show the visual comparison matrix and responsive Money Flow chart implementation contract for mobile, tablet, desktop, and ultrawide layouts.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "delivery_status",
+      "title": "Implementation and Delivery Status",
+      "summary": "Summarize the implemented code surfaces, validation results, safe YJ catalogue gate, and current GitHub/Cloudflare delivery state.",
+      "image_plan": "Use a suitable image if needed"
+    }
+  ]
+}

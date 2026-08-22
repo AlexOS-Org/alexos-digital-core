@@ -7,8 +7,10 @@ import {
 } from "./visual-themes";
 import {
   DEFAULT_DASHBOARD_SCENE,
+  DEFAULT_GREETING_TRIGGER,
   isDashboardSceneId,
   type DashboardSceneId,
+  type GreetingTriggerId,
 } from "./visual-scenes";
 type Theme = "system" | "light" | "dark";
 type ResolvedTheme = "light" | "dark";
@@ -26,6 +28,8 @@ type ThemeContextValue = {
   setCustomSidebar: (sidebar: string) => void;
   dashboardScene: DashboardSceneId;
   setDashboardScene: (scene: DashboardSceneId) => void;
+  greetingTrigger: GreetingTriggerId;
+  setGreetingTrigger: (trigger: GreetingTriggerId) => void;
 };
 const STORAGE_KEY = "alexos-theme";
 const VISUAL_THEME_KEY = "alexos-visual-theme";
@@ -33,6 +37,7 @@ const CUSTOM_ACCENT_KEY = "alexos-custom-accent";
 const CUSTOM_SURFACE_KEY = "alexos-custom-surface";
 const CUSTOM_SIDEBAR_KEY = "alexos-custom-sidebar";
 const DASHBOARD_SCENE_KEY = "alexos-dashboard-scene";
+const GREETING_TRIGGER_KEY = "alexos-greeting-trigger";
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 function getStoredTheme(): Theme {
   if (typeof window === "undefined") return "system";
@@ -65,6 +70,13 @@ function getStoredDashboardScene(): DashboardSceneId {
   const stored = window.localStorage.getItem(DASHBOARD_SCENE_KEY);
   return isDashboardSceneId(stored) ? stored : DEFAULT_DASHBOARD_SCENE;
 }
+function getStoredGreetingTrigger(): GreetingTriggerId {
+  if (typeof window === "undefined") return DEFAULT_GREETING_TRIGGER;
+  const stored = window.localStorage.getItem(GREETING_TRIGGER_KEY);
+  return stored === "time" || stored === "weather" || stored === "geolocation"
+    ? stored
+    : DEFAULT_GREETING_TRIGGER;
+}
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(getStoredTheme);
   const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(getSystemTheme);
@@ -74,6 +86,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [customSidebar, setCustomSidebarState] = useState(getStoredCustomSidebar);
   const [dashboardScene, setDashboardSceneState] =
     useState<DashboardSceneId>(getStoredDashboardScene);
+  const [greetingTrigger, setGreetingTriggerState] =
+    useState<GreetingTriggerId>(getStoredGreetingTrigger);
   const resolvedTheme: ResolvedTheme = theme === "system" ? systemTheme : theme;
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
@@ -114,6 +128,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setDashboardSceneState(next);
     window.localStorage.setItem(DASHBOARD_SCENE_KEY, next);
   };
+  const setGreetingTrigger = (next: GreetingTriggerId) => {
+    setGreetingTriggerState(next);
+    window.localStorage.setItem(GREETING_TRIGGER_KEY, next);
+  };
   const value = useMemo(
     () => ({
       theme,
@@ -129,8 +147,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setCustomSidebar,
       dashboardScene,
       setDashboardScene,
+      greetingTrigger,
+      setGreetingTrigger,
     }),
-    [theme, resolvedTheme, visualTheme, customAccent, customSurface, customSidebar, dashboardScene],
+    [
+      theme,
+      resolvedTheme,
+      visualTheme,
+      customAccent,
+      customSurface,
+      customSidebar,
+      dashboardScene,
+      greetingTrigger,
+    ],
   );
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

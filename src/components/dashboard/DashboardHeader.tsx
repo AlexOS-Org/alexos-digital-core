@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { DashboardWeather } from "@/components/dashboard/DashboardWeather";
 import { DailyInspirationCards } from "@/components/dashboard/DailyInspirationCards";
+import { useLocalWeather } from "@/components/dashboard/greeting-context";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { getVisualTheme } from "@/components/theme/visual-themes";
-import { getActiveDashboardScene, getDashboardSceneLabel } from "@/components/theme/visual-scenes";
+import { getDashboardSceneLabel, getGreetingScene } from "@/components/theme/visual-scenes";
 import alexosCommandCenterWide from "@/assets/visuals/alexos-command-center-wide.webp";
 import alexosCommandCenterMobile from "@/assets/visuals/alexos-command-center-mobile.webp";
 
@@ -36,14 +37,22 @@ export function DashboardHeader() {
     if (typeof window === "undefined") return "24h";
     return window.localStorage.getItem(TIME_FORMAT_KEY) === "12h" ? "12h" : "24h";
   });
-  const { visualTheme, dashboardScene } = useTheme();
+  const { visualTheme, dashboardScene, greetingTrigger } = useTheme();
   const selectedTheme = getVisualTheme(visualTheme);
+  const localWeather = useLocalWeather();
   const activeAtmosphere = getTimeAtmosphere(now.getHours());
-  const activeScene = getActiveDashboardScene(
-    dashboardScene,
-    now.getHours(),
-    selectedTheme.backdrop,
-  );
+  const activeScene =
+    dashboardScene === "auto"
+      ? getGreetingScene(
+          greetingTrigger,
+          now.getHours(),
+          selectedTheme.backdrop,
+          localWeather.weather
+            ? { weatherCode: localWeather.weather.weatherCode, night: localWeather.night }
+            : null,
+          localWeather.location,
+        )
+      : dashboardScene;
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
     return () => window.clearInterval(timer);
@@ -119,7 +128,7 @@ export function DashboardHeader() {
               You know what matters. Now let’s move it forward.
             </p>
             <div className="mt-4">
-              <DashboardWeather />
+              <DashboardWeather snapshot={localWeather} />
             </div>
             <div className="mt-6 flex flex-wrap gap-2">
               <Button asChild className="bg-white text-slate-950 shadow-lg hover:bg-slate-100">
@@ -148,14 +157,22 @@ export function DashboardHeader() {
 }
 export function MobileDashboardHeader() {
   const [now, setNow] = useState(() => new Date());
-  const { visualTheme, dashboardScene } = useTheme();
+  const { visualTheme, dashboardScene, greetingTrigger } = useTheme();
   const selectedTheme = getVisualTheme(visualTheme);
+  const localWeather = useLocalWeather();
   const atmosphere = getTimeAtmosphere(now.getHours());
-  const activeScene = getActiveDashboardScene(
-    dashboardScene,
-    now.getHours(),
-    selectedTheme.backdrop,
-  );
+  const activeScene =
+    dashboardScene === "auto"
+      ? getGreetingScene(
+          greetingTrigger,
+          now.getHours(),
+          selectedTheme.backdrop,
+          localWeather.weather
+            ? { weatherCode: localWeather.weather.weatherCode, night: localWeather.night }
+            : null,
+          localWeather.location,
+        )
+      : dashboardScene;
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
@@ -213,7 +230,7 @@ export function MobileDashboardHeader() {
               You know what matters. Now let’s move it forward.
             </p>
             <div className="mt-3">
-              <DashboardWeather />
+              <DashboardWeather snapshot={localWeather} />
             </div>
             <Button
               asChild

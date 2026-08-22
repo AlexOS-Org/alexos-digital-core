@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    .slide-container { width: 1280px; min-height: 720px; background: #070b18; color: #f8fafc; position: relative; overflow: hidden; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    .slide-container::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 10% 10%, rgba(66, 217, 255, 0.12), transparent 30rem); }
+    .page { position: relative; z-index: 1; display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 60px; min-height: 720px; padding: 62px 72px 4px 78px; }
+    .kicker { color: #9ca3ff; font-size: 12px; font-weight: 750; letter-spacing: .18em; text-transform: uppercase; }
+    h2 { margin: 22px 0 14px; font-size: 43px; line-height: 1.08; letter-spacing: -.045em; }
+    .intro { color: #a9b5ce; font-size: 16px; line-height: 1.55; margin-bottom: 20px; }
+    .trigger-list { display: grid; gap: 10px; }
+    .trigger-item { border-left: 2px solid rgba(156, 163, 255, 0.3); padding-left: 20px; }
+    .trigger-item strong { display: block; font-size: 15px; color: #dbe4ff; margin-bottom: 4px; }
+    .trigger-item p { font-size: 13px; color: #8391ad; line-height: 1.4; }
+    .scene-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start; }
+    .scene-card { border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 20px; background: rgba(255, 255, 255, 0.03); padding: 20px; position: relative; overflow: hidden; min-height: 240px; }
+    .scene-card span { position: relative; z-index: 2; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3ff; }
+    .scene-card strong { position: relative; z-index: 2; display: block; margin-top: 6px; font-size: 20px; letter-spacing: -0.02em; }
+    .scene-card p { position: relative; z-index: 2; margin-top: 8px; font-size: 12px; color: #8391ad; line-height: 1.4; }
+    .scene-bg { position: absolute; inset: 0; z-index: 1; opacity: 0.4; }
+    .ocean-bg { background: radial-gradient(ellipse at 50% 100%, #135f75, transparent); }
+    .basketball-bg { background: radial-gradient(circle at 80% 20%, #f59e0b, transparent); }
+    .sunset-bg { background: linear-gradient(160deg, #5b2b1b, #070b18); }
+    .night-bg { background: radial-gradient(circle at 20% 80%, #1e1b4b, transparent); }
+    .fallback-note { margin-top: 16px; padding: 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); font-size: 12px; color: #8391ad; }
+    .fallback-note b { color: #67e8f9; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="page">
+      <section>
+        <div class="kicker">03 · Scene triggers</div>
+        <h2>Greeting scenes that respond to your context.</h2>
+        <p class="intro">AlexOS moves beyond static backgrounds by using real-world signals to rotate the dashboard atmosphere.</p>
+        <div class="trigger-list">
+          <div class="trigger-item">
+            <strong>Time of day</strong>
+            <p>The default policy. Maps morning, day, evening, and night to specific visual moods.</p>
+          </div>
+          <div class="trigger-item">
+            <strong>Local weather</strong>
+            <p>Uses Open-Meteo signals. Rain triggers Ocean waves; clear skies trigger Basketball energy.</p>
+          </div>
+          <div class="trigger-item">
+            <strong>Geolocation</strong>
+            <p>Approximates mood based on latitude. Tropical zones favor Ocean; Northern zones favor Sunset.</p>
+          </div>
+        </div>
+        <div class="fallback-note">
+          <b>Safe Fallback:</b> If weather or location permissions are denied, the system automatically reverts to <b>Time of Day</b> rotation.
+        </div>
+      </section>
+      <section class="scene-grid">
+        <div class="scene-card">
+          <div class="scene-bg ocean-bg"></div>
+          <span>Morning / Rain</span>
+          <strong>Ocean Waves</strong>
+          <p>Cool teal radial waves with deep blue saturation for a calm start.</p>
+        </div>
+        <div class="scene-card">
+          <div class="scene-bg basketball-bg"></div>
+          <span>Day / Clear</span>
+          <strong>Basketball Energy</strong>
+          <p>Warm amber court-inspired circles for high-momentum operations.</p>
+        </div>
+        <div class="scene-card">
+          <div class="scene-bg sunset-bg"></div>
+          <span>Evening / Clouds</span>
+          <strong>Sunset Focus</strong>
+          <p>Copper and rose horizon treatment for end-of-day review.</p>
+        </div>
+        <div class="scene-card">
+          <div class="scene-bg night-bg"></div>
+          <span>Night / Storm</span>
+          <strong>Night Focus</strong>
+          <p>Low-light navy field with subtle violet pools for focused planning.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

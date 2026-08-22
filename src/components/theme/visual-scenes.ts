@@ -1,3 +1,5 @@
+export type GreetingTriggerId = "time" | "weather" | "geolocation";
+
 export type DashboardSceneId =
   "auto" | "none" | "mountains" | "ocean" | "basketball" | "sunset" | "night";
 
@@ -58,6 +60,28 @@ export const DASHBOARD_SCENES: Record<DashboardSceneId, DashboardScene> = {
 };
 
 export const DEFAULT_DASHBOARD_SCENE: DashboardSceneId = "auto";
+export const DEFAULT_GREETING_TRIGGER: GreetingTriggerId = "time";
+
+export const GREETING_TRIGGERS: Record<
+  GreetingTriggerId,
+  { id: GreetingTriggerId; label: string; description: string }
+> = {
+  time: {
+    id: "time",
+    label: "Time of day",
+    description: "Morning, day, evening, and night rotation",
+  },
+  weather: {
+    id: "weather",
+    label: "Local weather",
+    description: "Use current sky and precipitation conditions",
+  },
+  geolocation: {
+    id: "geolocation",
+    label: "Geolocation",
+    description: "Use the browser-approved latitude and longitude",
+  },
+};
 
 export function isDashboardSceneId(value: string | null | undefined): value is DashboardSceneId {
   return value !== null && value !== undefined && value in DASHBOARD_SCENES;
@@ -78,4 +102,29 @@ export function getActiveDashboardScene(
 
 export function getDashboardSceneLabel(id: DashboardSceneId) {
   return DASHBOARD_SCENES[id]?.label ?? DASHBOARD_SCENES[DEFAULT_DASHBOARD_SCENE].label;
+}
+
+export function getGreetingScene(
+  trigger: GreetingTriggerId,
+  hour: number,
+  themeBackdrop: "mountains" | "gradient" | "none",
+  weather?: { weatherCode: number; night: boolean | null } | null,
+  location?: { latitude: number; longitude: number } | null,
+): Exclude<DashboardSceneId, "auto"> {
+  if (trigger === "weather" && weather) {
+    if (weather.night) return "night";
+    if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(weather.weatherCode)) {
+      return "ocean";
+    }
+    if ([95, 96, 99].includes(weather.weatherCode)) return "night";
+    return "basketball";
+  }
+
+  if (trigger === "geolocation" && location) {
+    if (Math.abs(location.latitude) <= 23.5) return "ocean";
+    if (location.longitude >= 0) return "basketball";
+    return "sunset";
+  }
+
+  return getActiveDashboardScene("auto", hour, themeBackdrop);
 }
