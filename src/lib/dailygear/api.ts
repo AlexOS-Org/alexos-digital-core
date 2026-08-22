@@ -216,6 +216,7 @@ export const useProductEvidence = (productId?: string) =>
 export const useSaveProductEvidence = () => productEvidenceResource.useSave("Evidence record");
 export const useDeleteProductEvidence = () => productEvidenceResource.useRemove("Evidence record");
 export const useVariants = variantsResource.useList;
+export const useSaveVariant = () => variantsResource.useSave("Variant");
 export const useFunnels = funnelsResource.useList;
 export const useSaveFunnel = () => funnelsResource.useSave("Funnel");
 export const useDeleteFunnel = () => funnelsResource.useRemove("Funnel");

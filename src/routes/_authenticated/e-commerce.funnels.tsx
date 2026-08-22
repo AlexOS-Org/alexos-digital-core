@@ -26,10 +26,12 @@ import {
   useFunnelSteps,
   useFunnels,
   useProducts,
+  useSaveVariant,
+  useVariants,
   useSaveFunnel,
   useSaveFunnelStep,
 } from "@/lib/dailygear/api";
-import type { Funnel, FunnelStep } from "@/lib/dailygear/types";
+import type { Funnel, FunnelStep, ProductVariant } from "@/lib/dailygear/types";
 import {
   defaultFunnelLandingContent,
   improvedFunnelLandingContent,
@@ -139,11 +141,17 @@ function FunnelsPage() {
   const [landing, setLanding] = useState<FunnelLandingContent>(EMPTY_LANDING);
   const [offers, setOffers] = useState<OfferConfig>(EMPTY_OFFERS);
   const [flowOrder, setFlowOrder] = useState<FlowStepType[]>(DEFAULT_FLOW_ORDER);
+  const [variantDrafts, setVariantDrafts] = useState<Record<string, Partial<ProductVariant>>>({});
   const stepsQuery = useFunnelSteps(selectedId ?? undefined);
+  const variantsQuery = useVariants(
+    form.productId ? { product_id: form.productId } : undefined,
+    Boolean(form.productId),
+  );
   const saveFunnel = useSaveFunnel();
   const saveStep = useSaveFunnelStep();
   const deleteStep = useDeleteFunnelStep();
   const deleteFunnel = useDeleteFunnel();
+  const saveVariantMutation = useSaveVariant();
 
   const selectedProduct = products.find((product) => product.id === form.productId) ?? null;
   const offerProducts = useMemo(
@@ -164,6 +172,12 @@ function FunnelsPage() {
       thankYouBody: funnel.thank_you_body ?? EMPTY_FORM.thankYouBody,
     });
   }, [funnels, selectedId]);
+
+  useEffect(() => {
+    const nextDrafts: Record<string, Partial<ProductVariant>> = {};
+    for (const variant of variantsQuery.data ?? []) nextDrafts[variant.id] = { ...variant };
+    setVariantDrafts(nextDrafts);
+  }, [variantsQuery.data]);
 
   useEffect(() => {
     const steps = stepsQuery.data ?? [];
@@ -264,6 +278,23 @@ function FunnelsPage() {
     const toIndex = next.indexOf(active[swapIndex]);
     [next[fromIndex], next[toIndex]] = [next[toIndex], next[fromIndex]];
     setFlowOrder(next);
+  }
+
+  async function saveVariant(variantId: string) {
+    const draft = variantDrafts[variantId];
+    if (!draft) return;
+    await saveVariantMutation.mutateAsync({
+      id: variantId,
+      name: String(draft.name ?? "").trim(),
+      sku: draft.sku ?? null,
+      color: draft.color ?? null,
+      stock_quantity: Number(draft.stock_quantity ?? 0),
+      availability_confirmed: Boolean(draft.availability_confirmed),
+      image_url: draft.image_url ?? null,
+      price: draft.price ?? null,
+      sale_price: draft.sale_price ?? null,
+      options: draft.options ?? null,
+    });
   }
 
   async function save() {
@@ -596,6 +627,39 @@ function FunnelsPage() {
                   </p>
                 ) : null}
               </div>
+              <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-4 sm:col-span-2">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold">Public landing-page link</p>
+                    <p className="mt-1 break-all text-xs text-muted-foreground">
+                      {form.slug
+                        ? `https://dailygear.co.ke/funnel/${slugify(form.slug)}`
+                        : "Save the funnel to generate its public link."}
+                    </p>
+                  </div>
+                  {form.slug ? (
+                    <div className="flex shrink-0 gap-2">
+                      <Button type="button" size="sm" variant="outline" asChild>
+                        <a href={`/funnel/${slugify(form.slug)}`} target="_blank" rel="noreferrer">
+                          <ExternalLink className="mr-2 h-4 w-4" /> Open
+                        </a>
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() =>
+                          void navigator.clipboard?.writeText(
+                            `https://dailygear.co.ke/funnel/${slugify(form.slug)}`,
+                          )
+                        }
+                      >
+                        Copy link
+                      </Button>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
               <div className="space-y-1.5">
                 <Label htmlFor="funnel-source">Traffic source</Label>
                 <Input
@@ -623,6 +687,117 @@ function FunnelsPage() {
                 </select>
               </div>
             </div>
+
+            {form.productId ? (
+              <section className="space-y-4 rounded-2xl border bg-muted/25 p-4">
+                <div>
+                  <h3 className="text-sm font-semibold">Canonical product variants</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Edit the same variants used by the product and checkout. Image URLs remain
+                    remote references and are not uploaded to AlexOS storage.
+                  </p>
+                </div>
+                {variantsQuery.data?.length ? (
+                  variantsQuery.data.map((variant) => {
+                    const draft = variantDrafts[variant.id] ?? variant;
+                    return (
+                      <div
+                        key={variant.id}
+                        className="grid gap-3 rounded-2xl border bg-card p-3 sm:grid-cols-2 lg:grid-cols-4"
+                      >
+                        <Input
+                          value={String(draft.name ?? "")}
+                          placeholder="Variant name"
+                          onChange={(event) =>
+                            setVariantDrafts((current) => ({
+                              ...current,
+                              [variant.id]: { ...draft, name: event.target.value },
+                            }))
+                          }
+                        />
+                        <Input
+                          value={String(draft.sku ?? "")}
+                          placeholder="SKU"
+                          onChange={(event) =>
+                            setVariantDrafts((current) => ({
+                              ...current,
+                              [variant.id]: { ...draft, sku: event.target.value },
+                            }))
+                          }
+                        />
+                        <Input
+                          value={String(draft.color ?? "")}
+                          placeholder="Colour"
+                          onChange={(event) =>
+                            setVariantDrafts((current) => ({
+                              ...current,
+                              [variant.id]: { ...draft, color: event.target.value },
+                            }))
+                          }
+                        />
+                        <Input
+                          type="number"
+                          min="0"
+                          value={String(draft.stock_quantity ?? 0)}
+                          placeholder="Stock"
+                          onChange={(event) =>
+                            setVariantDrafts((current) => ({
+                              ...current,
+                              [variant.id]: {
+                                ...draft,
+                                stock_quantity: Number(event.target.value),
+                              },
+                            }))
+                          }
+                        />
+                        <Input
+                          value={String(draft.image_url ?? "")}
+                          placeholder="Remote image URL (optional)"
+                          className="sm:col-span-2 lg:col-span-3"
+                          onChange={(event) =>
+                            setVariantDrafts((current) => ({
+                              ...current,
+                              [variant.id]: { ...draft, image_url: event.target.value },
+                            }))
+                          }
+                        />
+                        <div className="flex items-center justify-between gap-3">
+                          <label className="flex items-center gap-2 text-xs">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(draft.availability_confirmed)}
+                              onChange={(event) =>
+                                setVariantDrafts((current) => ({
+                                  ...current,
+                                  [variant.id]: {
+                                    ...draft,
+                                    availability_confirmed: event.target.checked,
+                                  },
+                                }))
+                              }
+                            />{" "}
+                            Confirmed
+                          </label>
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={() => void saveVariant(variant.id)}
+                            disabled={saveVariantMutation.isPending}
+                          >
+                            <Save className="mr-2 h-4 w-4" /> Save
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    No variants are configured for this canonical product. Add them from the product
+                    catalogue when colour or SKU selection is required.
+                  </p>
+                )}
+              </section>
+            ) : null}
 
             <section className="space-y-4 rounded-2xl border bg-muted/25 p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

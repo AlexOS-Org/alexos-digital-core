@@ -187,6 +187,7 @@ function FunnelPage() {
   const bumpProduct = orderBump
     ? (funnel?.offerProducts.find((offer) => offer.id === orderBump.productId) ?? null)
     : null;
+  const heroImage = selectedVariant?.imageUrl ?? product?.images[0] ?? null;
 
   function addToCheckout() {
     if (!funnel || !product || maxQuantity < 1) return;
@@ -291,10 +292,10 @@ function FunnelPage() {
           </div>
           <div className="rounded-[2rem] border border-white/15 bg-white/[0.08] p-3 shadow-2xl backdrop-blur-md">
             <div className="aspect-square overflow-hidden rounded-[1.5rem] bg-black/20">
-              {product.images[0] ? (
+              {heroImage ? (
                 <img
-                  src={product.images[0]}
-                  alt={product.name}
+                  src={heroImage}
+                  alt={selectedVariant ? `${product.name} — ${selectedVariant.name}` : product.name}
                   fetchPriority="high"
                   decoding="async"
                   className="h-full w-full object-cover"
@@ -306,6 +307,24 @@ function FunnelPage() {
               )}
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="border-b bg-card/60">
+        <div className="mx-auto grid max-w-6xl gap-3 px-5 py-5 sm:grid-cols-3 sm:px-8">
+          {[
+            ["01", "Choose your option", "Select the colour or SKU that fits you."],
+            ["02", "Review at checkout", "Confirm delivery, payment, and your details."],
+            ["03", "We follow up", "Track the order and receive delivery updates."],
+          ].map(([step, title, body]) => (
+            <div key={step} className="flex gap-3 rounded-2xl border bg-background/70 p-4">
+              <span className="text-xs font-black text-primary">{step}</span>
+              <div>
+                <p className="text-sm font-bold">{title}</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">{body}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -421,8 +440,33 @@ function FunnelPage() {
             {landingCopy?.deliveryNote ??
               "Payment and delivery options are confirmed in DailyGear checkout. No payment is treated as settled until confirmed."}
           </p>
+          <Button
+            type="button"
+            variant="ghost"
+            className="mt-2 w-full rounded-xl"
+            onClick={() => navigate({ to: "/shop" })}
+          >
+            <ShoppingBag className="mr-2 h-4 w-4" /> Continue shopping
+          </Button>
         </aside>
       </section>
+
+      <div className="fixed inset-x-3 bottom-3 z-30 md:hidden">
+        <div className="flex items-center gap-3 rounded-2xl border bg-background/95 p-2 shadow-2xl backdrop-blur">
+          <div className="min-w-0 flex-1 px-2">
+            <p className="truncate text-xs font-semibold">
+              {selectedVariant?.name ?? product.name}
+            </p>
+            <p className="text-sm font-black">
+              {product.currency} {price.toLocaleString()}
+            </p>
+          </div>
+          <Button className="rounded-xl" disabled={maxQuantity < 1} onClick={addToCheckout}>
+            {maxQuantity < 1 ? "Unavailable" : "Order now"}
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      </div>
     </main>
   );
 }
