@@ -12,6 +12,20 @@ import type {
 import { cartStore } from "@/lib/storefront/cart";
 import { trackMetaPixel } from "@/lib/storefront/meta-pixel";
 
+interface ConfirmationSnapshot {
+  customerName: string | null;
+  customerEmail: string | null;
+  customerPhone: string;
+  paymentMethod: string;
+  shippingMethod: string;
+  shippingCounty: string;
+  shippingTown: string;
+  shippingAddress: string;
+  shippingAddressDetails: string | null;
+  items: Array<{ name: string; quantity: number; total: number }>;
+  paymentInstructions: { paybill: string; account: string; amount: number } | null;
+}
+
 interface ThankYouSearch {
   order?: string;
   funnel?: string;
@@ -58,8 +72,28 @@ function ThankYou() {
   } = Route.useSearch() as ThankYouSearch;
   const loadFunnel = useServerFn(loadPublicFunnel);
   const [funnel, setFunnel] = useState<PublicFunnel | null>(null);
+  const [confirmation, setConfirmation] = useState<ConfirmationSnapshot | null>(null);
   const [offerIndex, setOfferIndex] = useState(0);
   const [loadingOffer, setLoadingOffer] = useState(Boolean(funnelSlug));
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.sessionStorage.getItem("dailygear:last-confirmation");
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as {
+        order?: string;
+        confirmation?: ConfirmationSnapshot;
+        expiresAt?: number;
+      };
+      if (parsed.order === order && parsed.confirmation && Number(parsed.expiresAt) > Date.now()) {
+        setConfirmation(parsed.confirmation);
+      }
+      window.sessionStorage.removeItem("dailygear:last-confirmation");
+    } catch {
+      window.sessionStorage.removeItem("dailygear:last-confirmation");
+    }
+  }, [order]);
 
   useEffect(() => {
     if (!funnelSlug) return;
@@ -142,6 +176,62 @@ function ThankYou() {
           Your order number is <span className="font-bold">{order}</span>. Keep it safe — you can
           use it to track your delivery.
         </p>
+      ) : null}
+
+      {confirmation ? (
+        <section className="mt-8 space-y-4 rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+              Order details
+            </p>
+            <h2 className="mt-1 text-xl font-black">We have your delivery information</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {confirmation.customerName || "Customer"} · {confirmation.customerPhone}
+              {confirmation.customerEmail ? ` · ${confirmation.customerEmail}` : ""}
+            </p>
+          </div>
+          <div className="grid gap-3 text-sm sm:grid-cols-2">
+            <p>
+              <span className="font-semibold">Delivery:</span> {confirmation.shippingMethod},{" "}
+              {confirmation.shippingTown}, {confirmation.shippingCounty}
+            </p>
+            <p>
+              <span className="font-semibold">Address:</span> {confirmation.shippingAddress}
+              {confirmation.shippingAddressDetails
+                ? ` · ${confirmation.shippingAddressDetails}`
+                : ""}
+            </p>
+            <p>
+              <span className="font-semibold">Payment:</span> {confirmation.paymentMethod}
+            </p>
+          </div>
+          <div className="space-y-2 border-t pt-4">
+            {confirmation.items.map((item, index) => (
+              <div
+                key={`${item.name}-${index}`}
+                className="flex items-center justify-between gap-3 text-sm"
+              >
+                <span>
+                  {item.name} × {item.quantity}
+                </span>
+                {item.total > 0 ? (
+                  <span className="font-semibold">KES {item.total.toLocaleString()}</span>
+                ) : null}
+              </div>
+            ))}
+          </div>
+          {confirmation.paymentInstructions ? (
+            <div className="rounded-2xl border border-primary/20 bg-primary/[0.05] p-4 text-sm">
+              <p className="font-bold">Pay before dispatch</p>
+              <p className="mt-1 text-muted-foreground">
+                Pay KES {confirmation.paymentInstructions.amount.toLocaleString()} via M-Pesa
+                Paybill {confirmation.paymentInstructions.paybill}, account{" "}
+                {confirmation.paymentInstructions.account}. Use your order number as an optional
+                reference and keep the confirmation message.
+              </p>
+            </div>
+          ) : null}
+        </section>
       ) : null}
 
       {loadingOffer ? (

@@ -375,6 +375,16 @@ function CheckoutPage() {
           deliveryDetails: form.deliveryDetails,
         });
       }
+      if (typeof window !== "undefined" && result.confirmation) {
+        window.sessionStorage.setItem(
+          "dailygear:last-confirmation",
+          JSON.stringify({
+            order: result.orderNumber,
+            confirmation: result.confirmation,
+            expiresAt: Date.now() + 30 * 60_000,
+          }),
+        );
+      }
       cart.clear();
       navigate({
         to: "/shop/thank-you",

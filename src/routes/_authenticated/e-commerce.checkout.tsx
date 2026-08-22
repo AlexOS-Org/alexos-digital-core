@@ -74,6 +74,13 @@ function CheckoutPage() {
   const saveOrder = useSaveOrderWithItems();
 
   const [customerId, setCustomerId] = useState<string | "walk-in">("walk-in");
+  const [newCustomer, setNewCustomer] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    city: "",
+  });
   const [channel, setChannel] = useState<string>(SALES_CHANNELS[0]);
   const [paymentMethod, setPaymentMethod] = useState<string>("Cash on delivery");
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>("unpaid");
@@ -112,6 +119,10 @@ function CheckoutPage() {
 
   const availableTowns = townsForCounty(KENYA_COUNTIES.find((item) => item.name === county)?.slug);
   const ready = cart.items.length > 0 && cart.items.some((item) => item.product_id);
+
+  function updateNewCustomer(key: keyof typeof newCustomer, value: string) {
+    setNewCustomer((current) => ({ ...current, [key]: value }));
+  }
 
   const applyCoupon = () => {
     const code = couponCode.trim().toUpperCase();
@@ -176,6 +187,21 @@ function CheckoutPage() {
       .join(", ");
     const draft: DraftOrder = {
       customer_id: customerId === "walk-in" ? null : customerId,
+      customer:
+        customerId === "walk-in" && newCustomer.firstName.trim()
+          ? {
+              first_name: newCustomer.firstName,
+              last_name: newCustomer.lastName,
+              email: newCustomer.email,
+              phone: newCustomer.phone,
+              city: newCustomer.city,
+              country: "Kenya",
+              county,
+              town,
+              address: shippingAddress,
+              notes: `Captured via ${channel}`,
+            }
+          : null,
       channel,
       status: "new",
       payment_status: paymentStatus,
@@ -255,6 +281,45 @@ function CheckoutPage() {
                     </SelectContent>
                   </Select>
                 </div>
+                {customerId === "walk-in" ? (
+                  <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-4 sm:col-span-2">
+                    <p className="text-sm font-semibold">New customer details</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Use this for WhatsApp, phone, or walk-in orders. These details will be saved
+                      to the customer record and linked to this order.
+                    </p>
+                    <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                      <Input
+                        placeholder="First name *"
+                        required
+                        value={newCustomer.firstName}
+                        onChange={(event) => updateNewCustomer("firstName", event.target.value)}
+                      />
+                      <Input
+                        placeholder="Last name"
+                        value={newCustomer.lastName}
+                        onChange={(event) => updateNewCustomer("lastName", event.target.value)}
+                      />
+                      <Input
+                        type="tel"
+                        placeholder="Phone / WhatsApp"
+                        value={newCustomer.phone}
+                        onChange={(event) => updateNewCustomer("phone", event.target.value)}
+                      />
+                      <Input
+                        type="email"
+                        placeholder="Email (optional)"
+                        value={newCustomer.email}
+                        onChange={(event) => updateNewCustomer("email", event.target.value)}
+                      />
+                      <Input
+                        placeholder="City / locality"
+                        value={newCustomer.city}
+                        onChange={(event) => updateNewCustomer("city", event.target.value)}
+                      />
+                    </div>
+                  </div>
+                ) : null}
                 <div>
                   <label className="text-sm font-medium text-foreground">Sales channel</label>
                   <Select value={channel} onValueChange={(value) => setChannel(value)}>

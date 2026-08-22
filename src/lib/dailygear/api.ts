@@ -314,9 +314,23 @@ export interface DraftOrderItem {
   unit_cost: number;
 }
 
+export interface DraftCustomer {
+  first_name: string;
+  last_name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  city?: string | null;
+  country?: string | null;
+  county?: string | null;
+  town?: string | null;
+  notes?: string | null;
+}
+
 export interface DraftOrder {
   id?: string;
   customer_id: string | null;
+  customer?: DraftCustomer | null;
   channel: string;
   status: Order["status"];
   payment_status: Order["payment_status"];
@@ -483,9 +497,32 @@ export function useSaveOrderWithItems() {
       const subtotal = draft.items.reduce((s, i) => s + i.unit_price * i.quantity, 0);
       const total = subtotal + draft.shipping_fee + draft.tax - draft.discount;
 
+      let customerId = draft.customer_id;
+      if (!customerId && draft.customer?.first_name.trim()) {
+        const { data: customer, error: customerError } = await supabase
+          .from("dg_customers")
+          .insert({
+            user_id,
+            first_name: draft.customer.first_name.trim(),
+            last_name: draft.customer.last_name?.trim() || null,
+            email: draft.customer.email?.trim() || null,
+            phone: draft.customer.phone?.trim() || null,
+            address: draft.customer.address?.trim() || null,
+            city: draft.customer.city?.trim() || null,
+            country: draft.customer.country?.trim() || "Kenya",
+            county: draft.customer.county?.trim() || null,
+            town: draft.customer.town?.trim() || null,
+            notes: draft.customer.notes?.trim() || null,
+          })
+          .select("id")
+          .single();
+        if (customerError) throw customerError;
+        customerId = customer.id;
+      }
+
       const payload = {
         user_id,
-        customer_id: draft.customer_id,
+        customer_id: customerId,
         channel: draft.channel,
         status: draft.status,
         payment_status: draft.payment_status,
@@ -585,6 +622,7 @@ export function useSaveOrderWithItems() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["dailygear"] });
+      qc.invalidateQueries({ queryKey: ["customers"] });
       toast.success("Order saved");
     },
     onError: (e: Error) => toast.error(e.message),

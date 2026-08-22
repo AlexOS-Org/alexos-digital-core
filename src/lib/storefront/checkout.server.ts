@@ -252,6 +252,27 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
     shippingFee: Number(result.shippingFee ?? 0),
     currency: typeof result.currency === "string" ? result.currency : "KES",
     funnelId: typeof result.funnelId === "string" ? result.funnelId : null,
+    confirmation: {
+      customerName: [input.firstName, input.lastName].filter(Boolean).join(" "),
+      customerEmail: input.email ?? null,
+      customerPhone: input.phone,
+      paymentMethod: input.paymentMethod,
+      shippingMethod: "Delivery",
+      shippingCounty: input.county,
+      shippingTown: input.town,
+      shippingAddress: input.address,
+      shippingAddressDetails: input.deliveryDetails ?? null,
+      items:
+        createdItems?.map((item) => ({
+          name: item.name,
+          quantity: Number(item.quantity ?? 0),
+          total: Number(item.total ?? 0),
+        })) ??
+        input.items.map((item) => ({ name: item.productId, quantity: item.quantity, total: 0 })),
+      paymentInstructions: /m-?pesa/i.test(input.paymentMethod)
+        ? { paybill: "542542", account: "184545", amount: Number(result.total ?? 0) }
+        : null,
+    },
   };
 }
 
@@ -265,7 +286,7 @@ export async function trackOrderImpl(rawNumber: unknown, rawContact: unknown) {
   const { data: order, error } = await supabaseAdmin
     .from("dg_orders")
     .select(
-      "id,order_number,status,payment_status,total,currency,placed_at,delivered_at,tracking_number,shipping_method,customer_id",
+      "id,order_number,status,payment_status,total,currency,placed_at,delivered_at,tracking_number,shipping_method,payment_method,shipping_address,shipping_country,shipping_county,shipping_town,shipping_address_details,customer_id",
     )
     .eq("order_number", number)
     .is("deleted_at", null)
@@ -275,7 +296,7 @@ export async function trackOrderImpl(rawNumber: unknown, rawContact: unknown) {
 
   const { data: customer } = await supabaseAdmin
     .from("dg_customers")
-    .select("email,phone")
+    .select("first_name,last_name,email,phone")
     .eq("id", order.customer_id ?? "")
     .maybeSingle();
 
@@ -284,14 +305,24 @@ export async function trackOrderImpl(rawNumber: unknown, rawContact: unknown) {
     (customer?.phone ?? "").toLowerCase() === contact;
   if (!matches) throw new Error("No order found with that number.");
 
-  const { data: events } = await supabaseAdmin
-    .from("dg_order_events")
-    .select("id,type,title,occurred_at")
-    .eq("order_id", order.id)
-    .order("occurred_at", { ascending: false });
+  const [{ data: events }, { data: items }] = await Promise.all([
+    supabaseAdmin
+      .from("dg_order_events")
+      .select("id,type,title,occurred_at")
+      .eq("order_id", order.id)
+      .order("occurred_at", { ascending: false }),
+    supabaseAdmin
+      .from("dg_order_items")
+      .select("name,sku,quantity,total")
+      .eq("order_id", order.id)
+      .order("created_at", { ascending: true }),
+  ]);
 
   return {
     orderNumber: order.order_number,
+    customerName: [customer?.first_name, customer?.last_name].filter(Boolean).join(" ") || null,
+    customerEmail: customer?.email ?? null,
+    customerPhone: customer?.phone ?? null,
     status: order.status,
     paymentStatus: order.payment_status,
     total: Number(order.total),
@@ -300,6 +331,23 @@ export async function trackOrderImpl(rawNumber: unknown, rawContact: unknown) {
     deliveredAt: order.delivered_at,
     trackingNumber: order.tracking_number,
     shippingMethod: order.shipping_method,
+    paymentMethod: order.payment_method,
+    shippingAddress: order.shipping_address,
+    shippingCountry: order.shipping_country,
+    shippingCounty: order.shipping_county,
+    shippingTown: order.shipping_town,
+    shippingAddressDetails: order.shipping_address_details,
+    paymentInstructions:
+      order.payment_method?.toLowerCase().includes("m-pesa") ||
+      order.payment_method?.toLowerCase().includes("mpesa")
+        ? { paybill: "542542", account: "184545", amount: Number(order.total) }
+        : null,
+    items: (items ?? []).map((item) => ({
+      name: item.name,
+      sku: item.sku,
+      quantity: item.quantity,
+      total: Number(item.total),
+    })),
     events: events ?? [],
   };
 }
