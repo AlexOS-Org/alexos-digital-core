@@ -19,7 +19,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PRODUCT_STATUS_META } from "@/lib/dailygear/constants";
-import { useBrands, useCategories, useSaveProduct, useSuppliers } from "@/lib/dailygear/api";
+import {
+  useBrands,
+  useCategories,
+  useSaveProduct,
+  useSuppliers,
+  useVariants,
+} from "@/lib/dailygear/api";
 import type { Product, ProductStatus } from "@/lib/dailygear/types";
 
 const EMPTY = {
@@ -60,6 +66,7 @@ export function ProductFormDialog({
   const { data: categories = [] } = useCategories();
   const { data: brands = [] } = useBrands();
   const { data: suppliers = [] } = useSuppliers();
+  const { data: variants = [] } = useVariants(product?.id ? { product_id: product.id } : undefined);
 
   useEffect(() => {
     if (!open) return;
@@ -98,17 +105,26 @@ export function ProductFormDialog({
   const hasConfirmedAvailability = form.availability_confirmed === "true";
   const hasCategory = Boolean(form.category_id);
   const hasEvidence = evidenceCount > 0;
+  const incompleteVariants = variants.filter(
+    (variant) => Number(variant.stock_quantity) < 15 || !variant.availability_confirmed,
+  );
+  const hasVariantReadiness = incompleteVariants.length === 0;
   const missingPublicationRequirements = [
     !hasMinimumStock ? "at least 15 units" : null,
     !hasConfirmedAvailability ? "confirmed availability" : null,
     !hasCategory ? "a primary category" : null,
     !hasEvidence ? "source evidence" : null,
+    !hasVariantReadiness
+      ? "every colour/SKU variant must have confirmed availability and at least 15 units"
+      : null,
   ].filter((requirement): requirement is string => Boolean(requirement));
   const publicationBlocked = form.status === "active" && missingPublicationRequirements.length > 0;
   const invalid = !form.name.trim() || Number(form.price) <= 0 || publicationBlocked;
 
-  async function submit() {
-    if (invalid) return;
+  async function submit(statusOverride?: ProductStatus) {
+    const nextStatus = statusOverride ?? form.status;
+    if (!form.name.trim() || Number(form.price) <= 0) return;
+    if (nextStatus === "active" && missingPublicationRequirements.length > 0) return;
     await save.mutateAsync({
       ...(product ? { id: product.id } : {}),
       name: form.name.trim(),
@@ -123,7 +139,7 @@ export function ProductFormDialog({
         .map((keyword) => keyword.trim())
         .filter(Boolean),
       image_alt_text: form.image_alt_text.trim() || null,
-      status: form.status,
+      status: nextStatus,
       availability_confirmed: form.availability_confirmed === "true",
       price: Number(form.price) || 0,
       sale_price: form.sale_price ? Number(form.sale_price) : null,
@@ -392,7 +408,10 @@ export function ProductFormDialog({
                 </p>
                 <p className="mt-1 text-muted-foreground">
                   An active product needs {missingPublicationRequirements.join(", ")}. Keep it as a
-                  draft until the source, category and stock are verified.
+                  draft until the source, category, variant availability and stock are verified.
+                  {incompleteVariants.length > 0
+                    ? ` ${incompleteVariants.length} child variant${incompleteVariants.length === 1 ? "" : "s"} still need attention.`
+                    : ""}
                 </p>
               </div>
             </div>
@@ -403,7 +422,12 @@ export function ProductFormDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={submit} disabled={invalid || save.isPending}>
+          {publicationBlocked ? (
+            <Button variant="secondary" onClick={() => submit("draft")} disabled={save.isPending}>
+              Save as draft
+            </Button>
+          ) : null}
+          <Button onClick={() => submit()} disabled={invalid || save.isPending}>
             {save.isPending ? "Saving…" : "Save product"}
           </Button>
         </DialogFooter>
