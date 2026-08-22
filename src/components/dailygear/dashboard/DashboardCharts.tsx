@@ -43,7 +43,7 @@ function ChartShell({
     <Card className={cn("h-full rounded-3xl border-border/60 soft-shadow", className)}>
       <CardHeader className="flex flex-row items-center justify-between gap-3 pb-2">
         <CardTitle className="flex min-w-0 items-center gap-2 text-sm font-semibold">
-          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary/10 text-primary ring-1 ring-inset ring-primary/10">
             <Icon className="h-3.5 w-3.5" />
           </span>
           <span className="truncate">{title}</span>
@@ -55,7 +55,10 @@ function ChartShell({
         ) : null}
       </CardHeader>
       <CardContent className="pt-0">
-        <div style={{ height }}>
+        <div
+          className="h-[clamp(180px,24vw,240px)]"
+          style={{ height: `clamp(180px, 24vw, ${height}px)` }}
+        >
           <ResponsiveContainer width="100%" height="100%">
             {children}
           </ResponsiveContainer>
@@ -223,7 +226,7 @@ export function MetaAnalyticsPanel() {
     <Card className="h-full rounded-3xl border-border/60 soft-shadow">
       <CardHeader className="flex flex-row items-center justify-between gap-3 pb-3">
         <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-          <span className="grid h-7 w-7 place-items-center rounded-xl bg-chart-2/10 text-chart-2">
+          <span className="grid h-8 w-8 place-items-center rounded-full bg-chart-2/10 text-chart-2 ring-1 ring-inset ring-chart-2/10">
             <Facebook className="h-3.5 w-3.5" />
           </span>
           Facebook & Meta

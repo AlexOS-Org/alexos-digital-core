@@ -80,7 +80,7 @@ export default function BusinessSnapshot() {
     return (
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-[168px] rounded-[1.6rem]" />
+          <Skeleton key={i} className="h-[148px] rounded-[1.6rem]" />
         ))}
       </div>
     );
@@ -96,12 +96,12 @@ export default function BusinessSnapshot() {
               <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${item.accent}`} />
               <CardContent className="relative p-5">
                 <div className="flex items-center justify-between">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/[0.07] text-primary">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/[0.07] text-primary ring-1 ring-inset ring-primary/10">
                     <Icon className="h-5 w-5" />
                   </div>
                   <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </div>
-                <div className="mt-7">
+                <div className="mt-5">
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                     {item.title}
                   </p>
