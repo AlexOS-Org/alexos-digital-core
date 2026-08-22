@@ -115,7 +115,7 @@ export async function calculateDailyGearProfitCashFlowForUser(
     .eq("user_id", context.userId);
   const expenseQuery = context.supabase
     .from("dg_order_expenses")
-    .select("id,order_id,cost_type,amount,created_at,description,money_transaction_id")
+    .select("id,order_id,cost_type,amount,created_at,description,money_transaction_id,cash_paid")
     .eq("user_id", context.userId);
   const paymentQuery = context.supabase
     .from("dg_order_payments")
@@ -160,6 +160,7 @@ export async function calculateDailyGearProfitCashFlowForUser(
     orderId: expense.order_id,
     costType: expense.cost_type as DailyGearOrderExpense["costType"],
     amount: Number(expense.amount ?? 0),
+    cashPaid: expense.cash_paid !== false,
     currency: currencyByOrder.get(expense.order_id) ?? "KES",
     date: expense.created_at,
     note: expense.description,

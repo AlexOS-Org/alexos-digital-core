@@ -31,18 +31,26 @@ interface Props {
 interface FormState {
   purchaseCost: string;
   deliveryCost: string;
+  advertisingCost: string;
   otherCost: string;
   otherDescription: string;
   accountId: string;
+  supplierPaid: boolean;
+  supplierPaymentAmount: string;
+  supplierPaymentAccountId: string;
   advanceOrder: boolean;
 }
 
 const EMPTY: FormState = {
   purchaseCost: "",
   deliveryCost: "",
+  advertisingCost: "",
   otherCost: "",
   otherDescription: "",
   accountId: "",
+  supplierPaid: false,
+  supplierPaymentAmount: "",
+  supplierPaymentAccountId: "",
   advanceOrder: true,
 };
 
@@ -62,6 +70,7 @@ export function OrderFulfilmentDialog({ open, onOpenChange, order }: Props) {
     return {
       purchase: map.get("purchase_cost"),
       delivery: map.get("delivery"),
+      advertising: map.get("advertising"),
       other: map.get("other"),
     };
   }, [expenses.data]);
@@ -74,14 +83,24 @@ export function OrderFulfilmentDialog({ open, onOpenChange, order }: Props) {
     setForm({
       purchaseCost: existing.purchase?.amount ? String(existing.purchase.amount) : "",
       deliveryCost: existing.delivery?.amount ? String(existing.delivery.amount) : "",
+      advertisingCost: existing.advertising?.amount ? String(existing.advertising.amount) : "",
       otherCost: existing.other?.amount ? String(existing.other.amount) : "",
       otherDescription: existing.other?.description ?? "",
       accountId:
         existing.purchase?.account_id ??
         existing.delivery?.account_id ??
+        existing.advertising?.account_id ??
         existing.other?.account_id ??
         accounts.data?.[0]?.id ??
         "",
+      supplierPaid: Boolean(existing.purchase?.cash_paid),
+      supplierPaymentAmount:
+        existing.purchase?.cash_paid && existing.purchase.amount
+          ? String(existing.purchase.amount)
+          : "",
+      supplierPaymentAccountId: existing.purchase?.cash_paid
+        ? (existing.purchase.account_id ?? "")
+        : "",
       advanceOrder: Boolean(nextStatus),
     });
   }, [accounts.data, existing, nextStatus, open, order]);
@@ -89,6 +108,7 @@ export function OrderFulfilmentDialog({ open, onOpenChange, order }: Props) {
   const posted = Boolean(
     existing.purchase?.money_transaction_id ||
     existing.delivery?.money_transaction_id ||
+    existing.advertising?.money_transaction_id ||
     existing.other?.money_transaction_id,
   );
 
@@ -100,9 +120,19 @@ export function OrderFulfilmentDialog({ open, onOpenChange, order }: Props) {
     if (!order) return;
     const purchaseCost = amount(form.purchaseCost);
     const deliveryCost = amount(form.deliveryCost);
+    const advertisingCost = amount(form.advertisingCost);
     const otherCost = amount(form.otherCost);
-    if (purchaseCost + deliveryCost + otherCost > 0 && !form.accountId) {
+    const supplierPaymentAmount = amount(form.supplierPaymentAmount);
+    if (purchaseCost + deliveryCost + advertisingCost + otherCost > 0 && !form.accountId) {
       toast.error("Select the Money Center account used to pay the fulfilment costs.");
+      return;
+    }
+    if (form.supplierPaid && supplierPaymentAmount <= 0) {
+      toast.error("Enter the supplier payment amount when supplier paid is Yes.");
+      return;
+    }
+    if (form.supplierPaid && !form.supplierPaymentAccountId) {
+      toast.error("Select the account used to pay the supplier when supplier paid is Yes.");
       return;
     }
     if (otherCost > 0 && !form.otherDescription.trim()) {
@@ -114,8 +144,12 @@ export function OrderFulfilmentDialog({ open, onOpenChange, order }: Props) {
       orderId: order.id,
       purchaseCost,
       deliveryCost,
+      advertisingCost,
       otherCost,
       accountId: form.accountId || null,
+      supplierPaid: form.supplierPaid,
+      supplierPaymentAmount: form.supplierPaid ? supplierPaymentAmount : null,
+      supplierPaymentAccountId: form.supplierPaid ? form.supplierPaymentAccountId || null : null,
       otherDescription: form.otherDescription.trim() || null,
       nextStatus: form.advanceOrder ? nextStatus : null,
     });
@@ -168,7 +202,23 @@ export function OrderFulfilmentDialog({ open, onOpenChange, order }: Props) {
             ) : null}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="order-other-cost">Other fulfilment cost (KES)</Label>
+            <Label htmlFor="order-advertising-cost">Advertising cost (KES)</Label>
+            <Input
+              id="order-advertising-cost"
+              type="number"
+              min="0"
+              step="0.01"
+              value={form.advertisingCost}
+              disabled={Boolean(existing.advertising?.money_transaction_id)}
+              onChange={(event) => set("advertisingCost", event.target.value)}
+              placeholder="0"
+            />
+            {existing.advertising?.money_transaction_id ? (
+              <p className="text-[11px] text-muted-foreground">Already posted to Money Center.</p>
+            ) : null}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="order-other-cost">Packaging or other cost (KES)</Label>
             <Input
               id="order-other-cost"
               type="number"
@@ -192,7 +242,7 @@ export function OrderFulfilmentDialog({ open, onOpenChange, order }: Props) {
           </div>
         </div>
 
-        <div className="space-y-2 rounded-2xl border bg-muted/25 p-4">
+        <div className="space-y-4 rounded-2xl border bg-muted/25 p-4">
           <div className="flex items-center gap-2">
             <WalletCards className="h-4 w-4 text-primary" />
             <Label htmlFor="order-cost-account">Paid from Money Center account</Label>
@@ -212,9 +262,63 @@ export function OrderFulfilmentDialog({ open, onOpenChange, order }: Props) {
             </SelectContent>
           </Select>
           <p className="text-[11px] leading-5 text-muted-foreground">
-            All non-zero costs in this save are posted as business expenses from this account. The
-            order’s unpaid COD status remains unchanged; receiving payment is a separate action.
+            All non-zero fulfilment costs are recorded for this order. Only costs with a selected
+            paid-from account create a Money Center cash transaction.
           </p>
+
+          <label className="flex items-start gap-3 rounded-xl border bg-background p-3 text-sm">
+            <input
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 accent-primary"
+              checked={form.supplierPaid}
+              disabled={Boolean(existing.purchase?.money_transaction_id)}
+              onChange={(event) => set("supplierPaid", event.target.checked)}
+            />
+            <span>
+              <span className="font-semibold">Supplier paid?</span>
+              <span className="mt-1 block text-xs text-muted-foreground">
+                Select Yes only when money actually left an account. Select No to save the supplier
+                cost for profit analysis without posting supplier cash.
+              </span>
+            </span>
+          </label>
+
+          {form.supplierPaid ? (
+            <div className="grid gap-4 sm:grid-cols-2 rounded-xl border border-emerald-200 bg-emerald-50/60 p-3">
+              <div className="space-y-2">
+                <Label htmlFor="supplier-payment-amount">Actual supplier payment (KES)</Label>
+                <Input
+                  id="supplier-payment-amount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.supplierPaymentAmount}
+                  disabled={Boolean(existing.purchase?.money_transaction_id)}
+                  onChange={(event) => set("supplierPaymentAmount", event.target.value)}
+                  placeholder="Enter amount paid"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="supplier-payment-account">Supplier paid from</Label>
+                <Select
+                  value={form.supplierPaymentAccountId}
+                  disabled={Boolean(existing.purchase?.money_transaction_id)}
+                  onValueChange={(value) => set("supplierPaymentAccountId", value)}
+                >
+                  <SelectTrigger id="supplier-payment-account">
+                    <SelectValue placeholder="Select account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(accounts.data ?? []).map((account) => (
+                      <SelectItem key={account.id} value={account.id}>
+                        {account.name} · {account.currency}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          ) : null}
         </div>
 
         {nextStatus ? (

@@ -25,8 +25,9 @@ export interface DailyGearCashFlowEvent {
 export interface DailyGearOrderExpense {
   id: string;
   orderId: string;
-  costType: "purchase_cost" | "delivery" | "other";
+  costType: "purchase_cost" | "delivery" | "advertising" | "other";
   amount: number;
+  cashPaid?: boolean;
   currency: string;
   date: string;
   note?: string | null;
@@ -230,9 +231,16 @@ export function calculateDailyGearProfitAndCashFlow(
     const day = dateOnly(expense.date);
     if (expense.costType === "delivery" && !hasExplicitDeliveryPayments)
       addToMap(deliveryCostsByDate, day, num(expense.amount));
-    if (expense.costType === "other" && !hasExplicitOtherOutflows)
+    if (
+      (expense.costType === "advertising" || expense.costType === "other") &&
+      !hasExplicitOtherOutflows
+    )
       addToMap(otherOutflowsByDate, day, num(expense.amount));
-    if (expense.costType === "purchase_cost" && !hasExplicitSupplierPayments)
+    if (
+      expense.costType === "purchase_cost" &&
+      expense.cashPaid !== false &&
+      !hasExplicitSupplierPayments
+    )
       addToMap(supplierPaymentsByDate, day, num(expense.amount));
   }
 

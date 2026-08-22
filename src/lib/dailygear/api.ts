@@ -438,11 +438,12 @@ export interface OrderExpense {
   id: string;
   user_id: string;
   order_id: string;
-  cost_type: "purchase_cost" | "delivery" | "other";
+  cost_type: "purchase_cost" | "delivery" | "advertising" | "other";
   amount: number;
   account_id: string | null;
   description: string | null;
   money_transaction_id: string | null;
+  cash_paid: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -468,8 +469,12 @@ export interface OrderFulfilmentInput {
   orderId: string;
   purchaseCost: number;
   deliveryCost: number;
+  advertisingCost: number;
   otherCost: number;
   accountId: string | null;
+  supplierPaid: boolean;
+  supplierPaymentAmount: number | null;
+  supplierPaymentAccountId: string | null;
   otherDescription: string | null;
   nextStatus: Order["status"] | null;
 }
@@ -482,8 +487,12 @@ export function useRecordOrderFulfilment() {
         p_order_id: input.orderId,
         p_purchase_cost: input.purchaseCost,
         p_delivery_cost: input.deliveryCost,
+        p_advertising_cost: input.advertisingCost,
         p_other_cost: input.otherCost,
         p_account_id: input.accountId ?? undefined,
+        p_supplier_paid: input.supplierPaid,
+        p_supplier_payment_amount: input.supplierPaymentAmount ?? undefined,
+        p_supplier_payment_account_id: input.supplierPaymentAccountId ?? undefined,
         p_other_description: input.otherDescription ?? undefined,
         p_next_status: input.nextStatus ?? undefined,
       });

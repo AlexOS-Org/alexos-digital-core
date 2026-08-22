@@ -1363,6 +1363,7 @@ export type Database = {
         Row: {
           account_id: string | null
           amount: number
+          cash_paid: boolean
           cost_type: string
           created_at: string
           description: string | null
@@ -1375,6 +1376,7 @@ export type Database = {
         Insert: {
           account_id?: string | null
           amount?: number
+          cash_paid?: boolean
           cost_type: string
           created_at?: string
           description?: string | null
@@ -1387,6 +1389,7 @@ export type Database = {
         Update: {
           account_id?: string | null
           amount?: number
+          cash_paid?: boolean
           cost_type?: string
           created_at?: string
           description?: string | null
@@ -2868,12 +2871,16 @@ export type Database = {
       dg_record_order_fulfilment: {
         Args: {
           p_account_id?: string
+          p_advertising_cost?: number
           p_delivery_cost?: number
           p_next_status?: Database["public"]["Enums"]["dg_order_status"]
           p_order_id: string
           p_other_cost?: number
           p_other_description?: string
           p_purchase_cost?: number
+          p_supplier_paid?: boolean
+          p_supplier_payment_account_id?: string
+          p_supplier_payment_amount?: number
         }
         Returns: Json
       }
