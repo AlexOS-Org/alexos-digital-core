@@ -171,6 +171,9 @@ function CheckoutPage() {
   });
   const selectedCounty = KENYA_COUNTIES.find((county) => county.name === form.county);
   const availableTowns = townsForCounty(selectedCounty?.slug);
+  const isNearbyDeliveryArea = new Set(["nairobi", "kiambu", "kajiado"]).has(
+    form.county.trim().toLowerCase(),
+  );
 
   useEffect(() => {
     if (search.recovery) return;
@@ -689,6 +692,28 @@ function CheckoutPage() {
                 </Label>
               ))}
             </RadioGroup>
+            {form.paymentMethod === "mpesa" ? (
+              <div className="rounded-xl border border-primary/20 bg-primary/[0.05] p-4 text-xs leading-relaxed">
+                <p className="font-semibold text-foreground">Complete payment securely by M-Pesa</p>
+                <p className="mt-1 text-muted-foreground">
+                  Paybill <strong className="text-foreground">542542</strong> · Account{" "}
+                  <strong className="text-foreground">184545</strong> · Amount{" "}
+                  <strong className="text-foreground">
+                    {formatMoney(cart.subtotal + shipping, currency)}
+                  </strong>
+                </p>
+                <p className="mt-2 text-muted-foreground">
+                  {isNearbyDeliveryArea
+                    ? "Your area is within our nearby delivery area. We will confirm the route and dispatch details after your order."
+                    : "Your area is outside our nearby Nairobi-area route. Paying before dispatch helps us confirm the route; any delivery benefit or discount is offered only when it is explicitly approved and remains profit-safe."}
+                </p>
+                <p className="mt-2 text-muted-foreground">
+                  After paying, keep the M-Pesa code and reply to the confirmation email or WhatsApp
+                  message so we can match your receipt. You may choose pay on delivery instead if
+                  that option is available for your route.
+                </p>
+              </div>
+            ) : null}
           </section>
         </div>
 

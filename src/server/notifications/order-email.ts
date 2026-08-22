@@ -1,6 +1,7 @@
 export interface OrderNotificationInput {
   orderNumber: string;
   total: number;
+  shippingFee?: number;
   currency: string;
   paymentMethod: string;
   customerName: string;
@@ -22,6 +23,26 @@ export interface OrderNotificationInput {
 function requiredEnv(name: string) {
   const value = process.env[name]?.trim();
   return value || null;
+}
+
+function paymentInstructions(input: OrderNotificationInput) {
+  if (input.paymentMethod !== "mpesa") return [];
+  const paybill = requiredEnv("DAILYGEAR_MPESA_PAYBILL") || "542542";
+  const account = requiredEnv("DAILYGEAR_MPESA_ACCOUNT") || "184545";
+  const nearbyCounties = new Set(["nairobi", "kiambu", "kajiado"]);
+  const outsideNearby = !nearbyCounties.has(input.county.trim().toLowerCase());
+  return [
+    "M-Pesa payment instructions:",
+    `Paybill: ${paybill}`,
+    `Account: ${account}`,
+    `Amount: ${input.currency} ${input.total.toLocaleString()}`,
+    "Use your order number as the payment reference where your M-Pesa screen allows it.",
+    "After payment, reply with the M-Pesa transaction code so DailyGear can match and confirm the receipt.",
+    outsideNearby
+      ? "Your location is outside the Nairobi, Kiambu and Kajiado nearby-delivery area. Paying before dispatch lets us confirm the route and any approved prepayment delivery benefit before fulfilment; no discount is applied unless it is explicitly confirmed."
+      : "Your location is within our nearby-delivery area. We will confirm the delivery route and collection or prepayment details with you.",
+    "If you prefer pay on delivery, reply to this message and we will confirm whether that option is available for your route.",
+  ];
 }
 
 function plainText(input: OrderNotificationInput, audience: "customer" | "owner") {
@@ -49,6 +70,7 @@ function plainText(input: OrderNotificationInput, audience: "customer" | "owner"
     `Delivery: ${input.county} — ${input.town}`,
     `Address: ${input.address}`,
     input.deliveryDetails ? `Delivery details: ${input.deliveryDetails}` : "",
+    ...(audience === "customer" ? paymentInstructions(input) : []),
     `Customer phone: ${input.customerPhone}`,
     input.customerEmail ? `Customer email: ${input.customerEmail}` : "",
     "",
