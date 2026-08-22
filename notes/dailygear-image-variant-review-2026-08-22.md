@@ -1,0 +1,39 @@
+# DailyGear external image and variant review — 2026-08-22
+
+## Publication rule
+
+No product should be published solely because a campaign name exists. Each active product requires an exact matching external HTTPS image URL, image alt text, verified source evidence, category, SEO title and description, confirmed availability, and complete confirmed child variants. The public RLS policies already hide drafts and unavailable variants; the owner can continue to review them in admin.
+
+## Current evidence status
+
+The persisted Meta Insights and campaign records contain names, spend, reach/impressions, actions, and campaign IDs, but no creative-level `image_url`, `thumbnail_url`, or `picture` fields. Consequently, the exact image for each product cannot be truthfully inferred from the current Meta export. The admin form now accepts external HTTPS image URLs and previews them without storing image binaries.
+
+| Product family | Image URL status | Variant status | Publication decision |
+|---|---|---|---|
+| YJ / children’s school bags | Exact source images not present in persisted Meta export; use the user-provided YJ source images or verified supplier URLs | Consolidate blue and pink into one parent only after confirming they share product identity; retain separate colour availability flags | Blocked pending image and SKU confirmation |
+| Miyouqi / Forevermore school bag | No exact creative URL in export | Dimensions, colours, and SKU need verification | Draft only |
+| Top Bear Kids School Bag | No exact creative URL in export | Colour/size needs verification | Draft only |
+| Sultan School Backpack | No exact creative URL in export | Colour/size needs verification | Draft only |
+| 2024 Ladies Backpack | No exact creative URL in export | Colour/size needs verification | Draft only |
+| Laptop Backpack | No exact creative URL in export | Laptop-size compatibility needs verification | Draft only |
+| Travel and duffel bags | No exact creative URL in export | Capacity/colour needs verification | Draft only |
+| 20,000mAh and 30,000mAh power banks | No exact creative URL in export | Capacity, ports, wireless/solar functions, and model need verification | Draft only |
+| P88, PZX V79, ROZAL power banks | No exact creative URL in export | Model-specific functions and capacity need verification | Draft only |
+| LDNIO C506Q charger | No exact creative URL in export | Output wattage and connector type need verification | Draft only |
+| HY01, COLMI P81, COLMI V71 watches | No exact creative URL in export | Model, strap colour, functions, and compatibility need verification | Draft only |
+| Naviforce 9153, Megir, Curren, Skmei watches | No exact creative URL in export | Model/brand evidence and colour/strap mappings need verification | Draft only |
+| Handbag and sling-bag families | No exact creative URL in export | Colour/set contents need verification | Draft only |
+
+## YJ mapping target
+
+The safe target structure is one parent product, for example `Quality Waterproof YJ Children’s School Bag`, with colour variants such as `Red`, `Pink`, and `Blue` only where the source image and dimensions prove the variant. If the 31 × 20 × 16 cm red item and the 42 × 20 × 18 cm all-colour item are materially different products, they must remain separate parent products instead of being merged. Each variant should carry its own external `image_url`, colour/size options, SKU, price override if needed, stock status, and `availability_confirmed` value.
+
+When a variant is marked unavailable, the customer-facing query must exclude it while the authenticated owner query retains it. The owner should use explicit `out_of_stock` or `availability_confirmed = false`; quantity alone is not the storefront publication switch.
+
+## Copy standard
+
+Public descriptions should state only verified material, size, capacity, colour, included accessories, compatibility, delivery terms, and warranty information. Use AIDA structure for readability, but avoid unsupported scarcity, guarantees, medical claims, or competitor comparisons. The same verified facts should feed the SEO title, meta description, image alt text, product page, funnel, and ad copy.
+
+## Required owner inputs before exact matching
+
+For each product or variant, provide or approve the exact image URL, brand/model, capacity or dimensions, colour name, supplier cost, selling price, and available quantity. Once these are supplied, the product can be mapped to its existing category/subcategory and prepared for a draft-to-active review without creating duplicate parent products.
