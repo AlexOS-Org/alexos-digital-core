@@ -1,22 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
-  BatteryCharging,
   CheckCircle2,
   Compass,
   PackageCheck,
   ShieldCheck,
-  ShoppingBag,
   Sparkles,
-  Watch,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductCard } from "@/components/storefront/ProductCard";
 import { StoreConfidenceStrip } from "@/components/storefront/StoreConfidenceStrip";
-import { StoreJourneyGuide } from "@/components/storefront/StoreJourneyGuide";
-import { StoreVisualValueGrid } from "@/components/storefront/StoreVisualValueGrid";
-import { useStoreCategories, useStoreProducts, useStorefront } from "@/lib/storefront/api";
+import { useStoreProducts, useStorefront } from "@/lib/storefront/api";
 import dailyGearHeroPremiumWide from "@/assets/visuals/dailygear-hero-premium-wide.webp";
 import dailyGearHeroPremiumMobile from "@/assets/visuals/dailygear-hero-premium-mobile.webp";
 
@@ -61,18 +56,10 @@ export const Route = createFileRoute("/shop/")({
   component: StoreHome,
 });
 
-const PILLARS = [
-  { label: "Carry", copy: "Bags and daily movement", icon: ShoppingBag },
-  { label: "Power", copy: "Charge the day ahead", icon: BatteryCharging },
-  { label: "Style", copy: "Details that finish the look", icon: Watch },
-];
-
 function StoreHome() {
   const { data: store } = useStorefront();
-  const { data: categories } = useStoreCategories(store?.user_id);
-  const featured = useStoreProducts(store?.user_id, { limit: 8 });
+  const featured = useStoreProducts(store?.user_id, { limit: 4 });
   const currency = store?.currency ?? "KES";
-  const primaryCategories = (categories ?? []).filter((category) => !category.parent_id);
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-16 pt-5 sm:pt-8 4k:max-w-[1800px] 4k:px-8">
@@ -164,70 +151,9 @@ function StoreHome() {
         </div>
       </section>
 
-      <div className="dailygear-below-fold">
+      <div className="dailygear-below-fold mt-8">
         <StoreConfidenceStrip />
-        <StoreJourneyGuide />
-        <StoreVisualValueGrid />
       </div>
-
-      <section
-        className="dailygear-below-fold mt-10 grid gap-3 md:grid-cols-3"
-        aria-label="DailyGear collection pillars"
-      >
-        {PILLARS.map((pillar) => (
-          <Link
-            key={pillar.label}
-            to="/shop/products"
-            className="group flex items-center gap-4 rounded-2xl border bg-card p-4 transition duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md"
-          >
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
-              <pillar.icon className="h-5 w-5" aria-hidden="true" />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-sm font-bold group-hover:text-primary">
-                {pillar.label}
-              </span>
-              <span className="mt-1 block text-xs text-muted-foreground">{pillar.copy}</span>
-            </span>
-            <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground transition group-hover:translate-x-1 group-hover:text-primary" />
-          </Link>
-        ))}
-      </section>
-
-      {primaryCategories.length ? (
-        <section className="dailygear-below-fold mt-14 space-y-4">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                Browse the edit
-              </p>
-              <h2 className="mt-1 text-2xl font-black tracking-tight">Shop by category</h2>
-            </div>
-            <Link
-              to="/shop/products"
-              className="text-sm font-semibold text-primary hover:underline"
-            >
-              View all
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-            {primaryCategories.map((category) => (
-              <Link
-                key={category.id}
-                to="/shop/products"
-                search={{ category: category.id }}
-                className="group relative overflow-hidden rounded-2xl border bg-card p-5 transition duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md"
-              >
-                <span className="absolute -right-7 -top-7 h-20 w-20 rounded-full bg-primary/10 blur-2xl transition group-hover:bg-primary/20" />
-                <span className="relative block text-sm font-bold group-hover:text-primary">
-                  {category.name}
-                </span>
-                <ArrowRight className="relative mt-6 h-4 w-4 text-muted-foreground transition group-hover:translate-x-1 group-hover:text-primary" />
-              </Link>
-            ))}
-          </div>
-        </section>
-      ) : null}
 
       <section className="dailygear-below-fold mt-14 space-y-4">
         <div className="flex items-end justify-between gap-4">
@@ -235,7 +161,7 @@ function StoreHome() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
               The current drop
             </p>
-            <h2 className="mt-1 text-2xl font-black tracking-tight">Featured products</h2>
+            <h2 className="mt-1 text-2xl font-black tracking-tight">A small edit to start</h2>
           </div>
           <Link to="/shop/products" className="text-sm font-semibold text-primary hover:underline">
             View all
@@ -309,6 +235,20 @@ function StoreHome() {
             </div>
           </div>
         )}
+      </section>
+
+      <section className="dailygear-below-fold mt-12 rounded-[2rem] border bg-card p-6 text-center sm:p-10">
+        <Sparkles className="mx-auto h-6 w-6 text-primary" aria-hidden="true" />
+        <h2 className="mt-3 text-2xl font-black tracking-tight">Be first to see the next drop</h2>
+        <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
+          We keep the home page focused. For new arrivals and approved special offers, ask DailyGear
+          to add you to the email list.
+        </p>
+        <Button asChild className="mt-5 rounded-xl">
+          <a href="mailto:dailygear.co.ke@gmail.com?subject=DailyGear%20email%20updates">
+            Request email updates <ArrowRight className="ml-2 h-4 w-4" />
+          </a>
+        </Button>
       </section>
     </div>
   );
