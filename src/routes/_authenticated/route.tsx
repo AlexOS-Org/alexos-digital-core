@@ -40,10 +40,10 @@ function MobileWorkspaceHeader({
 
   return (
     <header
-      className={`relative isolate sticky top-0 z-20 flex h-[4.5rem] items-center gap-3 overflow-hidden border-b px-4 backdrop-blur-xl ${isDailyGearRoute ? "border-white/10 bg-[#090b11]/95 text-white" : "border-border/60 bg-background/90"}`}
+      className={`relative isolate sticky top-0 z-20 flex h-[4.5rem] touch-pan-y items-center gap-3 overflow-hidden border-b px-4 backdrop-blur-xl ${isDailyGearRoute ? "border-white/10 bg-sidebar/80 text-white" : "border-border/60 bg-background/90"}`}
     >
       <SidebarTrigger
-        className={`tap-target rounded-xl ${isDailyGearRoute ? "text-white hover:bg-white/10 hover:text-white" : ""}`}
+        className={`tap-target min-h-11 min-w-11 rounded-xl ${isDailyGearRoute ? "text-white hover:bg-white/10 hover:text-white" : ""}`}
       />
       <div className="flex min-w-0 flex-1 items-center gap-2.5">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--alexos-purple)] to-[var(--alexos-blue)] text-white shadow-lg shadow-[var(--alexos-glow)]">
@@ -63,14 +63,14 @@ function MobileWorkspaceHeader({
       </div>
       <Link
         to="/notifications"
-        className={`tap-target grid place-items-center rounded-xl transition-colors ${isDailyGearRoute ? "text-white/75 hover:bg-white/10 hover:text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+        className={`tap-target min-h-11 min-w-11 grid place-items-center rounded-xl transition-colors ${isDailyGearRoute ? "text-white/75 hover:bg-white/10 hover:text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
         aria-label="Notifications"
       >
         <Bell className="h-[19px] w-[19px]" />
       </Link>
       <Link
         to="/settings"
-        className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[var(--alexos-blue)] to-[var(--alexos-purple)] text-[11px] font-bold text-white shadow-md shadow-[var(--alexos-glow)]"
+        className="grid h-10 w-10 shrink-0 touch-manipulation place-items-center rounded-full bg-gradient-to-br from-[var(--alexos-blue)] to-[var(--alexos-purple)] text-[11px] font-bold text-white shadow-md shadow-[var(--alexos-glow)]"
         aria-label="Open settings"
       >
         AO
@@ -142,7 +142,9 @@ function AuthenticatedLayout() {
             />
           )}
           <SupabaseConfigBanner />
-          <main className={`flex-1 p-4 sm:p-6 lg:p-8 ${isMobile ? "pb-28" : "pb-8"}`}>
+          <main
+            className={`min-w-0 flex-1 touch-pan-y overflow-x-hidden p-4 sm:p-6 lg:p-8 ${isMobile ? "pb-28" : "pb-8"}`}
+          >
             <Outlet />
           </main>
           {!isDailyGearRoute && <MobileBottomNav />}

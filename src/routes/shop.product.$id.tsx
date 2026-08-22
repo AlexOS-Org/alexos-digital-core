@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Minus, Plus, ShieldCheck, ShoppingBag, Truck, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,25 @@ export const Route = createFileRoute("/shop/product/$id")({
   component: ProductDetail,
 });
 
+type VariantOptionKey = "color" | "size";
+
+type VariantOptionValues = Partial<Record<VariantOptionKey, string>>;
+
+function getVariantOption(
+  variant: NonNullable<ReturnType<typeof useStoreVariants>["data"]>[number],
+  key: VariantOptionKey,
+) {
+  if (key === "color" && variant.color?.trim()) return variant.color.trim();
+  const options = variant.options;
+  if (options && typeof options === "object" && !Array.isArray(options)) {
+    const value =
+      (options as Record<string, unknown>)[key] ??
+      (key === "color" ? (options as Record<string, unknown>).colour : undefined);
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return null;
+}
+
 function ProductDetail() {
   const { id } = Route.useParams();
   const { data: store } = useStorefront();
@@ -49,7 +68,21 @@ function ProductDetail() {
   const [qty, setQty] = useState(1);
   const [active, setActive] = useState(0);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
+  const [selectedOptions, setSelectedOptions] = useState<VariantOptionValues>({});
   const currency = store?.currency ?? "KES";
+
+  const optionGroups = useMemo(() => {
+    return (["color", "size"] as const).flatMap((key) => {
+      const values = Array.from(
+        new Set(
+          variants
+            .map((variant) => getVariantOption(variant, key))
+            .filter((value): value is string => Boolean(value)),
+        ),
+      );
+      return values.length ? [{ key, values }] : [];
+    });
+  }, [variants]);
 
   useEffect(() => {
     if (!product) return;
@@ -65,7 +98,16 @@ function ProductDetail() {
 
   useEffect(() => {
     if (!product) return;
-    setSelectedVariantId(variants[0]?.id ?? null);
+    const firstVariant = variants[0];
+    setSelectedVariantId(firstVariant?.id ?? null);
+    setSelectedOptions(
+      firstVariant
+        ? {
+            color: getVariantOption(firstVariant, "color") ?? undefined,
+            size: getVariantOption(firstVariant, "size") ?? undefined,
+          }
+        : {},
+    );
     setQty(1);
     setActive(0);
     document.title = `${product.seo_title ?? product.name} | DailyGear`;
@@ -209,30 +251,99 @@ function ProductDetail() {
               ) : null}
             </div>
             {variants.length ? (
-              <div className="space-y-2">
-                <p className="text-sm font-semibold">Choose an option</p>
-                <div className="flex flex-wrap gap-2">
-                  {variants.map((variant) => {
-                    const variantSoldOut = variant.availability_confirmed === false;
-                    const selected = variant.id === selectedVariantId;
-                    return (
-                      <button
-                        key={variant.id}
-                        type="button"
-                        disabled={variantSoldOut}
-                        onClick={() => setSelectedVariantId(variant.id)}
-                        className={`rounded-xl border px-3 py-2 text-left text-sm transition ${
-                          selected ? "border-primary bg-primary/10 text-primary" : "hover:bg-muted"
-                        } ${variantSoldOut ? "cursor-not-allowed opacity-50" : ""}`}
-                      >
-                        <span className="font-medium">{variant.name}</span>
-                        <span className="ml-2 text-xs text-muted-foreground">
-                          {variantSoldOut ? "Unavailable" : "Available to order"}
-                        </span>
-                      </button>
-                    );
-                  })}
+              <div className="space-y-4 rounded-2xl border border-border/60 bg-muted/20 p-4">
+                <div>
+                  <p className="text-sm font-semibold">Choose your options</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Select a live colour and size combination. Availability is controlled by the
+                    store owner.
+                  </p>
                 </div>
+                {optionGroups.length ? (
+                  optionGroups.map(({ key, values }) => (
+                    <div key={key} className="space-y-2">
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                        {key === "color" ? "Colour" : "Size"}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {values.map((value) => {
+                          const candidateVariants = variants.filter((variant) => {
+                            if (getVariantOption(variant, key) !== value) return false;
+                            return optionGroups.every(
+                              ({ key: otherKey }) =>
+                                otherKey === key ||
+                                !selectedOptions[otherKey] ||
+                                getVariantOption(variant, otherKey) === selectedOptions[otherKey],
+                            );
+                          });
+                          const unavailable =
+                            candidateVariants.length > 0 &&
+                            candidateVariants.every(
+                              (variant) => variant.availability_confirmed === false,
+                            );
+                          const selected = selectedOptions[key] === value;
+                          return (
+                            <button
+                              key={value}
+                              type="button"
+                              disabled={unavailable}
+                              onClick={() => {
+                                const nextOptions = { ...selectedOptions, [key]: value };
+                                const nextVariant =
+                                  variants.find((variant) =>
+                                    optionGroups.every(
+                                      ({ key: groupKey }) =>
+                                        !nextOptions[groupKey] ||
+                                        getVariantOption(variant, groupKey) ===
+                                          nextOptions[groupKey],
+                                    ),
+                                  ) ?? candidateVariants[0];
+                                setSelectedOptions(nextOptions);
+                                setSelectedVariantId(nextVariant?.id ?? null);
+                              }}
+                              className={`min-h-11 rounded-xl border px-3.5 py-2 text-left text-sm transition ${
+                                selected
+                                  ? "border-primary bg-primary/10 text-primary shadow-sm"
+                                  : "border-border/70 bg-background/70 hover:border-primary/50 hover:bg-primary/5"
+                              } ${unavailable ? "cursor-not-allowed opacity-45" : ""}`}
+                              aria-pressed={selected}
+                            >
+                              <span className="font-medium">{value}</span>
+                              <span className="ml-2 text-[11px] text-muted-foreground">
+                                {unavailable ? "Unavailable" : "Available"}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {variants.map((variant) => {
+                      const variantSoldOut = variant.availability_confirmed === false;
+                      const selected = variant.id === selectedVariantId;
+                      return (
+                        <button
+                          key={variant.id}
+                          type="button"
+                          disabled={variantSoldOut}
+                          onClick={() => setSelectedVariantId(variant.id)}
+                          className={`min-h-11 rounded-xl border px-3.5 py-2 text-left text-sm transition ${
+                            selected
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "hover:bg-muted"
+                          } ${variantSoldOut ? "cursor-not-allowed opacity-50" : ""}`}
+                        >
+                          <span className="font-medium">{variant.name}</span>
+                          <span className="ml-2 text-xs text-muted-foreground">
+                            {variantSoldOut ? "Unavailable" : "Available"}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             ) : null}
             {(product.short_description ?? product.description) ? (
