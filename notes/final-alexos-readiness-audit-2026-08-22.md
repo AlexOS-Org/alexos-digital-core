@@ -55,3 +55,13 @@ Supabase’s broader security-advisor warnings for older financial functions rem
 The weekly report is returned inside the scheduled task result. Email delivery has not been added to avoid silently sending financial data to an unconfirmed recipient. If email delivery is required later, the recipient and sender policy should be confirmed first.
 
 The final audit did not create test transactions or alter account balances. All financial findings are read-only observations of production state.
+
+## YJ catalogue correction follow-up — 22 Aug 2026
+
+The YJ school-bag product `0e4b22cd-a2a8-4e5e-a1ca-1218df7de98b` was corrected in Supabase using external CDN image URLs only. The product gallery, SEO title/description/keywords, public description, and image alt text were updated. Existing Red, Pink, and Blue variants were mapped to their supplied external avatars and retained their stock/availability safety rules.
+
+The public product route now supports both UUIDs and SEO slugs. The live smoke test exposed that the deployed storefront still queried a slug against the UUID `id` field and returned `Product not found`; this was fixed in `src/lib/storefront/api.ts` and committed as `d4e7100`. Static TypeScript, ESLint, and Vite production build checks passed locally. GitHub `Validate AlexOS` and `Production Verify` passed for commit `707752f`; the corresponding checks for `d4e7100` were still in progress at the time of this note.
+
+Cloudflare’s configured connector confirmed the existing `alexos-business-os` production Worker is healthy and has assets/modules, but the local Wrangler token lacks the permission to deploy (`Authentication error`, API code `10000`). Therefore the latest `d4e7100` slug fix is committed and pushed to `main` but is not yet confirmed live. The live browser smoke test still shows `Product not found` until the Cloudflare deployment completes with a deploy-capable token or the connected build pipeline publishes the commit.
+
+A fourth supplied visual colour is retained in the gallery evidence, not as an unavailable live SKU. This preserves the database trigger requiring every published colour/SKU variant to be confirmed available; a fourth sellable variant should only be added after its exact colour name, image, and at least 15 units are confirmed.
