@@ -103,7 +103,7 @@ function AuthenticatedLayout() {
   );
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full bg-background text-foreground transition-colors duration-300">
         <AppSidebar />
         <div className="flex min-w-0 flex-1 flex-col">

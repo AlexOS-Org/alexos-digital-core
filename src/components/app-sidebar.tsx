@@ -31,7 +31,8 @@ const MoneyCenterIcon = MONEY_CENTER_SECTIONS[0].icon;
 
 export function AppSidebar() {
   const { state, setOpenMobile } = useSidebar();
-  const collapsed = state === "collapsed";
+  const [hoverExpanded, setHoverExpanded] = useState(false);
+  const collapsed = state === "collapsed" && !hoverExpanded;
   const [businessesOpen, setBusinessesOpen] = useState(true);
   const [moneyCenterOpen, setMoneyCenterOpen] = useState(true);
 
@@ -64,7 +65,18 @@ export function AppSidebar() {
   );
 
   return (
-    <Sidebar collapsible="icon" className="alexos-sidebar-sheen border-r border-sidebar-border">
+    <Sidebar
+      collapsible="icon"
+      className="alexos-sidebar-sheen border-r border-sidebar-border transition-shadow duration-200 group-data-[collapsible=icon]:shadow-lg group-data-[collapsible=icon]:shadow-black/10"
+      onMouseEnter={() => setHoverExpanded(true)}
+      onMouseLeave={() => setHoverExpanded(false)}
+      onFocusCapture={() => setHoverExpanded(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setHoverExpanded(false);
+        }
+      }}
+    >
       <SidebarHeader className="border-b border-sidebar-border/70 bg-sidebar/80">
         <Link
           to="/dashboard"
