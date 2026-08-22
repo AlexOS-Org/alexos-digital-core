@@ -1139,3 +1139,127 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+@layer components {
+  .money-account-card {
+    --account-accent: var(--primary);
+    --account-ink: var(--card-foreground);
+    --account-surface: var(--card);
+    --account-glow: var(--alexos-glow);
+    position: relative;
+    isolation: isolate;
+    border-color: color-mix(in oklch, var(--account-accent) 42%, var(--border));
+    background:
+      radial-gradient(
+        circle at 92% 8%,
+        color-mix(in oklch, var(--account-accent) 25%, transparent),
+        transparent 42%
+      ),
+      linear-gradient(
+        135deg,
+        color-mix(in oklch, var(--account-accent) 19%, var(--account-surface)),
+        var(--account-surface)
+      );
+    color: var(--account-ink);
+    box-shadow: 0 22px 60px -34px color-mix(in oklch, var(--account-glow) 82%, transparent);
+  }
+
+  .money-account-card[data-account-theme="mpesa"] {
+    --account-accent: var(--alexos-green);
+  }
+  .money-account-card[data-account-theme="kcb"] {
+    --account-accent: var(--alexos-blue);
+  }
+  .money-account-card[data-account-theme="im"] {
+    --account-accent: var(--alexos-coral);
+  }
+  .money-account-card[data-account-theme="sbm"] {
+    --account-accent: var(--destructive);
+  }
+  .money-account-card[data-account-theme="salary"] {
+    --account-accent: var(--alexos-purple);
+  }
+  .money-account-card[data-account-theme="binance"] {
+    --account-accent: var(--alexos-amber);
+  }
+  .money-account-card[data-account-theme="airtel"] {
+    --account-accent: var(--destructive);
+  }
+  .money-account-card[data-account-theme="cash"] {
+    --account-accent: var(--muted-foreground);
+  }
+
+  .money-account-card__content {
+    position: relative;
+    isolation: isolate;
+  }
+  .money-account-card__glow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        110deg,
+        transparent 0 42%,
+        color-mix(in oklch, var(--account-accent) 9%, transparent) 58%,
+        transparent 78%
+      ),
+      radial-gradient(
+        circle at 12% 110%,
+        color-mix(in oklch, var(--account-accent) 15%, transparent),
+        transparent 40%
+      );
+  }
+  .money-account-card__watermark {
+    position: absolute;
+    right: -1.5rem;
+    bottom: -2rem;
+    z-index: -1;
+    width: clamp(8rem, 18vw, 15rem);
+    height: clamp(8rem, 18vw, 15rem);
+    object-fit: contain;
+    opacity: 0.12;
+    filter: saturate(0.9) contrast(1.08)
+      drop-shadow(0 16px 22px color-mix(in oklch, var(--account-accent) 35%, transparent));
+    transform: rotate(-7deg);
+  }
+  .money-account-card__logo {
+    border-color: color-mix(in oklch, var(--account-accent) 42%, var(--border));
+    background: color-mix(in oklch, var(--account-accent) 10%, var(--card));
+    box-shadow:
+      0 12px 26px -18px var(--account-accent),
+      0 0 0 5px color-mix(in oklch, var(--account-accent) 8%, transparent);
+  }
+  .money-account-card__balance {
+    border: 1px solid color-mix(in oklch, var(--account-accent) 28%, var(--border));
+    background: color-mix(in oklch, var(--account-accent) 9%, var(--card));
+  }
+  .money-account-card__amount {
+    color: color-mix(in oklch, var(--account-accent) 76%, var(--foreground));
+  }
+  .money-account-card__action {
+    border-color: color-mix(in oklch, var(--account-accent) 35%, var(--border));
+    background: color-mix(in oklch, var(--account-accent) 7%, var(--card));
+  }
+  .money-account-card__action:hover {
+    background: color-mix(in oklch, var(--account-accent) 15%, var(--card));
+  }
+  .money-account-card--warning {
+    --account-accent: var(--destructive);
+    border-color: color-mix(in oklch, var(--destructive) 72%, var(--border));
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--destructive) 18%, var(--card)),
+      var(--card)
+    );
+  }
+  .money-account-card__logo--warning {
+    border-color: color-mix(in oklch, var(--destructive) 60%, var(--border));
+  }
+  .money-account-card__amount--warning,
+  .money-account-card__warning,
+  .money-account-card__warning-icon {
+    color: var(--destructive);
+  }
+}
