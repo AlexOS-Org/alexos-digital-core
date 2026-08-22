@@ -595,6 +595,10 @@
     --dashboard-kpi-accent: var(--alexos-amber);
   }
 
+  .dashboard-kpi-card[data-tone="danger"] {
+    --dashboard-kpi-accent: var(--destructive);
+  }
+
   .dashboard-kpi-label {
     color: var(--color-muted-foreground);
     font-size: 0.68rem;

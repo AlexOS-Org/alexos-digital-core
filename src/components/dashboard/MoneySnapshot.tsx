@@ -94,56 +94,49 @@ export default function MoneySnapshot() {
       value: formatMoney(cashAvailable),
       icon: Wallet,
       subtitle: "All accounts",
-      accent: "from-emerald-500 to-teal-400",
-      iconClass: "bg-emerald-500/12 text-emerald-400 ring-emerald-400/15",
+      tone: "green",
     },
     {
       title: "Personal Cash",
       value: formatMoney(personalCash),
       icon: UserRound,
       subtitle: `Debt ${formatMoney(personalDebt)}`,
-      accent: "from-sky-500 to-cyan-400",
-      iconClass: "bg-sky-500/12 text-sky-400 ring-sky-400/15",
+      tone: "blue",
     },
     {
       title: "Business Cash",
       value: formatMoney(businessCash),
       icon: Briefcase,
       subtitle: `Debt ${formatMoney(businessDebt)}`,
-      accent: "from-violet-500 to-indigo-400",
-      iconClass: "bg-violet-500/12 text-violet-400 ring-violet-400/15",
+      tone: "purple",
     },
     {
       title: "Net Worth",
       value: formatMoney(netWorth),
       icon: Landmark,
       subtitle: "Cash less outstanding debt",
-      accent: netWorth >= 0 ? "from-violet-500 to-indigo-400" : "from-red-400 to-rose-300",
-      iconClass: "bg-indigo-500/12 text-indigo-400 ring-indigo-400/15",
+      tone: netWorth >= 0 ? "purple" : "danger",
     },
     {
       title: "Operating Income",
       value: formatMoney(operatingIncome),
       icon: TrendingUp,
       subtitle: "This month · loans excluded",
-      accent: "from-emerald-500 to-teal-400",
-      iconClass: "bg-emerald-500/12 text-emerald-400 ring-emerald-400/15",
+      tone: "green",
     },
     {
       title: "Expenses",
       value: formatMoney(expenses),
       icon: TrendingDown,
       subtitle: "This month",
-      accent: "from-amber-400 to-orange-300",
-      iconClass: "bg-amber-400/12 text-amber-300 ring-amber-300/15",
+      tone: "amber",
     },
     {
       title: "Loan Proceeds",
       value: formatMoney(loanProceeds),
       icon: ArrowDownCircle,
       subtitle: "Cash received · not income",
-      accent: "from-orange-400 to-red-300",
-      iconClass: "bg-orange-400/12 text-orange-300 ring-orange-300/15",
+      tone: "amber",
     },
   ];
 
@@ -155,20 +148,16 @@ export default function MoneySnapshot() {
           return (
             <Card
               key={card.title}
-              className="group relative overflow-hidden rounded-[1.6rem] border border-border/60 bg-card/80 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              data-tone={card.tone}
+              className="dashboard-kpi-card group relative h-full overflow-hidden rounded-[1.6rem] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
-              <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${card.accent}`} />
               <CardContent className="relative p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                      {card.title}
-                    </p>
+                    <p className="dashboard-kpi-label truncate">{card.title}</p>
                     <p className="mt-3 text-2xl font-bold tracking-tight">{card.value}</p>
                   </div>
-                  <div
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ring-1 ring-inset ${card.iconClass}`}
-                  >
+                  <div className="dashboard-kpi-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-full ring-1 ring-inset">
                     <Icon className="h-5 w-5" />
                   </div>
                 </div>
