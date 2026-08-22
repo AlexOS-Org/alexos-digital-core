@@ -19,6 +19,14 @@ import sbmLogo from "@/assets/branding/accounts/sbm.png";
 import binanceLogo from "@/assets/branding/accounts/binance.png";
 import cashLogo from "@/assets/branding/accounts/cash.png";
 
+const LOW_BALANCE_THRESHOLDS = {
+  mobileMoney: 500,
+  bank: 1000,
+  salary: 5000,
+  crypto: 1000,
+  cash: 500,
+} as const;
+
 export const Route = createFileRoute("/_authenticated/money-center/accounts")({
   component: AccountsPage,
 });
@@ -34,7 +42,7 @@ function institutionStyle(name: string) {
       actionClass:
         "border-emerald-300/70 bg-white/70 hover:bg-emerald-50 dark:border-emerald-800/70 dark:bg-background/50",
       accentClass: "bg-emerald-500",
-      warningThreshold: 300,
+      warningThreshold: LOW_BALANCE_THRESHOLDS.mobileMoney,
     };
   }
   if (/kcb/.test(value)) {
@@ -46,7 +54,7 @@ function institutionStyle(name: string) {
       actionClass:
         "border-blue-300/70 bg-white/70 hover:bg-blue-50 dark:border-blue-800/70 dark:bg-background/50",
       accentClass: "bg-blue-600",
-      warningThreshold: 500,
+      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
   if (/i&m|im bank/.test(value)) {
@@ -58,7 +66,7 @@ function institutionStyle(name: string) {
       actionClass:
         "border-orange-300/70 bg-white/70 hover:bg-orange-50 dark:border-orange-800/70 dark:bg-background/50",
       accentClass: "bg-orange-500",
-      warningThreshold: 500,
+      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
   if (/sbm/.test(value)) {
@@ -70,7 +78,91 @@ function institutionStyle(name: string) {
       actionClass:
         "border-red-300/70 bg-white/70 hover:bg-red-50 dark:border-red-800/70 dark:bg-background/50",
       accentClass: "bg-red-600",
-      warningThreshold: 500,
+      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
+    };
+  }
+  if (/equity/.test(value)) {
+    return {
+      iconClass: "bg-lime-100 text-lime-800 dark:bg-lime-950/40 dark:text-lime-300",
+      panelClass: "bg-lime-50/70 dark:bg-lime-950/20",
+      cardClass:
+        "border-lime-300/80 bg-gradient-to-br from-lime-200/90 via-lime-100/70 to-lime-50/60 dark:border-lime-800/60 dark:from-lime-950/60 dark:via-lime-950/35 dark:to-background",
+      actionClass:
+        "border-lime-300/70 bg-white/70 hover:bg-lime-50 dark:border-lime-800/70 dark:bg-background/50",
+      accentClass: "bg-lime-600",
+      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
+    };
+  }
+  if (/co[- ]?operative|co-op|coop/.test(value)) {
+    return {
+      iconClass: "bg-teal-100 text-teal-800 dark:bg-teal-950/40 dark:text-teal-300",
+      panelClass: "bg-teal-50/70 dark:bg-teal-950/20",
+      cardClass:
+        "border-teal-300/80 bg-gradient-to-br from-teal-200/90 via-teal-100/70 to-teal-50/60 dark:border-teal-800/60 dark:from-teal-950/60 dark:via-teal-950/35 dark:to-background",
+      actionClass:
+        "border-teal-300/70 bg-white/70 hover:bg-teal-50 dark:border-teal-800/70 dark:bg-background/50",
+      accentClass: "bg-teal-600",
+      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
+    };
+  }
+  if (/ncba/.test(value)) {
+    return {
+      iconClass: "bg-sky-100 text-sky-800 dark:bg-sky-950/40 dark:text-sky-300",
+      panelClass: "bg-sky-50/70 dark:bg-sky-950/20",
+      cardClass:
+        "border-sky-300/80 bg-gradient-to-br from-sky-200/90 via-sky-100/70 to-sky-50/60 dark:border-sky-800/60 dark:from-sky-950/60 dark:via-sky-950/35 dark:to-background",
+      actionClass:
+        "border-sky-300/70 bg-white/70 hover:bg-sky-50 dark:border-sky-800/70 dark:bg-background/50",
+      accentClass: "bg-sky-600",
+      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
+    };
+  }
+  if (/absa/.test(value)) {
+    return {
+      iconClass: "bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300",
+      panelClass: "bg-rose-50/70 dark:bg-rose-950/20",
+      cardClass:
+        "border-rose-300/80 bg-gradient-to-br from-rose-200/90 via-rose-100/70 to-rose-50/60 dark:border-rose-800/60 dark:from-rose-950/60 dark:via-rose-950/35 dark:to-background",
+      actionClass:
+        "border-rose-300/70 bg-white/70 hover:bg-rose-50 dark:border-rose-800/70 dark:bg-background/50",
+      accentClass: "bg-rose-600",
+      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
+    };
+  }
+  if (/stanbic/.test(value)) {
+    return {
+      iconClass: "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300",
+      panelClass: "bg-indigo-50/70 dark:bg-indigo-950/20",
+      cardClass:
+        "border-indigo-300/80 bg-gradient-to-br from-indigo-200/90 via-indigo-100/70 to-indigo-50/60 dark:border-indigo-800/60 dark:from-indigo-950/60 dark:via-indigo-950/35 dark:to-background",
+      actionClass:
+        "border-indigo-300/70 bg-white/70 hover:bg-indigo-50 dark:border-indigo-800/70 dark:bg-background/50",
+      accentClass: "bg-indigo-600",
+      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
+    };
+  }
+  if (/family bank/.test(value)) {
+    return {
+      iconClass: "bg-cyan-100 text-cyan-800 dark:bg-cyan-950/40 dark:text-cyan-300",
+      panelClass: "bg-cyan-50/70 dark:bg-cyan-950/20",
+      cardClass:
+        "border-cyan-300/80 bg-gradient-to-br from-cyan-200/90 via-cyan-100/70 to-cyan-50/60 dark:border-cyan-800/60 dark:from-cyan-950/60 dark:via-cyan-950/35 dark:to-background",
+      actionClass:
+        "border-cyan-300/70 bg-white/70 hover:bg-cyan-50 dark:border-cyan-800/70 dark:bg-background/50",
+      accentClass: "bg-cyan-600",
+      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
+    };
+  }
+  if (/airtel/.test(value)) {
+    return {
+      iconClass: "bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300",
+      panelClass: "bg-red-50/70 dark:bg-red-950/20",
+      cardClass:
+        "border-red-300/80 bg-gradient-to-br from-red-200/90 via-red-100/70 to-red-50/60 dark:border-red-800/60 dark:from-red-950/60 dark:via-red-950/35 dark:to-background",
+      actionClass:
+        "border-red-300/70 bg-white/70 hover:bg-red-50 dark:border-red-800/70 dark:bg-background/50",
+      accentClass: "bg-red-600",
+      warningThreshold: LOW_BALANCE_THRESHOLDS.mobileMoney,
     };
   }
   if (/salary/.test(value)) {
@@ -82,7 +174,7 @@ function institutionStyle(name: string) {
       actionClass:
         "border-violet-300/70 bg-white/70 hover:bg-violet-50 dark:border-violet-800/70 dark:bg-background/50",
       accentClass: "bg-violet-600",
-      warningThreshold: 500,
+      warningThreshold: LOW_BALANCE_THRESHOLDS.salary,
     };
   }
   if (/binance|crypto/.test(value)) {
@@ -94,7 +186,7 @@ function institutionStyle(name: string) {
       actionClass:
         "border-amber-300/70 bg-white/70 hover:bg-amber-50 dark:border-amber-800/70 dark:bg-background/50",
       accentClass: "bg-amber-500",
-      warningThreshold: 1000,
+      warningThreshold: LOW_BALANCE_THRESHOLDS.crypto,
     };
   }
   return {
