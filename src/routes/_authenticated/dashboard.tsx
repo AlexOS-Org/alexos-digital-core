@@ -209,10 +209,10 @@ function Dashboard() {
               </div>
             </section>
           </SafePanel>
-          <div className="grid gap-5 lg:grid-cols-[minmax(280px,0.78fr)_minmax(0,1.22fr)]">
+          <div className="space-y-5">
             <section id="dashboard-priorities" className="scroll-mt-24">
               <SafePanel>
-                <TodaysMission />
+                <TodaysMission compact />
               </SafePanel>
             </section>
             <section id="dashboard-auren" className="scroll-mt-24">

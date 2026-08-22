@@ -52,7 +52,9 @@ export default function TodaysMission({ compact = false }: { compact?: boolean }
             Priorities are unavailable right now. Refresh to retry.
           </p>
         ) : (
-          <div className={`mt-5 grid gap-2.5 ${compact ? "grid-cols-1" : "lg:grid-cols-3"}`}>
+          <div
+            className={`mt-5 grid gap-2.5 ${compact ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "lg:grid-cols-3"}`}
+          >
             {isLoading
               ? Array.from({ length: compact ? 2 : 3 }).map((_, i) => (
                   <Skeleton key={i} className="h-[118px] rounded-2xl bg-white/[0.06]" />
