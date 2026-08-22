@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Production Deployment Status</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0} .slide-container{width:1280px;min-height:720px;background:#07111f;color:#eef4f7;font-family:Inter,Arial,sans-serif;padding:54px 72px 40px;position:relative}.eyebrow{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#6fd3c3}.title{font-size:42px;line-height:1.06;margin-top:18px;letter-spacing:-1px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:48px}.section-label{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#7d9aa5;margin-bottom:20px;border-bottom:1px solid rgba(140,190,193,.22);padding-bottom:10px}.status-list{list-style:none}.status-item{margin-bottom:28px}.status-item h3{font-size:18px;color:#fff;margin-bottom:6px}.status-item p{font-size:14px;color:#a9b9c4;line-height:1.5;font-family:monospace}.tag-success{display:inline-block;padding:2px 8px;background:rgba(117,189,131,.15);color:#75bd83;border:1px solid rgba(117,189,131,.3);font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-left:10px;vertical-align:middle}.caveat-box{margin-top:40px;padding:24px;background:rgba(217,135,83,.05);border-left:4px solid #d98753}.caveat-box h4{font-size:14px;color:#f0c49e;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}.caveat-box p{font-size:14px;color:#a9b9c4;line-height:1.5}.foot{position:absolute;left:72px;bottom:30px;color:#78909a;font-size:11px}.tag{position:absolute;right:72px;bottom:30px;color:#d98753;font-size:12px;text-transform:uppercase;letter-spacing:1.2px}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">05 / Production Readiness</div>
+  <div class="title">Deployment is live.<br>Infrastructure is healthy.</div>
+  
+  <div class="grid">
+    <div class="left-col">
+      <div class="section-label">Worker & Validation</div>
+      <div class="status-list">
+        <div class="status-item">
+          <h3>Cloudflare Worker<span class="tag-success">100% Traffic</span></h3>
+          <p>Version: e66c8b62-e007-49d6-b742-59e9cbd3b9dd</p>
+          <p>Deployed: 22 Aug 2026, 17:31:41 UTC</p>
+        </div>
+        <div class="status-item">
+          <h3>GitHub Actions<span class="tag-success">Passed</span></h3>
+          <p>Commit: 11e73c6 (main)</p>
+          <p>Validation & Production Verify: Successful</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="right-col">
+      <div class="section-label">Domain & Connectivity</div>
+      <div class="status-list">
+        <div class="status-item">
+          <h3>dailygear.co.ke<span class="tag-success">HTTP 200</span></h3>
+          <p>SSL: Active (Cloudflare Managed)</p>
+          <p>Status: Healthy, rendering live build</p>
+        </div>
+        <div class="status-item">
+          <h3>www.dailygear.co.ke<span class="tag-success">HTTP 200</span></h3>
+          <p>SSL: Active (Cloudflare Managed)</p>
+          <p>Status: Healthy, synchronized with root</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="caveat-box">
+    <h4>Remaining Production Caveats</h4>
+    <p>The /calendar module remains a local workbench requiring backend OAuth integration. Novera and CarBarMotion identities are pending official source URLs. Catalogue publication gates remain active: unverified products cannot be activated.</p>
+  </div>
+
+  <div class="foot">Source: Cloudflare API verification · GitHub Actions run 32588111158</div>
+  <div class="tag">Verified Production</div>
+</div>
+</body>
+</html>

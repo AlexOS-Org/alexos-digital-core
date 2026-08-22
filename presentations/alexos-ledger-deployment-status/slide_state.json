@@ -1,0 +1,78 @@
+{
+  "project_info": {
+    "title": "AlexOS Finance & Deployment Review",
+    "created": 1787420742.613,
+    "last_updated": 1787420846.789,
+    "total_slides": 6
+  },
+  "slides": [
+    {
+      "id": "overview",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "ledger_flow",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "shared_scopes",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "allocation_controls",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "yj_evidence",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "cloudflare_status",
+      "state": "edited",
+      "pageNum": 6
+    }
+  ],
+  "outline": [
+    {
+      "id": "overview",
+      "title": "AlexOS Finance & Deployment Review",
+      "summary": "Executive overview of the verified ledger changes, YJ reference evidence, and production deployment state.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "ledger_flow",
+      "title": "One-Entry Ledger Flow",
+      "summary": "Show how receipts, expenses, transfers, supplier costs, and profit interact without double entry.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "shared_scopes",
+      "title": "Personal, Shared, and Business Expenses",
+      "summary": "Summarize the new shared expense scope and common/business categories added to Money Center.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "allocation_controls",
+      "title": "Emergency Fund and Tithe Controls",
+      "summary": "Explain approval-based savings suggestions, 10% positive-profit tithe prompts, and safety controls.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "yj_evidence",
+      "title": "YJ School Bag: Source and Four Colours",
+      "summary": "Use the Alibaba source and user-supplied labelled image to show A pink, B navy/red, C teal/orange-red, and D red/navy mappings.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "cloudflare_status",
+      "title": "Production Deployment Status",
+      "summary": "Report GitHub validation, Cloudflare Worker version, domain health, and remaining production caveats.",
+      "image_plan": "Use a suitable image if needed"
+    }
+  ]
+}

@@ -65,12 +65,17 @@ export default {
       );
       if (error) throw error;
       const recovery = await processAbandonedCartFollowUps(25);
-      console.info("Scheduled salary and cart recovery jobs completed", {
+      const { data: purgedOrders, error: purgeError } = await supabaseAdmin.rpc(
+        "dg_purge_expired_order_trash" as never,
+      );
+      if (purgeError) throw purgeError;
+      console.info("Scheduled salary, cart recovery, and order Trash jobs completed", {
         runDate: nairobiDateKey(),
         recovery,
+        purgedOrders: Number(purgedOrders ?? 0),
       });
     } catch (error) {
-      console.error("Scheduled salary posting failed", error);
+      console.error("Scheduled AlexOS maintenance failed", error);
       throw error;
     }
   },

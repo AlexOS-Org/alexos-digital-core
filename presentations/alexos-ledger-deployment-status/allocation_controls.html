@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Emergency Fund and Tithe Controls</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0} .slide-container{width:1280px;min-height:720px;background:#07111f;color:#eef4f7;font-family:Inter,Arial,sans-serif;padding:40px 72px 20px}.eyebrow{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#6fd3c3}.title{font-size:42px;line-height:1.06;margin-top:18px;letter-spacing:-1px}.intro{font-size:17px;color:#a9b9c4;margin-top:12px;max-width:800px}.controls{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:30px}.control-box{padding-top:12px;border-top:4px solid #d98753}.control-box.savings{border-top-color:#75bd83}.control-box h2{font-size:28px;color:#fff;margin-bottom:14px}.control-box p{font-size:15px;line-height:1.55;color:#a9b9c4;margin-bottom:16px}.rule-list{list-style:none}.rule-list li{font-size:15px;margin-bottom:10px;padding-left:20px;position:relative}.rule-list li:before{content:'\2192';position:absolute;left:0;color:#d98753}.savings li:before{color:#75bd83}.safety-bar{margin-top:36px;padding:18px 0;border-top:1px solid rgba(140,190,193,.25);display:flex;justify-content:space-between;align-items:center}.safety-label{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#7d9aa5}.safety-value{font-size:16px;color:#f0c49e;font-weight:500}.foot{position:absolute;left:72px;bottom:30px;color:#78909a;font-size:11px}.tag{position:absolute;right:72px;bottom:30px;color:#d98753;font-size:12px;letter-spacing:1.2px;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="eyebrow">03 / Allocation Logic</div>
+  <div class="title">Approval-based discipline.<br>No silent mutations.</div>
+  <div class="intro">The new Daily Allocation Review panel suggests splits based on today’s posted transactions. Nothing moves until you approve.</div>
+  
+  <div class="controls">
+    <div class="control-box">
+      <h2>10% Tithe Prompt</h2>
+      <p>Calculated daily from positive business profit and confirmed personal salary receipts.</p>
+      <ul class="rule-list">
+        <li>Includes DailyGear net operating profit</li>
+        <li>Includes confirmed personal salary receipts</li>
+        <li>Approval posts a charitable expense transaction</li>
+        <li>Select any personal or business source account</li>
+      </ul>
+    </div>
+    
+    <div class="control-box savings">
+      <h2>10% Emergency Fund</h2>
+      <p>A starter rule to build a personal reserve from every confirmed personal receipt.</p>
+      <ul class="rule-list">
+        <li>Dedicated personal "Emergency Fund" account</li>
+        <li>Calculated from all personal income transactions</li>
+        <li>Approval posts an internal account transfer</li>
+        <li>Neutral to profit and total net worth</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="safety-bar">
+    <div>
+      <div class="safety-label">Workflow</div>
+      <div class="safety-value">Suggestion &rarr; Review &rarr; Approval &rarr; Ledger Entry</div>
+    </div>
+    <div style="text-align:right">
+      <div class="safety-label">Safety Control</div>
+      <div class="safety-value">No automatic bank or M-Pesa movement</div>
+    </div>
+  </div>
+
+  <div class="foot">Source: AlexOS Money Allocation Panel · verified ledger rules</div>
+  <div class="tag">Owner controlled</div>
+</div>
+</body>
+</html>

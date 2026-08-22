@@ -204,6 +204,65 @@ export const useDeleteCustomer = () => customersResource.useRemove("Customer");
 
 export const useOrders = ordersResource.useList;
 export const useSaveOrder = () => ordersResource.useSave("Order");
+
+/** Orders in Trash are intentionally queried separately from active orders. */
+export function useTrashedOrders() {
+  return useQuery({
+    queryKey: ["dailygear", "dg_orders", "trash"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("dg_orders" as never)
+        .select("*")
+        .not("deleted_at", "is", null)
+        .order("deleted_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as unknown as Order[];
+    },
+  });
+}
+
+export function useMoveOrderToTrash() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (orderId: string) => {
+      const { error } = await supabase.rpc(
+        "dg_move_order_to_trash" as never,
+        {
+          p_order_id: orderId,
+        } as never,
+      );
+      if (error) throw error;
+      return orderId;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["dailygear", "dg_orders"] });
+      toast.success("Order moved to Trash for 14 days");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useRestoreOrderFromTrash() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (orderId: string) => {
+      const { error } = await supabase.rpc(
+        "dg_restore_order_from_trash" as never,
+        {
+          p_order_id: orderId,
+        } as never,
+      );
+      if (error) throw error;
+      return orderId;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["dailygear", "dg_orders"] });
+      toast.success("Order restored from Trash");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
 export const useDeleteOrder = () => ordersResource.useRemove("Order");
 
 export function useOrderPayments(orderId?: string) {

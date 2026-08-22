@@ -11,6 +11,7 @@ import {
   Search,
   ReceiptText,
   Trash2,
+  RotateCcw,
 } from "lucide-react";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { KpiCard } from "@/components/dailygear/KpiCard";
@@ -27,13 +28,17 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCommerceData } from "@/lib/dailygear/useCommerceData";
-import { useUpdateOrderStatus } from "@/lib/dailygear/api";
+import {
+  useMoveOrderToTrash,
+  useRestoreOrderFromTrash,
+  useTrashedOrders,
+  useUpdateOrderStatus,
+} from "@/lib/dailygear/api";
 import { OrderEditDialog } from "@/components/dailygear/OrderEditDialog";
 import { OrderFulfilmentDialog } from "@/components/dailygear/OrderFulfilmentDialog";
 import { OrderPaymentDialog } from "@/components/dailygear/OrderPaymentDialog";
 import { OrderDocuments } from "@/components/dailygear/OrderDocuments";
 import { OrderRefundDialog } from "@/components/dailygear/OrderRefundDialog";
-import { useDeleteOrder } from "@/lib/dailygear/api";
 import {
   DG_CURRENCY,
   ORDER_STATUS_FLOW,
@@ -80,8 +85,10 @@ function resolveCustomerName(customerId: string | null, customers: Customer[]): 
 
 function OrdersPage() {
   const { orders, customers, isLoading } = useCommerceData();
+  const { data: trashedOrders = [], isLoading: isTrashLoading } = useTrashedOrders();
   const updateStatus = useUpdateOrderStatus();
-  const deleteOrder = useDeleteOrder();
+  const moveOrderToTrash = useMoveOrderToTrash();
+  const restoreOrderFromTrash = useRestoreOrderFromTrash();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<Order["status"] | "all">("all");
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
@@ -89,6 +96,7 @@ function OrdersPage() {
   const [paymentOrder, setPaymentOrder] = useState<Order | null>(null);
   const [paymentAfterStatus, setPaymentAfterStatus] = useState<Order["status"] | null>(null);
   const [refundOrder, setRefundOrder] = useState<Order | null>(null);
+  const [view, setView] = useState<"active" | "trash">("active");
 
   const summary = useMemo(() => {
     const now = new Date();
@@ -130,6 +138,8 @@ function OrdersPage() {
       });
   }, [orders, customers, query, statusFilter]);
 
+  const showTrash = view === "trash";
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -137,71 +147,97 @@ function OrdersPage() {
         description="Fulfilment pipeline, payments, shipping and timelines."
       />
 
-      {/* KPIs */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard
-          label="Total orders"
-          value={summary.total}
-          icon={ShoppingCart}
-          loading={isLoading}
-        />
-        <KpiCard
-          label="Pending fulfilment"
-          value={summary.pending}
-          icon={Clock}
-          tone={summary.pending > 0 ? "warning" : "default"}
-          hint={summary.pending > 0 ? "Awaiting processing or shipping" : "All orders fulfilled"}
-          loading={isLoading}
-        />
-        <KpiCard
-          label="Revenue (30d)"
-          value={money(summary.revenue)}
-          icon={DollarSign}
-          loading={isLoading}
-        />
-        <KpiCard
-          label="Avg order value"
-          value={money(summary.avg)}
-          icon={CheckCircle}
-          tone="positive"
-          loading={isLoading}
-        />
+      <div className="flex flex-wrap items-center gap-2 border-b border-border/70 pb-3">
+        <Button
+          size="sm"
+          variant={view === "active" ? "default" : "outline"}
+          onClick={() => setView("active")}
+        >
+          Active orders
+        </Button>
+        <Button
+          size="sm"
+          variant={view === "trash" ? "default" : "outline"}
+          onClick={() => setView("trash")}
+        >
+          <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Trash ({trashedOrders.length})
+        </Button>
+        {showTrash && (
+          <p className="ml-1 text-xs text-muted-foreground">
+            Recoverable for 14 days, then permanently purged.
+          </p>
+        )}
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            className="pl-9"
-            placeholder="Search customer, order #, channel…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
+      {/* KPIs */}
+      {!showTrash && (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <KpiCard
+            label="Total orders"
+            value={summary.total}
+            icon={ShoppingCart}
+            loading={isLoading}
+          />
+          <KpiCard
+            label="Pending fulfilment"
+            value={summary.pending}
+            icon={Clock}
+            tone={summary.pending > 0 ? "warning" : "default"}
+            hint={summary.pending > 0 ? "Awaiting processing or shipping" : "All orders fulfilled"}
+            loading={isLoading}
+          />
+          <KpiCard
+            label="Revenue (30d)"
+            value={money(summary.revenue)}
+            icon={DollarSign}
+            loading={isLoading}
+          />
+          <KpiCard
+            label="Avg order value"
+            value={money(summary.avg)}
+            icon={CheckCircle}
+            tone="positive"
+            loading={isLoading}
           />
         </div>
-        <Select
-          value={statusFilter}
-          onValueChange={(v) => setStatusFilter(v as Order["status"] | "all")}
-        >
-          <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="All statuses" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            {(Object.keys(ORDER_STATUS_META) as Order["status"][]).map((key) => (
-              <SelectItem key={key} value={key}>
-                {ORDER_STATUS_META[key].label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      )}
+
+      {/* Filters */}
+      {!showTrash && (
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              className="pl-9"
+              placeholder="Search customer, order #, channel…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <Select
+            value={statusFilter}
+            onValueChange={(v) => setStatusFilter(v as Order["status"] | "all")}
+          >
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="All statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              {(Object.keys(ORDER_STATUS_META) as Order["status"][]).map((key) => (
+                <SelectItem key={key} value={key}>
+                  {ORDER_STATUS_META[key].label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       {/* Loading */}
-      {isLoading && <Skeleton className="h-72 w-full rounded-2xl" />}
+      {!showTrash && isLoading && <Skeleton className="h-72 w-full rounded-2xl" />}
 
       {/* Empty */}
-      {!isLoading && filtered.length === 0 && (
+      {!showTrash && !isLoading && filtered.length === 0 && (
         <Card className="rounded-2xl border-dashed">
           <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
             <ShoppingCart className="h-6 w-6 text-muted-foreground" />
@@ -215,7 +251,7 @@ function OrdersPage() {
       )}
 
       {/* Table */}
-      {!isLoading && filtered.length > 0 && (
+      {!showTrash && !isLoading && filtered.length > 0 && (
         <Card className="rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -325,24 +361,25 @@ function OrdersPage() {
                               <Trash2 className="mr-1 h-3.5 w-3.5" /> Void / refund
                             </Button>
                           ) : null}
-                          {order.payment_status === "unpaid" ? (
+                          {order.payment_status === "unpaid" ||
+                          order.payment_status === "refunded" ? (
                             <Button
                               size="sm"
                               variant="ghost"
                               className="whitespace-nowrap text-xs text-destructive hover:text-destructive"
-                              disabled={deleteOrder.isPending}
+                              disabled={moveOrderToTrash.isPending}
                               onClick={() => {
                                 if (
                                   typeof window !== "undefined" &&
                                   !window.confirm(
-                                    `Remove unpaid test order ${order.order_number ?? ""}? This is a soft delete and cannot remove any payment transaction.`,
+                                    `Move order ${order.order_number ?? ""} to Trash? It will be recoverable for 14 days. Paid orders must be refunded or voided first.`,
                                   )
                                 )
                                   return;
-                                deleteOrder.mutate(order.id);
+                                moveOrderToTrash.mutate(order.id);
                               }}
                             >
-                              <Trash2 className="mr-1 h-3.5 w-3.5" /> Remove test order
+                              <Trash2 className="mr-1 h-3.5 w-3.5" /> Move to Trash
                             </Button>
                           ) : null}
                         </div>
@@ -355,6 +392,70 @@ function OrdersPage() {
           </div>
         </Card>
       )}
+      {showTrash && (
+        <Card className="rounded-2xl overflow-hidden">
+          <div className="border-b border-border/70 px-4 py-3">
+            <p className="text-sm font-semibold">Order Trash</p>
+            <p className="text-xs text-muted-foreground">
+              Orders are recoverable for 14 days. The scheduled maintenance job permanently purges
+              expired rows.
+            </p>
+          </div>
+          {isTrashLoading ? (
+            <Skeleton className="m-4 h-48 w-[calc(100%-2rem)]" />
+          ) : trashedOrders.length === 0 ? (
+            <div className="px-4 py-12 text-center text-sm text-muted-foreground">
+              Trash is empty.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Order #</th>
+                    <th className="px-4 py-3 font-medium">Customer</th>
+                    <th className="px-4 py-3 font-medium">Moved to Trash</th>
+                    <th className="px-4 py-3 font-medium">Purge date</th>
+                    <th className="px-4 py-3 font-medium">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {trashedOrders.map((order) => (
+                    <tr key={order.id} className="border-t border-border/70">
+                      <td className="px-4 py-3 font-mono text-xs font-medium text-muted-foreground">
+                        {order.order_number ?? "—"}
+                      </td>
+                      <td className="px-4 py-3 font-medium">
+                        {resolveCustomerName(order.customer_id, customers)}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
+                        {order.deleted_at ? new Date(order.deleted_at).toLocaleString() : "—"}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
+                        {order.purge_after
+                          ? new Date(order.purge_after).toLocaleString()
+                          : "Pending"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="whitespace-nowrap text-xs"
+                          disabled={restoreOrderFromTrash.isPending}
+                          onClick={() => restoreOrderFromTrash.mutate(order.id)}
+                        >
+                          <RotateCcw className="mr-1 h-3.5 w-3.5" /> Restore
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
+      )}
+
       <OrderFulfilmentDialog
         open={Boolean(fulfillingOrder)}
         onOpenChange={(open) => {

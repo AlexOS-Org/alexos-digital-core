@@ -1565,6 +1565,7 @@ export type Database = {
           delivered_at: string | null
           discount: number
           funnel_id: string | null
+          purge_after: string | null
           id: string
           internal_notes: string | null
           notes: string | null
@@ -1597,6 +1598,7 @@ export type Database = {
           delivered_at?: string | null
           discount?: number
           funnel_id?: string | null
+          purge_after?: string | null
           id?: string
           internal_notes?: string | null
           notes?: string | null
@@ -1629,6 +1631,7 @@ export type Database = {
           delivered_at?: string | null
           discount?: number
           funnel_id?: string | null
+          purge_after?: string | null
           id?: string
           internal_notes?: string | null
           notes?: string | null
