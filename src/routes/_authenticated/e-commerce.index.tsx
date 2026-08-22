@@ -33,6 +33,7 @@ import {
 } from "@/components/dailygear/dashboard/DashboardChartsLazy";
 import { QuickActionsGrid } from "@/components/dailygear/dashboard/QuickActionsGrid";
 import { ProfitCashFlowPanel } from "@/components/dailygear/ProfitCashFlowPanel";
+import { YjFunnelHealthCard } from "@/components/dailygear/YjFunnelHealthCard";
 import { useCommerceData } from "@/lib/dailygear/useCommerceData";
 import { computeKpis, computeTrend } from "@/lib/dailygear/calculations";
 import { DG_CURRENCY } from "@/lib/dailygear/constants";
@@ -122,6 +123,7 @@ type Panels = {
   kpis: ReturnType<typeof computeKpis>;
   loading: boolean;
   ctx: ReturnType<typeof useCommerceData>["context"];
+  funnels: ReturnType<typeof useCommerceData>["funnels"];
 };
 
 /* ── Shared header ───────────────────────────────────────────── */
@@ -505,6 +507,7 @@ function MobileDashboard(p: Panels) {
       <Hero kpis={p.kpis} compactMode />
       <FacebookAdsBalanceCard />
       <MobileStoreOverview kpis={p.kpis} trend={p.trend} loading={p.loading} />
+      <YjFunnelHealthCard funnels={p.funnels} orders={p.orders} />
       <MobileFocus {...p} />
 
       <div className="grid gap-4">
@@ -536,6 +539,7 @@ function StandardDashboard(p: Panels & { tablet?: boolean }) {
       <Hero kpis={p.kpis} />
       <FacebookAdsBalanceCard />
       <CatalogueReadinessCard products={p.products} loading={p.loading} />
+      <YjFunnelHealthCard funnels={p.funnels} orders={p.orders} />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KpiWall kpis={p.kpis} loading={p.loading} />
@@ -588,6 +592,7 @@ function WideDashboard(p: Panels & { dense?: boolean }) {
       <Hero kpis={p.kpis} />
       <FacebookAdsBalanceCard />
       <CatalogueReadinessCard products={p.products} loading={p.loading} />
+      <YjFunnelHealthCard funnels={p.funnels} orders={p.orders} />
 
       <div className={p.dense ? "grid gap-5 grid-cols-8" : "grid gap-5 grid-cols-4"}>
         <KpiWall kpis={p.kpis} loading={p.loading} />
