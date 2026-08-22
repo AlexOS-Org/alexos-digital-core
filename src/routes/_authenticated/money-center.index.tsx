@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QuickActions } from "@/components/money/QuickActions";
+import { MoneyAllocationPanel } from "@/components/money/MoneyAllocationPanel";
 import { useAccountBalances, useAccounts, useExpected, useTransactions } from "@/lib/money/api";
 import { useBills } from "@/lib/money/bills";
 import { ACCOUNT_ICONS } from "@/lib/money/constants";
@@ -164,6 +165,8 @@ function MoneyDashboard() {
       </Card>
 
       <QuickActions />
+
+      <MoneyAllocationPanel />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {kpis.map((k) => {

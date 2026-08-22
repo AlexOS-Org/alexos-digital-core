@@ -16,6 +16,9 @@ export interface Account {
   sort_order: number;
   deleted_at: string | null;
   created_at: string;
+  financial_scope: "personal" | "business" | null;
+  business_name: string | null;
+  business_id: string | null;
 }
 
 export interface AccountBalance {
@@ -45,6 +48,9 @@ export interface Transaction {
   reference: string | null;
   amount: number;
   business_id: string | null;
+  financial_scope: "personal" | "business" | null;
+  business_name: string | null;
+  income_type: string | null;
   expense_type: string | null;
   attachment_url: string | null;
   status: "posted" | "pending" | "void";

@@ -1,0 +1,3 @@
+[22/08/2026, 10:14] Supplier: NAVIFORCE NF5060, price KSh 2,700. Details: quartz watch, black variant. https://supplier.example/nf5060-black.jpg https://supplier.example/nf5060
+
+[22/08/2026, 10:18] Unselected supplier message retained for export parsing only.
