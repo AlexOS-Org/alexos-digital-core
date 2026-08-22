@@ -22,9 +22,24 @@ export const Route = createFileRoute("/shop/contact")({
 function ContactPage() {
   const { data: store } = useStorefront();
   const rows = [
-    { icon: Phone, label: "Phone", value: store?.support_phone, href: store?.support_phone ? `tel:${store.support_phone}` : null },
-    { icon: Mail, label: "Email", value: store?.support_email, href: store?.support_email ? `mailto:${store.support_email}` : null },
-    { icon: null, label: "WhatsApp", value: store?.whatsapp ?? "0722658824", href: whatsappHref(store?.whatsapp) },
+    {
+      icon: Phone,
+      label: "Phone",
+      value: store?.support_phone,
+      href: store?.support_phone ? `tel:${store.support_phone}` : null,
+    },
+    {
+      icon: Mail,
+      label: "Email",
+      value: store?.support_email,
+      href: store?.support_email ? `mailto:${store.support_email}` : null,
+    },
+    {
+      icon: null,
+      label: "WhatsApp",
+      value: store?.whatsapp ?? "0722658824",
+      href: whatsappHref(store?.whatsapp),
+    },
   ].filter((r) => r.value);
 
   return (
@@ -35,9 +50,24 @@ function ContactPage() {
       </p>
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {rows.length ? (
-            rows.map((r) => (
-            <a key={r.label} href={r.href ?? undefined} className="flex items-center gap-3 rounded-2xl border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-primary/[0.03]">
-              {r.icon ? <r.icon className="h-5 w-5 shrink-0 text-primary" /> : <img src={DAILYGEAR_SOCIAL_LINKS.whatsapp.iconSrc} alt="" aria-hidden="true" width={20} height={20} className="h-5 w-5 shrink-0" />}
+          rows.map((r) => (
+            <a
+              key={r.label}
+              href={r.href ?? undefined}
+              className="flex items-center gap-3 rounded-2xl border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-primary/[0.03]"
+            >
+              {r.icon ? (
+                <r.icon className="h-5 w-5 shrink-0 text-primary" />
+              ) : (
+                <img
+                  src={DAILYGEAR_SOCIAL_LINKS.whatsapp.iconSrc}
+                  alt=""
+                  aria-hidden="true"
+                  width={20}
+                  height={20}
+                  className="h-5 w-5 shrink-0"
+                />
+              )}
               <div className="min-w-0">
                 <p className="text-xs text-muted-foreground">{r.label}</p>
                 <p className="truncate text-sm font-semibold">{r.value}</p>
@@ -52,9 +82,24 @@ function ContactPage() {
       </div>
       <div className="mt-8 grid gap-3 sm:grid-cols-3">
         {Object.values(DAILYGEAR_SOCIAL_LINKS).map((social) => (
-          <a key={social.label} href={social.href} target="_blank" rel="noreferrer" className="group flex items-center gap-3 rounded-2xl border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-primary/[0.03]">
-            <img src={social.iconSrc} alt="" aria-hidden="true" width={32} height={32} className="h-8 w-8 shrink-0 object-contain" />
-            <span className="text-sm font-semibold group-hover:text-primary">Follow on {social.label}</span>
+          <a
+            key={social.label}
+            href={social.href}
+            target="_blank"
+            rel="noreferrer"
+            className="group flex items-center gap-3 rounded-2xl border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-primary/[0.03]"
+          >
+            <img
+              src={social.iconSrc}
+              alt=""
+              aria-hidden="true"
+              width={32}
+              height={32}
+              className="h-8 w-8 shrink-0 object-contain"
+            />
+            <span className="text-sm font-semibold group-hover:text-primary">
+              Follow on {social.label}
+            </span>
           </a>
         ))}
       </div>

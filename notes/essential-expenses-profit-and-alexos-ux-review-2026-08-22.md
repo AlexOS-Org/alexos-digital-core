@@ -8,19 +8,19 @@ This is an evidence-based planning calculation, not licensed financial advice. T
 
 The persisted records contain four recurring personal obligations and six personal budget categories that can be combined without double-counting overlapping rent, WiFi, or water rows.
 
-| Essential line | Monthly KES | Evidence basis |
-|---|---:|---|
-| House rent | 13,000 | Recurring bill; overrides the duplicate Rent budget |
-| Home WiFi | 1,500 | Recurring bill; overrides the duplicate Internet/WiFi budget |
-| Water | 260 | Recurring bill; use instead of the duplicate Water budget |
-| Garbage | 250 | Recurring bill |
-| Airtime | 1,500 | Personal budget |
-| Electricity | 1,500 | Personal budget |
-| Food | 5,000 | Personal budget |
-| Kids | 10,000 | Personal budget; should later be split into school fees, children’s expenses, and shopping |
-| Medical | 5,000 | Personal budget |
-| Transport | 8,000 | Personal budget |
-| **Modeled essential monthly baseline** | **46,010** | Sum after overlap removal |
+| Essential line                         | Monthly KES | Evidence basis                                                                             |
+| -------------------------------------- | ----------: | ------------------------------------------------------------------------------------------ |
+| House rent                             |      13,000 | Recurring bill; overrides the duplicate Rent budget                                        |
+| Home WiFi                              |       1,500 | Recurring bill; overrides the duplicate Internet/WiFi budget                               |
+| Water                                  |         260 | Recurring bill; use instead of the duplicate Water budget                                  |
+| Garbage                                |         250 | Recurring bill                                                                             |
+| Airtime                                |       1,500 | Personal budget                                                                            |
+| Electricity                            |       1,500 | Personal budget                                                                            |
+| Food                                   |       5,000 | Personal budget                                                                            |
+| Kids                                   |      10,000 | Personal budget; should later be split into school fees, children’s expenses, and shopping |
+| Medical                                |       5,000 | Personal budget                                                                            |
+| Transport                              |       8,000 | Personal budget                                                                            |
+| **Modeled essential monthly baseline** |  **46,010** | Sum after overlap removal                                                                  |
 
 The persisted posted-transaction sample contains only KES 340 of personal expenses (transport 100, airtime 40, food 100, electricity 100). That is insufficient to infer a true monthly average, so KES 46,010 is the best current **budget-and-recurring-obligation baseline**, not an exact observed-spend average.
 
@@ -28,10 +28,10 @@ The persisted posted-transaction sample contains only KES 340 of personal expens
 
 Using the current modeled essential baseline:
 
-| Reserve horizon | Target |
-|---|---:|
-| 3 months | KES 138,030 |
-| 6 months | KES 276,060 |
+| Reserve horizon |      Target |
+| --------------- | ----------: |
+| 3 months        | KES 138,030 |
+| 6 months        | KES 276,060 |
 
 The product should display this as a target range and allow the user to override each essential line. Predictable costs such as school fees should be handled through a separate sinking-fund budget, not silently mixed into the Emergency Fund target. The account created earlier is personal and currently has a zero balance.
 

@@ -2,12 +2,30 @@ import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Link } from "@tanstack/react-router";
-import { ArrowDownToLine, BellRing, CheckCircle2, HeartHandshake, PiggyBank, ShieldCheck } from "lucide-react";
+import {
+  ArrowDownToLine,
+  BellRing,
+  CheckCircle2,
+  HeartHandshake,
+  PiggyBank,
+  ShieldCheck,
+} from "lucide-react";
 import { toast } from "sonner";
 import { formatMoney } from "@/lib/money/format";
-import { useAccountBalances, useAccounts, useSaveTransaction, useTransactions } from "@/lib/money/api";
+import {
+  useAccountBalances,
+  useAccounts,
+  useSaveTransaction,
+  useTransactions,
+} from "@/lib/money/api";
 import { getDailyGearProfitCashFlow } from "@/lib/dailygear/profit-cash-flow.functions";
 import type { DailyGearProfitCashFlowResponse } from "@/lib/dailygear/profit-cash-flow.server";
 
@@ -30,11 +48,15 @@ export function MoneyAllocationPanel() {
   const [savingsAccountId, setSavingsAccountId] = useState("");
   const [approvedTitheKeys, setApprovedTitheKeys] = useState<string[]>([]);
   const [approvedSavingsKeys, setApprovedSavingsKeys] = useState<string[]>([]);
-  const [profitResponse, setProfitResponse] = useState<DailyGearProfitCashFlowResponse | null>(null);
+  const [profitResponse, setProfitResponse] = useState<DailyGearProfitCashFlowResponse | null>(
+    null,
+  );
 
   useEffect(() => {
     let active = true;
-    getDailyGearProfitCashFlow({ data: { datePreset: "today", includeInsights: true, maxPages: 10 } })
+    getDailyGearProfitCashFlow({
+      data: { datePreset: "today", includeInsights: true, maxPages: 10 },
+    })
       .then((response) => {
         if (active) setProfitResponse(response);
       })
@@ -71,7 +93,10 @@ export function MoneyAllocationPanel() {
       )
       .reduce((total, transaction) => total + Number(transaction.amount), 0);
     const personalReceipts = posted
-      .filter((transaction) => transaction.type === "income" && transaction.financial_scope !== "business")
+      .filter(
+        (transaction) =>
+          transaction.type === "income" && transaction.financial_scope !== "business",
+      )
       .reduce((total, transaction) => total + Number(transaction.amount), 0);
     const canonicalBusinessProfit = profitResponse?.financials.operatingProfit;
     const businessProfit = canonicalBusinessProfit ?? ledgerBusinessProfit;
@@ -85,10 +110,15 @@ export function MoneyAllocationPanel() {
   }, [transactions, profitResponse]);
 
   const availableAccounts = accounts.filter((account) => account.id !== emergencyAccount?.id);
-  const personalSavingsAccounts = availableAccounts.filter((account) => account.financial_scope !== "business");
-  const selectedSavingsAccount = personalSavingsAccounts.find((account) => account.id === savingsAccountId);
+  const personalSavingsAccounts = availableAccounts.filter(
+    (account) => account.financial_scope !== "business",
+  );
+  const selectedSavingsAccount = personalSavingsAccounts.find(
+    (account) => account.id === savingsAccountId,
+  );
   const selectedTitheAccount = availableAccounts.find((account) => account.id === titheAccountId);
-  const balanceFor = (id: string) => Number(balances.find((balance) => balance.account_id === id)?.balance ?? 0);
+  const balanceFor = (id: string) =>
+    Number(balances.find((balance) => balance.account_id === id)?.balance ?? 0);
   const titheTotal = metrics.businessTithe + metrics.salaryTithe;
   const titheKey = `${window.from}:tithe:${titheTotal.toFixed(2)}`;
   const savingsKey = `${window.from}:savings:${metrics.savingsSuggestion.toFixed(2)}`;
@@ -96,7 +126,9 @@ export function MoneyAllocationPanel() {
   const approveTithe = async () => {
     if (!selectedTitheAccount || titheTotal <= 0) return;
     if (balanceFor(selectedTitheAccount.id) < titheTotal) {
-      toast.error("The selected account does not have enough available balance for this tithe suggestion.");
+      toast.error(
+        "The selected account does not have enough available balance for this tithe suggestion.",
+      );
       return;
     }
     await save.mutateAsync({
@@ -118,7 +150,9 @@ export function MoneyAllocationPanel() {
   const approveSavings = async () => {
     if (!emergencyAccount || !selectedSavingsAccount || metrics.savingsSuggestion <= 0) return;
     if (balanceFor(selectedSavingsAccount.id) < metrics.savingsSuggestion) {
-      toast.error("The selected account does not have enough available balance for this savings suggestion.");
+      toast.error(
+        "The selected account does not have enough available balance for this savings suggestion.",
+      );
       return;
     }
     await save.mutateAsync({
@@ -137,8 +171,12 @@ export function MoneyAllocationPanel() {
 
   const titheReference = `TITHE:${new Date().toISOString().slice(0, 10)}`;
   const savingsReference = `EMERGENCY:${new Date().toISOString().slice(0, 10)}`;
-  const titheAlreadyPosted = transactions.some((transaction) => transaction.reference === titheReference);
-  const savingsAlreadyPosted = transactions.some((transaction) => transaction.reference === savingsReference);
+  const titheAlreadyPosted = transactions.some(
+    (transaction) => transaction.reference === titheReference,
+  );
+  const savingsAlreadyPosted = transactions.some(
+    (transaction) => transaction.reference === savingsReference,
+  );
   const titheApproved = titheAlreadyPosted || approvedTitheKeys.includes(titheKey);
   const savingsApproved = savingsAlreadyPosted || approvedSavingsKeys.includes(savingsKey);
 
@@ -150,7 +188,8 @@ export function MoneyAllocationPanel() {
             <BellRing className="h-4 w-4 text-amber-500" /> Daily allocation review
           </CardTitle>
           <p className="mt-1 text-xs text-muted-foreground">
-            Suggestions are calculated from posted transactions today. Nothing moves until you approve it.
+            Suggestions are calculated from posted transactions today. Nothing moves until you
+            approve it.
           </p>
         </div>
         <ShieldCheck className="h-5 w-5 text-emerald-600" aria-label="Approval required" />
@@ -159,64 +198,115 @@ export function MoneyAllocationPanel() {
         <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/20 p-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Tithe due</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                Tithe due
+              </p>
               <p className="mt-1 text-2xl font-semibold">{formatMoney(titheTotal)}</p>
             </div>
             <HeartHandshake className="h-6 w-6 text-rose-500" />
           </div>
           <p className="text-xs text-muted-foreground">
-            10% of today’s net business profit ({formatMoney(metrics.businessTithe)}) plus 10% of confirmed salary received ({formatMoney(metrics.salaryTithe)}). Net business profit includes recognized revenue, COGS, order costs, business expenses, and available read-only Meta spend.
+            10% of today’s net business profit ({formatMoney(metrics.businessTithe)}) plus 10% of
+            confirmed salary received ({formatMoney(metrics.salaryTithe)}). Net business profit
+            includes recognized revenue, COGS, order costs, business expenses, and available
+            read-only Meta spend.
           </p>
           {profitResponse?.financials.dataQuality.warnings.length ? (
-            <p className="text-xs text-amber-700 dark:text-amber-300">Profit data warning: {profitResponse.financials.dataQuality.warnings[0]}</p>
+            <p className="text-xs text-amber-700 dark:text-amber-300">
+              Profit data warning: {profitResponse.financials.dataQuality.warnings[0]}
+            </p>
           ) : null}
           {titheTotal > 0 && !titheApproved ? (
             <>
               <div className="space-y-1.5">
                 <Label>Pay tithe from</Label>
                 <Select value={titheAccountId} onValueChange={setTitheAccountId}>
-                  <SelectTrigger><SelectValue placeholder="Select personal or business account" /></SelectTrigger>
-                  <SelectContent>{availableAccounts.map((account) => <SelectItem key={account.id} value={account.id}>{account.name}</SelectItem>)}</SelectContent>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select personal or business account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableAccounts.map((account) => (
+                      <SelectItem key={account.id} value={account.id}>
+                        {account.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </div>
-              <Button className="w-full" onClick={approveTithe} disabled={save.isPending || !titheAccountId}>
+              <Button
+                className="w-full"
+                onClick={approveTithe}
+                disabled={save.isPending || !titheAccountId}
+              >
                 <CheckCircle2 className="mr-2 h-4 w-4" /> Approve tithe payment
               </Button>
             </>
           ) : titheApproved ? (
-            <p className="flex items-center gap-2 text-sm font-medium text-emerald-600"><CheckCircle2 className="h-4 w-4" /> Approved and posted once.</p>
-          ) : <p className="text-sm text-muted-foreground">No tithe suggestion is due today.</p>}
+            <p className="flex items-center gap-2 text-sm font-medium text-emerald-600">
+              <CheckCircle2 className="h-4 w-4" /> Approved and posted once.
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">No tithe suggestion is due today.</p>
+          )}
         </div>
 
         <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/20 p-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Emergency Fund suggestion</p>
-              <p className="mt-1 text-2xl font-semibold">{formatMoney(metrics.savingsSuggestion)}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                Emergency Fund suggestion
+              </p>
+              <p className="mt-1 text-2xl font-semibold">
+                {formatMoney(metrics.savingsSuggestion)}
+              </p>
             </div>
             <PiggyBank className="h-6 w-6 text-emerald-600" />
           </div>
           <p className="text-xs text-muted-foreground">
-            Starter rule: 10% of today’s confirmed personal receipts. Current reserve balance: {formatMoney(emergencyBalance)}.
+            Starter rule: 10% of today’s confirmed personal receipts. Current reserve balance:{" "}
+            {formatMoney(emergencyBalance)}.
           </p>
           {!emergencyAccount ? (
-            <Button asChild variant="outline" className="w-full"><Link to="/money-center/accounts"><ArrowDownToLine className="mr-2 h-4 w-4" /> Create Emergency Fund account</Link></Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link to="/money-center/accounts">
+                <ArrowDownToLine className="mr-2 h-4 w-4" /> Create Emergency Fund account
+              </Link>
+            </Button>
           ) : metrics.savingsSuggestion > 0 && !savingsApproved ? (
             <>
               <div className="space-y-1.5">
                 <Label>Save from</Label>
                 <Select value={savingsAccountId} onValueChange={setSavingsAccountId}>
-                  <SelectTrigger><SelectValue placeholder="Select personal account" /></SelectTrigger>
-                  <SelectContent>{personalSavingsAccounts.map((account) => <SelectItem key={account.id} value={account.id}>{account.name}</SelectItem>)}</SelectContent>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select personal account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {personalSavingsAccounts.map((account) => (
+                      <SelectItem key={account.id} value={account.id}>
+                        {account.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </div>
-              <Button className="w-full" variant="secondary" onClick={approveSavings} disabled={save.isPending || !savingsAccountId}>
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={approveSavings}
+                disabled={save.isPending || !savingsAccountId}
+              >
                 <PiggyBank className="mr-2 h-4 w-4" /> Approve transfer to Emergency Fund
               </Button>
             </>
           ) : savingsApproved ? (
-            <p className="flex items-center gap-2 text-sm font-medium text-emerald-600"><CheckCircle2 className="h-4 w-4" /> Transfer approved and posted once.</p>
-          ) : <p className="text-sm text-muted-foreground">No personal receipt has been posted today.</p>}
+            <p className="flex items-center gap-2 text-sm font-medium text-emerald-600">
+              <CheckCircle2 className="h-4 w-4" /> Transfer approved and posted once.
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No personal receipt has been posted today.
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>

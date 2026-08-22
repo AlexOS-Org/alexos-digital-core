@@ -103,14 +103,38 @@ export function StoreFooter({ store }: { store: Storefront | null }) {
               </p>
             ) : null}
             {store?.whatsapp ? (
-              <a href={whatsappHref(store.whatsapp)} className="flex items-start gap-2 text-muted-foreground hover:text-foreground">
-                <img src={DAILYGEAR_SOCIAL_LINKS.whatsapp.iconSrc} alt="" aria-hidden="true" width={14} height={14} className="mt-0.5 h-3.5 w-3.5 shrink-0" /> WhatsApp {store.whatsapp}
+              <a
+                href={whatsappHref(store.whatsapp)}
+                className="flex items-start gap-2 text-muted-foreground hover:text-foreground"
+              >
+                <img
+                  src={DAILYGEAR_SOCIAL_LINKS.whatsapp.iconSrc}
+                  alt=""
+                  aria-hidden="true"
+                  width={14}
+                  height={14}
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                />{" "}
+                WhatsApp {store.whatsapp}
               </a>
             ) : null}
             <div className="flex items-center gap-3 pt-2">
               {Object.values(DAILYGEAR_SOCIAL_LINKS).map((social) => (
-                <a key={social.label} href={social.href} target="_blank" rel="noreferrer" aria-label={social.label}>
-                  <img src={social.iconSrc} alt="" aria-hidden="true" width={20} height={20} className="h-5 w-5 object-contain" />
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={social.label}
+                >
+                  <img
+                    src={social.iconSrc}
+                    alt=""
+                    aria-hidden="true"
+                    width={20}
+                    height={20}
+                    className="h-5 w-5 object-contain"
+                  />
                 </a>
               ))}
             </div>

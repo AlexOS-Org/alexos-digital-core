@@ -77,7 +77,13 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       setSource(editing.source ?? INCOME_SOURCES[0]);
       setDescription(editing.description ?? "");
       setReference(editing.reference ?? "");
-      setScope(editing.expense_type === "shared_living" || editing.category?.endsWith(" — Shared") ? "shared" : editing.business_id ? "business" : "personal");
+      setScope(
+        editing.expense_type === "shared_living" || editing.category?.endsWith(" — Shared")
+          ? "shared"
+          : editing.business_id
+            ? "business"
+            : "personal",
+      );
       setBusinessId(editing.business_id ?? "");
       setExpenseType(editing.expense_type ?? "other");
     } else {
@@ -118,7 +124,8 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       description: description || null,
       reference: reference || null,
       business_id: mode === "expense" && scope === "business" ? businessId : null,
-      expense_type: mode === "expense" ? (scope === "shared" ? "shared_living" : expenseType) : null,
+      expense_type:
+        mode === "expense" ? (scope === "shared" ? "shared_living" : expenseType) : null,
     });
     onOpenChange(false);
   };

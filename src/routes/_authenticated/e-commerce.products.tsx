@@ -221,9 +221,19 @@ function ProductsPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {productImage(p) ? (
-                            <img src={productImage(p) ?? undefined} alt="" aria-hidden="true" width={48} height={48} loading="lazy" className="h-12 w-12 shrink-0 rounded-xl border object-cover" />
+                            <img
+                              src={productImage(p) ?? undefined}
+                              alt=""
+                              aria-hidden="true"
+                              width={48}
+                              height={48}
+                              loading="lazy"
+                              className="h-12 w-12 shrink-0 rounded-xl border object-cover"
+                            />
                           ) : (
-                            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border bg-muted text-[10px] text-muted-foreground">No image</span>
+                            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border bg-muted text-[10px] text-muted-foreground">
+                              No image
+                            </span>
                           )}
                           <div className="min-w-0">
                             <p className="font-medium">{p.name}</p>

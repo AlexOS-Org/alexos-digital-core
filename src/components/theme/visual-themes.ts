@@ -1,5 +1,14 @@
 export type VisualThemeId =
-  "midnight" | "aurora" | "dailygear" | "paper" | "ocean" | "ocean_mountain" | "plum" | "copper" | "sage" | "custom";
+  | "midnight"
+  | "aurora"
+  | "dailygear"
+  | "paper"
+  | "ocean"
+  | "ocean_mountain"
+  | "plum"
+  | "copper"
+  | "sage"
+  | "custom";
 export type VisualBackdrop = "mountains" | "gradient" | "none";
 export type VisualTheme = {
   id: VisualThemeId;
