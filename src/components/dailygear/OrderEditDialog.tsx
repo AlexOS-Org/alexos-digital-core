@@ -27,6 +27,7 @@ interface Props {
   order: Order | null;
   customer: Customer | null;
   onRequestPayment?: () => void;
+  onRequestFulfilment?: () => void;
 }
 
 interface FormState {
@@ -87,7 +88,14 @@ function clean(value: string) {
   return value.trim() || null;
 }
 
-export function OrderEditDialog({ open, onOpenChange, order, customer, onRequestPayment }: Props) {
+export function OrderEditDialog({
+  open,
+  onOpenChange,
+  order,
+  customer,
+  onRequestPayment,
+  onRequestFulfilment,
+}: Props) {
   const save = useUpdateOrderDetails();
   const payments = useOrderPayments(order?.id);
   const expenses = useOrderExpenses(order?.id);
@@ -175,6 +183,21 @@ export function OrderEditDialog({ open, onOpenChange, order, customer, onRequest
           Customer, delivery, payment, fulfilment and notes can be corrected here. Line items, order
           totals, stock movements and the original order number are preserved to prevent duplicate
           reservation or false financial history.
+        </div>
+
+        <div className="flex flex-col gap-3 rounded-2xl border border-primary/20 bg-primary/[0.04] p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold">Order expenses &amp; fulfilment costs</p>
+            <p className="text-xs leading-5 text-muted-foreground">
+              Add supplier, delivery, advertising, packaging, and other costs. These reduce this
+              order’s profit; only confirmed payments reduce the selected account.
+            </p>
+          </div>
+          {onRequestFulfilment ? (
+            <Button type="button" size="sm" variant="secondary" onClick={onRequestFulfilment}>
+              Add or edit order costs
+            </Button>
+          ) : null}
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">

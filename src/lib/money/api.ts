@@ -26,6 +26,12 @@ export interface AccountBalance {
   money_out: number;
 }
 
+export interface Business {
+  id: string;
+  name: string;
+  status: string;
+}
+
 export interface Transaction {
   id: string;
   user_id: string;
@@ -38,6 +44,8 @@ export interface Transaction {
   description: string | null;
   reference: string | null;
   amount: number;
+  business_id: string | null;
+  expense_type: string | null;
   attachment_url: string | null;
   status: "posted" | "pending" | "void";
   deleted_at: string | null;
@@ -74,6 +82,22 @@ async function uid() {
 }
 
 /* ---------------- Accounts ---------------- */
+export function useBusinesses() {
+  return useQuery({
+    queryKey: ["businesses", "finance"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("businesses")
+        .select("id,name,status")
+        .eq("status", "active")
+        .order("name")
+        .limit(50);
+      if (error) throw error;
+      return (data ?? []) as Business[];
+    },
+  });
+}
+
 export function useAccounts(includeArchived = false) {
   return useQuery({
     queryKey: ["accounts", includeArchived],

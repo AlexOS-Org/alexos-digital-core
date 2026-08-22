@@ -23,6 +23,10 @@ function ExpensesPage() {
     .filter((t) => new Date(t.occurred_at) >= monthStart)
     .reduce((s, t) => s + Number(t.amount), 0);
   const total = txs.reduce((s, t) => s + Number(t.amount), 0);
+  const businessTotal = txs
+    .filter((t) => Boolean(t.business_id))
+    .reduce((s, t) => s + Number(t.amount), 0);
+  const personalTotal = txs.filter((t) => !t.business_id).reduce((s, t) => s + Number(t.amount), 0);
 
   const byCat = txs.reduce<Record<string, number>>((acc, t) => {
     const k = t.category ?? "Other";
@@ -42,7 +46,7 @@ function ExpensesPage() {
         </Button>
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Card className="rounded-2xl">
           <CardHeader className="pb-1">
             <CardTitle className="text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -73,6 +77,26 @@ function ExpensesPage() {
             <div className="text-xl font-semibold">{txs.length}</div>
           </CardContent>
         </Card>
+        <Card className="rounded-2xl border-primary/20 bg-primary/[0.04]">
+          <CardHeader className="pb-1">
+            <CardTitle className="text-[10px] uppercase tracking-widest text-primary">
+              Business
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl font-semibold">{formatMoney(businessTotal)}</div>
+          </CardContent>
+        </Card>
+        <Card className="rounded-2xl border-violet-500/20 bg-violet-500/[0.04]">
+          <CardHeader className="pb-1">
+            <CardTitle className="text-[10px] uppercase tracking-widest text-violet-600 dark:text-violet-300">
+              Personal
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl font-semibold">{formatMoney(personalTotal)}</div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -96,6 +120,10 @@ function ExpensesPage() {
                       <div className="text-xs text-muted-foreground">
                         {formatDate(t.occurred_at)} · {formatTime(t.occurred_at)} ·{" "}
                         {accName[t.account_id]} · {t.category}
+                      </div>
+                      <div className="mt-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                        {t.business_id ? "Business expense" : "Personal expense"}
+                        {t.expense_type ? ` · ${t.expense_type.replace(/_/g, " ")}` : ""}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 text-destructive font-semibold">

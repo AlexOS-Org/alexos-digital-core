@@ -375,6 +375,12 @@ function OrdersPage() {
             setEditingOrder(null);
           }
         }}
+        onRequestFulfilment={() => {
+          if (editingOrder) {
+            setFulfillingOrder(editingOrder);
+            setEditingOrder(null);
+          }
+        }}
         customer={
           editingOrder?.customer_id
             ? (customers.find((customer) => customer.id === editingOrder.customer_id) ?? null)
