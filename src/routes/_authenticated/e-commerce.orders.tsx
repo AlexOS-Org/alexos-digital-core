@@ -10,6 +10,7 @@ import {
   ShoppingCart,
   Search,
   ReceiptText,
+  Trash2,
 } from "lucide-react";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { KpiCard } from "@/components/dailygear/KpiCard";
@@ -31,6 +32,7 @@ import { OrderEditDialog } from "@/components/dailygear/OrderEditDialog";
 import { OrderFulfilmentDialog } from "@/components/dailygear/OrderFulfilmentDialog";
 import { OrderPaymentDialog } from "@/components/dailygear/OrderPaymentDialog";
 import { OrderDocuments } from "@/components/dailygear/OrderDocuments";
+import { useDeleteOrder } from "@/lib/dailygear/api";
 import {
   DG_CURRENCY,
   ORDER_STATUS_FLOW,
@@ -78,6 +80,7 @@ function resolveCustomerName(customerId: string | null, customers: Customer[]): 
 function OrdersPage() {
   const { orders, customers, isLoading } = useCommerceData();
   const updateStatus = useUpdateOrderStatus();
+  const deleteOrder = useDeleteOrder();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<Order["status"] | "all">("all");
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
@@ -288,6 +291,26 @@ function OrdersPage() {
                             >
                               <PackageCheck className="mr-1 h-3.5 w-3.5" />
                               Record costs & fulfil
+                            </Button>
+                          ) : null}
+                          {order.payment_status === "unpaid" ? (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="whitespace-nowrap text-xs text-destructive hover:text-destructive"
+                              disabled={deleteOrder.isPending}
+                              onClick={() => {
+                                if (
+                                  typeof window !== "undefined" &&
+                                  !window.confirm(
+                                    `Remove unpaid test order ${order.order_number ?? ""}? This is a soft delete and cannot remove any payment transaction.`,
+                                  )
+                                )
+                                  return;
+                                deleteOrder.mutate(order.id);
+                              }}
+                            >
+                              <Trash2 className="mr-1 h-3.5 w-3.5" /> Remove test order
                             </Button>
                           ) : null}
                         </div>
