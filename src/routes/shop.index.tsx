@@ -37,6 +37,26 @@ export const Route = createFileRoute("/shop/")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://dailygear.co.ke/shop" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "OnlineStore",
+          name: "DailyGear",
+          url: "https://dailygear.co.ke/shop",
+          description:
+            "Curated everyday gear with fast local delivery and secure checkout in Kenya.",
+          areaServed: "KE",
+          contactPoint: {
+            "@type": "ContactPoint",
+            telephone: "+254722658824",
+            contactType: "customer service",
+          },
+        }),
+      },
+    ],
   }),
   component: StoreHome,
 });
@@ -122,7 +142,7 @@ function StoreHome() {
               <source media="(max-width: 640px)" srcSet={dailyGearHeroPremiumMobile} />
               <img
                 src={store?.hero_image_url ?? dailyGearHeroPremiumWide}
-                alt={store?.hero_image_url ? store.name : ""}
+                alt="DailyGear everyday essentials collection in Kenya"
                 fetchPriority="high"
                 decoding="async"
                 className="h-full w-full object-cover"
@@ -144,12 +164,14 @@ function StoreHome() {
         </div>
       </section>
 
-      <StoreConfidenceStrip />
-      <StoreJourneyGuide />
-      <StoreVisualValueGrid />
+      <div className="dailygear-below-fold">
+        <StoreConfidenceStrip />
+        <StoreJourneyGuide />
+        <StoreVisualValueGrid />
+      </div>
 
       <section
-        className="mt-10 grid gap-3 md:grid-cols-3"
+        className="dailygear-below-fold mt-10 grid gap-3 md:grid-cols-3"
         aria-label="DailyGear collection pillars"
       >
         {PILLARS.map((pillar) => (
@@ -173,7 +195,7 @@ function StoreHome() {
       </section>
 
       {primaryCategories.length ? (
-        <section className="mt-14 space-y-4">
+        <section className="dailygear-below-fold mt-14 space-y-4">
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
@@ -207,7 +229,7 @@ function StoreHome() {
         </section>
       ) : null}
 
-      <section className="mt-14 space-y-4">
+      <section className="dailygear-below-fold mt-14 space-y-4">
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">

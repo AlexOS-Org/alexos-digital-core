@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /shop
+Allow: /shop/products
+Allow: /shop/product/
+Allow: /shop/category/
+Allow: /shop/about
+Allow: /shop/contact
+Allow: /shop/faq
+Allow: /shop/policies/
+Disallow: /shop/cart
+Disallow: /shop/checkout
+Disallow: /shop/thank-you
+Disallow: /shop/track
+Disallow: /auth
+Disallow: /dashboard
+Disallow: /api/
+
+Sitemap: https://dailygear.co.ke/sitemap.xml

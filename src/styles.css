@@ -706,7 +706,6 @@
   }
 }
 
-
 @layer utilities {
   .dailygear-store-header {
     background: color-mix(in oklch, var(--color-background) 92%, var(--alexos-green) 8%);
@@ -743,12 +742,11 @@
   }
 
   .dailygear-store-footer {
-    background:
-      linear-gradient(
-        180deg,
-        color-mix(in oklch, var(--color-muted) 34%, transparent),
-        color-mix(in oklch, var(--color-background) 96%, var(--alexos-green) 4%)
-      );
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--color-muted) 34%, transparent),
+      color-mix(in oklch, var(--color-background) 96%, var(--alexos-green) 4%)
+    );
   }
 
   .dailygear-product-media {
@@ -763,5 +761,22 @@
 
   .dailygear-product-cta:hover {
     background: linear-gradient(135deg, var(--alexos-green-dark), var(--alexos-blue-dark));
+  }
+}
+
+/* Keep the first viewport responsive while allowing browsers to defer painting of lower storefront sections. */
+.dailygear-below-fold {
+  content-visibility: auto;
+  contain-intrinsic-size: 720px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
