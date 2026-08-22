@@ -20,6 +20,7 @@ import {
 import { MobileDashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DashboardKpiStrip } from "@/components/dashboard/DashboardKpiStrip";
 import { AlexosDashboardFooter } from "@/components/dashboard/AlexosDashboardFooter";
+import MoneyFlowChart from "@/components/dashboard/MoneyFlowChart";
 import { Component, ErrorInfo, ReactNode } from "react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: Dashboard });
@@ -163,6 +164,49 @@ function Dashboard() {
                 </p>
               </div>
               <MoneySnapshot />
+              <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(260px,0.55fr)]">
+                <MoneyFlowChart />
+                <div className="rounded-[1.75rem] border border-border/60 bg-card/70 p-5 shadow-sm sm:p-6">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                    Reading the numbers
+                  </p>
+                  <h3 className="mt-2 text-lg font-semibold tracking-tight">
+                    Cash in, cash out, and what remains
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    Income increases the receiving account and operating result. Expenses reduce
+                    cash and profit once. Transfers between your own accounts change location, not
+                    profit.
+                  </p>
+                  <div className="mt-5 space-y-3 text-xs text-muted-foreground">
+                    <div className="flex items-start gap-3">
+                      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-emerald-500/12 text-emerald-600 dark:text-emerald-300">
+                        1
+                      </span>
+                      <span>
+                        Confirm a customer payment against the exact account that received it.
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-amber-500/12 text-amber-600 dark:text-amber-300">
+                        2
+                      </span>
+                      <span>
+                        Record supplier, delivery, and advertising costs as separate expenses.
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-violet-500/12 text-violet-600 dark:text-violet-300">
+                        3
+                      </span>
+                      <span>
+                        Use Transfers when money moves from I&amp;M to M-Pesa or another business
+                        account.
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </section>
           </SafePanel>
           <div className="grid gap-5 lg:grid-cols-2">

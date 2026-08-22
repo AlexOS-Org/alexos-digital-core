@@ -167,7 +167,7 @@ export default function MoneySnapshot() {
                     <p className="mt-3 text-2xl font-bold tracking-tight">{card.value}</p>
                   </div>
                   <div
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ring-1 ring-inset ${card.iconClass}`}
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ring-1 ring-inset ${card.iconClass}`}
                   >
                     <Icon className="h-5 w-5" />
                   </div>
