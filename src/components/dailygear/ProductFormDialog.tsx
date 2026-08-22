@@ -206,7 +206,7 @@ export function ProductFormDialog({
   const categoryNameById = new Map(categories.map((category) => [category.id, category.name]));
 
   const imageUrls = form.images
-    .split(/\n|,/) 
+    .split(/\n|,/)
     .map((value) => value.trim())
     .filter(Boolean);
   const invalidImageUrls = imageUrls.filter((url) => {
