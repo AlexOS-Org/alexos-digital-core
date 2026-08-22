@@ -540,6 +540,118 @@
   --sidebar-accent: oklch(0.21 0.04 255);
   --sidebar-border: oklch(1 0 0 / 14%);
 }
+:root[data-visual-theme="ocean"] {
+  --alexos-blue: oklch(0.55 0.17 220);
+  --alexos-purple: oklch(0.58 0.18 265);
+  --alexos-green: oklch(0.58 0.15 175);
+  --primary: var(--alexos-blue);
+  --ring: var(--alexos-blue);
+  --sidebar-primary: var(--alexos-blue);
+  --sidebar-ring: var(--alexos-blue);
+  --background: oklch(0.975 0.015 205);
+  --card: oklch(1 0.005 205);
+  --popover: oklch(1 0.005 205);
+  --sidebar: oklch(0.17 0.06 220);
+  --sidebar-accent: oklch(0.25 0.08 220);
+}
+.dark[data-visual-theme="ocean"] {
+  --alexos-blue: oklch(0.76 0.15 210);
+  --alexos-purple: oklch(0.72 0.17 265);
+  --alexos-green: oklch(0.72 0.15 175);
+  --primary: var(--alexos-blue);
+  --ring: var(--alexos-blue);
+  --sidebar-primary: var(--alexos-blue);
+  --sidebar-ring: var(--alexos-blue);
+  --background: oklch(0.15 0.035 220);
+  --card: oklch(0.22 0.055 220);
+  --popover: oklch(0.23 0.055 220);
+  --sidebar: oklch(0.13 0.055 220);
+  --sidebar-accent: oklch(0.25 0.07 220);
+}
+:root[data-visual-theme="plum"] {
+  --alexos-blue: oklch(0.56 0.18 270);
+  --alexos-purple: oklch(0.6 0.2 315);
+  --alexos-green: oklch(0.58 0.16 160);
+  --primary: var(--alexos-purple);
+  --ring: var(--alexos-purple);
+  --sidebar-primary: var(--alexos-purple);
+  --sidebar-ring: var(--alexos-purple);
+  --background: oklch(0.98 0.012 315);
+  --card: oklch(1 0.004 315);
+  --popover: oklch(1 0.004 315);
+  --sidebar: oklch(0.2 0.055 315);
+  --sidebar-accent: oklch(0.3 0.08 315);
+}
+.dark[data-visual-theme="plum"] {
+  --alexos-blue: oklch(0.76 0.16 275);
+  --alexos-purple: oklch(0.76 0.17 315);
+  --alexos-green: oklch(0.7 0.15 160);
+  --primary: var(--alexos-purple);
+  --ring: var(--alexos-purple);
+  --sidebar-primary: var(--alexos-purple);
+  --sidebar-ring: var(--alexos-purple);
+  --background: oklch(0.16 0.035 315);
+  --card: oklch(0.23 0.045 315);
+  --popover: oklch(0.24 0.045 315);
+  --sidebar: oklch(0.14 0.045 315);
+  --sidebar-accent: oklch(0.27 0.07 315);
+}
+:root[data-visual-theme="copper"] {
+  --alexos-blue: oklch(0.55 0.14 245);
+  --alexos-purple: oklch(0.58 0.15 35);
+  --alexos-green: oklch(0.58 0.14 150);
+  --primary: var(--alexos-purple);
+  --ring: var(--alexos-purple);
+  --sidebar-primary: var(--alexos-purple);
+  --sidebar-ring: var(--alexos-purple);
+  --background: oklch(0.98 0.012 75);
+  --card: oklch(1 0.006 75);
+  --popover: oklch(1 0.006 75);
+  --sidebar: oklch(0.22 0.045 35);
+  --sidebar-accent: oklch(0.31 0.07 35);
+}
+.dark[data-visual-theme="copper"] {
+  --alexos-blue: oklch(0.74 0.14 245);
+  --alexos-purple: oklch(0.76 0.16 45);
+  --alexos-green: oklch(0.7 0.14 150);
+  --primary: var(--alexos-purple);
+  --ring: var(--alexos-purple);
+  --sidebar-primary: var(--alexos-purple);
+  --sidebar-ring: var(--alexos-purple);
+  --background: oklch(0.17 0.03 45);
+  --card: oklch(0.24 0.04 45);
+  --popover: oklch(0.25 0.04 45);
+  --sidebar: oklch(0.15 0.04 35);
+  --sidebar-accent: oklch(0.28 0.06 35);
+}
+:root[data-visual-theme="sage"] {
+  --alexos-blue: oklch(0.54 0.14 220);
+  --alexos-purple: oklch(0.58 0.14 285);
+  --alexos-green: oklch(0.56 0.15 155);
+  --primary: var(--alexos-green);
+  --ring: var(--alexos-green);
+  --sidebar-primary: var(--alexos-green);
+  --sidebar-ring: var(--alexos-green);
+  --background: oklch(0.975 0.015 155);
+  --card: oklch(1 0.004 155);
+  --popover: oklch(1 0.004 155);
+  --sidebar: oklch(0.19 0.045 155);
+  --sidebar-accent: oklch(0.28 0.06 155);
+}
+.dark[data-visual-theme="sage"] {
+  --alexos-blue: oklch(0.72 0.14 220);
+  --alexos-purple: oklch(0.72 0.15 285);
+  --alexos-green: oklch(0.72 0.15 155);
+  --primary: var(--alexos-green);
+  --ring: var(--alexos-green);
+  --sidebar-primary: var(--alexos-green);
+  --sidebar-ring: var(--alexos-green);
+  --background: oklch(0.15 0.03 155);
+  --card: oklch(0.22 0.04 155);
+  --popover: oklch(0.23 0.04 155);
+  --sidebar: oklch(0.13 0.04 155);
+  --sidebar-accent: oklch(0.25 0.06 155);
+}
 :root[data-visual-theme="paper"] {
   --alexos-blue: oklch(0.54 0.2 255);
   --alexos-purple: oklch(0.58 0.2 292);
