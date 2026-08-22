@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ProductCard } from "@/components/storefront/ProductCard";
 import { StoreConfidenceStrip } from "@/components/storefront/StoreConfidenceStrip";
 import { useStoreProducts, useStorefront } from "@/lib/storefront/api";
+import type { StoreProduct } from "@/lib/storefront/api";
 import dailyGearHeroPremiumWide from "@/assets/visuals/dailygear-hero-premium-wide.webp";
 import dailyGearHeroPremiumMobile from "@/assets/visuals/dailygear-hero-premium-mobile.webp";
 
@@ -58,8 +59,17 @@ export const Route = createFileRoute("/shop/")({
 
 function StoreHome() {
   const { data: store } = useStorefront();
-  const featured = useStoreProducts(store?.user_id, { limit: 4 });
+  const products = useStoreProducts(store?.user_id, { limit: 50, sort: "newest" });
   const currency = store?.currency ?? "KES";
+  const activeProducts = products.data ?? [];
+  const featured = activeProducts.filter((product) =>
+    (product.tags ?? []).some((tag) => /featured/i.test(tag)),
+  );
+  const bestSelling = activeProducts.filter((product) =>
+    (product.tags ?? []).some((tag) => /best[- ]?selling|popular/i.test(tag)),
+  );
+  const newArrivals = activeProducts.slice(0, 4);
+  const featuredProducts = (featured.length ? featured : activeProducts).slice(0, 4);
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-16 pt-5 sm:pt-8 4k:max-w-[1800px] 4k:px-8">
@@ -155,87 +165,35 @@ function StoreHome() {
         <StoreConfidenceStrip />
       </div>
 
-      <section className="dailygear-below-fold mt-14 space-y-4">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-              The current drop
-            </p>
-            <h2 className="mt-1 text-2xl font-black tracking-tight">A small edit to start</h2>
-          </div>
-          <Link to="/shop/products" className="text-sm font-semibold text-primary hover:underline">
-            View all
-          </Link>
-        </div>
+      <MerchandisingSection
+        eyebrow="Featured products"
+        title="A considered edit to start"
+        description="Explore the products currently available from DailyGear, with options shown clearly before checkout."
+        products={featuredProducts}
+        currency={currency}
+        loading={products.isLoading}
+        emptyCopy="Featured products will appear here as the catalogue grows."
+      />
 
-        {featured.isLoading ? (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {[...Array(4)].map((_, index) => (
-              <Skeleton key={index} className="h-80 rounded-3xl" />
-            ))}
-          </div>
-        ) : featured.data?.length ? (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {featured.data.map((product) => (
-              <ProductCard key={product.id} product={product} currency={currency} />
-            ))}
-          </div>
-        ) : (
-          <div className="relative overflow-hidden rounded-[2rem] border bg-gradient-to-br from-card via-card to-primary/5 p-6 sm:p-10">
-            <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
-              <div className="max-w-2xl">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                  <PackageCheck className="h-5 w-5" aria-hidden="true" />
-                </div>
-                <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                  The first drop is being prepared
-                </p>
-                <h3 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
-                  Good gear is worth getting right.
-                </h3>
-                <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                  The storefront is ready. The catalogue is being checked for current images,
-                  options, prices and availability before it is opened for orders.
-                </p>
-                <div className="mt-6 flex flex-wrap gap-x-5 gap-y-3 text-xs font-medium text-muted-foreground">
-                  <span className="inline-flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-primary" /> Real product images
-                  </span>
-                  <span className="inline-flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-primary" /> Clear checkout
-                  </span>
-                  <span className="inline-flex items-center gap-2">
-                    <Compass className="h-4 w-4 text-primary" /> Support when needed
-                  </span>
-                </div>
-                <div className="mt-7 flex flex-wrap gap-3">
-                  <Button asChild className="rounded-xl">
-                    <Link to="/shop/faq">See how DailyGear works</Link>
-                  </Button>
-                  <Button asChild variant="outline" className="rounded-xl">
-                    <Link to="/shop/contact">Contact the store</Link>
-                  </Button>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:w-[260px] lg:grid-cols-1">
-                {[
-                  { label: "Select", copy: "Choose the right option", icon: Compass },
-                  { label: "Review", copy: "See price and payment", icon: ShieldCheck },
-                  { label: "Track", copy: "Keep the next step close", icon: PackageCheck },
-                ].map((step) => (
-                  <div key={step.label} className="rounded-2xl border bg-background/70 p-3 sm:p-4">
-                    <step.icon className="h-4 w-4 text-primary" aria-hidden="true" />
-                    <p className="mt-3 text-xs font-bold">{step.label}</p>
-                    <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-                      {step.copy}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </section>
+      <MerchandisingSection
+        eyebrow="Best selling"
+        title="Customer favourites"
+        description="This section uses confirmed paid-order history or products explicitly marked as popular."
+        products={bestSelling.slice(0, 4)}
+        currency={currency}
+        loading={products.isLoading}
+        emptyCopy="Best-seller history is still building. Browse the current collection while customer orders accumulate."
+      />
+
+      <MerchandisingSection
+        eyebrow="New arrivals"
+        title="Fresh to DailyGear"
+        description="The latest active products are placed here so returning customers can discover what has just been added."
+        products={newArrivals}
+        currency={currency}
+        loading={products.isLoading}
+        emptyCopy="New arrivals will appear here when active products are added."
+      />
 
       <section className="dailygear-below-fold mt-12 rounded-[2rem] border bg-card p-6 text-center sm:p-10">
         <Sparkles className="mx-auto h-6 w-6 text-primary" aria-hidden="true" />
@@ -251,5 +209,60 @@ function StoreHome() {
         </Button>
       </section>
     </div>
+  );
+}
+
+function MerchandisingSection({
+  eyebrow,
+  title,
+  description,
+  products,
+  currency,
+  loading,
+  emptyCopy,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  products: StoreProduct[];
+  currency: string;
+  loading: boolean;
+  emptyCopy: string;
+}) {
+  return (
+    <section className="dailygear-below-fold mt-14 space-y-4">
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            {eyebrow}
+          </p>
+          <h2 className="mt-1 text-2xl font-black tracking-tight">{title}</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{description}</p>
+        </div>
+        <Link
+          to="/shop/products"
+          className="shrink-0 text-sm font-semibold text-primary hover:underline"
+        >
+          View all
+        </Link>
+      </div>
+      {loading ? (
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {[...Array(4)].map((_, index) => (
+            <Skeleton key={index} className="h-80 rounded-3xl" />
+          ))}
+        </div>
+      ) : products.length ? (
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} currency={currency} />
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-[1.75rem] border bg-card/80 p-6 text-sm text-muted-foreground shadow-sm sm:p-8">
+          {emptyCopy}
+        </div>
+      )}
+    </section>
   );
 }
