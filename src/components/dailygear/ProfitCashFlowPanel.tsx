@@ -130,7 +130,7 @@ export function ProfitCashFlowPanel() {
             Profit and cash flow
           </CardTitle>
           <p className="mt-1 text-xs text-muted-foreground">
-            Revenue, COGS, Meta Spend, operating profit, and cash conversion.
+            Revenue, COGS, order costs, daily business expenses, Meta Spend, and cash conversion.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -166,7 +166,7 @@ export function ProfitCashFlowPanel() {
         {loading ? (
           <div className="flex min-h-44 items-center justify-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
-            Loading orders, fulfilment costs and Meta Spend…
+            Loading orders, fulfilment costs, business expenses and Meta Spend…
           </div>
         ) : error ? (
           <div className="rounded-2xl border border-amber-300/60 bg-amber-50/70 p-4 text-sm dark:border-amber-500/30 dark:bg-amber-950/20">
@@ -191,10 +191,10 @@ export function ProfitCashFlowPanel() {
                   <div>
                     <p className="font-semibold">Meta spend is unavailable</p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Revenue, COGS, fulfilment expenses and cash flow below come from DailyGear and
-                      Money Center records. Operating profit excludes Meta spend until the server
-                      Meta token and Ads Manager read permission are configured; no spend value is
-                      estimated.
+                      Revenue, COGS, order fulfilment expenses, daily business expenses and cash
+                      flow below come from DailyGear and Money Center records. Operating profit
+                      excludes Meta spend until the server Meta token and Ads Manager read
+                      permission are configured; no spend value is estimated.
                     </p>
                   </div>
                 </div>
@@ -231,6 +231,10 @@ export function ProfitCashFlowPanel() {
 
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Stat label="COGS" value={money(financials.cogs, financials.currency)} />
+              <Stat
+                label="Daily business expenses"
+                value={money(financials.businessOperatingExpenses, financials.currency)}
+              />
               <Stat label="Gross margin" value={percent(financials.grossMarginPct)} />
               <Stat label="Operating margin" value={percent(financials.operatingMarginPct)} />
               <Stat label="Cash conversion" value={percent(financials.cashConversionPct)} />

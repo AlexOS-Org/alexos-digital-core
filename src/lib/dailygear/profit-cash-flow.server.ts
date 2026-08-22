@@ -6,6 +6,7 @@ import {
   calculateDailyGearProfitAndCashFlow,
   type DailyGearCashFlowEvent,
   type DailyGearOrderExpense,
+  type DailyGearBusinessExpense,
   type DailyGearProfitCashFlowResult,
 } from "./profit-cash-flow";
 
@@ -114,17 +115,26 @@ export async function calculateDailyGearProfitCashFlowForUser(
     .eq("user_id", context.userId);
   const expenseQuery = context.supabase
     .from("dg_order_expenses")
-    .select("id,order_id,cost_type,amount,created_at,description")
+    .select("id,order_id,cost_type,amount,created_at,description,money_transaction_id")
     .eq("user_id", context.userId);
+  const businessExpenseQuery = context.supabase
+    .from("transactions")
+    .select("id,occurred_at,amount,description,source,financial_scope,status,deleted_at")
+    .eq("user_id", context.userId)
+    .eq("type", "expense")
+    .eq("financial_scope", "business")
+    .eq("status", "posted")
+    .is("deleted_at", null);
   const [
     { data: orderRows, error: orderError },
     { data: itemRows, error: itemError },
     { data: expenseRows, error: expenseError },
-  ] = await Promise.all([orderQuery, itemQuery, expenseQuery]);
+    { data: businessExpenseRows, error: businessExpenseError },
+  ] = await Promise.all([orderQuery, itemQuery, expenseQuery, businessExpenseQuery]);
   if (orderError) throw orderError;
   if (itemError) throw itemError;
   if (expenseError) throw expenseError;
-
+  if (businessExpenseError) throw businessExpenseError;
   const currencyByOrder = new Map(
     (orderRows ?? []).map((order) => [order.id, order.currency ?? "KES"]),
   );
@@ -137,7 +147,20 @@ export async function calculateDailyGearProfitCashFlowForUser(
     date: expense.created_at,
     note: expense.description,
   }));
-
+  const linkedOrderExpenseTransactions = new Set(
+    (expenseRows ?? [])
+      .map((expense) => expense.money_transaction_id)
+      .filter((id): id is string => Boolean(id)),
+  );
+  const businessExpenses: DailyGearBusinessExpense[] = (businessExpenseRows ?? [])
+    .filter((expense) => !linkedOrderExpenseTransactions.has(expense.id))
+    .map((expense) => ({
+      id: expense.id,
+      amount: Number(expense.amount ?? 0),
+      currency: "KES",
+      date: expense.occurred_at,
+      note: expense.description ?? expense.source,
+    }));
   let adInsights: Awaited<
     ReturnType<typeof syncDailyGearAdsManager>
   >["accounts"][number]["insights"] = [];
@@ -161,6 +184,7 @@ export async function calculateDailyGearProfitCashFlowForUser(
     orders: (orderRows ?? []) as Order[],
     orderItems: (itemRows ?? []) as OrderItem[],
     orderExpenses,
+    businessExpenses,
     adInsights,
     cashEvents: request.cashEvents,
     from: request.from,

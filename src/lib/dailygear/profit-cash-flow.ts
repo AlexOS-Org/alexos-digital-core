@@ -32,10 +32,19 @@ export interface DailyGearOrderExpense {
   note?: string | null;
 }
 
+export interface DailyGearBusinessExpense {
+  id: string;
+  amount: number;
+  currency: string;
+  date: string;
+  note?: string | null;
+}
+
 export interface DailyGearProfitCashFlowInput {
   orders: Order[];
   orderItems: OrderItem[];
   orderExpenses?: DailyGearOrderExpense[];
+  businessExpenses?: DailyGearBusinessExpense[];
   adInsights: NormalizedMetaInsight[];
   /** Explicit cash movements override inferred paid-order receipts. */
   cashEvents?: DailyGearCashFlowEvent[];
@@ -75,6 +84,7 @@ export interface DailyGearProfitCashFlowResult {
   deliveryCosts: number;
   supplierPayments: number;
   otherOperatingOutflows: number;
+  businessOperatingExpenses: number;
   operatingExpenses: number;
   operatingProfit: number;
   operatingMarginPct: number | null;
@@ -129,6 +139,7 @@ function currenciesFrom(
   insights: NormalizedMetaInsight[],
   cashEvents: DailyGearCashFlowEvent[],
   orderExpenses: DailyGearOrderExpense[],
+  businessExpenses: DailyGearBusinessExpense[],
 ): string[] {
   return [
     ...new Set(
@@ -137,6 +148,7 @@ function currenciesFrom(
         ...insights.map((row) => row.currency),
         ...cashEvents.map((event) => event.currency),
         ...orderExpenses.map((expense) => expense.currency),
+        ...businessExpenses.map((expense) => expense.currency),
       ].filter((currency): currency is string => Boolean(currency)),
     ),
   ];
@@ -165,6 +177,9 @@ export function calculateDailyGearProfitAndCashFlow(
   const orderExpenses = (input.orderExpenses ?? []).filter(
     (expense) =>
       recognizedOrderIds.has(expense.orderId) && inPeriod(expense.date, input.from, input.until),
+  );
+  const businessExpenses = (input.businessExpenses ?? []).filter((expense) =>
+    inPeriod(expense.date, input.from, input.until),
   );
   const cogsByOrder = new Map<string, number>();
   const purchaseCostByOrder = new Map<string, number>();
@@ -204,6 +219,7 @@ export function calculateDailyGearProfitAndCashFlow(
   const deliveryCostsByDate = new Map<string, number>();
   const supplierPaymentsByDate = new Map<string, number>();
   const otherOutflowsByDate = new Map<string, number>();
+  const businessExpensesByDate = new Map<string, number>();
 
   for (const expense of orderExpenses) {
     const day = dateOnly(expense.date);
@@ -213,6 +229,10 @@ export function calculateDailyGearProfitAndCashFlow(
       addToMap(otherOutflowsByDate, day, num(expense.amount));
     if (expense.costType === "purchase_cost" && !hasExplicitSupplierPayments)
       addToMap(supplierPaymentsByDate, day, num(expense.amount));
+  }
+
+  for (const expense of businessExpenses) {
+    addToMap(businessExpensesByDate, dateOnly(expense.date), num(expense.amount));
   }
 
   if (hasExplicitReceipts) {
@@ -252,7 +272,12 @@ export function calculateDailyGearProfitAndCashFlow(
     (sum, amount) => sum + amount,
     0,
   );
-  const operatingExpenses = adSpend + paymentFees + deliveryCosts + otherOperatingOutflows;
+  const businessOperatingExpenses = [...businessExpensesByDate.values()].reduce(
+    (sum, amount) => sum + amount,
+    0,
+  );
+  const operatingExpenses =
+    adSpend + paymentFees + deliveryCosts + otherOperatingOutflows + businessOperatingExpenses;
   const grossProfit = revenue - cogs;
   const operatingProfit = grossProfit - operatingExpenses;
   const cashReceived = [...cashReceivedByDate.values()].reduce((sum, amount) => sum + amount, 0);
@@ -262,6 +287,7 @@ export function calculateDailyGearProfitAndCashFlow(
     deliveryCosts +
     supplierPayments +
     otherOperatingOutflows +
+    businessOperatingExpenses +
     [...explicitEvents]
       .filter((event) => event.type === "customer_refund")
       .reduce((sum, event) => sum + num(event.amount), 0);
@@ -281,7 +307,9 @@ export function calculateDailyGearProfitAndCashFlow(
     const dayPaymentFees = paymentFeesByDate.get(date) ?? 0;
     const dayDeliveryCosts = deliveryCostsByDate.get(date) ?? 0;
     const dayOtherOutflows = otherOutflowsByDate.get(date) ?? 0;
-    const dayOperatingExpenses = dayAdSpend + dayPaymentFees + dayDeliveryCosts + dayOtherOutflows;
+    const dayBusinessExpenses = businessExpensesByDate.get(date) ?? 0;
+    const dayOperatingExpenses =
+      dayAdSpend + dayPaymentFees + dayDeliveryCosts + dayOtherOutflows + dayBusinessExpenses;
     const dayCashReceived = cashReceivedByDate.get(date) ?? 0;
     const dayCashOutflows =
       dayAdSpend +
@@ -289,6 +317,7 @@ export function calculateDailyGearProfitAndCashFlow(
       dayDeliveryCosts +
       (supplierPaymentsByDate.get(date) ?? 0) +
       dayOtherOutflows +
+      dayBusinessExpenses +
       explicitEvents
         .filter((event) => dateOnly(event.date) === date && event.type === "customer_refund")
         .reduce((sum, event) => sum + num(event.amount), 0);
@@ -315,7 +344,13 @@ export function calculateDailyGearProfitAndCashFlow(
     };
   });
 
-  const currencies = currenciesFrom(orders, adRows, explicitEvents, orderExpenses);
+  const currencies = currenciesFrom(
+    orders,
+    adRows,
+    explicitEvents,
+    orderExpenses,
+    businessExpenses,
+  );
   const warnings: string[] = [];
   if (currencies.length > 1)
     warnings.push(
@@ -355,6 +390,7 @@ export function calculateDailyGearProfitAndCashFlow(
     deliveryCosts,
     supplierPayments,
     otherOperatingOutflows,
+    businessOperatingExpenses,
     operatingExpenses,
     operatingProfit,
     operatingMarginPct: percentage(operatingProfit, revenue),

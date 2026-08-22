@@ -11,10 +11,62 @@ import { Archive, ArchiveRestore, Pencil, Plus, Wallet, CircleAlert } from "luci
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { CryptoHoldingsPanel } from "@/components/money/CryptoHoldingsPanel";
 
 export const Route = createFileRoute("/_authenticated/money-center/accounts")({
   component: AccountsPage,
 });
+
+function institutionStyle(name: string) {
+  const value = name.toLowerCase();
+  if (/m[- ]?pesa/.test(value)) {
+    return {
+      iconClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300",
+      panelClass: "bg-emerald-50/70 dark:bg-emerald-950/20",
+      warningThreshold: 300,
+    };
+  }
+  if (/kcb/.test(value)) {
+    return {
+      iconClass: "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
+      panelClass: "bg-blue-50/70 dark:bg-blue-950/20",
+      warningThreshold: 500,
+    };
+  }
+  if (/i&m|im bank/.test(value)) {
+    return {
+      iconClass: "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300",
+      panelClass: "bg-orange-50/70 dark:bg-orange-950/20",
+      warningThreshold: 500,
+    };
+  }
+  if (/sbm/.test(value)) {
+    return {
+      iconClass: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300",
+      panelClass: "bg-red-50/70 dark:bg-red-950/20",
+      warningThreshold: 500,
+    };
+  }
+  if (/salary/.test(value)) {
+    return {
+      iconClass: "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300",
+      panelClass: "bg-violet-50/70 dark:bg-violet-950/20",
+      warningThreshold: 500,
+    };
+  }
+  if (/binance|crypto/.test(value)) {
+    return {
+      iconClass: "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300",
+      panelClass: "bg-amber-50/70 dark:bg-amber-950/20",
+      warningThreshold: 1000,
+    };
+  }
+  return {
+    iconClass: "bg-primary/10 text-primary",
+    panelClass: "bg-muted/40",
+    warningThreshold: null,
+  };
+}
 
 function AccountsPage() {
   const [showArchived, setShowArchived] = useState(false);
@@ -62,12 +114,8 @@ function AccountsPage() {
           const balance = Number(bal?.balance ?? 0);
           const Icon = ACCOUNT_ICONS[a.icon] ?? Wallet;
           const isArchived = a.status === "archived";
-          const isMpesa = /m[- ]?pesa/i.test(a.name);
-          const isBank =
-            /bank|kcb|equity|coop|co-operative|absa|ncba|stanbic|family|dtb|i&m|im bank|sidian|prime/i.test(
-              `${a.name} ${a.type}`,
-            );
-          const warningThreshold = isMpesa ? 300 : isBank ? 500 : null;
+          const institution = institutionStyle(a.name);
+          const warningThreshold = institution.warningThreshold;
           const isLowBalance = warningThreshold !== null && balance < warningThreshold;
 
           return (
@@ -86,7 +134,7 @@ function AccountsPage() {
                         "h-11 w-11 rounded-xl grid place-items-center",
                         isLowBalance
                           ? "bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400"
-                          : "bg-primary/10 text-primary",
+                          : institution.iconClass,
                       )}
                     >
                       <Icon className="h-5 w-5" />
@@ -103,7 +151,7 @@ function AccountsPage() {
                 <div
                   className={cn(
                     "rounded-xl px-3 py-2.5",
-                    isLowBalance ? "bg-red-50/70 dark:bg-red-950/20" : "bg-muted/40",
+                    isLowBalance ? "bg-red-50/70 dark:bg-red-950/20" : institution.panelClass,
                   )}
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -163,6 +211,8 @@ function AccountsPage() {
           );
         })}
       </div>
+
+      <CryptoHoldingsPanel />
 
       <AccountFormDialog open={open} onOpenChange={setOpen} account={editing} />
     </div>
