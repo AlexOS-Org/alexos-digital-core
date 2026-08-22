@@ -33,3 +33,9 @@ The browser opened https://dailygear.co.ke/shop successfully after a command-lin
 The browser opened https://dailygear.co.ke/e-commerce/orders in an authenticated session. The Orders workspace showed one live order, the existing Edit details action and the AlexOS/DailyGear navigation. The order currently displayed as Delivered and Paid, reflecting the owner’s current production state; no order was modified during this verification.
 
 The browser opened https://dailygear.co.ke/e-commerce/funnels in the same authenticated session. The page showed the published Children School Backpack funnel, a product selector containing the active catalogue, the **Improve for this product** control, the landing-step CTA editor, the three-step Landing → Checkout → Thank-you flow and the save configuration action. The live page text at the captured viewport did not show the external preview link because the saved funnel’s editor panel is below the initial viewport; no save action was taken.
+
+## Connector verification
+
+The authorized Gmail connector is now bound to dailygear.co.ke@gmail.com. A read-only inbox search found no usable Meta Pixel ID, Resend API key or email-provider configuration. It did surface a Meta for Business message about Pixel enhancements, but not the account’s numeric Pixel identifier. The mailbox also reports approximately 1% storage remaining, which may affect email reliability.
+
+The authorized Meta Ads Manager connector exposes the Daily Gear 2025 ad account (`act_753805746633479`) with currency KES and historical ad/campaign data, but the account-object response does not expose a Pixel ID. The canonical Cloudflare Worker secret metadata currently contains only `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY` and `SUPABASE_URL`; `META_ACCESS_TOKEN`, `RESEND_API_KEY` and `DAILYGEAR_EMAIL_FROM` are absent. No secret values were read or written.
