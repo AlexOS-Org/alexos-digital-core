@@ -387,6 +387,12 @@ async function openDocument(order: Order, kind: "invoice" | "receipt", store: St
     const items = (itemResult.data ?? []) as unknown as ItemRecord[];
     const payment = ((paymentResult.data ?? []) as unknown as PaymentRecord[])[0] ?? null;
     const details = detailResult.data as unknown as OrderDetails | null;
+    if (kind === "receipt" && !payment) {
+      toast.error(
+        "This order is marked paid but has no payment record. Use Record payment first, then download the receipt.",
+      );
+      return;
+    }
     let account: AccountRecord | null = null;
     if (payment?.account_id) {
       const { data } = await supabase

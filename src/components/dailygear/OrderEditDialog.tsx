@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useUpdateOrderDetails } from "@/lib/dailygear/api";
+import { useOrderExpenses, useOrderPayments, useUpdateOrderDetails } from "@/lib/dailygear/api";
 import { ORDER_STATUS_META } from "@/lib/dailygear/constants";
 import type { Customer, Order } from "@/lib/dailygear/types";
 
@@ -26,6 +26,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   order: Order | null;
   customer: Customer | null;
+  onRequestPayment?: () => void;
 }
 
 interface FormState {
@@ -86,8 +87,10 @@ function clean(value: string) {
   return value.trim() || null;
 }
 
-export function OrderEditDialog({ open, onOpenChange, order, customer }: Props) {
+export function OrderEditDialog({ open, onOpenChange, order, customer, onRequestPayment }: Props) {
   const save = useUpdateOrderDetails();
+  const payments = useOrderPayments(order?.id);
+  const expenses = useOrderExpenses(order?.id);
   const [form, setForm] = useState<FormState>(EMPTY);
 
   useEffect(() => {
@@ -208,9 +211,25 @@ export function OrderEditDialog({ open, onOpenChange, order, customer }: Props) 
           </div>
           <div className="space-y-2">
             <Label>Payment status</Label>
-            <div className="flex h-10 items-center rounded-md border bg-muted/30 px-3 text-sm text-muted-foreground">
-              {order?.payment_status ?? "unpaid"} · use Confirm paid or Void / refund
+            <div className="flex min-h-10 items-center justify-between gap-3 rounded-md border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+              <span>
+                <span className="font-medium capitalize text-foreground">
+                  {order?.payment_status ?? "unpaid"}
+                </span>{" "}
+                · use the controlled payment workflow
+              </span>
+              {order && order.payment_status !== "refunded" && onRequestPayment ? (
+                <Button type="button" size="sm" variant="secondary" onClick={onRequestPayment}>
+                  {payments.data?.length ? "View payment" : "Record payment"}
+                </Button>
+              ) : null}
             </div>
+            {order?.payment_status === "paid" && !payments.isLoading && !payments.data?.length ? (
+              <p className="text-xs text-destructive">
+                Payment status is marked paid, but no receipt/payment record exists. Record the
+                actual amount, account and transaction reference before issuing a receipt.
+              </p>
+            ) : null}
           </div>
           <div className="space-y-2">
             <Label>Payment method</Label>
@@ -287,6 +306,50 @@ export function OrderEditDialog({ open, onOpenChange, order, customer }: Props) 
               for editing.
             </p>
           ) : null}
+        </div>
+
+        <div className="space-y-3 rounded-xl border bg-muted/20 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold">Payment and fulfilment ledger</p>
+              <p className="text-xs text-muted-foreground">
+                Costs reduce order profit; only confirmed paid costs reduce the selected account.
+              </p>
+            </div>
+            <span className="text-sm font-semibold">
+              KES{" "}
+              {(expenses.data ?? [])
+                .reduce((sum, expense) => sum + Number(expense.amount || 0), 0)
+                .toLocaleString()}
+            </span>
+          </div>
+          {payments.data?.length ? (
+            <div className="space-y-1 text-xs">
+              {payments.data.map((payment) => (
+                <div key={payment.id} className="flex flex-wrap justify-between gap-2">
+                  <span>Received · {payment.transaction_id}</span>
+                  <span className="font-medium">KES {Number(payment.amount).toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">No payment receipt record found.</p>
+          )}
+          {expenses.data?.length ? (
+            <div className="space-y-1 border-t pt-2 text-xs">
+              {expenses.data.map((expense) => (
+                <div key={expense.id} className="flex flex-wrap justify-between gap-2">
+                  <span className="capitalize">
+                    {expense.cost_type.replace(/_/g, " ")}{" "}
+                    {expense.cash_paid ? "· paid" : "· unpaid"}
+                  </span>
+                  <span className="font-medium">KES {Number(expense.amount).toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">No order-specific expenses recorded.</p>
+          )}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

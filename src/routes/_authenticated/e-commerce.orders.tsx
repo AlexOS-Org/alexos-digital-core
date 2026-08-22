@@ -302,7 +302,7 @@ function OrdersPage() {
                             <Edit3 className="mr-1 h-3.5 w-3.5" />
                             Edit details
                           </Button>
-                          {order.status === "new" || order.status === "processing" ? (
+                          {order.status !== "cancelled" && order.payment_status !== "refunded" ? (
                             <Button
                               size="sm"
                               variant="outline"
@@ -310,7 +310,9 @@ function OrdersPage() {
                               onClick={() => setFulfillingOrder(order)}
                             >
                               <PackageCheck className="mr-1 h-3.5 w-3.5" />
-                              Record costs & fulfil
+                              {order.status === "delivered"
+                                ? "View / record costs"
+                                : "Record costs & fulfil"}
                             </Button>
                           ) : null}
                           {order.payment_status === "paid" ? (
@@ -367,6 +369,12 @@ function OrdersPage() {
           if (!open) setEditingOrder(null);
         }}
         order={editingOrder}
+        onRequestPayment={() => {
+          if (editingOrder) {
+            setPaymentOrder(editingOrder);
+            setEditingOrder(null);
+          }
+        }}
         customer={
           editingOrder?.customer_id
             ? (customers.find((customer) => customer.id === editingOrder.customer_id) ?? null)
