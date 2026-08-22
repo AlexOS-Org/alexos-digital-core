@@ -755,6 +755,11 @@
   --sidebar-accent: oklch(0.15 0.035 285);
   --sidebar-border: oklch(1 0 0 / 14%);
   --dashboard-grid-line: color-mix(in oklch, var(--alexos-purple) 15%, transparent);
+  --chart-1: var(--alexos-purple);
+  --chart-2: var(--alexos-blue);
+  --chart-3: var(--alexos-green);
+  --chart-4: var(--alexos-amber);
+  --chart-5: var(--alexos-coral);
 }
 
 .dark[data-visual-theme="opsmind"] {
@@ -789,6 +794,11 @@
   --sidebar-accent: oklch(0.2 0.045 35);
   --sidebar-border: oklch(1 0 0 / 15%);
   --dashboard-grid-line: color-mix(in oklch, var(--alexos-amber) 15%, transparent);
+  --chart-1: var(--alexos-amber);
+  --chart-2: var(--alexos-coral);
+  --chart-3: var(--alexos-blue);
+  --chart-4: var(--alexos-green);
+  --chart-5: var(--alexos-purple);
 }
 
 .dark[data-visual-theme="droneview"] {
@@ -823,6 +833,11 @@
   --sidebar-accent: oklch(0.32 0.055 55);
   --sidebar-border: oklch(0.4 0.04 55);
   --dashboard-grid-line: color-mix(in oklch, var(--alexos-amber) 12%, transparent);
+  --chart-1: var(--alexos-amber);
+  --chart-2: var(--alexos-coral);
+  --chart-3: var(--alexos-blue);
+  --chart-4: var(--alexos-green);
+  --chart-5: var(--alexos-purple);
 }
 
 .dark[data-visual-theme="pulseai"] {
@@ -858,6 +873,11 @@
   --sidebar-accent: oklch(0.3 0.06 285);
   --sidebar-border: oklch(0.38 0.04 285);
   --dashboard-grid-line: color-mix(in oklch, var(--alexos-purple) 10%, transparent);
+  --chart-1: var(--alexos-purple);
+  --chart-2: var(--alexos-blue);
+  --chart-3: var(--alexos-green);
+  --chart-4: var(--alexos-amber);
+  --chart-5: var(--alexos-coral);
 }
 
 .dark[data-visual-theme="pricepilot"] {
@@ -894,6 +914,11 @@
   --sidebar-accent: oklch(0.14 0.055 255);
   --sidebar-border: oklch(1 0 0 / 15%);
   --dashboard-grid-line: color-mix(in oklch, var(--alexos-blue) 16%, transparent);
+  --chart-1: var(--alexos-blue);
+  --chart-2: var(--alexos-purple);
+  --chart-3: var(--alexos-coral);
+  --chart-4: var(--alexos-green);
+  --chart-5: var(--alexos-amber);
 }
 
 .dark[data-visual-theme="finai"] {
@@ -1310,6 +1335,97 @@
     );
   }
 
+  .alexos-dashboard-hero[data-scene="none"],
+  .dailygear-workspace-hero[data-scene="none"] {
+    background: linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--alexos-blue-dark) 76%, var(--background)),
+      color-mix(in oklch, var(--alexos-purple-dark) 64%, var(--background)),
+      color-mix(in oklch, var(--alexos-blue-dark) 80%, var(--background))
+    );
+  }
+
+  .alexos-dashboard-hero[data-scene="ocean"],
+  .dailygear-workspace-hero[data-scene="ocean"] {
+    background:
+      radial-gradient(
+        ellipse at 16% 86%,
+        color-mix(in oklch, var(--alexos-green) 26%, transparent),
+        transparent 38%
+      ),
+      repeating-radial-gradient(
+        ellipse at 48% 112%,
+        transparent 0 22px,
+        color-mix(in oklch, var(--alexos-blue) 30%, transparent) 23px 25px,
+        transparent 26px 48px
+      ),
+      linear-gradient(
+        145deg,
+        color-mix(in oklch, var(--alexos-blue-dark) 82%, var(--background)),
+        color-mix(in oklch, var(--alexos-blue) 46%, var(--alexos-green-dark)),
+        color-mix(in oklch, var(--alexos-purple-dark) 48%, var(--background))
+      );
+  }
+
+  .alexos-dashboard-hero[data-scene="basketball"],
+  .dailygear-workspace-hero[data-scene="basketball"] {
+    background:
+      radial-gradient(
+        circle at 78% 28%,
+        color-mix(in oklch, var(--alexos-amber) 38%, transparent) 0 4.5rem,
+        transparent 4.7rem
+      ),
+      radial-gradient(
+        circle at 78% 28%,
+        transparent 0 3.2rem,
+        color-mix(in oklch, var(--alexos-coral) 30%, transparent) 3.3rem 3.45rem,
+        transparent 3.5rem
+      ),
+      linear-gradient(
+        145deg,
+        color-mix(in oklch, var(--alexos-blue-dark) 78%, var(--background)),
+        color-mix(in oklch, var(--alexos-coral) 55%, var(--alexos-blue-dark)),
+        color-mix(in oklch, var(--alexos-amber) 38%, var(--alexos-purple-dark))
+      );
+  }
+
+  .alexos-dashboard-hero[data-scene="sunset"],
+  .dailygear-workspace-hero[data-scene="sunset"] {
+    background:
+      radial-gradient(
+        ellipse at 72% 18%,
+        color-mix(in oklch, var(--alexos-amber) 66%, transparent),
+        transparent 17%
+      ),
+      linear-gradient(
+        160deg,
+        color-mix(in oklch, var(--alexos-purple-dark) 78%, var(--background)),
+        color-mix(in oklch, var(--alexos-coral) 52%, var(--alexos-purple-dark)),
+        color-mix(in oklch, var(--alexos-amber) 48%, var(--alexos-blue-dark))
+      );
+  }
+
+  .alexos-dashboard-hero[data-scene="night"],
+  .dailygear-workspace-hero[data-scene="night"] {
+    background:
+      radial-gradient(
+        circle at 78% 18%,
+        color-mix(in oklch, var(--alexos-blue) 22%, transparent),
+        transparent 15%
+      ),
+      radial-gradient(
+        circle at 20% 74%,
+        color-mix(in oklch, var(--alexos-purple) 18%, transparent),
+        transparent 24%
+      ),
+      linear-gradient(
+        145deg,
+        color-mix(in oklch, var(--background) 92%, black),
+        color-mix(in oklch, var(--alexos-blue-dark) 74%, var(--background)),
+        color-mix(in oklch, var(--alexos-purple-dark) 66%, var(--background))
+      );
+  }
+
   .alexos-dashboard-orb-left {
     background: color-mix(in oklch, var(--alexos-green) 18%, transparent);
   }
@@ -1355,6 +1471,35 @@
       color-mix(in oklch, var(--background) 82%, transparent),
       color-mix(in oklch, var(--background) 10%, transparent),
       transparent
+    );
+  }
+
+  .alexos-dashboard-hero[data-scene="ocean"] .alexos-dashboard-overlay,
+  .dailygear-workspace-hero[data-scene="ocean"] .dailygear-hero-overlay {
+    background: linear-gradient(
+      to top,
+      color-mix(in oklch, var(--alexos-blue-dark) 82%, transparent),
+      transparent 70%
+    );
+  }
+
+  .alexos-dashboard-hero[data-scene="basketball"] .alexos-dashboard-overlay,
+  .dailygear-workspace-hero[data-scene="basketball"] .dailygear-hero-overlay {
+    background: linear-gradient(
+      to top,
+      color-mix(in oklch, var(--alexos-blue-dark) 82%, transparent),
+      color-mix(in oklch, var(--alexos-coral) 12%, transparent),
+      transparent 74%
+    );
+  }
+
+  .alexos-dashboard-hero[data-scene="sunset"] .alexos-dashboard-overlay,
+  .dailygear-workspace-hero[data-scene="sunset"] .dailygear-hero-overlay {
+    background: linear-gradient(
+      to top,
+      color-mix(in oklch, var(--alexos-purple-dark) 84%, transparent),
+      color-mix(in oklch, var(--alexos-coral) 10%, transparent),
+      transparent 76%
     );
   }
 }

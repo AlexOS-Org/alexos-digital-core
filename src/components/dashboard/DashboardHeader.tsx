@@ -6,6 +6,7 @@ import { DashboardWeather } from "@/components/dashboard/DashboardWeather";
 import { DailyInspirationCards } from "@/components/dashboard/DailyInspirationCards";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { getVisualTheme } from "@/components/theme/visual-themes";
+import { getActiveDashboardScene, getDashboardSceneLabel } from "@/components/theme/visual-scenes";
 import alexosCommandCenterWide from "@/assets/visuals/alexos-command-center-wide.webp";
 import alexosCommandCenterMobile from "@/assets/visuals/alexos-command-center-mobile.webp";
 
@@ -35,9 +36,14 @@ export function DashboardHeader() {
     if (typeof window === "undefined") return "24h";
     return window.localStorage.getItem(TIME_FORMAT_KEY) === "12h" ? "12h" : "24h";
   });
-  const { visualTheme } = useTheme();
+  const { visualTheme, dashboardScene } = useTheme();
   const selectedTheme = getVisualTheme(visualTheme);
   const activeAtmosphere = getTimeAtmosphere(now.getHours());
+  const activeScene = getActiveDashboardScene(
+    dashboardScene,
+    now.getHours(),
+    selectedTheme.backdrop,
+  );
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
     return () => window.clearInterval(timer);
@@ -58,9 +64,10 @@ export function DashboardHeader() {
     <div>
       <section
         data-atmosphere={activeAtmosphere}
+        data-scene={activeScene}
         className="alexos-dashboard-hero relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/15 text-white shadow-[0_24px_70px_-30px_var(--alexos-glow)] transition-[background] duration-[1800ms] ease-in-out sm:min-h-[330px]"
       >
-        {selectedTheme.backdrop === "mountains" ? (
+        {activeScene === "mountains" ? (
           <picture className="alexos-dashboard-backdrop pointer-events-none absolute inset-0 block">
             <source media="(max-width: 640px)" srcSet={alexosCommandCenterMobile} />
             <img
@@ -103,7 +110,7 @@ export function DashboardHeader() {
           </div>
           <div className="max-w-3xl pb-2 sm:pb-0">
             <p className="text-xs font-medium text-white/65 sm:text-sm">
-              {today} · {formatTime(now, timeFormat)} · {activeAtmosphere}
+              {today} · {formatTime(now, timeFormat)} · {getDashboardSceneLabel(activeScene)}
             </p>
             <h1 className="mt-2 text-[2rem] font-semibold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
               {greeting}, Alex.
@@ -141,9 +148,14 @@ export function DashboardHeader() {
 }
 export function MobileDashboardHeader() {
   const [now, setNow] = useState(() => new Date());
-  const { visualTheme } = useTheme();
+  const { visualTheme, dashboardScene } = useTheme();
   const selectedTheme = getVisualTheme(visualTheme);
   const atmosphere = getTimeAtmosphere(now.getHours());
+  const activeScene = getActiveDashboardScene(
+    dashboardScene,
+    now.getHours(),
+    selectedTheme.backdrop,
+  );
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
@@ -162,9 +174,10 @@ export function MobileDashboardHeader() {
     <div className="space-y-4">
       <section
         data-atmosphere={atmosphere}
+        data-scene={activeScene}
         className="alexos-dashboard-hero relative min-h-[250px] overflow-hidden rounded-[1.9rem] border border-white/15 p-5 text-white shadow-[0_22px_58px_-30px_var(--alexos-glow)]"
       >
-        {selectedTheme.backdrop === "mountains" ? (
+        {activeScene === "mountains" ? (
           <picture className="pointer-events-none absolute inset-0 block">
             <source media="(max-width: 640px)" srcSet={alexosCommandCenterMobile} />
             <img
@@ -191,7 +204,7 @@ export function MobileDashboardHeader() {
           </div>
           <div>
             <p className="text-[10px] font-medium text-white/70">
-              {today} · {formatTime(now, "24h")} · {atmosphere}
+              {today} · {formatTime(now, "24h")} · {getDashboardSceneLabel(activeScene)}
             </p>
             <h1 className="mt-2 text-[2rem] font-semibold leading-tight tracking-tight">
               {greeting}, Alex.

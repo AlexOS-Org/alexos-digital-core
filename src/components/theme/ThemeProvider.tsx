@@ -5,6 +5,11 @@ import {
   isVisualThemeId,
   type VisualThemeId,
 } from "./visual-themes";
+import {
+  DEFAULT_DASHBOARD_SCENE,
+  isDashboardSceneId,
+  type DashboardSceneId,
+} from "./visual-scenes";
 type Theme = "system" | "light" | "dark";
 type ResolvedTheme = "light" | "dark";
 type ThemeContextValue = {
@@ -19,12 +24,15 @@ type ThemeContextValue = {
   setCustomAccent: (accent: string) => void;
   setCustomSurface: (surface: string) => void;
   setCustomSidebar: (sidebar: string) => void;
+  dashboardScene: DashboardSceneId;
+  setDashboardScene: (scene: DashboardSceneId) => void;
 };
 const STORAGE_KEY = "alexos-theme";
 const VISUAL_THEME_KEY = "alexos-visual-theme";
 const CUSTOM_ACCENT_KEY = "alexos-custom-accent";
 const CUSTOM_SURFACE_KEY = "alexos-custom-surface";
 const CUSTOM_SIDEBAR_KEY = "alexos-custom-sidebar";
+const DASHBOARD_SCENE_KEY = "alexos-dashboard-scene";
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 function getStoredTheme(): Theme {
   if (typeof window === "undefined") return "system";
@@ -52,6 +60,11 @@ function getStoredCustomSidebar() {
   if (typeof window === "undefined") return "#11182f";
   return window.localStorage.getItem(CUSTOM_SIDEBAR_KEY) ?? "#11182f";
 }
+function getStoredDashboardScene(): DashboardSceneId {
+  if (typeof window === "undefined") return DEFAULT_DASHBOARD_SCENE;
+  const stored = window.localStorage.getItem(DASHBOARD_SCENE_KEY);
+  return isDashboardSceneId(stored) ? stored : DEFAULT_DASHBOARD_SCENE;
+}
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(getStoredTheme);
   const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(getSystemTheme);
@@ -59,6 +72,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [customAccent, setCustomAccentState] = useState(getStoredCustomAccent);
   const [customSurface, setCustomSurfaceState] = useState(getStoredCustomSurface);
   const [customSidebar, setCustomSidebarState] = useState(getStoredCustomSidebar);
+  const [dashboardScene, setDashboardSceneState] =
+    useState<DashboardSceneId>(getStoredDashboardScene);
   const resolvedTheme: ResolvedTheme = theme === "system" ? systemTheme : theme;
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
@@ -95,6 +110,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setCustomSidebarState(next);
     window.localStorage.setItem(CUSTOM_SIDEBAR_KEY, next);
   };
+  const setDashboardScene = (next: DashboardSceneId) => {
+    setDashboardSceneState(next);
+    window.localStorage.setItem(DASHBOARD_SCENE_KEY, next);
+  };
   const value = useMemo(
     () => ({
       theme,
@@ -108,8 +127,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setCustomAccent,
       setCustomSurface,
       setCustomSidebar,
+      dashboardScene,
+      setDashboardScene,
     }),
-    [theme, resolvedTheme, visualTheme, customAccent, customSurface, customSidebar],
+    [theme, resolvedTheme, visualTheme, customAccent, customSurface, customSidebar, dashboardScene],
   );
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

@@ -39,7 +39,7 @@ export default function MoneyFlowChart() {
   }, [transactions]);
 
   return (
-    <Card className="dashboard-surface rounded-[1.75rem]">
+    <Card className="dashboard-surface min-w-0 rounded-[1.75rem]">
       <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-2">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
@@ -62,10 +62,10 @@ export default function MoneyFlowChart() {
           />
         ) : (
           <div
-            className="dashboard-chart-grid h-56 w-full rounded-2xl px-2 pt-2"
+            className="dashboard-chart-grid h-52 min-w-0 w-full rounded-2xl px-1 pt-2 sm:h-60 sm:px-2 lg:h-64"
             aria-label="Six-month income and expense chart"
           >
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart
                 data={chartData}
                 barGap={6}
@@ -74,39 +74,39 @@ export default function MoneyFlowChart() {
                 <CartesianGrid
                   strokeDasharray="3 3"
                   vertical={false}
-                  stroke="hsl(var(--border) / 0.7)"
+                  stroke="var(--color-border)"
                 />
                 <XAxis
                   dataKey="label"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                  tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                  tick={{ fontSize: 10, fill: "var(--color-muted-foreground)" }}
                   tickFormatter={(value) => `${Math.round(Number(value) / 1000)}k`}
                 />
                 <Tooltip
                   formatter={(value: number) => formatMoney(Number(value))}
-                  cursor={{ fill: "hsl(var(--muted) / 0.35)" }}
+                  cursor={{ fill: "var(--color-muted)" }}
                   contentStyle={{
                     borderRadius: 14,
-                    border: "1px solid hsl(var(--border))",
-                    background: "hsl(var(--card))",
+                    border: "1px solid var(--color-border)",
+                    background: "var(--color-card)",
                   }}
                 />
                 <Bar
                   dataKey="income"
                   name="Income"
-                  fill="hsl(var(--chart-2))"
+                  fill="var(--color-chart-2)"
                   radius={[6, 6, 0, 0]}
                 />
                 <Bar
                   dataKey="expenses"
                   name="Expenses"
-                  fill="hsl(var(--chart-4))"
+                  fill="var(--color-chart-4)"
                   radius={[6, 6, 0, 0]}
                 />
               </BarChart>

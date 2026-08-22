@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "./ThemeProvider";
 import { getVisualTheme, VISUAL_THEMES, type VisualThemeId } from "./visual-themes";
+import { DASHBOARD_SCENES, type DashboardSceneId } from "./visual-scenes";
 export function VisualThemePicker() {
   const {
     theme,
@@ -24,6 +25,8 @@ export function VisualThemePicker() {
     setCustomSurface,
     customSidebar,
     setCustomSidebar,
+    dashboardScene,
+    setDashboardScene,
   } = useTheme();
   const selected = getVisualTheme(visualTheme);
 
@@ -36,6 +39,7 @@ export function VisualThemePicker() {
         mode: theme,
         resolvedMode: resolvedTheme,
         visualTheme,
+        dashboardScene,
         customAccent,
         customSurface,
         customSidebar,
@@ -114,6 +118,36 @@ export function VisualThemePicker() {
                 <span className="block text-sm font-medium">{option.label}</span>
                 <span className="block truncate text-[11px] text-muted-foreground">
                   {option.description}
+                </span>
+              </span>
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel className="px-2 py-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+          Greeting background scene
+        </DropdownMenuLabel>
+        <p className="px-2 pb-2 text-[11px] leading-4 text-muted-foreground">
+          Choose a scene or let AlexOS rotate it with the time of day.
+        </p>
+        <DropdownMenuRadioGroup
+          value={dashboardScene}
+          onValueChange={(value) => setDashboardScene(value as DashboardSceneId)}
+        >
+          {Object.values(DASHBOARD_SCENES).map((scene) => (
+            <DropdownMenuRadioItem key={scene.id} value={scene.id} className="rounded-xl py-2">
+              <span
+                aria-hidden="true"
+                className="h-7 w-7 shrink-0 rounded-lg border border-white/20 shadow-inner"
+                style={{
+                  background: `linear-gradient(135deg, ${scene.preview.start}, ${scene.preview.end})`,
+                  boxShadow: `inset 0 -3px 0 ${scene.preview.accent}`,
+                }}
+              />
+              <span className="min-w-0">
+                <span className="block text-xs font-medium">{scene.label}</span>
+                <span className="block truncate text-[10px] text-muted-foreground">
+                  {scene.description}
                 </span>
               </span>
             </DropdownMenuRadioItem>

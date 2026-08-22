@@ -28,3 +28,14 @@ A fourth Blue/Teal option should only be created or renamed after the owner conf
 ## Product copy basis
 
 The user-provided facts are: water-resistant nylon material; approximate sizes 40 × 30 × 16 cm and 36 × 28 × 14 cm; two side pockets; one front pocket; one interior zippered pocket; two organiser pockets; one laptop/tablet compartment up to 14 inches; padded straps; back cushioning; suitable for boys and girls aged 3–12; and suitable for school, preschool, daycare, travel, toys, or lunch items. Avoid unsupported claims such as guaranteed waterproofing, health outcomes, safety certification, or universal laptop compatibility. Use “water-resistant” unless the source evidence specifically supports “waterproof.”
+
+
+## Follow-up colour evidence — 2026-08-22
+
+| Purpose | User-supplied file | External CDN URL | Mapping status |
+|---|---|---|---|
+| Green colour avatar candidate | `Screenshot(1).png` | https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/GdgxGfkdKdZdPhqi.png | Externalized for review; not yet created as a live variant because real stock quantity and availability confirmation are still required. |
+
+The live product currently has three active variants: Blue, Pink, and Red, with 14 units recorded on each row. The active-product publication rule requires at least 15 confirmed units per sellable colour. The green image is therefore preserved as external evidence only until the owner confirms the exact stock quantity and approves the variant mapping. The existing Red mapping is also retained pending confirmation because the newly supplied red reference visibly differs from the YJ Baby design.
+
+The colour-selector UI remains data-driven: once a confirmed Green variant is added through the admin workflow, its external avatar and colour option will appear automatically without another frontend code change.

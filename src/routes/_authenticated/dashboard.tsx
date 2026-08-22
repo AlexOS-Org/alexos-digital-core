@@ -98,6 +98,11 @@ function MobileDashboard() {
       </SafePanel>
       <MobileMetricTiles />
       <MobileRevenueToday />
+      <section id="dashboard-money-mobile" className="scroll-mt-24">
+        <SafePanel>
+          <MoneyFlowChart />
+        </SafePanel>
+      </section>
       <SafePanel>
         <QuickActions compact />
       </SafePanel>

@@ -1,6 +1,6 @@
 import { CatalogueReadinessCard } from "@/components/dailygear/dashboard/CatalogueReadinessCard";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowUpRight,
   Boxes,
@@ -41,6 +41,7 @@ import dailyGearMountainWide from "@/assets/visuals/dailygear-mountain-golden-wi
 import dailyGearMountainMobile from "@/assets/visuals/dailygear-mountain-mobile.webp";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { getVisualTheme } from "@/components/theme/visual-themes";
+import { getActiveDashboardScene } from "@/components/theme/visual-scenes";
 import { debtRemaining, useDebts } from "@/lib/debts/api";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/")({
@@ -127,14 +128,24 @@ type Panels = {
 /* ── Shared header ───────────────────────────────────────────── */
 
 function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boolean }) {
-  const hour = new Date().getHours();
+  const [now, setNow] = useState(() => new Date());
+  const hour = now.getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
-  const { visualTheme } = useTheme();
+  const { visualTheme, dashboardScene } = useTheme();
   const selectedVisualTheme = getVisualTheme(visualTheme);
-  const isMountainPreset = selectedVisualTheme.backdrop === "mountains";
+  const activeScene = getActiveDashboardScene(dashboardScene, hour, selectedVisualTheme.backdrop);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const isMountainPreset = activeScene === "mountains";
 
   return (
-    <section className="dashboard-hero-frame dailygear-workspace-hero rise-in relative overflow-hidden rounded-[1.75rem] p-5 text-white sm:p-7">
+    <section
+      data-scene={activeScene}
+      className="dashboard-hero-frame dailygear-workspace-hero rise-in relative overflow-hidden rounded-[1.75rem] p-5 text-white sm:p-7"
+    >
       {isMountainPreset ? (
         <picture className="pointer-events-none absolute inset-0 z-0 block">
           <source media="(max-width: 640px)" srcSet={dailyGearMountainMobile} />
