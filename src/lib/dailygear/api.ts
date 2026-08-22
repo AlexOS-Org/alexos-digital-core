@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { formatMoney } from "@/lib/money/format";
 import type {
   Category,
   Brand,
@@ -557,6 +558,7 @@ export interface ConfirmOrderPaymentResult {
   order_total: number;
   payment_status: Order["payment_status"];
   receipt_number: string;
+  account_name: string;
 }
 
 /**
@@ -588,7 +590,9 @@ export function useConfirmOrderPayment() {
       qc.invalidateQueries({ queryKey: ["dailygear"] });
       qc.invalidateQueries({ queryKey: ["account_balances"] });
       qc.invalidateQueries({ queryKey: ["transactions"] });
-      toast.success(`Payment confirmed · ${result.receipt_number}`);
+      toast.success(
+        `Payment posted · ${formatMoney(result.amount_paid)} into ${result.account_name} · ${result.receipt_number}`,
+      );
     },
     onError: (error: Error) => toast.error(error.message),
   });
