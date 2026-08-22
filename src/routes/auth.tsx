@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Facebook, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { AlexOSLogo } from "@/components/alexos-logo";
 import { SupabaseConfigBanner } from "@/components/SupabaseConfigBanner";
 import { isAuthorizedAlexOSUser, unauthorizedWorkspaceMessage } from "@/lib/authz";
@@ -25,15 +25,36 @@ function AuthPage() {
   const [accessMessage, setAccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
+    let cancelled = false;
+    const completeOAuthOrRestoreSession = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const authError = params.get("error_description") || params.get("error");
+      if (authError) {
+        if (!cancelled) setAccessMessage(decodeURIComponent(authError.replace(/\+/g, " ")));
+        return;
+      }
+      const code = params.get("code");
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        window.history.replaceState({}, document.title, window.location.pathname);
+        if (error) {
+          if (!cancelled) toast.error(error.message);
+          return;
+        }
+      }
+      const { data } = await supabase.auth.getSession();
       if (!data.session) return;
       if (isAuthorizedAlexOSUser(data.session.user)) {
-        navigate({ to: "/dashboard" });
+        navigate({ to: "/dashboard", replace: true });
         return;
       }
       await supabase.auth.signOut();
-      setAccessMessage(unauthorizedWorkspaceMessage());
-    });
+      if (!cancelled) setAccessMessage(unauthorizedWorkspaceMessage());
+    };
+    void completeOAuthOrRestoreSession();
+    return () => {
+      cancelled = true;
+    };
   }, [navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -55,11 +76,15 @@ function AuthPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+      options: { redirectTo: `${window.location.origin}/auth` },
     });
     if (error) {
       setLoading(false);
-      toast.error(error.message);
+      toast.error(
+        error.message.includes("provider")
+          ? `${provider === "google" ? "Google" : "Facebook"} sign-in is not enabled in Supabase Auth yet.`
+          : error.message,
+      );
     }
   };
 
@@ -136,6 +161,12 @@ function AuthPage() {
                 disabled={loading}
                 onClick={() => void handleOAuth("google")}
               >
+                <img
+                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                  alt=""
+                  aria-hidden="true"
+                  className="mr-2 h-4 w-4"
+                />
                 Continue with Google
               </Button>
               <Button
@@ -144,7 +175,13 @@ function AuthPage() {
                 disabled={loading}
                 onClick={() => void handleOAuth("facebook")}
               >
-                <Facebook className="mr-2 h-4 w-4" /> Continue with Facebook
+                <img
+                  src="https://cdn.simpleicons.org/facebook/1877F2"
+                  alt=""
+                  aria-hidden="true"
+                  className="mr-2 h-4 w-4"
+                />
+                Continue with Facebook
               </Button>
             </div>
             <p className="mt-3 text-center text-xs text-muted-foreground">

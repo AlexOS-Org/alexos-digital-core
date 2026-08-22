@@ -12,6 +12,12 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { CryptoHoldingsPanel } from "@/components/money/CryptoHoldingsPanel";
+import mpesaLogo from "@/assets/branding/accounts/mpesa.png";
+import kcbLogo from "@/assets/branding/accounts/kcb.png";
+import imBankLogo from "@/assets/branding/accounts/im-bank.jpg";
+import sbmLogo from "@/assets/branding/accounts/sbm.png";
+import binanceLogo from "@/assets/branding/accounts/binance.png";
+import cashLogo from "@/assets/branding/accounts/cash.png";
 
 export const Route = createFileRoute("/_authenticated/money-center/accounts")({
   component: AccountsPage,
@@ -66,6 +72,18 @@ function institutionStyle(name: string) {
     panelClass: "bg-muted/40",
     warningThreshold: null,
   };
+}
+
+function accountLogo(name: string) {
+  const value = name.toLowerCase();
+  if (/m[- ]?pesa/.test(value)) return mpesaLogo;
+  if (/kcb/.test(value)) return kcbLogo;
+  if (/i&m|im bank/.test(value)) return imBankLogo;
+  if (/sbm/.test(value)) return sbmLogo;
+  if (/binance|crypto/.test(value)) return binanceLogo;
+  if (/cash/.test(value)) return cashLogo;
+  if (/salary/.test(value)) return cashLogo;
+  return null;
 }
 
 function AccountsPage() {
@@ -137,7 +155,16 @@ function AccountsPage() {
                           : institution.iconClass,
                       )}
                     >
-                      <Icon className="h-5 w-5" />
+                      {accountLogo(a.name) ? (
+                        <img
+                          src={accountLogo(a.name)!}
+                          alt={`${a.name} logo`}
+                          className="h-7 w-7 rounded-md object-contain"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <Icon className="h-5 w-5" />
+                      )}
                     </div>
                     <div>
                       <div className="font-medium">{a.name}</div>
