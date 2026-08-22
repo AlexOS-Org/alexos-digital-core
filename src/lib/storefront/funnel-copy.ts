@@ -114,6 +114,40 @@ export function improvedFunnelLandingContent(
   product: Pick<Product, "name" | "sku" | "description" | "short_description" | "seo_description">,
 ): FunnelLandingContent {
   const productName = clean(product.name, "Your DailyGear product", MAX_SHORT_TEXT);
+  if (/quality waterproof yj|yj children school bag/i.test(productName)) {
+    return {
+      eyebrow: "Back-to-school comfort, made practical",
+      headline: "Make school mornings easier on the child—and the parent.",
+      subheadline:
+        "A roomy Oxford-fabric school bag for children who carry books, lunch and everyday essentials, with colour and size options to help you choose the right fit.",
+      benefits: [
+        {
+          title: "A better fit for the school day",
+          body: "Choose the available size that suits your child: the compact 31 × 20 × 16 cm option is listed in red, while the 42 × 20 × 18 cm option is available across the listed colours.",
+        },
+        {
+          title: "Room for the everyday essentials",
+          body: "Help keep books and school items together in one practical backpack instead of juggling loose items on busy mornings.",
+        },
+        {
+          title: "A finish made for real routines",
+          body: "The catalogue describes Oxford fabric and a water-resistant design, giving parents a practical option for everyday school use.",
+        },
+        {
+          title: "Let them choose their favourite",
+          body: "Select from the available red, pink, and blue options, then confirm the live size and availability before checkout.",
+        },
+      ],
+      proof: [
+        "Oxford-fabric school backpack",
+        "Red, pink and blue options listed",
+        "Availability checked before checkout",
+      ],
+      deliveryNote:
+        "Choose the available colour and size first. Delivery and payment options are confirmed in DailyGear checkout before you place the order.",
+      ctaLabel: "Choose a school bag",
+    };
+  }
   const verifiedDescription = clean(
     product.seo_description ?? product.short_description ?? product.description,
     `${productName}. Review the verified details, available options and checkout information before you order.`,
