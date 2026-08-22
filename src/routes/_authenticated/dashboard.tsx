@@ -145,8 +145,8 @@ function Dashboard() {
           </div>
         </section>
       </SafePanel>
-      <section className="grid gap-5 xl:grid-cols-12">
-        <div className="space-y-5 xl:col-span-8">
+      <section className="grid gap-5 2xl:grid-cols-12">
+        <div className="space-y-5 2xl:col-span-8">
           <SafePanel>
             <section
               id="dashboard-money"
@@ -164,7 +164,7 @@ function Dashboard() {
                 </p>
               </div>
               <MoneySnapshot />
-              <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(260px,0.55fr)]">
+              <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,1.45fr)_minmax(260px,0.55fr)]">
                 <MoneyFlowChart />
                 <div className="rounded-[1.75rem] border border-border/60 bg-card/70 p-5 shadow-sm sm:p-6">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
@@ -249,7 +249,7 @@ function Dashboard() {
             </section>
           </SafePanel>
         </div>
-        <div className="space-y-5 xl:col-span-4">
+        <div className="space-y-5 2xl:col-span-4">
           <SafePanel>
             <section
               id="dashboard-business"
