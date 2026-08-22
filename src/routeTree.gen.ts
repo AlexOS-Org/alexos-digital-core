@@ -78,6 +78,15 @@ import { Route as ApiScheduledAbandonedCartRouteImport } from './routes/api/sche
 import { Route as ShopCategorySlugRouteImport } from './routes/shop.category.$slug'
 import { Route as ShopPoliciesSlugRouteImport } from './routes/shop.policies.$slug'
 import { Route as ShopProductIdRouteImport } from './routes/shop.product.$id'
+import { Route as AuthenticatedBusinessesNoveraCustomersRouteImport } from './routes/_authenticated/businesses.novera.customers'
+import { Route as AuthenticatedBusinessesNoveraEvidenceRouteImport } from './routes/_authenticated/businesses.novera.evidence'
+import { Route as AuthenticatedBusinessesNoveraFunnelsRouteImport } from './routes/_authenticated/businesses.novera.funnels'
+import { Route as AuthenticatedBusinessesNoveraInventoryRouteImport } from './routes/_authenticated/businesses.novera.inventory'
+import { Route as AuthenticatedBusinessesNoveraMarketingRouteImport } from './routes/_authenticated/businesses.novera.marketing'
+import { Route as AuthenticatedBusinessesNoveraOrdersRouteImport } from './routes/_authenticated/businesses.novera.orders'
+import { Route as AuthenticatedBusinessesNoveraProductsRouteImport } from './routes/_authenticated/businesses.novera.products'
+import { Route as AuthenticatedBusinessesNoveraReportsRouteImport } from './routes/_authenticated/businesses.novera.reports'
+import { Route as AuthenticatedBusinessesNoveraSettingsRouteImport } from './routes/_authenticated/businesses.novera.settings'
 import { Route as AuthenticatedPeopleContactsIdRouteImport } from './routes/_authenticated/people.contacts.$id'
 import { Route as AuthenticatedPeopleLeadsIdRouteImport } from './routes/_authenticated/people.leads.$id'
 import { Route as ShopCategorySlugSubcategoryRouteImport } from './routes/shop.category.$slug.$subcategory'
@@ -461,6 +470,60 @@ const ShopProductIdRoute = ShopProductIdRouteImport.update({
   path: '/product/$id',
   getParentRoute: () => ShopRoute,
 } as any)
+const AuthenticatedBusinessesNoveraCustomersRoute =
+  AuthenticatedBusinessesNoveraCustomersRouteImport.update({
+    id: '/customers',
+    path: '/customers',
+    getParentRoute: () => AuthenticatedBusinessesNoveraRoute,
+  } as any)
+const AuthenticatedBusinessesNoveraEvidenceRoute =
+  AuthenticatedBusinessesNoveraEvidenceRouteImport.update({
+    id: '/evidence',
+    path: '/evidence',
+    getParentRoute: () => AuthenticatedBusinessesNoveraRoute,
+  } as any)
+const AuthenticatedBusinessesNoveraFunnelsRoute =
+  AuthenticatedBusinessesNoveraFunnelsRouteImport.update({
+    id: '/funnels',
+    path: '/funnels',
+    getParentRoute: () => AuthenticatedBusinessesNoveraRoute,
+  } as any)
+const AuthenticatedBusinessesNoveraInventoryRoute =
+  AuthenticatedBusinessesNoveraInventoryRouteImport.update({
+    id: '/inventory',
+    path: '/inventory',
+    getParentRoute: () => AuthenticatedBusinessesNoveraRoute,
+  } as any)
+const AuthenticatedBusinessesNoveraMarketingRoute =
+  AuthenticatedBusinessesNoveraMarketingRouteImport.update({
+    id: '/marketing',
+    path: '/marketing',
+    getParentRoute: () => AuthenticatedBusinessesNoveraRoute,
+  } as any)
+const AuthenticatedBusinessesNoveraOrdersRoute =
+  AuthenticatedBusinessesNoveraOrdersRouteImport.update({
+    id: '/orders',
+    path: '/orders',
+    getParentRoute: () => AuthenticatedBusinessesNoveraRoute,
+  } as any)
+const AuthenticatedBusinessesNoveraProductsRoute =
+  AuthenticatedBusinessesNoveraProductsRouteImport.update({
+    id: '/products',
+    path: '/products',
+    getParentRoute: () => AuthenticatedBusinessesNoveraRoute,
+  } as any)
+const AuthenticatedBusinessesNoveraReportsRoute =
+  AuthenticatedBusinessesNoveraReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedBusinessesNoveraRoute,
+  } as any)
+const AuthenticatedBusinessesNoveraSettingsRoute =
+  AuthenticatedBusinessesNoveraSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedBusinessesNoveraRoute,
+  } as any)
 const AuthenticatedPeopleContactsIdRoute =
   AuthenticatedPeopleContactsIdRouteImport.update({
     id: '/contacts/$id',
@@ -514,7 +577,7 @@ export interface FileRoutesByFullPath {
   '/shop/thank-you': typeof ShopThankYouRoute
   '/shop/track': typeof ShopTrackRoute
   '/shop/': typeof ShopIndexRoute
-  '/businesses/novera': typeof AuthenticatedBusinessesNoveraRoute
+  '/businesses/novera': typeof AuthenticatedBusinessesNoveraRouteWithChildren
   '/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
   '/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
   '/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
@@ -549,6 +612,15 @@ export interface FileRoutesByFullPath {
   '/e-commerce/': typeof AuthenticatedECommerceIndexRoute
   '/money-center/': typeof AuthenticatedMoneyCenterIndexRoute
   '/people/': typeof AuthenticatedPeopleIndexRoute
+  '/businesses/novera/customers': typeof AuthenticatedBusinessesNoveraCustomersRoute
+  '/businesses/novera/evidence': typeof AuthenticatedBusinessesNoveraEvidenceRoute
+  '/businesses/novera/funnels': typeof AuthenticatedBusinessesNoveraFunnelsRoute
+  '/businesses/novera/inventory': typeof AuthenticatedBusinessesNoveraInventoryRoute
+  '/businesses/novera/marketing': typeof AuthenticatedBusinessesNoveraMarketingRoute
+  '/businesses/novera/orders': typeof AuthenticatedBusinessesNoveraOrdersRoute
+  '/businesses/novera/products': typeof AuthenticatedBusinessesNoveraProductsRoute
+  '/businesses/novera/reports': typeof AuthenticatedBusinessesNoveraReportsRoute
+  '/businesses/novera/settings': typeof AuthenticatedBusinessesNoveraSettingsRoute
   '/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
   '/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
   '/shop/category/$slug/$subcategory': typeof ShopCategorySlugSubcategoryRoute
@@ -583,7 +655,7 @@ export interface FileRoutesByTo {
   '/shop/thank-you': typeof ShopThankYouRoute
   '/shop/track': typeof ShopTrackRoute
   '/shop': typeof ShopIndexRoute
-  '/businesses/novera': typeof AuthenticatedBusinessesNoveraRoute
+  '/businesses/novera': typeof AuthenticatedBusinessesNoveraRouteWithChildren
   '/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
   '/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
   '/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
@@ -618,6 +690,15 @@ export interface FileRoutesByTo {
   '/e-commerce': typeof AuthenticatedECommerceIndexRoute
   '/money-center': typeof AuthenticatedMoneyCenterIndexRoute
   '/people': typeof AuthenticatedPeopleIndexRoute
+  '/businesses/novera/customers': typeof AuthenticatedBusinessesNoveraCustomersRoute
+  '/businesses/novera/evidence': typeof AuthenticatedBusinessesNoveraEvidenceRoute
+  '/businesses/novera/funnels': typeof AuthenticatedBusinessesNoveraFunnelsRoute
+  '/businesses/novera/inventory': typeof AuthenticatedBusinessesNoveraInventoryRoute
+  '/businesses/novera/marketing': typeof AuthenticatedBusinessesNoveraMarketingRoute
+  '/businesses/novera/orders': typeof AuthenticatedBusinessesNoveraOrdersRoute
+  '/businesses/novera/products': typeof AuthenticatedBusinessesNoveraProductsRoute
+  '/businesses/novera/reports': typeof AuthenticatedBusinessesNoveraReportsRoute
+  '/businesses/novera/settings': typeof AuthenticatedBusinessesNoveraSettingsRoute
   '/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
   '/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
   '/shop/category/$slug/$subcategory': typeof ShopCategorySlugSubcategoryRoute
@@ -658,7 +739,7 @@ export interface FileRoutesById {
   '/shop/thank-you': typeof ShopThankYouRoute
   '/shop/track': typeof ShopTrackRoute
   '/shop/': typeof ShopIndexRoute
-  '/_authenticated/businesses/novera': typeof AuthenticatedBusinessesNoveraRoute
+  '/_authenticated/businesses/novera': typeof AuthenticatedBusinessesNoveraRouteWithChildren
   '/_authenticated/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
   '/_authenticated/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
   '/_authenticated/e-commerce/competitors': typeof AuthenticatedECommerceCompetitorsRoute
@@ -693,6 +774,15 @@ export interface FileRoutesById {
   '/_authenticated/e-commerce/': typeof AuthenticatedECommerceIndexRoute
   '/_authenticated/money-center/': typeof AuthenticatedMoneyCenterIndexRoute
   '/_authenticated/people/': typeof AuthenticatedPeopleIndexRoute
+  '/_authenticated/businesses/novera/customers': typeof AuthenticatedBusinessesNoveraCustomersRoute
+  '/_authenticated/businesses/novera/evidence': typeof AuthenticatedBusinessesNoveraEvidenceRoute
+  '/_authenticated/businesses/novera/funnels': typeof AuthenticatedBusinessesNoveraFunnelsRoute
+  '/_authenticated/businesses/novera/inventory': typeof AuthenticatedBusinessesNoveraInventoryRoute
+  '/_authenticated/businesses/novera/marketing': typeof AuthenticatedBusinessesNoveraMarketingRoute
+  '/_authenticated/businesses/novera/orders': typeof AuthenticatedBusinessesNoveraOrdersRoute
+  '/_authenticated/businesses/novera/products': typeof AuthenticatedBusinessesNoveraProductsRoute
+  '/_authenticated/businesses/novera/reports': typeof AuthenticatedBusinessesNoveraReportsRoute
+  '/_authenticated/businesses/novera/settings': typeof AuthenticatedBusinessesNoveraSettingsRoute
   '/_authenticated/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
   '/_authenticated/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
   '/shop/category/$slug/$subcategory': typeof ShopCategorySlugSubcategoryRoute
@@ -768,6 +858,15 @@ export interface FileRouteTypes {
     | '/e-commerce/'
     | '/money-center/'
     | '/people/'
+    | '/businesses/novera/customers'
+    | '/businesses/novera/evidence'
+    | '/businesses/novera/funnels'
+    | '/businesses/novera/inventory'
+    | '/businesses/novera/marketing'
+    | '/businesses/novera/orders'
+    | '/businesses/novera/products'
+    | '/businesses/novera/reports'
+    | '/businesses/novera/settings'
     | '/people/contacts/$id'
     | '/people/leads/$id'
     | '/shop/category/$slug/$subcategory'
@@ -837,6 +936,15 @@ export interface FileRouteTypes {
     | '/e-commerce'
     | '/money-center'
     | '/people'
+    | '/businesses/novera/customers'
+    | '/businesses/novera/evidence'
+    | '/businesses/novera/funnels'
+    | '/businesses/novera/inventory'
+    | '/businesses/novera/marketing'
+    | '/businesses/novera/orders'
+    | '/businesses/novera/products'
+    | '/businesses/novera/reports'
+    | '/businesses/novera/settings'
     | '/people/contacts/$id'
     | '/people/leads/$id'
     | '/shop/category/$slug/$subcategory'
@@ -911,6 +1019,15 @@ export interface FileRouteTypes {
     | '/_authenticated/e-commerce/'
     | '/_authenticated/money-center/'
     | '/_authenticated/people/'
+    | '/_authenticated/businesses/novera/customers'
+    | '/_authenticated/businesses/novera/evidence'
+    | '/_authenticated/businesses/novera/funnels'
+    | '/_authenticated/businesses/novera/inventory'
+    | '/_authenticated/businesses/novera/marketing'
+    | '/_authenticated/businesses/novera/orders'
+    | '/_authenticated/businesses/novera/products'
+    | '/_authenticated/businesses/novera/reports'
+    | '/_authenticated/businesses/novera/settings'
     | '/_authenticated/people/contacts/$id'
     | '/_authenticated/people/leads/$id'
     | '/shop/category/$slug/$subcategory'
@@ -1411,6 +1528,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopProductIdRouteImport
       parentRoute: typeof ShopRoute
     }
+    '/_authenticated/businesses/novera/customers': {
+      id: '/_authenticated/businesses/novera/customers'
+      path: '/customers'
+      fullPath: '/businesses/novera/customers'
+      preLoaderRoute: typeof AuthenticatedBusinessesNoveraCustomersRouteImport
+      parentRoute: typeof AuthenticatedBusinessesNoveraRoute
+    }
+    '/_authenticated/businesses/novera/evidence': {
+      id: '/_authenticated/businesses/novera/evidence'
+      path: '/evidence'
+      fullPath: '/businesses/novera/evidence'
+      preLoaderRoute: typeof AuthenticatedBusinessesNoveraEvidenceRouteImport
+      parentRoute: typeof AuthenticatedBusinessesNoveraRoute
+    }
+    '/_authenticated/businesses/novera/funnels': {
+      id: '/_authenticated/businesses/novera/funnels'
+      path: '/funnels'
+      fullPath: '/businesses/novera/funnels'
+      preLoaderRoute: typeof AuthenticatedBusinessesNoveraFunnelsRouteImport
+      parentRoute: typeof AuthenticatedBusinessesNoveraRoute
+    }
+    '/_authenticated/businesses/novera/inventory': {
+      id: '/_authenticated/businesses/novera/inventory'
+      path: '/inventory'
+      fullPath: '/businesses/novera/inventory'
+      preLoaderRoute: typeof AuthenticatedBusinessesNoveraInventoryRouteImport
+      parentRoute: typeof AuthenticatedBusinessesNoveraRoute
+    }
+    '/_authenticated/businesses/novera/marketing': {
+      id: '/_authenticated/businesses/novera/marketing'
+      path: '/marketing'
+      fullPath: '/businesses/novera/marketing'
+      preLoaderRoute: typeof AuthenticatedBusinessesNoveraMarketingRouteImport
+      parentRoute: typeof AuthenticatedBusinessesNoveraRoute
+    }
+    '/_authenticated/businesses/novera/orders': {
+      id: '/_authenticated/businesses/novera/orders'
+      path: '/orders'
+      fullPath: '/businesses/novera/orders'
+      preLoaderRoute: typeof AuthenticatedBusinessesNoveraOrdersRouteImport
+      parentRoute: typeof AuthenticatedBusinessesNoveraRoute
+    }
+    '/_authenticated/businesses/novera/products': {
+      id: '/_authenticated/businesses/novera/products'
+      path: '/products'
+      fullPath: '/businesses/novera/products'
+      preLoaderRoute: typeof AuthenticatedBusinessesNoveraProductsRouteImport
+      parentRoute: typeof AuthenticatedBusinessesNoveraRoute
+    }
+    '/_authenticated/businesses/novera/reports': {
+      id: '/_authenticated/businesses/novera/reports'
+      path: '/reports'
+      fullPath: '/businesses/novera/reports'
+      preLoaderRoute: typeof AuthenticatedBusinessesNoveraReportsRouteImport
+      parentRoute: typeof AuthenticatedBusinessesNoveraRoute
+    }
+    '/_authenticated/businesses/novera/settings': {
+      id: '/_authenticated/businesses/novera/settings'
+      path: '/settings'
+      fullPath: '/businesses/novera/settings'
+      preLoaderRoute: typeof AuthenticatedBusinessesNoveraSettingsRouteImport
+      parentRoute: typeof AuthenticatedBusinessesNoveraRoute
+    }
     '/_authenticated/people/contacts/$id': {
       id: '/_authenticated/people/contacts/$id'
       path: '/contacts/$id'
@@ -1435,13 +1615,53 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedBusinessesNoveraRouteChildren {
+  AuthenticatedBusinessesNoveraCustomersRoute: typeof AuthenticatedBusinessesNoveraCustomersRoute
+  AuthenticatedBusinessesNoveraEvidenceRoute: typeof AuthenticatedBusinessesNoveraEvidenceRoute
+  AuthenticatedBusinessesNoveraFunnelsRoute: typeof AuthenticatedBusinessesNoveraFunnelsRoute
+  AuthenticatedBusinessesNoveraInventoryRoute: typeof AuthenticatedBusinessesNoveraInventoryRoute
+  AuthenticatedBusinessesNoveraMarketingRoute: typeof AuthenticatedBusinessesNoveraMarketingRoute
+  AuthenticatedBusinessesNoveraOrdersRoute: typeof AuthenticatedBusinessesNoveraOrdersRoute
+  AuthenticatedBusinessesNoveraProductsRoute: typeof AuthenticatedBusinessesNoveraProductsRoute
+  AuthenticatedBusinessesNoveraReportsRoute: typeof AuthenticatedBusinessesNoveraReportsRoute
+  AuthenticatedBusinessesNoveraSettingsRoute: typeof AuthenticatedBusinessesNoveraSettingsRoute
+}
+
+const AuthenticatedBusinessesNoveraRouteChildren: AuthenticatedBusinessesNoveraRouteChildren =
+  {
+    AuthenticatedBusinessesNoveraCustomersRoute:
+      AuthenticatedBusinessesNoveraCustomersRoute,
+    AuthenticatedBusinessesNoveraEvidenceRoute:
+      AuthenticatedBusinessesNoveraEvidenceRoute,
+    AuthenticatedBusinessesNoveraFunnelsRoute:
+      AuthenticatedBusinessesNoveraFunnelsRoute,
+    AuthenticatedBusinessesNoveraInventoryRoute:
+      AuthenticatedBusinessesNoveraInventoryRoute,
+    AuthenticatedBusinessesNoveraMarketingRoute:
+      AuthenticatedBusinessesNoveraMarketingRoute,
+    AuthenticatedBusinessesNoveraOrdersRoute:
+      AuthenticatedBusinessesNoveraOrdersRoute,
+    AuthenticatedBusinessesNoveraProductsRoute:
+      AuthenticatedBusinessesNoveraProductsRoute,
+    AuthenticatedBusinessesNoveraReportsRoute:
+      AuthenticatedBusinessesNoveraReportsRoute,
+    AuthenticatedBusinessesNoveraSettingsRoute:
+      AuthenticatedBusinessesNoveraSettingsRoute,
+  }
+
+const AuthenticatedBusinessesNoveraRouteWithChildren =
+  AuthenticatedBusinessesNoveraRoute._addFileChildren(
+    AuthenticatedBusinessesNoveraRouteChildren,
+  )
+
 interface AuthenticatedBusinessesRouteChildren {
-  AuthenticatedBusinessesNoveraRoute: typeof AuthenticatedBusinessesNoveraRoute
+  AuthenticatedBusinessesNoveraRoute: typeof AuthenticatedBusinessesNoveraRouteWithChildren
 }
 
 const AuthenticatedBusinessesRouteChildren: AuthenticatedBusinessesRouteChildren =
   {
-    AuthenticatedBusinessesNoveraRoute: AuthenticatedBusinessesNoveraRoute,
+    AuthenticatedBusinessesNoveraRoute:
+      AuthenticatedBusinessesNoveraRouteWithChildren,
   }
 
 const AuthenticatedBusinessesRouteWithChildren =
