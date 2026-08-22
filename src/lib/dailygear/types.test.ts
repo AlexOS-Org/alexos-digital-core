@@ -15,10 +15,17 @@ describe("getProductReadiness", () => {
     expect(getProductReadiness(product, 1).readyToPublish).toBe(true);
   });
 
-  it("keeps the minimum stock rule independent from ordinary availability", () => {
-    const readiness = getProductReadiness({ ...product, stock_quantity: 14 }, 1);
-    expect(readiness.hasMinimumStock).toBe(false);
+  it("does not block publication when informational stock is below 15 units", () => {
+    const readiness = getProductReadiness({ ...product, stock_quantity: 1 }, 1);
+    expect(readiness.hasMinimumStock).toBe(true);
     expect(readiness.hasConfirmedAvailability).toBe(true);
-    expect(readiness.readyToPublish).toBe(false);
+    expect(readiness.available).toBe(true);
+    expect(readiness.readyToPublish).toBe(true);
+  });
+
+  it("uses explicit Out of stock status to control sellability", () => {
+    const readiness = getProductReadiness({ ...product, status: "out_of_stock" }, 1);
+    expect(readiness.available).toBe(false);
+    expect(readiness.readyToPublish).toBe(true);
   });
 });

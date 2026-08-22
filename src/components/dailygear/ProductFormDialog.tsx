@@ -101,22 +101,16 @@ export function ProductFormDialog({
     setForm((current) => ({ ...current, [key]: value }));
   const categoryNameById = new Map(categories.map((category) => [category.id, category.name]));
 
-  const hasMinimumStock = Number(form.stock_quantity) >= 15;
   const hasConfirmedAvailability = form.availability_confirmed === "true";
   const hasCategory = Boolean(form.category_id);
   const hasEvidence = evidenceCount > 0;
-  const incompleteVariants = variants.filter(
-    (variant) => Number(variant.stock_quantity) < 15 || !variant.availability_confirmed,
-  );
+  const incompleteVariants = variants.filter((variant) => !variant.availability_confirmed);
   const hasVariantReadiness = incompleteVariants.length === 0;
   const missingPublicationRequirements = [
-    !hasMinimumStock ? "at least 15 units" : null,
     !hasConfirmedAvailability ? "confirmed availability" : null,
     !hasCategory ? "a primary category" : null,
     !hasEvidence ? "source evidence" : null,
-    !hasVariantReadiness
-      ? "every colour/SKU variant must have confirmed availability and at least 15 units"
-      : null,
+    !hasVariantReadiness ? "every colour/SKU variant must have confirmed availability" : null,
   ].filter((requirement): requirement is string => Boolean(requirement));
   const publicationBlocked = form.status === "active" && missingPublicationRequirements.length > 0;
   const invalid = !form.name.trim() || Number(form.price) <= 0 || publicationBlocked;
@@ -408,7 +402,8 @@ export function ProductFormDialog({
                 </p>
                 <p className="mt-1 text-muted-foreground">
                   An active product needs {missingPublicationRequirements.join(", ")}. Keep it as a
-                  draft until the source, category, variant availability and stock are verified.
+                  draft until the source, category and variant availability are verified. Quantity
+                  is informational; choose Out of stock when you want to stop accepting orders.
                   {incompleteVariants.length > 0
                     ? ` ${incompleteVariants.length} child variant${incompleteVariants.length === 1 ? "" : "s"} still need attention.`
                     : ""}

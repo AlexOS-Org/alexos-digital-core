@@ -14,6 +14,8 @@ export interface PublicFunnelProduct {
   images: string[];
   sku: string | null;
   stockQuantity: number;
+  status: string;
+  availabilityConfirmed: boolean;
   attributes: Json | null;
 }
 
@@ -28,6 +30,7 @@ export interface PublicFunnelVariant {
   imageUrl: string | null;
   options: Json | null;
   color: string | null;
+  availabilityConfirmed: boolean;
 }
 
 export interface PublicFunnelStep {
@@ -102,7 +105,7 @@ export async function loadPublicFunnelImpl(slug: string): Promise<PublicFunnel |
     .is("deleted_at", null)
     .maybeSingle();
   if (productError) throw productError;
-  if (!product || Number(product.stock_quantity ?? 0) < 1 || !product.category_id) return null;
+  if (!product || product.status === "out_of_stock" || !product.category_id) return null;
 
   const { data: steps, error: stepError } = await supabaseAdmin
     .from("dg_funnel_steps")
@@ -184,6 +187,8 @@ export async function loadPublicFunnelImpl(slug: string): Promise<PublicFunnel |
       images: (product.images ?? []) as string[],
       sku: product.sku,
       stockQuantity: Number(product.stock_quantity ?? 0),
+      status: product.status,
+      availabilityConfirmed: product.availability_confirmed === true,
       attributes: product.attributes,
     },
     offerProducts: eligibleOfferProducts.map((offerProduct) => ({
@@ -200,6 +205,8 @@ export async function loadPublicFunnelImpl(slug: string): Promise<PublicFunnel |
       images: (offerProduct.images ?? []) as string[],
       sku: offerProduct.sku,
       stockQuantity: Number(offerProduct.stock_quantity ?? 0),
+      status: offerProduct.status,
+      availabilityConfirmed: offerProduct.availability_confirmed === true,
       attributes: offerProduct.attributes,
     })),
     variants: (variants ?? []).map((variant) => ({
@@ -213,6 +220,7 @@ export async function loadPublicFunnelImpl(slug: string): Promise<PublicFunnel |
       imageUrl: variant.image_url,
       options: variant.options,
       color: variant.color,
+      availabilityConfirmed: variant.availability_confirmed === true,
     })),
     steps: (steps ?? []).map((step) => ({
       id: step.id,

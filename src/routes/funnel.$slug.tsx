@@ -181,7 +181,9 @@ function FunnelPage() {
       ? variantPrice(selectedVariant, product)
       : sellingPrice(product)
     : 0;
-  const maxQuantity = selectedVariant?.stockQuantity ?? product?.stockQuantity ?? 0;
+  const outOfStock =
+    product?.status === "out_of_stock" || selectedVariant?.availabilityConfirmed === false;
+  const maxQuantity = Number.MAX_SAFE_INTEGER;
   const orderBump =
     funnel?.steps.find((step) => step.stepType === "order_bump" && step.productId) ?? null;
   const bumpProduct = orderBump
@@ -190,7 +192,7 @@ function FunnelPage() {
   const heroImage = selectedVariant?.imageUrl ?? product?.images[0] ?? null;
 
   function addToCheckout() {
-    if (!funnel || !product || maxQuantity < 1) return;
+    if (!funnel || !product || outOfStock) return;
     cartStore.add(
       {
         productId: product.id,
@@ -203,7 +205,7 @@ function FunnelPage() {
         offerRole: "primary",
         funnelSlug: funnel.slug,
       },
-      Math.min(quantity, maxQuantity),
+      quantity,
     );
     trackMetaPixel("AddToCart", {
       content_ids: [selectedVariant?.sku ?? product.sku ?? product.id],
@@ -395,7 +397,8 @@ function FunnelPage() {
               >
                 {productVariants.map((variant) => (
                   <option key={variant.id} value={variant.id}>
-                    {variant.name} · {variant.stockQuantity} available
+                    {variant.name} ·{" "}
+                    {variant.availabilityConfirmed === false ? "Unavailable" : "Available to order"}
                   </option>
                 ))}
               </select>
@@ -406,7 +409,7 @@ function FunnelPage() {
               {product.currency} {price.toLocaleString()}
             </span>
             <span className="text-xs text-muted-foreground">
-              {maxQuantity > 0 ? `${maxQuantity} available` : "Out of stock"}
+              {outOfStock ? "Out of stock" : "Available to order"}
             </span>
           </div>
           <div className="mt-4 flex items-center gap-3">
@@ -418,9 +421,9 @@ function FunnelPage() {
               value={quantity}
               onChange={(event) => setQuantity(Number(event.target.value))}
               className="h-10 rounded-xl border bg-background px-3 text-sm"
-              disabled={maxQuantity < 1}
+              disabled={outOfStock}
             >
-              {Array.from({ length: Math.min(maxQuantity, 10) || 1 }, (_, index) => (
+              {Array.from({ length: 10 }, (_, index) => (
                 <option key={index + 1} value={index + 1}>
                   {index + 1}
                 </option>
@@ -430,10 +433,10 @@ function FunnelPage() {
           <Button
             size="lg"
             className="mt-5 w-full rounded-xl"
-            disabled={maxQuantity < 1}
+            disabled={outOfStock}
             onClick={addToCheckout}
           >
-            {maxQuantity < 1 ? "Out of stock" : "Order now"}
+            {outOfStock ? "Out of stock" : "Order now"}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
           <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
@@ -461,8 +464,8 @@ function FunnelPage() {
               {product.currency} {price.toLocaleString()}
             </p>
           </div>
-          <Button className="rounded-xl" disabled={maxQuantity < 1} onClick={addToCheckout}>
-            {maxQuantity < 1 ? "Unavailable" : "Order now"}
+          <Button className="rounded-xl" disabled={outOfStock} onClick={addToCheckout}>
+            {outOfStock ? "Unavailable" : "Order now"}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>

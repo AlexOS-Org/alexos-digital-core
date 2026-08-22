@@ -289,7 +289,7 @@ function CheckoutPage() {
           sku: orderBumpProduct.sku,
           price: orderBumpPrice,
           image: orderBumpProduct.images[0] ?? null,
-          maxQuantity: orderBumpProduct.stockQuantity,
+          maxQuantity: Number.MAX_SAFE_INTEGER,
           offerRole: "order_bump",
           funnelStepId: orderBump.id,
           funnelSlug: funnelContext?.slug ?? null,

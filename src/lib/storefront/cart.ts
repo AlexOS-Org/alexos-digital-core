@@ -82,6 +82,8 @@ function sanitizeLines(input: unknown[]): CartLine[] {
           : "";
     const quantity = Number(candidate.quantity);
     const maxQuantity = Number(candidate.maxQuantity);
+    const normalizedMaxQuantity =
+      Number.isFinite(maxQuantity) && maxQuantity > 0 ? maxQuantity : Number.MAX_SAFE_INTEGER;
     if (!UUID_RE.test(productId) || (variantId && !UUID_RE.test(variantId))) return [];
     if (!Number.isFinite(quantity) || quantity < 1) return [];
     return [
@@ -89,8 +91,8 @@ function sanitizeLines(input: unknown[]): CartLine[] {
         ...candidate,
         productId,
         variantId: variantId || null,
-        quantity: Math.max(1, Math.min(Math.floor(quantity), Math.max(1, maxQuantity || 1))),
-        maxQuantity: Math.max(1, maxQuantity || 1),
+        quantity: Math.max(1, Math.min(Math.floor(quantity), normalizedMaxQuantity)),
+        maxQuantity: normalizedMaxQuantity,
         offerRole: candidate.offerRole ?? "primary",
         funnelStepId: candidate.funnelStepId ?? null,
         funnelSlug: candidate.funnelSlug ?? null,

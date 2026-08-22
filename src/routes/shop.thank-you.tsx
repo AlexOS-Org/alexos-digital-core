@@ -145,7 +145,7 @@ function ThankYou() {
         sku: product.sku,
         price: offerPrice(product),
         image: product.images[0] ?? null,
-        maxQuantity: product.stockQuantity,
+        maxQuantity: Number.MAX_SAFE_INTEGER,
         offerRole: step.stepType === "upsell" ? "upsell" : "downsell",
         funnelStepId: step.id,
         funnelSlug: funnel.slug,
@@ -264,7 +264,7 @@ function ThankYou() {
                 <Button
                   className="rounded-xl"
                   onClick={() => acceptOffer(activeOfferStep, activeOfferProduct)}
-                  disabled={activeOfferProduct.stockQuantity < 1}
+                  disabled={activeOfferProduct.status === "out_of_stock"}
                 >
                   Add to this journey <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>

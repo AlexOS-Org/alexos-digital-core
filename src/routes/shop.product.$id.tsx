@@ -107,8 +107,8 @@ function ProductDetail() {
   const selectedVariant = variants.find((variant) => variant.id === selectedVariantId) ?? null;
   const sellingItem = selectedVariant ?? product;
   const price = effectivePrice(sellingItem);
-  const availableStock = Number(sellingItem.stock_quantity ?? 0);
-  const soldOut = availableStock <= 0;
+  const soldOut =
+    product.status === "out_of_stock" || selectedVariant?.availability_confirmed === false;
 
   function add() {
     if (!product) return;
@@ -120,7 +120,7 @@ function ProductDetail() {
         sku: selectedVariant?.sku ?? product.sku,
         price,
         image: selectedVariant?.image_url ?? productImage(product),
-        maxQuantity: availableStock,
+        maxQuantity: Number.MAX_SAFE_INTEGER,
       },
       qty,
     );
@@ -196,7 +196,7 @@ function ProductDetail() {
             <div className="flex flex-wrap gap-2">
               {isOnSale(sellingItem) ? <Badge className="rounded-full">Sale</Badge> : null}
               <Badge variant={soldOut ? "secondary" : "outline"} className="rounded-full">
-                {soldOut ? "Sold out" : `${availableStock} in stock`}
+                {soldOut ? "Sold out" : "Available to order"}
               </Badge>
             </div>
             <h1 className="text-3xl font-black tracking-tight">{product.name}</h1>
@@ -213,21 +213,21 @@ function ProductDetail() {
                 <p className="text-sm font-semibold">Choose an option</p>
                 <div className="flex flex-wrap gap-2">
                   {variants.map((variant) => {
-                    const variantStock = Number(variant.stock_quantity ?? 0);
+                    const variantSoldOut = variant.availability_confirmed === false;
                     const selected = variant.id === selectedVariantId;
                     return (
                       <button
                         key={variant.id}
                         type="button"
-                        disabled={variantStock <= 0}
+                        disabled={variantSoldOut}
                         onClick={() => setSelectedVariantId(variant.id)}
                         className={`rounded-xl border px-3 py-2 text-left text-sm transition ${
                           selected ? "border-primary bg-primary/10 text-primary" : "hover:bg-muted"
-                        } ${variantStock <= 0 ? "cursor-not-allowed opacity-50" : ""}`}
+                        } ${variantSoldOut ? "cursor-not-allowed opacity-50" : ""}`}
                       >
                         <span className="font-medium">{variant.name}</span>
                         <span className="ml-2 text-xs text-muted-foreground">
-                          {variantStock > 0 ? `${variantStock} available` : "Sold out"}
+                          {variantSoldOut ? "Unavailable" : "Available to order"}
                         </span>
                       </button>
                     );
@@ -256,7 +256,7 @@ function ProductDetail() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setQty((q) => Math.min(availableStock || 1, q + 1))}
+                onClick={() => setQty((q) => q + 1)}
                 aria-label="Increase"
               >
                 <Plus className="h-4 w-4" />

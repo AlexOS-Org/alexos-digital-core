@@ -172,9 +172,8 @@ async function resolveRecoveryItems(
     const variant = item.variantId ? variantById.get(item.variantId) : null;
     if (item.variantId && (!variant || variant.product_id !== product.id)) continue;
 
-    const maxQuantity = Math.max(0, Number(variant?.stock_quantity ?? product.stock_quantity ?? 0));
-    if (maxQuantity <= 0) continue;
-    const quantity = Math.min(item.quantity, maxQuantity);
+    const maxQuantity = Number.MAX_SAFE_INTEGER;
+    const quantity = Math.max(1, Math.floor(item.quantity));
     const images = (product.images ?? []) as string[];
     const price = sellingPrice(variant ?? product);
     lines.push({

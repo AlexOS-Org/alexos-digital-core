@@ -59,7 +59,7 @@ export function createSupplierProductDraft(input: SupplierMessageInput): Supplie
     .slice(0, 10);
   const approvalNotes = [
     "Verify supplier identity and the message source before approval.",
-    "Confirm stock, colour/size availability, and at least 15 units for every published variant.",
+    "Confirm colour/size availability; set Out of stock whenever a variant should stop accepting orders.",
     "Approve specific product media only; unapproved media is not saved to the catalogue.",
     supplierPrice == null
       ? "Supplier price was not detected; enter and verify it manually."

@@ -22,7 +22,7 @@ export function ProductCard({ product, currency }: Props) {
   const price = effectivePrice(product);
   const image = productImage(product);
   const secondaryImage = productSecondaryImage(product);
-  const soldOut = Number(product.stock_quantity) <= 0;
+  const soldOut = product.status === "out_of_stock";
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-3xl border bg-card transition-shadow hover:shadow-lg">
@@ -87,7 +87,7 @@ export function ProductCard({ product, currency }: Props) {
         <p className="text-xs leading-relaxed text-muted-foreground">
           {soldOut
             ? "This listing is currently unavailable."
-            : "View current stock and choose any available size or colour."}
+            : "Choose any available size or colour and place your order."}
         </p>
 
         <Button asChild className="dailygear-product-cta mt-auto w-full rounded-xl">

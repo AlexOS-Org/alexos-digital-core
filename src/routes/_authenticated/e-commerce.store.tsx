@@ -175,7 +175,7 @@ function StorePage() {
           <div>
             <h2 className="text-xl font-semibold tracking-tight">Available products</h2>
             <p className="text-sm text-muted-foreground">
-              Products with stock and active status are ready for orders.
+              Active products remain orderable until you explicitly mark them Out of stock.
             </p>
           </div>
           <Button variant="outline" onClick={() => cart.addBlankItem()}>
@@ -206,11 +206,9 @@ function StorePage() {
                       <p className="text-xs text-muted-foreground">{product.sku ?? "No SKU"}</p>
                     </div>
                     <Badge
-                      variant={
-                        Number(product.stock_quantity ?? 0) > 0 ? "secondary" : "destructive"
-                      }
+                      variant={product.status === "out_of_stock" ? "destructive" : "secondary"}
                     >
-                      {Number(product.stock_quantity ?? 0) > 0 ? "In stock" : "Out of stock"}
+                      {product.status === "out_of_stock" ? "Out of stock" : "Orderable"}
                     </Badge>
                   </div>
                   <p className="text-2xl font-semibold">
@@ -234,7 +232,7 @@ function StorePage() {
                         unit_cost: Number(product.cost_price ?? 0),
                       })
                     }
-                    disabled={Number(product.stock_quantity ?? 0) <= 0}
+                    disabled={product.status === "out_of_stock"}
                   >
                     Add to cart
                   </Button>

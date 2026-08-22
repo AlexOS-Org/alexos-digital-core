@@ -22,9 +22,7 @@ export function CatalogueReadinessCard({
   if (loading) return <Skeleton className="h-52 w-full rounded-[1.75rem]" />;
   const active = products.filter((product) => product.status === "active").length;
   const drafts = products.length - active;
-  const needsReview = products.filter(
-    (product) => !product.availability_confirmed || Number(product.stock_quantity) < 15,
-  ).length;
+  const needsReview = products.filter((product) => !product.availability_confirmed).length;
   const progress = products.length ? Math.round((active / products.length) * 100) : 0;
   return (
     <Card className="group relative overflow-hidden rounded-[1.75rem] border-primary/20 bg-gradient-to-br from-card via-card to-primary/[0.07] shadow-[0_22px_60px_-36px_var(--alexos-glow)]">
@@ -70,7 +68,7 @@ export function CatalogueReadinessCard({
         {products.length === 0 ? (
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             <GateItem icon={ShieldCheck} label="Current source evidence" />
-            <GateItem icon={Boxes} label="At least 15 units per variant" />
+            <GateItem icon={Boxes} label="Owner-controlled availability" />
             <GateItem icon={CheckCircle2} label="Availability confirmed" />
           </div>
         ) : (
@@ -96,8 +94,8 @@ export function CatalogueReadinessCard({
             {needsReview > 0 && (
               <p className="mt-2 flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-300">
                 <AlertTriangle className="h-3.5 w-3.5" />
-                {needsReview} item{needsReview === 1 ? " needs" : "s need"} evidence or the 15-unit
-                gate reviewed.
+                {needsReview} item{needsReview === 1 ? " needs" : "s need"} availability evidence
+                reviewed. Quantity is informational; set Out of stock to pause orders.
               </p>
             )}
           </div>

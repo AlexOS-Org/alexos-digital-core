@@ -74,18 +74,20 @@ export function getProductReadiness(
   product: Pick<Product, "stock_quantity" | "availability_confirmed" | "status" | "category_id">,
   evidenceCount = 0,
 ): ProductReadiness {
-  const hasMinimumStock = Number(product.stock_quantity ?? 0) >= 15;
+  // Quantity is an owner-managed inventory signal, not a storefront sellability gate.
+  // Products remain orderable until their explicit status is set to out_of_stock.
+  const hasMinimumStock = true;
   const hasConfirmedAvailability = product.availability_confirmed === true;
   const hasCategory = Boolean(product.category_id);
   const hasEvidence = evidenceCount > 0;
-  const available = product.status === "active" && Number(product.stock_quantity ?? 0) > 0;
+  const available = product.status === "active";
   return {
     available,
     hasMinimumStock,
     hasConfirmedAvailability,
     hasCategory,
     hasEvidence,
-    readyToPublish: hasMinimumStock && hasConfirmedAvailability && hasCategory && hasEvidence,
+    readyToPublish: hasConfirmedAvailability && hasCategory && hasEvidence,
   };
 }
 

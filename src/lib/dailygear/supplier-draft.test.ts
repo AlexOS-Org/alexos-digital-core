@@ -16,7 +16,7 @@ describe("DailyGear supplier drafts", () => {
     expect(draft.supplierPrice).toBe(2700);
     expect(draft.sourceLinks).toEqual(["https://supplier.example/nf5060"]);
     expect(draft.candidateMediaUrls).toEqual(["https://supplier.example/nf5060.jpg"]);
-    expect(draft.approvalNotes.join(" ")).toContain("at least 15 units");
+    expect(draft.approvalNotes.join(" ")).toContain("set Out of stock");
   });
 
   it("does not invent a price when the selected message has none", () => {

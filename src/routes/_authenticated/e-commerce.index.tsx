@@ -313,9 +313,7 @@ function MobileStoreOverview({ kpis, trend, loading }: Pick<Panels, "kpis" | "tr
 function MobileFocus(p: Panels) {
   const pendingOrders = p.orders.filter((order) => ["new", "processing"].includes(order.status));
   const draftProducts = p.products.filter((product) => product.status === "draft");
-  const gatedProducts = p.products.filter(
-    (product) => Number(product.stock_quantity) < 15 || !product.availability_confirmed,
-  );
+  const gatedProducts = p.products.filter((product) => !product.availability_confirmed);
   const focus = [
     pendingOrders.length > 0
       ? {
@@ -333,8 +331,8 @@ function MobileFocus(p: Panels) {
       : null,
     gatedProducts.length > 0
       ? {
-          title: "Pass the stock gate",
-          detail: "Confirm availability and at least 15 units per SKU or variant",
+          title: "Review availability evidence",
+          detail: "Confirm source availability for products and variants",
           to: "/e-commerce/inventory",
         }
       : null,
