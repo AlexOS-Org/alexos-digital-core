@@ -1,6 +1,6 @@
 import { env as workerEnv } from "cloudflare:workers";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "@/integrations/supabase/types";
+import type { Database, Json } from "@/integrations/supabase/types";
 import type { DashboardSnapshot } from "@/lib/dashboard/types";
 import { computeDashboardMetrics } from "@/lib/dashboard/calculations";
 import { generateSignals } from "@/lib/intelligence/signals";
@@ -98,6 +98,18 @@ export interface AurenRecommendation {
   action?: { label: string; to: string };
   confidence: AurenConfidence;
 }
+export interface AurenLiveEvidenceRecord {
+  sourceType:
+    "meta_ads_manager" | "instagram_insights" | "public_ads_library" | "public_competitor_page";
+  sourceKey: string;
+  sourceUrl: string | null;
+  observedAt: string;
+  status: "ok" | "partial" | "unavailable";
+  confidence: AurenConfidence;
+  summary: string | null;
+  payload: Json;
+}
+
 export interface AurenAdvisorySnapshot {
   asOf: string;
   period: { from: string; until: string; days: number };
@@ -130,6 +142,7 @@ export interface AurenAdvisorySnapshot {
   businesses: AurenBusinessSummary[];
   recommendations: AurenRecommendation[];
   externalContext: AurenPublicContextRecord[];
+  liveEvidence: AurenLiveEvidenceRecord[];
   dataQuality: {
     warnings: string[];
     sourceRows: Record<string, number>;
@@ -563,6 +576,7 @@ export function buildAurenAdvisory(input: AurenAdvisoryInput): AurenAdvisorySnap
       warnings,
     ),
     externalContext: getAurenPublicContext(input.request.scope),
+    liveEvidence: [],
     dataQuality: {
       warnings,
       sourceRows: {
@@ -607,7 +621,10 @@ function advisoryPrompt(advisory: AurenAdvisorySnapshot) {
   ].join("\n");
 }
 function noData(advisory: AurenAdvisorySnapshot) {
-  return Object.values(advisory.dataQuality.sourceRows).every((value) => value === 0);
+  return (
+    Object.values(advisory.dataQuality.sourceRows).every((value) => value === 0) &&
+    advisory.liveEvidence.length === 0
+  );
 }
 export async function getAurenAdvisoryForUser(
   request: AurenAdvisorRequest,
@@ -634,6 +651,7 @@ export async function getAurenAdvisoryForUser(
     leadsResult,
     productsResult,
     ordersResult,
+    liveEvidenceResult,
   ] = await Promise.all([
     context.supabase
       .from("businesses")
@@ -651,7 +669,13 @@ export async function getAurenAdvisoryForUser(
     scoped("contacts"),
     scoped("leads"),
     scoped("dg_products"),
-    scoped("dg_orders"),
+    context.supabase.from("dg_orders").select("*").eq("user_id", userId).limit(MAX_ROWS),
+    context.supabase
+      .from("auren_evidence_snapshots" as never)
+      .select("source_type,source_key,source_url,observed_at,status,confidence,summary,payload")
+      .eq("user_id", userId)
+      .order("observed_at", { ascending: false })
+      .limit(60),
   ]);
   const results = [
     businessesResult,
@@ -667,9 +691,22 @@ export async function getAurenAdvisoryForUser(
     leadsResult,
     productsResult,
     ordersResult,
+    liveEvidenceResult,
   ];
   const failed = results.find((result) => result.error);
   if (failed?.error) throw failed.error;
+  const liveEvidence = ((liveEvidenceResult.data ?? []) as Array<Record<string, unknown>>).map(
+    (row) => ({
+      sourceType: row.source_type as AurenLiveEvidenceRecord["sourceType"],
+      sourceKey: String(row.source_key ?? ""),
+      sourceUrl: typeof row.source_url === "string" ? row.source_url : null,
+      observedAt: String(row.observed_at ?? new Date().toISOString()),
+      status: row.status as AurenLiveEvidenceRecord["status"],
+      confidence: row.confidence as AurenConfidence,
+      summary: typeof row.summary === "string" ? row.summary : null,
+      payload: (row.payload ?? {}) as Json,
+    }),
+  );
   const businesses = (businessesResult.data ?? []) as AurenBusinessRecord[];
   const selectedBusinessId = request.businessId ?? null;
   const selectedBusiness = selectedBusinessId
@@ -715,6 +752,7 @@ export async function getAurenAdvisoryForUser(
     dailyGear,
     dashboardSnapshot,
   });
+  advisory.liveEvidence = liveEvidence;
   if (noData(advisory)) return { status: "no_data", advisory, summary: null, model: null };
   const ai = workerEnv.AI;
   if (!ai) return { status: "ai_unavailable", advisory, summary: null, model: null };

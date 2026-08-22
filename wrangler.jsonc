@@ -5,7 +5,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
   "triggers": {
-    "crons": ["0 3 * * *"],
+    "crons": ["0 3 * * *", "*/30 * * * *"],
   },
   "ai": {
     "binding": "AI",

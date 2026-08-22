@@ -52,8 +52,14 @@ export default {
       });
     }
   },
-  async scheduled() {
+  async scheduled(controller: { cron: string }) {
     try {
+      if (controller.cron === "*/30 * * * *") {
+        const { refreshAurenEvidence } = await import("@/server/auren/live-evidence-refresh");
+        const refresh = await refreshAurenEvidence();
+        console.info("Scheduled Auren evidence refresh completed", refresh);
+      }
+
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { processAbandonedCartFollowUps } =
         await import("@/server/notifications/cart-recovery-email");

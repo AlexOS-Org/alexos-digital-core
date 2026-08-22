@@ -365,6 +365,56 @@ function AurenPage() {
             </Card>
           ) : null}
 
+          {advisory.liveEvidence.length > 0 ? (
+            <Card className="rounded-3xl border-primary/20 bg-primary/[0.025] soft-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <RefreshCw className="h-4 w-4 text-primary" /> Live evidence refresh
+                  <Badge variant="outline" className="ml-auto text-xs">
+                    Read-only · 30 min
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-3 md:grid-cols-3">
+                {advisory.liveEvidence.slice(0, 9).map((evidence) => (
+                  <div
+                    key={`${evidence.sourceType}-${evidence.sourceKey}-${evidence.observedAt}`}
+                    className="rounded-2xl border border-border/60 bg-card/70 p-4"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold">
+                          {evidence.sourceType.replaceAll("_", " ")}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">{evidence.sourceKey}</p>
+                      </div>
+                      <Badge variant={evidence.status === "ok" ? "secondary" : "outline"}>
+                        {evidence.status === "ok" ? "Fresh" : evidence.status}
+                      </Badge>
+                    </div>
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                      {evidence.summary ?? "No source summary was returned."}
+                    </p>
+                    <p className="mt-3 text-[11px] leading-5 text-muted-foreground">
+                      Observed {new Date(evidence.observedAt).toLocaleString()} ·{" "}
+                      {confidenceLabel(evidence.confidence)}
+                    </p>
+                    {evidence.sourceUrl ? (
+                      <a
+                        href={evidence.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                      >
+                        View source <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    ) : null}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          ) : null}
+
           {advisory.externalContext.length > 0 ? (
             <Card className="rounded-3xl border-border/60 soft-shadow">
               <CardHeader>

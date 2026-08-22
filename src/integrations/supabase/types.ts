@@ -300,6 +300,95 @@ export type Database = {
           },
         ]
       }
+      auren_evidence_refresh_runs: {
+        Row: {
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          rows_written: number
+          source_status: Json
+          started_at: string
+          status: string
+        }
+        Insert: {
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          rows_written?: number
+          source_status?: Json
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          rows_written?: number
+          source_status?: Json
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      auren_evidence_snapshots: {
+        Row: {
+          business_id: string | null
+          confidence: string
+          created_at: string
+          id: string
+          observed_at: string
+          payload: Json
+          source_key: string
+          source_type: string
+          source_url: string | null
+          status: string
+          summary: string | null
+          user_id: string
+          window_end: string | null
+          window_start: string | null
+        }
+        Insert: {
+          business_id?: string | null
+          confidence?: string
+          created_at?: string
+          id?: string
+          observed_at?: string
+          payload?: Json
+          source_key: string
+          source_type: string
+          source_url?: string | null
+          status?: string
+          summary?: string | null
+          user_id: string
+          window_end?: string | null
+          window_start?: string | null
+        }
+        Update: {
+          business_id?: string | null
+          confidence?: string
+          created_at?: string
+          id?: string
+          observed_at?: string
+          payload?: Json
+          source_key?: string
+          source_type?: string
+          source_url?: string | null
+          status?: string
+          summary?: string | null
+          user_id?: string
+          window_end?: string | null
+          window_start?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auren_evidence_snapshots_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bills: {
         Row: {
           account_id: string | null
@@ -1430,48 +1519,6 @@ export type Database = {
           },
         ]
       }
-      dg_order_payments: {
-        Row: {
-          account_id: string
-          amount: number
-          created_at: string
-          id: string
-          money_transaction_id: string | null
-          notes: string | null
-          order_id: string
-          paid_at: string
-          payment_method: string
-          transaction_id: string
-          user_id: string
-        }
-        Insert: {
-          account_id: string
-          amount: number
-          created_at?: string
-          id?: string
-          money_transaction_id?: string | null
-          notes?: string | null
-          order_id: string
-          paid_at?: string
-          payment_method?: string
-          transaction_id: string
-          user_id: string
-        }
-        Update: {
-          account_id?: string
-          amount?: number
-          created_at?: string
-          id?: string
-          money_transaction_id?: string | null
-          notes?: string | null
-          order_id?: string
-          paid_at?: string
-          payment_method?: string
-          transaction_id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       dg_order_items: {
         Row: {
           created_at: string
@@ -1555,6 +1602,77 @@ export type Database = {
           },
         ]
       }
+      dg_order_payments: {
+        Row: {
+          account_id: string
+          amount: number
+          created_at: string
+          id: string
+          money_transaction_id: string | null
+          notes: string | null
+          order_id: string
+          paid_at: string
+          payment_method: string
+          transaction_id: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          created_at?: string
+          id?: string
+          money_transaction_id?: string | null
+          notes?: string | null
+          order_id: string
+          paid_at?: string
+          payment_method?: string
+          transaction_id: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          created_at?: string
+          id?: string
+          money_transaction_id?: string | null
+          notes?: string | null
+          order_id?: string
+          paid_at?: string
+          payment_method?: string
+          transaction_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dg_order_payments_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "account_balances"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "dg_order_payments_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dg_order_payments_money_transaction_id_fkey"
+            columns: ["money_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dg_order_payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "dg_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dg_orders: {
         Row: {
           channel: string
@@ -1565,7 +1683,6 @@ export type Database = {
           delivered_at: string | null
           discount: number
           funnel_id: string | null
-          purge_after: string | null
           id: string
           internal_notes: string | null
           notes: string | null
@@ -1573,6 +1690,7 @@ export type Database = {
           payment_method: string | null
           payment_status: Database["public"]["Enums"]["dg_payment_status"]
           placed_at: string
+          purge_after: string | null
           shipping_address: string | null
           shipping_address_details: string | null
           shipping_country: string | null
@@ -1598,7 +1716,6 @@ export type Database = {
           delivered_at?: string | null
           discount?: number
           funnel_id?: string | null
-          purge_after?: string | null
           id?: string
           internal_notes?: string | null
           notes?: string | null
@@ -1606,6 +1723,7 @@ export type Database = {
           payment_method?: string | null
           payment_status?: Database["public"]["Enums"]["dg_payment_status"]
           placed_at?: string
+          purge_after?: string | null
           shipping_address?: string | null
           shipping_address_details?: string | null
           shipping_country?: string | null
@@ -1631,7 +1749,6 @@ export type Database = {
           delivered_at?: string | null
           discount?: number
           funnel_id?: string | null
-          purge_after?: string | null
           id?: string
           internal_notes?: string | null
           notes?: string | null
@@ -1639,6 +1756,7 @@ export type Database = {
           payment_method?: string | null
           payment_status?: Database["public"]["Enums"]["dg_payment_status"]
           placed_at?: string
+          purge_after?: string | null
           shipping_address?: string | null
           shipping_address_details?: string | null
           shipping_country?: string | null
@@ -2530,6 +2648,163 @@ export type Database = {
           },
         ]
       }
+      money_crypto_holdings: {
+        Row: {
+          created_at: string
+          exchange: string
+          id: string
+          notes: string | null
+          price_kes: number
+          quantity: number
+          symbol: string
+          updated_at: string
+          user_id: string
+          valued_at: string
+        }
+        Insert: {
+          created_at?: string
+          exchange?: string
+          id?: string
+          notes?: string | null
+          price_kes: number
+          quantity: number
+          symbol: string
+          updated_at?: string
+          user_id: string
+          valued_at?: string
+        }
+        Update: {
+          created_at?: string
+          exchange?: string
+          id?: string
+          notes?: string | null
+          price_kes?: number
+          quantity?: number
+          symbol?: string
+          updated_at?: string
+          user_id?: string
+          valued_at?: string
+        }
+        Relationships: []
+      }
+      money_salary_runs: {
+        Row: {
+          created_at: string
+          id: string
+          run_date: string
+          run_key: string
+          schedule_id: string
+          transaction_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          run_date: string
+          run_key: string
+          schedule_id: string
+          transaction_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          run_date?: string
+          run_key?: string
+          schedule_id?: string
+          transaction_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "money_salary_runs_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "money_salary_schedules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "money_salary_runs_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      money_salary_schedules: {
+        Row: {
+          account_id: string
+          active: boolean
+          amount: number
+          business_id: string | null
+          created_at: string
+          day_of_month: number
+          description: string | null
+          financial_scope: string
+          id: string
+          name: string
+          start_date: string
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          active?: boolean
+          amount: number
+          business_id?: string | null
+          created_at?: string
+          day_of_month: number
+          description?: string | null
+          financial_scope?: string
+          id?: string
+          name: string
+          start_date?: string
+          timezone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          active?: boolean
+          amount?: number
+          business_id?: string | null
+          created_at?: string
+          day_of_month?: number
+          description?: string | null
+          financial_scope?: string
+          id?: string
+          name?: string
+          start_date?: string
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "money_salary_schedules_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "account_balances"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "money_salary_schedules_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "money_salary_schedules_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notes: {
         Row: {
           contact_id: string | null
@@ -2641,8 +2916,8 @@ export type Database = {
           debt_id: string | null
           deleted_at: string | null
           description: string | null
-          expense_type: string | null
           expense_scope: string
+          expense_type: string | null
           financial_scope: string
           flow_type: string
           id: string
@@ -2670,8 +2945,8 @@ export type Database = {
           debt_id?: string | null
           deleted_at?: string | null
           description?: string | null
-          expense_type?: string | null
           expense_scope?: string
+          expense_type?: string | null
           financial_scope?: string
           flow_type?: string
           id?: string
@@ -2699,8 +2974,8 @@ export type Database = {
           debt_id?: string | null
           deleted_at?: string | null
           description?: string | null
-          expense_type?: string | null
           expense_scope?: string
+          expense_type?: string | null
           financial_scope?: string
           flow_type?: string
           id?: string
@@ -2852,6 +3127,26 @@ export type Database = {
       }
     }
     Functions: {
+      dg_confirm_order_payment: {
+        Args: {
+          p_account_id: string
+          p_amount: number
+          p_notes?: string
+          p_order_id: string
+          p_paid_at?: string
+          p_transaction_id: string
+        }
+        Returns: {
+          account_name: string
+          amount_paid: number
+          money_transaction_id: string
+          order_number: string
+          order_total: number
+          payment_id: string
+          payment_status: Database["public"]["Enums"]["dg_payment_status"]
+          receipt_number: string
+        }[]
+      }
       dg_create_guest_order: {
         Args: {
           p_address: string
@@ -2874,21 +3169,55 @@ export type Database = {
         Returns: Json
       }
       dg_is_published_store: { Args: { _user_id: string }; Returns: boolean }
-      dg_record_order_fulfilment: {
+      dg_move_order_to_trash: {
+        Args: { p_order_id: string }
+        Returns: undefined
+      }
+      dg_purge_expired_order_trash: { Args: never; Returns: number }
+      dg_record_order_fulfilment:
+        | {
+            Args: {
+              p_account_id?: string
+              p_advertising_cost?: number
+              p_delivery_cost?: number
+              p_next_status?: Database["public"]["Enums"]["dg_order_status"]
+              p_order_id: string
+              p_other_cost?: number
+              p_other_description?: string
+              p_purchase_cost?: number
+              p_supplier_paid?: boolean
+              p_supplier_payment_account_id?: string
+              p_supplier_payment_amount?: number
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_account_id?: string
+              p_delivery_cost?: number
+              p_next_status?: Database["public"]["Enums"]["dg_order_status"]
+              p_order_id: string
+              p_other_cost?: number
+              p_other_description?: string
+              p_purchase_cost?: number
+            }
+            Returns: Json
+          }
+      dg_refund_or_void_order_payment: {
         Args: {
-          p_account_id?: string
-          p_advertising_cost?: number
-          p_delivery_cost?: number
-          p_next_status?: Database["public"]["Enums"]["dg_order_status"]
+          p_mode: string
+          p_notes?: string
           p_order_id: string
-          p_other_cost?: number
-          p_other_description?: string
-          p_purchase_cost?: number
-          p_supplier_paid?: boolean
-          p_supplier_payment_account_id?: string
-          p_supplier_payment_amount?: number
+          p_refund_account_id?: string
+          p_refund_amount?: number
+          p_refund_transaction_id?: string
         }
-        Returns: Json
+        Returns: {
+          amount_reversed: number
+          mode: string
+          order_number: string
+          refund_transaction_id: string
+        }[]
       }
       dg_reserve_stock: {
         Args: { p_product_id: string; p_qty: number }
@@ -2897,6 +3226,10 @@ export type Database = {
       dg_reserve_variant_stock: {
         Args: { p_product_id: string; p_qty: number; p_variant_id: string }
         Returns: boolean
+      }
+      dg_restore_order_from_trash: {
+        Args: { p_order_id: string }
+        Returns: undefined
       }
       dg_seed_default_categories: {
         Args: { _user_id: string }
@@ -2921,6 +3254,10 @@ export type Database = {
           p_tracking_number?: string
         }
         Returns: Json
+      }
+      money_post_due_salary_schedules: {
+        Args: { p_run_date?: string }
+        Returns: number
       }
       next_order_number: { Args: never; Returns: string }
     }
