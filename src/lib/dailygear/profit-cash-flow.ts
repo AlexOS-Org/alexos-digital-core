@@ -147,7 +147,9 @@ function currenciesFrom(
  * data. The function intentionally keeps accounting and cash timing separate:
  * COGS affects profit when an order is recognized, while supplier payments,
  * payment fees, delivery payments, and customer receipts affect cash flow only
- * when supplied as explicit cash events.
+ * when supplied as explicit cash events. When both an order expense and an
+ * explicit cash event represent the same outflow, the explicit event wins so
+ * the cash movement is not counted twice.
  */
 export function calculateDailyGearProfitAndCashFlow(
   input: DailyGearProfitCashFlowInput,
@@ -187,6 +189,15 @@ export function calculateDailyGearProfitAndCashFlow(
     inPeriod(event.date, input.from, input.until),
   );
   const hasExplicitReceipts = explicitEvents.some((event) => event.type === "customer_receipt");
+  const hasExplicitDeliveryPayments = explicitEvents.some(
+    (event) => event.type === "delivery_payment",
+  );
+  const hasExplicitSupplierPayments = explicitEvents.some(
+    (event) => event.type === "supplier_payment",
+  );
+  const hasExplicitOtherOutflows = explicitEvents.some(
+    (event) => event.type === "other_operating_outflow",
+  );
   const cashReceivedByDate = new Map<string, number>();
   const cashOutflowsByDate = new Map<string, number>();
   const paymentFeesByDate = new Map<string, number>();
@@ -196,9 +207,11 @@ export function calculateDailyGearProfitAndCashFlow(
 
   for (const expense of orderExpenses) {
     const day = dateOnly(expense.date);
-    if (expense.costType === "delivery") addToMap(deliveryCostsByDate, day, num(expense.amount));
-    if (expense.costType === "other") addToMap(otherOutflowsByDate, day, num(expense.amount));
-    if (expense.costType === "purchase_cost")
+    if (expense.costType === "delivery" && !hasExplicitDeliveryPayments)
+      addToMap(deliveryCostsByDate, day, num(expense.amount));
+    if (expense.costType === "other" && !hasExplicitOtherOutflows)
+      addToMap(otherOutflowsByDate, day, num(expense.amount));
+    if (expense.costType === "purchase_cost" && !hasExplicitSupplierPayments)
       addToMap(supplierPaymentsByDate, day, num(expense.amount));
   }
 
