@@ -802,6 +802,7 @@ export type Database = {
           created_at: string;
           deleted_at: string | null;
           description: string | null;
+          expense_scope: string;
           id: string;
           occurred_at: string;
           reference: string | null;
@@ -820,6 +821,7 @@ export type Database = {
           created_at?: string;
           deleted_at?: string | null;
           description?: string | null;
+          expense_scope?: string;
           id?: string;
           occurred_at?: string;
           reference?: string | null;
@@ -838,6 +840,7 @@ export type Database = {
           created_at?: string;
           deleted_at?: string | null;
           description?: string | null;
+          expense_scope?: string;
           id?: string;
           occurred_at?: string;
           reference?: string | null;

@@ -2642,6 +2642,7 @@ export type Database = {
           deleted_at: string | null
           description: string | null
           expense_type: string | null
+          expense_scope: string
           financial_scope: string
           flow_type: string
           id: string
@@ -2670,6 +2671,7 @@ export type Database = {
           deleted_at?: string | null
           description?: string | null
           expense_type?: string | null
+          expense_scope?: string
           financial_scope?: string
           flow_type?: string
           id?: string
@@ -2698,6 +2700,7 @@ export type Database = {
           deleted_at?: string | null
           description?: string | null
           expense_type?: string | null
+          expense_scope?: string
           financial_scope?: string
           flow_type?: string
           id?: string

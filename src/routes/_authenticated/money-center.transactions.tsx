@@ -71,6 +71,7 @@ function TransactionsPage() {
         "Account",
         "To Account",
         "Category/Source",
+        "Scope",
         "Description",
         "Reference",
         "Amount",
@@ -84,6 +85,7 @@ function TransactionsPage() {
         accountName[t.account_id] ?? "",
         t.transfer_account_id ? (accountName[t.transfer_account_id] ?? "") : "",
         t.category ?? t.source ?? "",
+        t.expense_scope ?? t.financial_scope ?? "",
         t.description ?? "",
         t.reference ?? "",
         String(t.amount),
@@ -182,6 +184,7 @@ function TransactionsPage() {
                   <TableHead>Type</TableHead>
                   <TableHead>Account</TableHead>
                   <TableHead>Category / Source</TableHead>
+                  <TableHead>Scope</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Reference</TableHead>
                   <TableHead className="text-right">Amount</TableHead>
@@ -193,7 +196,7 @@ function TransactionsPage() {
                 {isLoading && (
                   <TableRow>
                     <TableCell
-                      colSpan={9}
+                      colSpan={10}
                       className="text-center text-sm text-muted-foreground py-8"
                     >
                       Loading...
@@ -203,7 +206,7 @@ function TransactionsPage() {
                 {!isLoading && txs.length === 0 && (
                   <TableRow>
                     <TableCell
-                      colSpan={9}
+                      colSpan={10}
                       className="text-center text-sm text-muted-foreground py-8"
                     >
                       No transactions match your filters.
@@ -231,6 +234,9 @@ function TransactionsPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-sm">{t.category ?? t.source ?? "—"}</TableCell>
+                    <TableCell className="text-xs capitalize">
+                      {t.expense_scope ?? t.financial_scope ?? "—"}
+                    </TableCell>
                     <TableCell className="text-sm max-w-[220px] truncate">
                       {t.description ?? "—"}
                     </TableCell>

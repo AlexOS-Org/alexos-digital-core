@@ -52,6 +52,7 @@ export interface Transaction {
   business_name: string | null;
   income_type: string | null;
   expense_type: string | null;
+  expense_scope: "personal" | "business" | "shared" | null;
   attachment_url: string | null;
   status: "posted" | "pending" | "void";
   deleted_at: string | null;

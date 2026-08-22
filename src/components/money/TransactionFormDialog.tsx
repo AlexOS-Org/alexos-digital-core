@@ -60,11 +60,29 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
     ["utilities", "Utilities"],
     ["tax", "Tax"],
     ["transport", "Transport"],
+    ["airtime", "Airtime / mobile data"],
     ["personal_living", "Personal living"],
     ["education", "Education"],
     ["health", "Health"],
     ["other", "Other"],
   ] as const;
+
+  const eligibleAccounts =
+    mode !== "expense"
+      ? accounts
+      : accounts.filter((account) => {
+          const accountScope = account.financial_scope ?? "personal";
+          if (scope === "business") return accountScope === "business";
+          if (scope === "personal") return accountScope === "personal";
+          return true;
+        });
+
+  useEffect(() => {
+    if (!open || mode !== "expense") return;
+    if (!eligibleAccounts.some((account) => account.id === accountId)) {
+      setAccountId(eligibleAccounts[0]?.id ?? "");
+    }
+  }, [open, mode, scope, accountId, eligibleAccounts]);
 
   useEffect(() => {
     if (!open) return;
@@ -86,6 +104,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       );
       setBusinessId(editing.business_id ?? "");
       setExpenseType(editing.expense_type ?? "other");
+      setScope(editing.expense_scope ?? (editing.business_id ? "business" : "personal"));
     } else {
       setDate(new Date().toISOString().slice(0, 16));
       setAmount("");
@@ -101,6 +120,8 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
     }
   }, [open, editing, accounts, businesses]);
 
+  const selectedAccount = accounts.find((account) => account.id === accountId);
+
   const title =
     mode === "income" ? "Receive Money" : mode === "expense" ? "Spend Money" : "Transfer Money";
 
@@ -110,6 +131,19 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
     if (mode === "transfer" && (!toAccountId || toAccountId === accountId)) return;
     if (mode === "expense" && scope === "business" && !businessId) {
       toast.error("Select the business this expense belongs to.");
+      return;
+    }
+    if (mode === "expense" && !selectedAccount) {
+      toast.error("Select the account that paid this expense.");
+      return;
+    }
+    if (
+      mode === "expense" &&
+      scope === "business" &&
+      selectedAccount?.business_id &&
+      selectedAccount.business_id !== businessId
+    ) {
+      toast.error("Choose an account owned by the selected business, or record it as shared.");
       return;
     }
     await save.mutateAsync({
@@ -124,8 +158,9 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       description: description || null,
       reference: reference || null,
       business_id: mode === "expense" && scope === "business" ? businessId : null,
-      expense_type:
-        mode === "expense" ? (scope === "shared" ? "shared_living" : expenseType) : null,
+      financial_scope: mode === "expense" ? (selectedAccount?.financial_scope ?? "personal") : null,
+      expense_type: mode === "expense" ? expenseType : null,
+      expense_scope: mode === "expense" ? scope : null,
     });
     onOpenChange(false);
   };
@@ -156,19 +191,26 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
           </div>
 
           <div className="space-y-1.5">
-            <Label>{mode === "transfer" ? "From Account" : "Account"}</Label>
+            <Label>{mode === "transfer" ? "From Account" : "Paid from account"}</Label>
             <Select value={accountId} onValueChange={setAccountId}>
               <SelectTrigger>
                 <SelectValue placeholder="Select account" />
               </SelectTrigger>
               <SelectContent>
-                {accounts.map((a) => (
+                {eligibleAccounts.map((a) => (
                   <SelectItem key={a.id} value={a.id}>
-                    {a.name}
+                    {a.name} · {a.financial_scope === "business" ? "Business" : "Personal"}
+                    {a.business_name ? ` · ${a.business_name}` : ""}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {mode === "expense" && (
+              <p className="text-xs text-muted-foreground">
+                This is the one account that will be reduced. Transfers between accounts belong in
+                Transfer Money, not as an expense.
+              </p>
+            )}
           </div>
 
           {mode === "transfer" && (
@@ -222,7 +264,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="personal">Personal expense</SelectItem>
-                    <SelectItem value="shared">Shared household/business expense</SelectItem>
+                    <SelectItem value="shared">Shared expense</SelectItem>
                     <SelectItem value="business">Business expense</SelectItem>
                   </SelectContent>
                 </Select>
@@ -244,6 +286,11 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
                   </Select>
                 </div>
               )}
+              <p className="text-xs text-muted-foreground">
+                Shared expenses remain one cash-outflow from the selected account and are labelled
+                shared for reporting. They are not split into duplicate personal and business
+                entries.
+              </p>
               <div className="space-y-1.5">
                 <Label>Expense purpose</Label>
                 <Select value={expenseType} onValueChange={setExpenseType}>
