@@ -17,6 +17,7 @@ export interface AurenAdvisorRequest {
   period: AurenAdvisorPeriod;
   scope: AurenAdvisorScope;
   horizonDays: AurenForecastHorizon;
+  businessId?: string | null;
 }
 export interface AurenBusinessRecord {
   id: string;
@@ -379,12 +380,14 @@ export function validateAurenAdvisorRequest(raw: unknown): AurenAdvisorRequest {
   const period = input.period ?? "last_30d";
   const scope = input.scope ?? "portfolio";
   const horizonDays = input.horizonDays ?? 30;
+  const businessId =
+    typeof input.businessId === "string" && input.businessId.trim() ? input.businessId : null;
   if (period !== "last_30d" && period !== "last_90d")
     throw new Error("period must be last_30d or last_90d.");
   if (scope !== "portfolio" && scope !== "personal" && scope !== "businesses")
     throw new Error("scope must be portfolio, personal, or businesses.");
   if (horizonDays !== 30 && horizonDays !== 90) throw new Error("horizonDays must be 30 or 90.");
-  return { period, scope, horizonDays };
+  return { period, scope, horizonDays, businessId };
 }
 export function buildAurenAdvisory(input: AurenAdvisoryInput): AurenAdvisorySnapshot {
   const now = input.now ?? new Date();
@@ -668,18 +671,34 @@ export async function getAurenAdvisoryForUser(
   const failed = results.find((result) => result.error);
   if (failed?.error) throw failed.error;
   const businesses = (businessesResult.data ?? []) as AurenBusinessRecord[];
+  const selectedBusinessId = request.businessId ?? null;
+  const selectedBusiness = selectedBusinessId
+    ? businesses.find((business) => business.id === selectedBusinessId)
+    : null;
+  if (selectedBusinessId && !selectedBusiness) {
+    throw new Error("The selected business is not available in this workspace.");
+  }
   const accounts = (accountsResult.data ?? []) as AurenAccountRecord[];
-  const transactions = (transactionsResult.data ?? []) as AurenTransactionRecord[];
-  const expected = (expectedResult.data ?? []) as AurenExpectedRecord[];
+  const allTransactions = (transactionsResult.data ?? []) as AurenTransactionRecord[];
+  const allExpected = (expectedResult.data ?? []) as AurenExpectedRecord[];
+  const transactions = selectedBusinessId
+    ? allTransactions.filter((row) => row.business_id === selectedBusinessId)
+    : allTransactions;
+  const expected = selectedBusinessId
+    ? allExpected.filter((row) => row.business_id === selectedBusinessId)
+    : allExpected;
+  const isDailyGear = selectedBusiness
+    ? `${selectedBusiness.slug} ${selectedBusiness.name}`.toLowerCase().includes("dailygear")
+    : true;
   const dailyGear: AurenDailyGearRecord = {
-    products: (productsResult.data ?? []) as AurenDailyGearRecord["products"],
-    orders: (ordersResult.data ?? []) as AurenDailyGearRecord["orders"],
+    products: isDailyGear ? ((productsResult.data ?? []) as AurenDailyGearRecord["products"]) : [],
+    orders: isDailyGear ? ((ordersResult.data ?? []) as AurenDailyGearRecord["orders"]) : [],
   };
   const dashboardSnapshot = {
     accounts: accountsResult.data ?? [],
     balances: balancesResult.data ?? [],
-    transactions: transactionsResult.data ?? [],
-    expected: expectedResult.data ?? [],
+    transactions,
+    expected,
     bills: billsResult.data ?? [],
     debts: debtsResult.data ?? [],
     goals: goalsResult.data ?? [],

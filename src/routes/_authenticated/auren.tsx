@@ -139,6 +139,7 @@ function ForecastCard({ label, forecast }: { label: string; forecast: AurenForec
 function AurenPage() {
   const [period, setPeriod] = useState<AurenAdvisorPeriod>("last_30d");
   const [scope, setScope] = useState<AurenAdvisorScope>("portfolio");
+  const [businessId, setBusinessId] = useState<string | null>(null);
   const [horizonDays, setHorizonDays] = useState<AurenForecastHorizon>(30);
   const [response, setResponse] = useState<AurenAdvisoryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -149,7 +150,7 @@ function AurenPage() {
     let active = true;
     setLoading(true);
     setError(null);
-    getAurenAdvisory({ data: { period, scope, horizonDays } })
+    getAurenAdvisory({ data: { period, scope, horizonDays, businessId } })
       .then((result) => {
         if (active) setResponse(result);
       })
@@ -166,7 +167,7 @@ function AurenPage() {
     return () => {
       active = false;
     };
-  }, [period, scope, horizonDays, refreshNonce]);
+  }, [businessId, period, scope, horizonDays, refreshNonce]);
 
   const advisory = response?.advisory;
   const statusLabel =
@@ -230,7 +231,10 @@ function AurenPage() {
               </div>
               <select
                 value={scope}
-                onChange={(event) => setScope(event.target.value as AurenAdvisorScope)}
+                onChange={(event) => {
+                  setScope(event.target.value as AurenAdvisorScope);
+                  if (event.target.value !== "businesses") setBusinessId(null);
+                }}
                 className="mt-3 w-full rounded-xl border border-white/15 bg-[#0d1b3c] px-3 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-300/40"
                 aria-label="Auren advisory scope"
               >
@@ -240,6 +244,25 @@ function AurenPage() {
                   </option>
                 ))}
               </select>
+              {scope === "businesses" && advisory?.businesses.length ? (
+                <select
+                  value={businessId ?? "all"}
+                  onChange={(event) =>
+                    setBusinessId(event.target.value === "all" ? null : event.target.value)
+                  }
+                  className="mt-2 w-full rounded-xl border border-white/15 bg-[#0d1b3c] px-3 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-300/40"
+                  aria-label="Auren business"
+                >
+                  <option value="all">All businesses</option>
+                  {advisory.businesses
+                    .filter((business) => business.id)
+                    .map((business) => (
+                      <option key={business.id} value={business.id ?? ""}>
+                        {business.name}
+                      </option>
+                    ))}
+                </select>
+              ) : null}
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <select
                   value={period}

@@ -686,7 +686,20 @@ function CheckoutPage() {
             <h2 className="text-sm font-semibold">Payment method</h2>
             <RadioGroup
               value={form.paymentMethod}
-              onValueChange={(v) => setForm({ ...form, paymentMethod: v })}
+              onValueChange={(v) => {
+                setForm({ ...form, paymentMethod: v });
+                trackMetaPixel("AddPaymentInfo", {
+                  content_ids: cart.items.map((line) => line.sku ?? line.productId),
+                  content_type: "product",
+                  contents: cart.items.map((line) => ({
+                    id: line.sku ?? line.productId,
+                    quantity: line.quantity,
+                  })),
+                  currency,
+                  value: cart.subtotal + shipping,
+                  payment_method: v,
+                });
+              }}
               className="grid gap-3"
             >
               {[

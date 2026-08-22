@@ -125,7 +125,9 @@ function ThankYou() {
   }, [funnel?.id]);
 
   useEffect(() => {
-    if (!order || value == null || !currency) return;
+    if (!order || value == null || !currency || typeof window === "undefined") return;
+    const eventKey = `dailygear:purchase-tracked:${order}`;
+    if (window.sessionStorage.getItem(eventKey) === "1") return;
     trackMetaPixel("Purchase", {
       content_ids: contentIds ? contentIds.split(",").filter(Boolean) : undefined,
       content_type: "product",
@@ -133,6 +135,7 @@ function ThankYou() {
       num_items: contentIds ? contentIds.split(",").filter(Boolean).length : undefined,
       value,
     });
+    window.sessionStorage.setItem(eventKey, "1");
   }, [contentIds, currency, order, value]);
 
   function acceptOffer(step: PublicFunnelStep, product: PublicFunnelProduct) {

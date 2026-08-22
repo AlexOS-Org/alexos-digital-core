@@ -39,7 +39,7 @@ export const Route = createFileRoute("/shop/product/$id")({
   component: ProductDetail,
 });
 
-type VariantOptionKey = "color" | "size";
+type VariantOptionKey = "gender" | "color" | "size";
 
 type VariantOptionValues = Partial<Record<VariantOptionKey, string>>;
 
@@ -50,9 +50,11 @@ function getVariantOption(
   if (key === "color" && variant.color?.trim()) return variant.color.trim();
   const options = variant.options;
   if (options && typeof options === "object" && !Array.isArray(options)) {
+    const optionRecord = options as Record<string, unknown>;
     const value =
-      (options as Record<string, unknown>)[key] ??
-      (key === "color" ? (options as Record<string, unknown>).colour : undefined);
+      optionRecord[key] ??
+      (key === "gender" ? (optionRecord.sex ?? optionRecord.audience) : undefined) ??
+      (key === "color" ? optionRecord.colour : undefined);
     if (typeof value === "string" && value.trim()) return value.trim();
   }
   return null;
@@ -72,7 +74,7 @@ function ProductDetail() {
   const currency = store?.currency ?? "KES";
 
   const optionGroups = useMemo(() => {
-    return (["color", "size"] as const).flatMap((key) => {
+    return (["gender", "color", "size"] as const).flatMap((key) => {
       const values = Array.from(
         new Set(
           variants
@@ -103,6 +105,7 @@ function ProductDetail() {
     setSelectedOptions(
       firstVariant
         ? {
+            gender: getVariantOption(firstVariant, "gender") ?? undefined,
             color: getVariantOption(firstVariant, "color") ?? undefined,
             size: getVariantOption(firstVariant, "size") ?? undefined,
           }
@@ -263,7 +266,7 @@ function ProductDetail() {
                   optionGroups.map(({ key, values }) => (
                     <div key={key} className="space-y-2">
                       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                        {key === "color" ? "Colour" : "Size"}
+                        {key === "gender" ? "Gender" : key === "color" ? "Colour" : "Size"}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {values.map((value) => {

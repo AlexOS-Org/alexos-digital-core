@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/lib/storefront/cart";
 import type { Storefront, StoreCategory } from "@/lib/storefront/api";
 import { DAILYGEAR_LOGO, DAILYGEAR_NAME } from "@/lib/storefront/brand";
+import { trackMetaPixel } from "@/lib/storefront/meta-pixel";
 
 const LINKS = [
   { to: "/shop", label: "Home", exact: true },
@@ -32,7 +33,14 @@ export function StoreHeader({
 
   function search(event: React.FormEvent) {
     event.preventDefault();
-    navigate({ to: "/shop/products", search: { q: query || undefined } });
+    const normalizedQuery = query.trim();
+    if (normalizedQuery) {
+      trackMetaPixel("Search", {
+        search_string: normalizedQuery,
+        content_type: "product",
+      });
+    }
+    navigate({ to: "/shop/products", search: { q: normalizedQuery || undefined } });
     setOpen(false);
   }
 
