@@ -16,12 +16,12 @@ export default function TodaysMission({ compact = false }: { compact?: boolean }
 
   return (
     <section
-      className={`relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#071329] text-white shadow-[0_24px_70px_-35px_rgba(37,99,235,.6)] ${compact ? "rounded-[1.5rem]" : ""}`}
+      className={`dashboard-priority-card relative overflow-hidden rounded-[2rem] border border-white/10 text-white ${compact ? "rounded-[1.5rem]" : ""}`}
     >
-      <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-violet-500/15 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-28 left-1/3 h-56 w-56 rounded-full bg-blue-500/10 blur-3xl" />
-      <div className={compact ? "relative p-4" : "relative p-6 sm:p-7"}>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="dashboard-priority-orb dashboard-priority-orb-purple pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full blur-3xl" />
+      <div className="dashboard-priority-orb dashboard-priority-orb-blue pointer-events-none absolute -bottom-28 left-1/3 h-56 w-56 rounded-full blur-3xl" />
+      <div className={compact ? "relative p-4 sm:p-5" : "relative p-6 sm:p-7"}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-200 sm:mb-3 sm:text-xs">
               <Target className="h-3.5 w-3.5" /> Today's priorities
@@ -29,7 +29,7 @@ export default function TodaysMission({ compact = false }: { compact?: boolean }
             <h2
               className={
                 compact
-                  ? "text-xl font-semibold tracking-tight"
+                  ? "text-lg font-semibold tracking-tight sm:text-xl"
                   : "text-2xl font-semibold tracking-tight sm:text-3xl"
               }
             >
@@ -53,7 +53,7 @@ export default function TodaysMission({ compact = false }: { compact?: boolean }
           </p>
         ) : (
           <div
-            className={`mt-5 grid gap-2.5 ${compact ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "lg:grid-cols-3"}`}
+            className={`mt-4 grid gap-3 ${compact ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "lg:grid-cols-3"}`}
           >
             {isLoading
               ? Array.from({ length: compact ? 2 : 3 }).map((_, i) => (
@@ -77,7 +77,7 @@ export default function TodaysMission({ compact = false }: { compact?: boolean }
                       </div>
                       <span className="text-2xl font-bold tracking-tight">{task.count}</span>
                     </div>
-                    <p className="mt-3 text-sm font-semibold">
+                    <p className="mt-2.5 text-sm font-semibold leading-5">
                       {index + 1}. {task.title}
                     </p>
                     <div className="mt-1 flex items-center justify-between gap-2 text-xs text-slate-400">

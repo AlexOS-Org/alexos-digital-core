@@ -217,14 +217,14 @@ function Dashboard() {
             </section>
             <section id="dashboard-auren" className="scroll-mt-24">
               <SafePanel>
-                <section className="relative h-full overflow-hidden rounded-[1.75rem] border border-[var(--alexos-purple)]/20 bg-gradient-to-br from-[var(--alexos-purple)]/[0.12] via-card to-primary/[0.05] p-5 shadow-[0_18px_50px_-35px_var(--alexos-glow)] sm:p-6">
+                <section className="relative h-full overflow-hidden rounded-[1.75rem] border border-[var(--alexos-purple)]/20 bg-gradient-to-br from-[var(--alexos-purple)]/[0.12] via-card to-primary/[0.05] p-4 shadow-[0_18px_50px_-35px_var(--alexos-glow)] sm:p-5 lg:p-6">
                   <div className="pointer-events-none absolute -right-14 -top-16 h-40 w-40 rounded-full bg-[var(--alexos-purple)]/15 blur-3xl" />
-                  <div className="relative mb-4 flex items-end justify-between gap-3">
+                  <div className="relative mb-3 flex items-center justify-between gap-3 sm:mb-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-600 dark:text-violet-300">
                         Auren
                       </p>
-                      <h2 className="mt-1 text-xl font-semibold tracking-tight">
+                      <h2 className="mt-1 text-lg font-semibold tracking-tight sm:text-xl">
                         What deserves your attention?
                       </h2>
                       <p className="mt-1 text-sm text-muted-foreground">

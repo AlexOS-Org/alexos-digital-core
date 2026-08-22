@@ -22,6 +22,8 @@ import { DAILYGEAR_SECTIONS } from "@/lib/dailygear/registry";
 import { MONEY_CENTER_SECTIONS } from "@/lib/money/registry";
 import { AlexOSLogo } from "@/components/alexos-logo";
 import { DailyGearBrand } from "@/components/dailygear/DailyGearBrand";
+import { VisualThemePicker } from "@/components/theme/VisualThemePicker";
+import alexosMountainDuskWide from "@/assets/visuals/alexos-mountain-dusk-wide.webp";
 import { Building2, ChevronRight, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -78,7 +80,10 @@ export function AppSidebar() {
         }
       }}
     >
-      <SidebarHeader className="border-b border-sidebar-border/70 bg-sidebar/80">
+      <div className="alexos-sidebar-backdrop" aria-hidden="true">
+        <img src={alexosMountainDuskWide} alt="" decoding="async" />
+      </div>
+      <SidebarHeader className="border-b border-sidebar-border/70 bg-sidebar/45">
         <Link
           to="/dashboard"
           onClick={closeSidebar}
@@ -347,6 +352,19 @@ export function AppSidebar() {
 
       {/* ── Footer: Settings + Sign out ───────────── */}
       <SidebarFooter className="border-t border-sidebar-border/70 bg-sidebar/70">
+        <div
+          className={`flex items-center gap-2 rounded-xl border border-sidebar-border/60 bg-sidebar-accent/25 px-2 py-1.5 ${collapsed ? "justify-center" : ""}`}
+        >
+          <VisualThemePicker />
+          {!collapsed && (
+            <div className="min-w-0">
+              <p className="truncate text-xs font-semibold text-sidebar-foreground">Theme</p>
+              <p className="truncate text-[10px] text-sidebar-foreground/55">
+                Palette and appearance
+              </p>
+            </div>
+          )}
+        </div>
         <SidebarMenu>
           {modules
             .filter((m) => m.group === "System")
