@@ -30,7 +30,9 @@ function institutionStyle(name: string) {
       iconClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300",
       panelClass: "bg-emerald-50/70 dark:bg-emerald-950/20",
       cardClass:
-        "border-emerald-200/70 bg-gradient-to-br from-emerald-50/60 via-background to-background dark:border-emerald-900/40 dark:from-emerald-950/20",
+        "border-emerald-300/80 bg-gradient-to-br from-emerald-200/90 via-emerald-100/70 to-emerald-50/60 dark:border-emerald-800/60 dark:from-emerald-950/60 dark:via-emerald-950/35 dark:to-background",
+      actionClass:
+        "border-emerald-300/70 bg-white/70 hover:bg-emerald-50 dark:border-emerald-800/70 dark:bg-background/50",
       accentClass: "bg-emerald-500",
       warningThreshold: 300,
     };
@@ -40,7 +42,9 @@ function institutionStyle(name: string) {
       iconClass: "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
       panelClass: "bg-blue-50/70 dark:bg-blue-950/20",
       cardClass:
-        "border-blue-200/70 bg-gradient-to-br from-blue-50/60 via-background to-background dark:border-blue-900/40 dark:from-blue-950/20",
+        "border-blue-300/80 bg-gradient-to-br from-blue-200/90 via-blue-100/70 to-blue-50/60 dark:border-blue-800/60 dark:from-blue-950/60 dark:via-blue-950/35 dark:to-background",
+      actionClass:
+        "border-blue-300/70 bg-white/70 hover:bg-blue-50 dark:border-blue-800/70 dark:bg-background/50",
       accentClass: "bg-blue-600",
       warningThreshold: 500,
     };
@@ -50,7 +54,9 @@ function institutionStyle(name: string) {
       iconClass: "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300",
       panelClass: "bg-orange-50/70 dark:bg-orange-950/20",
       cardClass:
-        "border-orange-200/70 bg-gradient-to-br from-orange-50/60 via-background to-background dark:border-orange-900/40 dark:from-orange-950/20",
+        "border-orange-300/80 bg-gradient-to-br from-orange-200/90 via-orange-100/70 to-orange-50/60 dark:border-orange-800/60 dark:from-orange-950/60 dark:via-orange-950/35 dark:to-background",
+      actionClass:
+        "border-orange-300/70 bg-white/70 hover:bg-orange-50 dark:border-orange-800/70 dark:bg-background/50",
       accentClass: "bg-orange-500",
       warningThreshold: 500,
     };
@@ -60,7 +66,9 @@ function institutionStyle(name: string) {
       iconClass: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300",
       panelClass: "bg-red-50/70 dark:bg-red-950/20",
       cardClass:
-        "border-red-200/70 bg-gradient-to-br from-red-50/60 via-background to-background dark:border-red-900/40 dark:from-red-950/20",
+        "border-red-300/80 bg-gradient-to-br from-red-200/90 via-red-100/70 to-red-50/60 dark:border-red-800/60 dark:from-red-950/60 dark:via-red-950/35 dark:to-background",
+      actionClass:
+        "border-red-300/70 bg-white/70 hover:bg-red-50 dark:border-red-800/70 dark:bg-background/50",
       accentClass: "bg-red-600",
       warningThreshold: 500,
     };
@@ -70,7 +78,9 @@ function institutionStyle(name: string) {
       iconClass: "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300",
       panelClass: "bg-violet-50/70 dark:bg-violet-950/20",
       cardClass:
-        "border-violet-200/70 bg-gradient-to-br from-violet-50/60 via-background to-background dark:border-violet-900/40 dark:from-violet-950/20",
+        "border-violet-300/80 bg-gradient-to-br from-violet-200/90 via-violet-100/70 to-violet-50/60 dark:border-violet-800/60 dark:from-violet-950/60 dark:via-violet-950/35 dark:to-background",
+      actionClass:
+        "border-violet-300/70 bg-white/70 hover:bg-violet-50 dark:border-violet-800/70 dark:bg-background/50",
       accentClass: "bg-violet-600",
       warningThreshold: 500,
     };
@@ -80,7 +90,9 @@ function institutionStyle(name: string) {
       iconClass: "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300",
       panelClass: "bg-amber-50/70 dark:bg-amber-950/20",
       cardClass:
-        "border-amber-200/70 bg-gradient-to-br from-amber-50/60 via-background to-background dark:border-amber-900/40 dark:from-amber-950/20",
+        "border-amber-300/80 bg-gradient-to-br from-amber-200/90 via-amber-100/70 to-amber-50/60 dark:border-amber-800/60 dark:from-amber-950/60 dark:via-amber-950/35 dark:to-background",
+      actionClass:
+        "border-amber-300/70 bg-white/70 hover:bg-amber-50 dark:border-amber-800/70 dark:bg-background/50",
       accentClass: "bg-amber-500",
       warningThreshold: 1000,
     };
@@ -88,7 +100,10 @@ function institutionStyle(name: string) {
   return {
     iconClass: "bg-primary/10 text-primary",
     panelClass: "bg-muted/40",
-    cardClass: "border-border/70 bg-gradient-to-br from-muted/50 via-background to-background",
+    cardClass:
+      "border-slate-300/80 bg-gradient-to-br from-slate-200/80 via-slate-100/60 to-background dark:border-slate-700/70 dark:from-slate-900/60 dark:via-slate-900/30 dark:to-background",
+    actionClass:
+      "border-slate-300/70 bg-white/70 hover:bg-slate-50 dark:border-slate-700/70 dark:bg-background/50",
     accentClass: "bg-primary",
     warningThreshold: null,
   };
@@ -163,10 +178,10 @@ function AccountsPage() {
                 "relative overflow-hidden rounded-2xl shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
                 institution.cardClass,
                 isLowBalance &&
-                  "border-red-300/90 bg-gradient-to-br from-red-50/80 via-background to-background dark:border-red-900/60 dark:from-red-950/30",
+                  "border-red-400/90 bg-gradient-to-br from-red-200/95 via-red-100/80 to-red-50/70 dark:border-red-800/70 dark:from-red-950/70 dark:via-red-950/45 dark:to-background",
               )}
             >
-              <CardContent className="space-y-4 p-5 pt-6 sm:p-6 sm:pt-7">
+              <CardContent className="space-y-4 p-5 pt-6 text-slate-900 sm:p-6 sm:pt-7 dark:text-slate-100">
                 <div
                   className={cn(
                     "absolute inset-x-0 top-0 h-1",
@@ -177,7 +192,7 @@ function AccountsPage() {
                   <div className="flex items-center gap-3">
                     <div
                       className={cn(
-                        "grid h-14 w-14 place-items-center rounded-2xl border border-white/80 bg-white/80 shadow-sm ring-4 ring-background/80 dark:border-white/10 dark:bg-background/60",
+                        "grid h-16 w-16 place-items-center rounded-2xl border-2 border-white/90 bg-white/90 shadow-md ring-4 ring-white/40 dark:border-white/15 dark:bg-background/70 dark:ring-background/40",
                         isLowBalance
                           ? "bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400"
                           : institution.iconClass,
@@ -187,7 +202,7 @@ function AccountsPage() {
                         <img
                           src={accountLogo(a.name)!}
                           alt={`${a.name} logo`}
-                          className="h-10 w-10 rounded-lg object-contain drop-shadow-sm"
+                          className="h-12 w-12 rounded-xl object-contain drop-shadow-md"
                           loading="lazy"
                         />
                       ) : (
@@ -240,7 +255,7 @@ function AccountsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => openEdit(a)}
-                    className="flex-1 rounded-lg"
+                    className={cn("flex-1 rounded-lg", institution.actionClass)}
                   >
                     <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
                   </Button>
@@ -248,7 +263,7 @@ function AccountsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => archive.mutate({ id: a.id, archived: !isArchived })}
-                    className="flex-1 rounded-lg"
+                    className={cn("flex-1 rounded-lg", institution.actionClass)}
                   >
                     {isArchived ? (
                       <>
