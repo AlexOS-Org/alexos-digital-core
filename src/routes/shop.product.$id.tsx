@@ -155,6 +155,32 @@ function ProductDetail() {
   const soldOut =
     product.status === "out_of_stock" || selectedVariant?.availability_confirmed === false;
 
+  function chooseOption(key: VariantOptionKey, value: string) {
+    const nextOptions = { ...selectedOptions, [key]: value };
+    const candidateVariants = variants.filter((variant) => {
+      if (getVariantOption(variant, key) !== value) return false;
+      return optionGroups.every(
+        ({ key: otherKey }) =>
+          otherKey === key ||
+          !nextOptions[otherKey] ||
+          getVariantOption(variant, otherKey) === nextOptions[otherKey],
+      );
+    });
+    const nextVariant =
+      variants.find((variant) =>
+        optionGroups.every(
+          ({ key: groupKey }) =>
+            !nextOptions[groupKey] || getVariantOption(variant, groupKey) === nextOptions[groupKey],
+        ),
+      ) ?? candidateVariants[0];
+    setSelectedOptions(nextOptions);
+    setSelectedVariantId(nextVariant?.id ?? null);
+    if (nextVariant?.image_url) {
+      const imageIndex = images.indexOf(nextVariant.image_url);
+      if (imageIndex >= 0) setActive(imageIndex);
+    }
+  }
+
   function add() {
     if (!product) return;
     cartStore.add(
@@ -268,57 +294,125 @@ function ProductDetail() {
                       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
                         {key === "gender" ? "Gender" : key === "color" ? "Colour" : "Size"}
                       </p>
-                      <div className="flex flex-wrap gap-2">
-                        {values.map((value) => {
-                          const candidateVariants = variants.filter((variant) => {
-                            if (getVariantOption(variant, key) !== value) return false;
-                            return optionGroups.every(
-                              ({ key: otherKey }) =>
-                                otherKey === key ||
-                                !selectedOptions[otherKey] ||
-                                getVariantOption(variant, otherKey) === selectedOptions[otherKey],
+                      {key === "color" ? (
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-3 gap-2">
+                            {values.map((value) => {
+                              const candidateVariants = variants.filter(
+                                (variant) => getVariantOption(variant, key) === value,
+                              );
+                              const representative = candidateVariants.find(
+                                (variant) => variant.image_url,
+                              );
+                              const unavailable =
+                                candidateVariants.length > 0 &&
+                                candidateVariants.every(
+                                  (variant) => variant.availability_confirmed === false,
+                                );
+                              const selected = selectedOptions[key] === value;
+                              return (
+                                <button
+                                  key={value}
+                                  type="button"
+                                  disabled={unavailable}
+                                  onClick={() => chooseOption(key, value)}
+                                  className={`overflow-hidden rounded-xl border text-left ${
+                                    selected
+                                      ? "border-primary ring-2 ring-primary/30"
+                                      : "border-border/70"
+                                  } ${unavailable ? "cursor-not-allowed opacity-45" : ""}`}
+                                  aria-label={`Choose colour ${value}`}
+                                  aria-pressed={selected}
+                                >
+                                  {representative?.image_url ? (
+                                    <ResponsiveProductImage
+                                      src={representative.image_url}
+                                      alt={`${product.name} ${value} colour`}
+                                      width={120}
+                                      height={96}
+                                      sizes="120px"
+                                      className="h-20 w-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="h-20 w-full bg-muted" />
+                                  )}
+                                  <span className="block px-2 py-1.5 text-xs font-medium">
+                                    {value}
+                                    <span className="ml-1 text-[10px] text-muted-foreground">
+                                      {unavailable ? "Unavailable" : "Available"}
+                                    </span>
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                          <select
+                            value={selectedOptions[key] ?? ""}
+                            onChange={(event) => chooseOption(key, event.target.value)}
+                            className="min-h-11 w-full rounded-xl border border-border/70 bg-background px-3 text-sm"
+                            aria-label="Select colour"
+                          >
+                            <option value="" disabled>
+                              Select a colour
+                            </option>
+                            {values.map((value) => {
+                              const candidateVariants = variants.filter(
+                                (variant) => getVariantOption(variant, key) === value,
+                              );
+                              const unavailable =
+                                candidateVariants.length > 0 &&
+                                candidateVariants.every(
+                                  (variant) => variant.availability_confirmed === false,
+                                );
+                              return (
+                                <option key={value} value={value} disabled={unavailable}>
+                                  {value}
+                                  {unavailable ? " — unavailable" : ""}
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          {values.map((value) => {
+                            const candidateVariants = variants.filter((variant) => {
+                              if (getVariantOption(variant, key) !== value) return false;
+                              return optionGroups.every(
+                                ({ key: otherKey }) =>
+                                  otherKey === key ||
+                                  !selectedOptions[otherKey] ||
+                                  getVariantOption(variant, otherKey) === selectedOptions[otherKey],
+                              );
+                            });
+                            const unavailable =
+                              candidateVariants.length > 0 &&
+                              candidateVariants.every(
+                                (variant) => variant.availability_confirmed === false,
+                              );
+                            const selected = selectedOptions[key] === value;
+                            return (
+                              <button
+                                key={value}
+                                type="button"
+                                disabled={unavailable}
+                                onClick={() => chooseOption(key, value)}
+                                className={`min-h-11 rounded-xl border px-3.5 py-2 text-left text-sm transition ${
+                                  selected
+                                    ? "border-primary bg-primary/10 text-primary shadow-sm"
+                                    : "border-border/70 bg-background/70 hover:border-primary/50 hover:bg-primary/5"
+                                } ${unavailable ? "cursor-not-allowed opacity-45" : ""}`}
+                                aria-pressed={selected}
+                              >
+                                <span className="font-medium">{value}</span>
+                                <span className="ml-2 text-[11px] text-muted-foreground">
+                                  {unavailable ? "Unavailable" : "Available"}
+                                </span>
+                              </button>
                             );
-                          });
-                          const unavailable =
-                            candidateVariants.length > 0 &&
-                            candidateVariants.every(
-                              (variant) => variant.availability_confirmed === false,
-                            );
-                          const selected = selectedOptions[key] === value;
-                          return (
-                            <button
-                              key={value}
-                              type="button"
-                              disabled={unavailable}
-                              onClick={() => {
-                                const nextOptions = { ...selectedOptions, [key]: value };
-                                const nextVariant =
-                                  variants.find((variant) =>
-                                    optionGroups.every(
-                                      ({ key: groupKey }) =>
-                                        !nextOptions[groupKey] ||
-                                        getVariantOption(variant, groupKey) ===
-                                          nextOptions[groupKey],
-                                    ),
-                                  ) ?? candidateVariants[0];
-                                setSelectedOptions(nextOptions);
-                                setSelectedVariantId(nextVariant?.id ?? null);
-                              }}
-                              className={`min-h-11 rounded-xl border px-3.5 py-2 text-left text-sm transition ${
-                                selected
-                                  ? "border-primary bg-primary/10 text-primary shadow-sm"
-                                  : "border-border/70 bg-background/70 hover:border-primary/50 hover:bg-primary/5"
-                              } ${unavailable ? "cursor-not-allowed opacity-45" : ""}`}
-                              aria-pressed={selected}
-                            >
-                              <span className="font-medium">{value}</span>
-                              <span className="ml-2 text-[11px] text-muted-foreground">
-                                {unavailable ? "Unavailable" : "Available"}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
+                          })}
+                        </div>
+                      )}
                     </div>
                   ))
                 ) : (

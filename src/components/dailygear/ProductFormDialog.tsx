@@ -136,8 +136,26 @@ function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> 
           return (
             <div
               key={id}
-              className="grid gap-3 rounded-xl border border-border/60 bg-background/70 p-3 md:grid-cols-6 md:items-end"
+              className="grid gap-3 rounded-xl border border-border/60 bg-background/70 p-3 md:grid-cols-7 md:items-end"
             >
+              <div className="flex items-center gap-3 md:col-span-2">
+                {draft.imageUrl ? (
+                  <img
+                    src={draft.imageUrl}
+                    alt={`${String(variant.name ?? "Variant")} avatar`}
+                    loading="lazy"
+                    className="h-16 w-16 rounded-lg border border-border/60 object-cover"
+                  />
+                ) : (
+                  <div className="h-16 w-16 rounded-lg border border-dashed border-border/70 bg-muted/40" />
+                )}
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                    Avatar preview
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">External URL only</p>
+                </div>
+              </div>
               <div className="md:col-span-2">
                 <Label className="text-xs">Variant name</Label>
                 <p className="mt-1 text-sm font-medium">
