@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Facebook, ShieldCheck } from "lucide-react";
 import { AlexOSLogo } from "@/components/alexos-logo";
 import { SupabaseConfigBanner } from "@/components/SupabaseConfigBanner";
+import { isAuthorizedAlexOSUser, unauthorizedWorkspaceMessage } from "@/lib/authz";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -21,19 +22,31 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [accessMessage, setAccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard" });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      if (isAuthorizedAlexOSUser(data.session.user)) {
+        navigate({ to: "/dashboard" });
+        return;
+      }
+      await supabase.auth.signOut();
+      setAccessMessage(unauthorizedWorkspaceMessage());
     });
   }, [navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) return toast.error(error.message);
+    if (!isAuthorizedAlexOSUser(data.user)) {
+      await supabase.auth.signOut();
+      setAccessMessage(unauthorizedWorkspaceMessage());
+      return toast.error(unauthorizedWorkspaceMessage());
+    }
     toast.success("Welcome back");
     navigate({ to: "/dashboard" });
   };
@@ -52,6 +65,10 @@ function AuthPage() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAuthorizedAlexOSUser({ email })) {
+      setAccessMessage(unauthorizedWorkspaceMessage());
+      return toast.error(unauthorizedWorkspaceMessage());
+    }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email,
@@ -104,6 +121,14 @@ function AuthPage() {
             <CardDescription>Sign in to your AlexOS workspace.</CardDescription>
           </CardHeader>
           <CardContent>
+            {accessMessage ? (
+              <div
+                className="mb-4 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+                role="alert"
+              >
+                {accessMessage}
+              </div>
+            ) : null}
             <div className="grid gap-2 sm:grid-cols-2">
               <Button
                 type="button"

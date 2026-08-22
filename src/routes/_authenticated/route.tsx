@@ -7,6 +7,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { modules } from "@/lib/modules";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { isAuthorizedAlexOSUser } from "@/lib/authz";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -17,6 +18,10 @@ export const Route = createFileRoute("/_authenticated")({
     if (!isSupabaseConfigured()) return { user: null };
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
+    if (!isAuthorizedAlexOSUser(data.user)) {
+      await supabase.auth.signOut();
+      throw redirect({ to: "/auth" });
+    }
     return { user: data.user };
   },
   component: AuthenticatedLayout,
