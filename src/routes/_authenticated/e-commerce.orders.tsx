@@ -9,6 +9,7 @@ import {
   PackageCheck,
   ShoppingCart,
   Search,
+  ReceiptText,
 } from "lucide-react";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { KpiCard } from "@/components/dailygear/KpiCard";
@@ -28,6 +29,8 @@ import { useCommerceData } from "@/lib/dailygear/useCommerceData";
 import { useUpdateOrderStatus } from "@/lib/dailygear/api";
 import { OrderEditDialog } from "@/components/dailygear/OrderEditDialog";
 import { OrderFulfilmentDialog } from "@/components/dailygear/OrderFulfilmentDialog";
+import { OrderPaymentDialog } from "@/components/dailygear/OrderPaymentDialog";
+import { OrderDocuments } from "@/components/dailygear/OrderDocuments";
 import {
   DG_CURRENCY,
   ORDER_STATUS_FLOW,
@@ -79,6 +82,7 @@ function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState<Order["status"] | "all">("all");
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [fulfillingOrder, setFulfillingOrder] = useState<Order | null>(null);
+  const [paymentOrder, setPaymentOrder] = useState<Order | null>(null);
 
   const summary = useMemo(() => {
     const now = new Date();
@@ -236,18 +240,33 @@ function OrdersPage() {
                         {new Date(order.placed_at).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
-                        {next && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="whitespace-nowrap text-xs"
-                            disabled={updateStatus.isPending}
-                            onClick={() => updateStatus.mutate({ order, status: next })}
-                          >
-                            {ORDER_STATUS_META[next].label}
-                            <ChevronRight className="ml-1 h-3 w-3" />
-                          </Button>
-                        )}
+                        <div className="flex flex-wrap items-center gap-2">
+                          {next && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="whitespace-nowrap text-xs"
+                              disabled={updateStatus.isPending}
+                              onClick={() => updateStatus.mutate({ order, status: next })}
+                            >
+                              {ORDER_STATUS_META[next].label}
+                              <ChevronRight className="ml-1 h-3 w-3" />
+                            </Button>
+                          )}
+                          <OrderDocuments order={order} />
+                          {order.payment_status !== "paid" &&
+                            order.payment_status !== "refunded" && (
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                className="whitespace-nowrap text-xs"
+                                onClick={() => setPaymentOrder(order)}
+                              >
+                                <ReceiptText className="mr-1 h-3 w-3" />
+                                Confirm paid
+                              </Button>
+                            )}
+                        </div>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex flex-col items-start gap-1">
@@ -281,7 +300,6 @@ function OrdersPage() {
           </div>
         </Card>
       )}
-
       <OrderFulfilmentDialog
         open={Boolean(fulfillingOrder)}
         onOpenChange={(open) => {
@@ -301,6 +319,14 @@ function OrdersPage() {
             ? (customers.find((customer) => customer.id === editingOrder.customer_id) ?? null)
             : null
         }
+      />
+
+      <OrderPaymentDialog
+        open={Boolean(paymentOrder)}
+        onOpenChange={(open) => {
+          if (!open) setPaymentOrder(null);
+        }}
+        order={paymentOrder}
       />
     </div>
   );

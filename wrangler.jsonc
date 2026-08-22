@@ -3,11 +3,14 @@
   "name": "alexos-business-os",
   "compatibility_date": "2026-08-13",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry",
+  "main": "src/server.ts",
+  "triggers": {
+    "crons": ["0 3 * * *"],
+  },
   "ai": {
-    "binding": "AI"
+    "binding": "AI",
   },
   "observability": {
-    "enabled": true
-  }
+    "enabled": true,
+  },
 }

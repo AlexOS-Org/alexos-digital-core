@@ -539,3 +539,57 @@ export function useSaveOrderWithItems() {
     onError: (e: Error) => toast.error(e.message),
   });
 }
+
+export interface ConfirmOrderPaymentInput {
+  orderId: string;
+  accountId: string;
+  amount: number;
+  transactionId: string;
+  paidAt?: string;
+  notes?: string | null;
+}
+
+export interface ConfirmOrderPaymentResult {
+  payment_id: string;
+  money_transaction_id: string;
+  order_number: string;
+  amount_paid: number;
+  order_total: number;
+  payment_status: Order["payment_status"];
+  receipt_number: string;
+}
+
+/**
+ * Records one customer receipt against an order and the selected account.
+ * The database RPC owns idempotency, payment-state transitions, and the
+ * linked Money Center income transaction so the UI cannot double-post cash.
+ */
+export function useConfirmOrderPayment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: ConfirmOrderPaymentInput) => {
+      const { data, error } = await supabase.rpc(
+        "dg_confirm_order_payment" as never,
+        {
+          p_order_id: input.orderId,
+          p_account_id: input.accountId,
+          p_amount: input.amount,
+          p_transaction_id: input.transactionId.trim(),
+          p_paid_at: input.paidAt ?? new Date().toISOString(),
+          p_notes: input.notes ?? null,
+        } as never,
+      );
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!row) throw new Error("Payment confirmation returned no result.");
+      return row as unknown as ConfirmOrderPaymentResult;
+    },
+    onSuccess: (result) => {
+      qc.invalidateQueries({ queryKey: ["dailygear"] });
+      qc.invalidateQueries({ queryKey: ["account_balances"] });
+      qc.invalidateQueries({ queryKey: ["transactions"] });
+      toast.success(`Payment confirmed · ${result.receipt_number}`);
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+}
