@@ -24,18 +24,12 @@ import { AlexOSLogo } from "@/components/alexos-logo";
 import { DailyGearBrand } from "@/components/dailygear/DailyGearBrand";
 import { VisualThemePicker } from "@/components/theme/VisualThemePicker";
 import alexosMountainDuskWide from "@/assets/visuals/alexos-mountain-dusk-wide.webp";
-import { BarChart3, Boxes, Building2, ChevronRight, LogOut, ShoppingCart } from "lucide-react";
+import { Building2, ChevronRight, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const BUSINESS_GROUP = "Businesses" as const;
 const MoneyCenterIcon = MONEY_CENTER_SECTIONS[0].icon;
-
-const BUSINESS_QUICK_LINKS = [
-  { title: "Sales", url: "/e-commerce/orders", icon: ShoppingCart },
-  { title: "Inventory", url: "/e-commerce/inventory", icon: Boxes },
-  { title: "Analytics", url: "/reports", icon: BarChart3 },
-] as const;
 
 export function AppSidebar() {
   const { state, setOpenMobile } = useSidebar();
@@ -172,20 +166,6 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {BUSINESS_QUICK_LINKS.map((item) => (
-                        <SidebarMenuSubItem key={item.url}>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={isActive(item.url)}
-                            className="data-[active=true]:alexos-nav-active"
-                          >
-                            <Link to={item.url} onClick={closeSidebar}>
-                              <item.icon className="h-3.5 w-3.5" />
-                              <span>{item.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
                       {businessModules.map((item) => (
                         <SidebarMenuSubItem key={item.url}>
                           <SidebarMenuSubButton

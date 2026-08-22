@@ -79,7 +79,7 @@ export const modules: ModuleDef[] = [
     url: "/people",
     icon: Users,
     description: "Customers, contacts, leads and relationship management.",
-    group: "Businesses",
+    group: "Growth",
   },
 
   // ── Money ────────────────────────────────────────────
