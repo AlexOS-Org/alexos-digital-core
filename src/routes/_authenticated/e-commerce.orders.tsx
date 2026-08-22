@@ -32,6 +32,7 @@ import { OrderEditDialog } from "@/components/dailygear/OrderEditDialog";
 import { OrderFulfilmentDialog } from "@/components/dailygear/OrderFulfilmentDialog";
 import { OrderPaymentDialog } from "@/components/dailygear/OrderPaymentDialog";
 import { OrderDocuments } from "@/components/dailygear/OrderDocuments";
+import { OrderRefundDialog } from "@/components/dailygear/OrderRefundDialog";
 import { useDeleteOrder } from "@/lib/dailygear/api";
 import {
   DG_CURRENCY,
@@ -86,6 +87,7 @@ function OrdersPage() {
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [fulfillingOrder, setFulfillingOrder] = useState<Order | null>(null);
   const [paymentOrder, setPaymentOrder] = useState<Order | null>(null);
+  const [refundOrder, setRefundOrder] = useState<Order | null>(null);
 
   const summary = useMemo(() => {
     const now = new Date();
@@ -293,6 +295,16 @@ function OrdersPage() {
                               Record costs & fulfil
                             </Button>
                           ) : null}
+                          {order.payment_status === "paid" ? (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="whitespace-nowrap text-xs text-destructive hover:text-destructive"
+                              onClick={() => setRefundOrder(order)}
+                            >
+                              <Trash2 className="mr-1 h-3.5 w-3.5" /> Void / refund
+                            </Button>
+                          ) : null}
                           {order.payment_status === "unpaid" ? (
                             <Button
                               size="sm"
@@ -342,6 +354,14 @@ function OrdersPage() {
             ? (customers.find((customer) => customer.id === editingOrder.customer_id) ?? null)
             : null
         }
+      />
+
+      <OrderRefundDialog
+        open={Boolean(refundOrder)}
+        onOpenChange={(open) => {
+          if (!open) setRefundOrder(null);
+        }}
+        order={refundOrder}
       />
 
       <OrderPaymentDialog

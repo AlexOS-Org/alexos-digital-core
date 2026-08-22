@@ -252,6 +252,56 @@ export function useUpdateOrderStatus() {
   });
 }
 
+export interface RefundOrVoidOrderPaymentInput {
+  orderId: string;
+  mode: "void" | "refund";
+  refundAccountId?: string | null;
+  refundAmount?: number | null;
+  refundTransactionId?: string | null;
+  notes?: string | null;
+}
+
+export interface RefundOrVoidOrderPaymentResult {
+  order_number: string;
+  mode: "void" | "refund";
+  amount_reversed: number;
+  refund_transaction_id: string | null;
+}
+
+export function useRefundOrVoidOrderPayment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: RefundOrVoidOrderPaymentInput) => {
+      const { data, error } = await supabase.rpc(
+        "dg_refund_or_void_order_payment" as never,
+        {
+          p_order_id: input.orderId,
+          p_mode: input.mode,
+          p_refund_account_id: input.refundAccountId ?? null,
+          p_refund_amount: input.refundAmount ?? null,
+          p_refund_transaction_id: input.refundTransactionId?.trim() || null,
+          p_notes: input.notes?.trim() || null,
+        } as never,
+      );
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!row) throw new Error("Refund or void returned no result.");
+      return row as unknown as RefundOrVoidOrderPaymentResult;
+    },
+    onSuccess: (result) => {
+      qc.invalidateQueries({ queryKey: ["dailygear"] });
+      qc.invalidateQueries({ queryKey: ["transactions"] });
+      qc.invalidateQueries({ queryKey: ["account_balances"] });
+      toast.success(
+        result.mode === "refund"
+          ? `Refund recorded · ${formatMoney(result.amount_reversed)}`
+          : `Payment voided · ${formatMoney(result.amount_reversed)}`,
+      );
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+}
+
 /* ── Composite operations ─────────────────────────────────────── */
 
 export interface DraftOrderItem {

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { ShieldCheck } from "lucide-react";
+import { Facebook, ShieldCheck } from "lucide-react";
 import { AlexOSLogo } from "@/components/alexos-logo";
 import { SupabaseConfigBanner } from "@/components/SupabaseConfigBanner";
 
@@ -36,6 +36,18 @@ function AuthPage() {
     if (error) return toast.error(error.message);
     toast.success("Welcome back");
     navigate({ to: "/dashboard" });
+  };
+
+  const handleOAuth = async (provider: "google" | "facebook") => {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: `${window.location.origin}/dashboard` },
+    });
+    if (error) {
+      setLoading(false);
+      toast.error(error.message);
+    }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -92,6 +104,33 @@ function AuthPage() {
             <CardDescription>Sign in to your AlexOS workspace.</CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={loading}
+                onClick={() => void handleOAuth("google")}
+              >
+                Continue with Google
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={loading}
+                onClick={() => void handleOAuth("facebook")}
+              >
+                <Facebook className="mr-2 h-4 w-4" /> Continue with Facebook
+              </Button>
+            </div>
+            <p className="mt-3 text-center text-xs text-muted-foreground">
+              Social sign-in creates or opens an AlexOS account. The provider must be enabled in
+              Supabase Auth first.
+            </p>
+            <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
+              <span className="h-px flex-1 bg-border" />
+              <span>or use email</span>
+              <span className="h-px flex-1 bg-border" />
+            </div>
             <Tabs defaultValue="signin">
               <TabsList className="grid grid-cols-2 w-full">
                 <TabsTrigger value="signin">Sign in</TabsTrigger>

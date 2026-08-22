@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useUpdateOrderDetails } from "@/lib/dailygear/api";
-import { ORDER_STATUS_META, PAYMENT_STATUS_META } from "@/lib/dailygear/constants";
+import { ORDER_STATUS_META } from "@/lib/dailygear/constants";
 import type { Customer, Order } from "@/lib/dailygear/types";
 
 interface Props {
@@ -161,7 +161,6 @@ export function OrderEditDialog({ open, onOpenChange, order, customer }: Props) 
   }
 
   const statusOptions = Object.keys(ORDER_STATUS_META) as Order["status"][];
-  const paymentOptions = Object.keys(PAYMENT_STATUS_META) as Order["payment_status"][];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -209,21 +208,9 @@ export function OrderEditDialog({ open, onOpenChange, order, customer }: Props) 
           </div>
           <div className="space-y-2">
             <Label>Payment status</Label>
-            <Select
-              value={form.paymentStatus}
-              onValueChange={(value) => set("paymentStatus", value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {paymentOptions.map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {PAYMENT_STATUS_META[status].label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex h-10 items-center rounded-md border bg-muted/30 px-3 text-sm text-muted-foreground">
+              {order?.payment_status ?? "unpaid"} · use Confirm paid or Void / refund
+            </div>
           </div>
           <div className="space-y-2">
             <Label>Payment method</Label>
