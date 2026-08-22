@@ -70,7 +70,7 @@ export function AppSidebar() {
     <Sidebar
       collapsible="icon"
       data-hover-expanded={hoverExpanded ? "true" : "false"}
-      className="alexos-sidebar-sheen border-r border-sidebar-border transition-shadow duration-200 group-data-[collapsible=icon]:shadow-lg group-data-[collapsible=icon]:shadow-[0_18px_45px_-24px_var(--alexos-glow)]"
+      className="group/sidebar alexos-sidebar-sheen border-r border-sidebar-border transition-shadow duration-200 group-data-[collapsible=icon]:shadow-lg group-data-[collapsible=icon]:shadow-[0_18px_45px_-24px_var(--alexos-glow)]"
       onMouseEnter={() => setHoverExpanded(true)}
       onMouseLeave={() => setHoverExpanded(false)}
       onFocusCapture={() => setHoverExpanded(true)}

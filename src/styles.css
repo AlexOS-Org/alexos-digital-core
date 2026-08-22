@@ -579,6 +579,37 @@
 }
 
 @layer utilities {
+  .store-product-detail {
+    --store-product-accent: var(--primary);
+  }
+
+  .store-product-gallery {
+    position: relative;
+  }
+
+  .store-product-gallery::before {
+    position: absolute;
+    z-index: -1;
+    inset: 12% 6% -4%;
+    border-radius: 3rem;
+    background: color-mix(in oklch, var(--store-product-accent) 13%, transparent);
+    filter: blur(2rem);
+    content: "";
+  }
+
+  .store-product-purchase {
+    background: linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--color-card) 95%, var(--store-product-accent) 5%),
+      var(--color-card)
+    );
+  }
+
+  .store-product-trust {
+    border-color: color-mix(in oklch, var(--store-product-accent) 18%, var(--color-border));
+    background: color-mix(in oklch, var(--store-product-accent) 5%, var(--color-card));
+  }
+
   .dashboard-priority-card {
     background: linear-gradient(
       145deg,

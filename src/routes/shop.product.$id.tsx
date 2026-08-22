@@ -136,8 +136,8 @@ function ProductDetail() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <nav className="mb-6 text-xs text-muted-foreground">
+    <div className="store-product-detail mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-10">
+      <nav className="mb-6 flex flex-wrap items-center text-xs text-muted-foreground">
         <Link to="/shop" className="hover:text-foreground">
           Home
         </Link>
@@ -149,9 +149,9 @@ function ProductDetail() {
         <span className="text-foreground">{product.name}</span>
       </nav>
 
-      <div className="grid gap-10 lg:grid-cols-2">
-        <div className="space-y-3">
-          <div className="aspect-square overflow-hidden rounded-3xl border bg-muted">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.06fr)_minmax(360px,0.94fr)] lg:gap-12">
+        <div className="store-product-gallery space-y-3">
+          <div className="aspect-square overflow-hidden rounded-[2rem] border bg-muted shadow-[0_24px_70px_-40px_var(--alexos-glow)]">
             {images[active] ? (
               <ResponsiveProductImage
                 src={images[active]}
@@ -191,7 +191,7 @@ function ProductDetail() {
           ) : null}
         </div>
 
-        <div className="space-y-6">
+        <div className="store-product-purchase space-y-6 rounded-[2rem] border border-border/60 bg-card/75 p-5 shadow-[0_20px_55px_-40px_var(--alexos-glow)] backdrop-blur-sm sm:p-7">
           <div className="space-y-3">
             <div className="flex flex-wrap gap-2">
               {isOnSale(sellingItem) ? <Badge className="rounded-full">Sale</Badge> : null}
@@ -275,7 +275,7 @@ function ProductDetail() {
             ].map((t) => (
               <div
                 key={t.label}
-                className="flex items-center gap-2 rounded-xl border bg-card p-3 text-xs"
+                className="store-product-trust flex items-center gap-2 rounded-xl border p-3 text-xs"
               >
                 <t.icon className="h-4 w-4 shrink-0 text-primary" />
                 {t.label}
