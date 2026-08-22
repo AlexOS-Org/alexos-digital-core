@@ -29,6 +29,9 @@ function institutionStyle(name: string) {
     return {
       iconClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300",
       panelClass: "bg-emerald-50/70 dark:bg-emerald-950/20",
+      cardClass:
+        "border-emerald-200/70 bg-gradient-to-br from-emerald-50/60 via-background to-background dark:border-emerald-900/40 dark:from-emerald-950/20",
+      accentClass: "bg-emerald-500",
       warningThreshold: 300,
     };
   }
@@ -36,6 +39,9 @@ function institutionStyle(name: string) {
     return {
       iconClass: "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
       panelClass: "bg-blue-50/70 dark:bg-blue-950/20",
+      cardClass:
+        "border-blue-200/70 bg-gradient-to-br from-blue-50/60 via-background to-background dark:border-blue-900/40 dark:from-blue-950/20",
+      accentClass: "bg-blue-600",
       warningThreshold: 500,
     };
   }
@@ -43,6 +49,9 @@ function institutionStyle(name: string) {
     return {
       iconClass: "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300",
       panelClass: "bg-orange-50/70 dark:bg-orange-950/20",
+      cardClass:
+        "border-orange-200/70 bg-gradient-to-br from-orange-50/60 via-background to-background dark:border-orange-900/40 dark:from-orange-950/20",
+      accentClass: "bg-orange-500",
       warningThreshold: 500,
     };
   }
@@ -50,6 +59,9 @@ function institutionStyle(name: string) {
     return {
       iconClass: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300",
       panelClass: "bg-red-50/70 dark:bg-red-950/20",
+      cardClass:
+        "border-red-200/70 bg-gradient-to-br from-red-50/60 via-background to-background dark:border-red-900/40 dark:from-red-950/20",
+      accentClass: "bg-red-600",
       warningThreshold: 500,
     };
   }
@@ -57,6 +69,9 @@ function institutionStyle(name: string) {
     return {
       iconClass: "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300",
       panelClass: "bg-violet-50/70 dark:bg-violet-950/20",
+      cardClass:
+        "border-violet-200/70 bg-gradient-to-br from-violet-50/60 via-background to-background dark:border-violet-900/40 dark:from-violet-950/20",
+      accentClass: "bg-violet-600",
       warningThreshold: 500,
     };
   }
@@ -64,12 +79,17 @@ function institutionStyle(name: string) {
     return {
       iconClass: "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300",
       panelClass: "bg-amber-50/70 dark:bg-amber-950/20",
+      cardClass:
+        "border-amber-200/70 bg-gradient-to-br from-amber-50/60 via-background to-background dark:border-amber-900/40 dark:from-amber-950/20",
+      accentClass: "bg-amber-500",
       warningThreshold: 1000,
     };
   }
   return {
     iconClass: "bg-primary/10 text-primary",
     panelClass: "bg-muted/40",
+    cardClass: "border-border/70 bg-gradient-to-br from-muted/50 via-background to-background",
+    accentClass: "bg-primary",
     warningThreshold: null,
   };
 }
@@ -140,16 +160,24 @@ function AccountsPage() {
             <Card
               key={a.id}
               className={cn(
-                "rounded-2xl transition-colors",
-                isLowBalance && "border-red-200/80 dark:border-red-900/50",
+                "relative overflow-hidden rounded-2xl shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
+                institution.cardClass,
+                isLowBalance &&
+                  "border-red-300/90 bg-gradient-to-br from-red-50/80 via-background to-background dark:border-red-900/60 dark:from-red-950/30",
               )}
             >
-              <CardContent className="p-5 space-y-4">
+              <CardContent className="space-y-4 p-5 pt-6 sm:p-6 sm:pt-7">
+                <div
+                  className={cn(
+                    "absolute inset-x-0 top-0 h-1",
+                    isLowBalance ? "bg-red-600" : institution.accentClass,
+                  )}
+                />
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div
                       className={cn(
-                        "h-11 w-11 rounded-xl grid place-items-center",
+                        "grid h-14 w-14 place-items-center rounded-2xl border border-white/80 bg-white/80 shadow-sm ring-4 ring-background/80 dark:border-white/10 dark:bg-background/60",
                         isLowBalance
                           ? "bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400"
                           : institution.iconClass,
@@ -159,7 +187,7 @@ function AccountsPage() {
                         <img
                           src={accountLogo(a.name)!}
                           alt={`${a.name} logo`}
-                          className="h-7 w-7 rounded-md object-contain"
+                          className="h-10 w-10 rounded-lg object-contain drop-shadow-sm"
                           loading="lazy"
                         />
                       ) : (
