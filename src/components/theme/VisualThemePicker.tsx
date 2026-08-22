@@ -1,4 +1,4 @@
-import { Moon, Palette, Sun, Monitor } from "lucide-react";
+import { Download, Moon, Palette, Sun, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,8 +20,62 @@ export function VisualThemePicker() {
     setVisualTheme,
     customAccent,
     setCustomAccent,
+    customSurface,
+    setCustomSurface,
+    customSidebar,
+    setCustomSidebar,
   } = useTheme();
   const selected = getVisualTheme(visualTheme);
+
+  const exportPreset = () => {
+    const preset = {
+      schema: "alexos.dashboard-preset",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      theme: {
+        mode: theme,
+        resolvedMode: resolvedTheme,
+        visualTheme,
+        customAccent,
+        customSurface,
+        customSidebar,
+      },
+      layout: {
+        dashboard: [
+          "greetings",
+          "inspiration",
+          "command-snapshot",
+          "today-priorities",
+          "auren",
+          "cash-flow",
+          "reading-the-numbers",
+        ],
+        sidebar: {
+          defaultCollapsed: true,
+          scrollable: true,
+          groups: [
+            "Home",
+            "Businesses",
+            "Money Center",
+            "Auren",
+            "Growth",
+            "Library",
+            "Missions",
+            "System",
+          ],
+        },
+      },
+      safety: { includesBusinessData: false, includesSecrets: false },
+    };
+    const blob = new Blob([JSON.stringify(preset, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `alexos-dashboard-preset-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -69,23 +123,33 @@ export function VisualThemePicker() {
         <DropdownMenuLabel className="px-2 py-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
           Custom accent
         </DropdownMenuLabel>
-        <div className="flex items-center gap-3 rounded-xl px-2 py-2">
-          <input
-            type="color"
-            value={customAccent}
-            onChange={(event) => setCustomAccent(event.target.value)}
-            aria-label="Choose custom accent colour"
-            className="h-9 w-12 cursor-pointer rounded-lg border border-border bg-transparent p-0.5"
-          />
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium">Accent colour</p>
-            <p className="text-[11px] text-muted-foreground">Used when Custom accent is selected</p>
-          </div>
-          <span
-            aria-hidden="true"
-            className="h-5 w-5 rounded-full border border-border"
-            style={{ backgroundColor: customAccent }}
-          />
+        <div className="space-y-2 rounded-xl px-2 py-2">
+          {(
+            [
+              ["Accent", customAccent, setCustomAccent],
+              ["Surface", customSurface, setCustomSurface],
+              ["Sidebar", customSidebar, setCustomSidebar],
+            ] as const
+          ).map(([label, value, setter]) => (
+            <label key={label} className="flex min-h-10 items-center gap-3">
+              <input
+                type="color"
+                value={value}
+                onChange={(event) => setter(event.target.value)}
+                aria-label={`Choose custom ${label.toLowerCase()} colour`}
+                className="h-9 w-12 cursor-pointer rounded-lg border border-border bg-transparent p-0.5"
+              />
+              <span className="min-w-0 flex-1 text-xs font-medium">{label} colour</span>
+              <span
+                aria-hidden="true"
+                className="h-5 w-5 rounded-full border border-border"
+                style={{ backgroundColor: value }}
+              />
+            </label>
+          ))}
+          <p className="text-[11px] leading-4 text-muted-foreground">
+            Mix these three colours, then select Custom Accent to apply the palette.
+          </p>
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuLabel className="px-2 py-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
@@ -111,6 +175,15 @@ export function VisualThemePicker() {
             </button>
           ))}
         </div>
+        <DropdownMenuSeparator />
+        <button
+          type="button"
+          onClick={exportPreset}
+          className="flex min-h-10 w-full items-center gap-2 rounded-xl px-2 text-left text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+        >
+          <Download className="h-3.5 w-3.5" />
+          Export dashboard preset
+        </button>
         <p className="px-2 pb-1 pt-2 text-[10px] leading-4 text-muted-foreground">
           Current mode: {resolvedTheme}. Preferences are saved on this device.
         </p>

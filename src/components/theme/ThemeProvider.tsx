@@ -13,12 +13,18 @@ type ThemeContextValue = {
   setTheme: (theme: Theme) => void;
   visualTheme: VisualThemeId;
   customAccent: string;
+  customSurface: string;
+  customSidebar: string;
   setVisualTheme: (theme: VisualThemeId) => void;
   setCustomAccent: (accent: string) => void;
+  setCustomSurface: (surface: string) => void;
+  setCustomSidebar: (sidebar: string) => void;
 };
 const STORAGE_KEY = "alexos-theme";
 const VISUAL_THEME_KEY = "alexos-visual-theme";
 const CUSTOM_ACCENT_KEY = "alexos-custom-accent";
+const CUSTOM_SURFACE_KEY = "alexos-custom-surface";
+const CUSTOM_SIDEBAR_KEY = "alexos-custom-sidebar";
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 function getStoredTheme(): Theme {
   if (typeof window === "undefined") return "system";
@@ -38,11 +44,21 @@ function getStoredCustomAccent() {
   if (typeof window === "undefined") return DEFAULT_CUSTOM_ACCENT;
   return window.localStorage.getItem(CUSTOM_ACCENT_KEY) ?? DEFAULT_CUSTOM_ACCENT;
 }
+function getStoredCustomSurface() {
+  if (typeof window === "undefined") return "#202337";
+  return window.localStorage.getItem(CUSTOM_SURFACE_KEY) ?? "#202337";
+}
+function getStoredCustomSidebar() {
+  if (typeof window === "undefined") return "#11182f";
+  return window.localStorage.getItem(CUSTOM_SIDEBAR_KEY) ?? "#11182f";
+}
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(getStoredTheme);
   const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(getSystemTheme);
   const [visualTheme, setVisualThemeState] = useState<VisualThemeId>(getStoredVisualTheme);
   const [customAccent, setCustomAccentState] = useState(getStoredCustomAccent);
+  const [customSurface, setCustomSurfaceState] = useState(getStoredCustomSurface);
+  const [customSidebar, setCustomSidebarState] = useState(getStoredCustomSidebar);
   const resolvedTheme: ResolvedTheme = theme === "system" ? systemTheme : theme;
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
@@ -56,7 +72,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     document.documentElement.style.colorScheme = resolvedTheme;
     document.documentElement.dataset.visualTheme = visualTheme;
     document.documentElement.style.setProperty("--alexos-custom-accent", customAccent);
-  }, [customAccent, resolvedTheme, visualTheme]);
+    document.documentElement.style.setProperty("--alexos-custom-surface", customSurface);
+    document.documentElement.style.setProperty("--alexos-custom-sidebar", customSidebar);
+  }, [customAccent, customSidebar, customSurface, resolvedTheme, visualTheme]);
   const setTheme = (next: Theme) => {
     setThemeState(next);
     window.localStorage.setItem(STORAGE_KEY, next);
@@ -69,6 +87,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setCustomAccentState(next);
     window.localStorage.setItem(CUSTOM_ACCENT_KEY, next);
   };
+  const setCustomSurface = (next: string) => {
+    setCustomSurfaceState(next);
+    window.localStorage.setItem(CUSTOM_SURFACE_KEY, next);
+  };
+  const setCustomSidebar = (next: string) => {
+    setCustomSidebarState(next);
+    window.localStorage.setItem(CUSTOM_SIDEBAR_KEY, next);
+  };
   const value = useMemo(
     () => ({
       theme,
@@ -76,10 +102,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setTheme,
       visualTheme,
       customAccent,
+      customSurface,
+      customSidebar,
       setVisualTheme,
       setCustomAccent,
+      setCustomSurface,
+      setCustomSidebar,
     }),
-    [theme, resolvedTheme, visualTheme, customAccent],
+    [theme, resolvedTheme, visualTheme, customAccent, customSurface, customSidebar],
   );
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
