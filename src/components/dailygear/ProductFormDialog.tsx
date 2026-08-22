@@ -48,6 +48,7 @@ const EMPTY = {
   category_id: "",
   brand_id: "",
   supplier_id: "",
+  images: "",
 };
 
 export function ProductFormDialog({
@@ -92,6 +93,7 @@ export function ProductFormDialog({
             category_id: product.category_id ?? "",
             brand_id: product.brand_id ?? "",
             supplier_id: product.supplier_id ?? "",
+            images: ((product.images ?? []) as string[]).join("\n"),
           }
         : EMPTY,
     );
@@ -101,6 +103,18 @@ export function ProductFormDialog({
     setForm((current) => ({ ...current, [key]: value }));
   const categoryNameById = new Map(categories.map((category) => [category.id, category.name]));
 
+  const imageUrls = form.images
+    .split(/\n|,/) 
+    .map((value) => value.trim())
+    .filter(Boolean);
+  const invalidImageUrls = imageUrls.filter((url) => {
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol !== "https:";
+    } catch {
+      return true;
+    }
+  });
   const hasConfirmedAvailability = form.availability_confirmed === "true";
   const hasCategory = Boolean(form.category_id);
   const hasEvidence = evidenceCount > 0;
@@ -111,6 +125,7 @@ export function ProductFormDialog({
     !hasCategory ? "a primary category" : null,
     !hasEvidence ? "source evidence" : null,
     !hasVariantReadiness ? "every colour/SKU variant must have confirmed availability" : null,
+    invalidImageUrls.length > 0 ? "valid HTTPS image URLs" : null,
   ].filter((requirement): requirement is string => Boolean(requirement));
   const publicationBlocked = form.status === "active" && missingPublicationRequirements.length > 0;
   const invalid = !form.name.trim() || Number(form.price) <= 0 || publicationBlocked;
@@ -143,6 +158,7 @@ export function ProductFormDialog({
       category_id: form.category_id || null,
       brand_id: form.brand_id || null,
       supplier_id: form.supplier_id || null,
+      images: imageUrls,
     });
     onOpenChange(false);
   }
@@ -338,6 +354,29 @@ export function ProductFormDialog({
               onChange={(e) => set("short_description")(e.target.value)}
               placeholder="A concise, search-friendly product promise."
             />
+          </div>
+
+          <div className="space-y-2 sm:col-span-2">
+            <Label>External product image URLs</Label>
+            <Textarea
+              rows={3}
+              value={form.images}
+              onChange={(e) => set("images")(e.target.value)}
+              placeholder="https://supplier.example/product-front.jpg\nhttps://supplier.example/product-detail.jpg"
+            />
+            <p className="text-xs text-muted-foreground">
+              Paste one HTTPS image URL per line. Images stay hosted by the source; AlexOS stores only the URLs. Match each URL to this exact product or variant before publishing.
+            </p>
+            {imageUrls.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {imageUrls.slice(0, 6).map((url) => (
+                  <img key={url} src={url} alt="Product preview" width={64} height={64} className="h-16 w-16 rounded-lg border object-cover" loading="lazy" />
+                ))}
+              </div>
+            ) : null}
+            {invalidImageUrls.length > 0 ? (
+              <p className="text-xs text-destructive">Each image must be a valid HTTPS URL.</p>
+            ) : null}
           </div>
 
           <div className="space-y-2 sm:col-span-2">

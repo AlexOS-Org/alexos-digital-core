@@ -27,6 +27,7 @@ import {
 } from "@/lib/dailygear/api";
 import { DG_CURRENCY, PRODUCT_STATUS_META } from "@/lib/dailygear/constants";
 import { getProductReadiness } from "@/lib/dailygear/types";
+import { productImage } from "@/lib/storefront/api";
 import type { Product } from "@/lib/dailygear/types";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/products")({
@@ -218,8 +219,17 @@ function ProductsPage() {
                   return (
                     <tr key={p.id} className="border-t border-border/70">
                       <td className="px-4 py-3">
-                        <p className="font-medium">{p.name}</p>
-                        <p className="text-xs text-muted-foreground">{p.sku ?? "No SKU"}</p>
+                        <div className="flex items-center gap-3">
+                          {productImage(p) ? (
+                            <img src={productImage(p) ?? undefined} alt="" aria-hidden="true" width={48} height={48} loading="lazy" className="h-12 w-12 shrink-0 rounded-xl border object-cover" />
+                          ) : (
+                            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border bg-muted text-[10px] text-muted-foreground">No image</span>
+                          )}
+                          <div className="min-w-0">
+                            <p className="font-medium">{p.name}</p>
+                            <p className="text-xs text-muted-foreground">{p.sku ?? "No SKU"}</p>
+                          </div>
+                        </div>
                         <p className="mt-1 text-xs text-muted-foreground">
                           {categoryNames.get(p.category_id ?? "") ?? "Uncategorised"}
                         </p>

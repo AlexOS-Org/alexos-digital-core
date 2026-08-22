@@ -69,3 +69,15 @@ Business records currently expose names and finance scope but do not provide a c
 - Supabase mutation during this pass: none.
 - External calendar connection: not performed because Google Calendar is disabled.
 - External notifications or money movement: not performed.
+
+## Catalogue, image, copy, and security follow-up — 2026-08-22
+
+The current source does not contain creative-level image URLs in the persisted Meta campaign evidence, so exact image matching cannot be truthfully completed automatically from campaign names alone. To support a safe workflow, the admin Product form now accepts one or more external HTTPS image URLs, renders lazy previews, stores only URL strings in the existing `images` field, and blocks active publication when an image URL is missing or invalid. The admin product list now shows a thumbnail or a visible `No image` state for both draft and active products.
+
+Public catalogue security already enforces the desired boundary through existing RLS and server-side publication gates: anonymous readers can see only active products from a published storefront, undeleted variants, confirmed availability, and an active/confirmed parent product. Admin owners retain visibility of draft and unavailable records through owner-only policies. The storefront product route already hides or disables unavailable variants while the admin retains them. No new table or storage bucket was created.
+
+The form already supports SEO title, description, keywords, image alt text, category, brand, supplier, cost, selling price, and source evidence. The publication trigger requires confirmed availability, category, evidence, slug, SEO title, SEO description, image alt text, and at least one image URL. This is safer than bulk-generating copy that could make unsupported product claims. A full product-by-product SEO rewrite still requires verified product specifications, brand/model, dimensions, functions, warranty, and matching images.
+
+The imported Meta draft CSV contains 24 draft rows, not 25; its 24 rows remain unpublished. The YJ blue and pink children’s backpack records should be consolidated only after the exact product identity and source images are confirmed, because merging records without matching dimensions, SKU, image, or colour evidence could damage order history. The correct target is one parent product with colour variants and independent availability flags, with unavailable variants hidden from storefront queries but visible to the owner.
+
+Security scan results: no secret-pattern match was found in the scanned source/public paths; the product RLS/publication policies are present; the production dependency audit reported no known high-severity vulnerabilities. The connector refresh for Google Calendar returned 403, so real calendar synchronization remains unconfigured. Gmail is enabled, but Gmail is not a calendar source and should not be scraped as a substitute for a calendar feed.
