@@ -1,12 +1,5 @@
 import { useMemo } from "react";
-import {
-  useCustomers,
-  useFunnels,
-  useOrderItems,
-  useOrders,
-  useProducts,
-  useStockMovements,
-} from "./api";
+import { useCustomers, useOrderItems, useOrders, useProducts, useStockMovements } from "./api";
 import { DG_CURRENCY } from "./constants";
 import type { IntelligenceContext } from "./types";
 
@@ -22,17 +15,11 @@ export function useCommerceData() {
   const orderItems = useOrderItems();
   const customers = useCustomers();
   const movements = useStockMovements();
-  const funnels = useFunnels();
 
   const isLoading =
-    products.isLoading ||
-    orders.isLoading ||
-    orderItems.isLoading ||
-    customers.isLoading ||
-    funnels.isLoading;
+    products.isLoading || orders.isLoading || orderItems.isLoading || customers.isLoading;
 
-  const error =
-    products.error ?? orders.error ?? orderItems.error ?? customers.error ?? funnels.error ?? null;
+  const error = products.error ?? orders.error ?? orderItems.error ?? customers.error ?? null;
 
   const context = useMemo<IntelligenceContext>(
     () => ({
@@ -48,7 +35,6 @@ export function useCommerceData() {
   return {
     ...context,
     movements: movements.data ?? [],
-    funnels: funnels.data ?? [],
     context,
     isLoading,
     error: error as Error | null,
