@@ -68,7 +68,7 @@ export function AppSidebar() {
     <Sidebar
       collapsible="icon"
       data-hover-expanded={hoverExpanded ? "true" : "false"}
-      className="alexos-sidebar-sheen border-r border-sidebar-border transition-shadow duration-200 group-data-[collapsible=icon]:shadow-lg group-data-[collapsible=icon]:shadow-black/10"
+      className="alexos-sidebar-sheen border-r border-sidebar-border transition-shadow duration-200 group-data-[collapsible=icon]:shadow-lg group-data-[collapsible=icon]:shadow-[0_18px_45px_-24px_var(--alexos-glow)]"
       onMouseEnter={() => setHoverExpanded(true)}
       onMouseLeave={() => setHoverExpanded(false)}
       onFocusCapture={() => setHoverExpanded(true)}
@@ -186,7 +186,7 @@ export function AppSidebar() {
             <div className="px-2 pb-2">
               {collapsed ? (
                 <div
-                  className="grid h-9 w-9 place-items-center rounded-xl bg-red-500 text-xs font-black text-white shadow-lg shadow-red-500/20"
+                  className="alexos-sidebar-brand grid h-9 w-9 place-items-center rounded-xl text-xs font-black shadow-lg"
                   aria-label="DailyGear workspace"
                   title="DailyGear workspace"
                 >
@@ -231,7 +231,7 @@ export function AppSidebar() {
             <div className="px-2 pb-2">
               {collapsed ? (
                 <div
-                  className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-xs font-black text-primary-foreground shadow-lg shadow-primary/20"
+                  className="alexos-sidebar-brand grid h-9 w-9 place-items-center rounded-xl text-xs font-black shadow-lg"
                   aria-label="Money Center workspace"
                   title="Money Center workspace"
                 >
@@ -240,7 +240,7 @@ export function AppSidebar() {
               ) : (
                 <div className="rounded-2xl border border-sidebar-border/70 bg-sidebar-accent/40 px-3 py-2.5">
                   <div className="flex items-center gap-2 text-sm font-semibold text-sidebar-foreground">
-                    <span className="grid h-7 w-7 place-items-center rounded-lg bg-primary/15 text-primary">
+                    <span className="alexos-sidebar-brand-mark grid h-7 w-7 place-items-center rounded-lg">
                       <MoneyCenterIcon className="h-4 w-4" />
                     </span>
                     <span>Money Center</span>

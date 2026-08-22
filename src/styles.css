@@ -548,6 +548,22 @@
 }
 
 @layer utilities {
+  .alexos-sidebar-brand {
+    color: var(--primary-foreground);
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--sidebar-primary) 92%, var(--sidebar) 8%),
+      color-mix(in oklch, var(--alexos-purple) 72%, var(--sidebar-primary) 28%)
+    );
+    box-shadow: 0 12px 28px -16px color-mix(in oklch, var(--sidebar-primary) 70%, transparent);
+  }
+
+  .alexos-sidebar-brand-mark {
+    color: var(--sidebar-primary);
+    background: color-mix(in oklch, var(--sidebar-primary) 14%, var(--sidebar-accent));
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--sidebar-primary) 22%, transparent);
+  }
+
   .dashboard-eyebrow {
     color: var(--primary);
     font-size: 0.68rem;
