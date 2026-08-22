@@ -206,6 +206,28 @@ export const useOrders = ordersResource.useList;
 export const useSaveOrder = () => ordersResource.useSave("Order");
 export const useDeleteOrder = () => ordersResource.useRemove("Order");
 
+export function useOrderPayments(orderId?: string) {
+  return useQuery({
+    queryKey: ["dailygear", "dg_order_payments", orderId ?? null],
+    enabled: Boolean(orderId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("dg_order_payments" as never)
+        .select("id,amount,transaction_id,paid_at,account_id")
+        .eq("order_id", orderId as never)
+        .order("paid_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as unknown as Array<{
+        id: string;
+        amount: number;
+        transaction_id: string;
+        paid_at: string;
+        account_id: string;
+      }>;
+    },
+  });
+}
+
 export const useOrderItems = orderItemsResource.useList;
 export const useOrderEvents = orderEventsResource.useList;
 
@@ -677,6 +699,7 @@ export function useConfirmOrderPayment() {
     },
     onSuccess: (result) => {
       qc.invalidateQueries({ queryKey: ["dailygear"] });
+      qc.invalidateQueries({ queryKey: ["dailygear", "dg_order_payments"] });
       qc.invalidateQueries({ queryKey: ["account_balances"] });
       qc.invalidateQueries({ queryKey: ["transactions"] });
       toast.success(

@@ -18,7 +18,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAccounts } from "@/lib/money/api";
-import { useConfirmOrderPayment, type ConfirmOrderPaymentResult } from "@/lib/dailygear/api";
+import {
+  useConfirmOrderPayment,
+  useOrderPayments,
+  type ConfirmOrderPaymentResult,
+} from "@/lib/dailygear/api";
 import type { Order } from "@/lib/dailygear/types";
 
 interface Props {
@@ -31,6 +35,11 @@ interface Props {
 export function OrderPaymentDialog({ open, onOpenChange, order, onConfirmed }: Props) {
   const { data: accounts = [], isLoading: accountsLoading } = useAccounts();
   const confirmPayment = useConfirmOrderPayment();
+  const payments = useOrderPayments(order?.id);
+  const paidToDate = useMemo(
+    () => (payments.data ?? []).reduce((sum, payment) => sum + Number(payment.amount ?? 0), 0),
+    [payments.data],
+  );
   const [accountId, setAccountId] = useState("");
   const [amount, setAmount] = useState("");
   const [transactionId, setTransactionId] = useState("");
@@ -39,8 +48,8 @@ export function OrderPaymentDialog({ open, onOpenChange, order, onConfirmed }: P
 
   const remaining = useMemo(() => {
     if (!order) return 0;
-    return Math.max(0, Number(order.total ?? 0));
-  }, [order]);
+    return Math.max(0, Number(order.total ?? 0) - paidToDate);
+  }, [order, paidToDate]);
 
   useEffect(() => {
     if (!open || !order) return;
@@ -57,6 +66,9 @@ export function OrderPaymentDialog({ open, onOpenChange, order, onConfirmed }: P
     if (!order || !accountId || !transactionId.trim()) return;
     const numericAmount = Number(amount);
     if (!Number.isFinite(numericAmount) || numericAmount <= 0) return;
+    if (numericAmount > remaining) {
+      return;
+    }
     const result = await confirmPayment.mutateAsync({
       orderId: order.id,
       accountId,
@@ -85,6 +97,14 @@ export function OrderPaymentDialog({ open, onOpenChange, order, onConfirmed }: P
               <span className="text-muted-foreground">Order total</span>
               <strong>KES {Number(order.total ?? 0).toLocaleString()}</strong>
             </div>
+            <div className="mt-1 flex justify-between gap-3">
+              <span className="text-muted-foreground">Paid to date</span>
+              <strong>KES {paidToDate.toLocaleString()}</strong>
+            </div>
+            <div className="mt-1 flex justify-between gap-3">
+              <span className="text-muted-foreground">Remaining</span>
+              <strong className="text-primary">KES {remaining.toLocaleString()}</strong>
+            </div>
             <p className="mt-2 text-xs text-muted-foreground">
               Only the amount you confirm will be posted to the selected account. Profit is
               calculated separately; it is not posted as another income transaction.
@@ -98,6 +118,8 @@ export function OrderPaymentDialog({ open, onOpenChange, order, onConfirmed }: P
               <Input
                 type="number"
                 min="0.01"
+                max={remaining}
+                aria-describedby="payment-remaining-help"
                 step="0.01"
                 inputMode="decimal"
                 value={amount}
@@ -113,6 +135,9 @@ export function OrderPaymentDialog({ open, onOpenChange, order, onConfirmed }: P
               />
             </div>
           </div>
+          <p id="payment-remaining-help" className="text-xs text-muted-foreground">
+            The selected amount is posted once to the receiving account and linked to this order.
+          </p>
           <div className="space-y-1.5">
             <Label>Received into</Label>
             <Select value={accountId} onValueChange={setAccountId} disabled={accountsLoading}>
@@ -152,7 +177,14 @@ export function OrderPaymentDialog({ open, onOpenChange, order, onConfirmed }: P
           </Button>
           <Button
             onClick={submit}
-            disabled={confirmPayment.isPending || !accountId || !transactionId.trim()}
+            disabled={
+              confirmPayment.isPending ||
+              payments.isLoading ||
+              !accountId ||
+              !transactionId.trim() ||
+              remaining <= 0 ||
+              Number(amount) > remaining
+            }
           >
             {confirmPayment.isPending ? "Confirming…" : "Confirm payment"}
           </Button>

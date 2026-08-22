@@ -87,6 +87,7 @@ function OrdersPage() {
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [fulfillingOrder, setFulfillingOrder] = useState<Order | null>(null);
   const [paymentOrder, setPaymentOrder] = useState<Order | null>(null);
+  const [paymentAfterStatus, setPaymentAfterStatus] = useState<Order["status"] | null>(null);
   const [refundOrder, setRefundOrder] = useState<Order | null>(null);
 
   const summary = useMemo(() => {
@@ -100,6 +101,19 @@ function OrdersPage() {
     const avg = recent.length > 0 ? revenue / recent.length : 0;
     return { total: orders.length, pending: pending.length, revenue, avg };
   }, [orders]);
+
+  function advanceOrder(order: Order, next: Order["status"]) {
+    if (
+      next === "delivered" &&
+      order.payment_status !== "paid" &&
+      order.payment_status !== "refunded"
+    ) {
+      setPaymentOrder(order);
+      setPaymentAfterStatus(next);
+      return;
+    }
+    updateStatus.mutate({ order, status: next });
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -252,9 +266,13 @@ function OrdersPage() {
                               variant="outline"
                               className="whitespace-nowrap text-xs"
                               disabled={updateStatus.isPending}
-                              onClick={() => updateStatus.mutate({ order, status: next })}
+                              onClick={() => advanceOrder(order, next)}
                             >
-                              {ORDER_STATUS_META[next].label}
+                              {next === "delivered" &&
+                              order.payment_status !== "paid" &&
+                              order.payment_status !== "refunded"
+                                ? "Record payment & deliver"
+                                : ORDER_STATUS_META[next].label}
                               <ChevronRight className="ml-1 h-3 w-3" />
                             </Button>
                           )}
@@ -367,9 +385,18 @@ function OrdersPage() {
       <OrderPaymentDialog
         open={Boolean(paymentOrder)}
         onOpenChange={(open) => {
-          if (!open) setPaymentOrder(null);
+          if (!open) {
+            setPaymentOrder(null);
+            setPaymentAfterStatus(null);
+          }
         }}
         order={paymentOrder}
+        onConfirmed={(result) => {
+          if (paymentAfterStatus && paymentOrder && result.payment_status === "paid") {
+            updateStatus.mutate({ order: paymentOrder, status: paymentAfterStatus });
+          }
+          setPaymentAfterStatus(null);
+        }}
       />
     </div>
   );
