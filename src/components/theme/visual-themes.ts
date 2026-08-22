@@ -1,5 +1,5 @@
 export type VisualThemeId =
-  "midnight" | "aurora" | "dailygear" | "paper" | "ocean" | "plum" | "copper" | "sage" | "custom";
+  "midnight" | "aurora" | "dailygear" | "paper" | "ocean" | "ocean_mountain" | "plum" | "copper" | "sage" | "custom";
 export type VisualBackdrop = "mountains" | "gradient" | "none";
 export type VisualTheme = {
   id: VisualThemeId;
@@ -54,6 +54,14 @@ export const VISUAL_THEMES: Record<VisualThemeId, VisualTheme> = {
     backdrop: "gradient",
     accent: "blue",
     preview: { start: "#092d3b", end: "#176b79", accent: "#62d9df" },
+  },
+  ocean_mountain: {
+    id: "ocean_mountain",
+    label: "Ocean Mountain",
+    description: "4K mountain backdrop with cool ocean atmosphere",
+    backdrop: "mountains",
+    accent: "blue",
+    preview: { start: "#082f49", end: "#0f766e", accent: "#67e8f9" },
   },
   plum: {
     id: "plum",

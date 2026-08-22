@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,8 @@ import { ArrowDownToLine, BellRing, CheckCircle2, HeartHandshake, PiggyBank, Shi
 import { toast } from "sonner";
 import { formatMoney } from "@/lib/money/format";
 import { useAccountBalances, useAccounts, useSaveTransaction, useTransactions } from "@/lib/money/api";
+import { getDailyGearProfitCashFlow } from "@/lib/dailygear/profit-cash-flow.functions";
+import type { DailyGearProfitCashFlowResponse } from "@/lib/dailygear/profit-cash-flow.server";
 
 const ALLOCATION_RATE = 0.1;
 
@@ -28,6 +30,21 @@ export function MoneyAllocationPanel() {
   const [savingsAccountId, setSavingsAccountId] = useState("");
   const [approvedTitheKeys, setApprovedTitheKeys] = useState<string[]>([]);
   const [approvedSavingsKeys, setApprovedSavingsKeys] = useState<string[]>([]);
+  const [profitResponse, setProfitResponse] = useState<DailyGearProfitCashFlowResponse | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    getDailyGearProfitCashFlow({ data: { datePreset: "today", includeInsights: true, maxPages: 10 } })
+      .then((response) => {
+        if (active) setProfitResponse(response);
+      })
+      .catch(() => {
+        if (active) setProfitResponse(null);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const emergencyAccount = accounts.find((account) => /emergency fund/i.test(account.name));
   const emergencyBalance = Number(
@@ -36,7 +53,7 @@ export function MoneyAllocationPanel() {
 
   const metrics = useMemo(() => {
     const posted = transactions.filter((transaction) => transaction.status === "posted");
-    const businessProfit = posted.reduce((total, transaction) => {
+    const ledgerBusinessProfit = posted.reduce((total, transaction) => {
       if (transaction.financial_scope !== "business") return total;
       if (transaction.type === "income") return total + Number(transaction.amount);
       if (transaction.type === "expense") {
@@ -56,14 +73,16 @@ export function MoneyAllocationPanel() {
     const personalReceipts = posted
       .filter((transaction) => transaction.type === "income" && transaction.financial_scope !== "business")
       .reduce((total, transaction) => total + Number(transaction.amount), 0);
+    const canonicalBusinessProfit = profitResponse?.financials.operatingProfit;
+    const businessProfit = canonicalBusinessProfit ?? ledgerBusinessProfit;
     return {
-      businessProfit,
+      businessProfit: canonicalBusinessProfit ?? ledgerBusinessProfit,
       salaryReceived,
       businessTithe: Math.max(0, businessProfit) * ALLOCATION_RATE,
       salaryTithe: salaryReceived * ALLOCATION_RATE,
       savingsSuggestion: personalReceipts * ALLOCATION_RATE,
     };
-  }, [transactions]);
+  }, [transactions, profitResponse]);
 
   const availableAccounts = accounts.filter((account) => account.id !== emergencyAccount?.id);
   const personalSavingsAccounts = availableAccounts.filter((account) => account.financial_scope !== "business");
@@ -146,8 +165,11 @@ export function MoneyAllocationPanel() {
             <HeartHandshake className="h-6 w-6 text-rose-500" />
           </div>
           <p className="text-xs text-muted-foreground">
-            10% of today’s positive business profit ({formatMoney(metrics.businessTithe)}) plus 10% of confirmed salary received ({formatMoney(metrics.salaryTithe)}).
+            10% of today’s net business profit ({formatMoney(metrics.businessTithe)}) plus 10% of confirmed salary received ({formatMoney(metrics.salaryTithe)}). Net business profit includes recognized revenue, COGS, order costs, business expenses, and available read-only Meta spend.
           </p>
+          {profitResponse?.financials.dataQuality.warnings.length ? (
+            <p className="text-xs text-amber-700 dark:text-amber-300">Profit data warning: {profitResponse.financials.dataQuality.warnings[0]}</p>
+          ) : null}
           {titheTotal > 0 && !titheApproved ? (
             <>
               <div className="space-y-1.5">
