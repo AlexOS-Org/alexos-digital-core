@@ -21,36 +21,39 @@ import { parseFunnelLandingContent } from "@/lib/storefront/funnel-copy";
 import { useStorefront } from "@/lib/storefront/api";
 import { initMetaPixel, trackMetaPixel, useMetaPixel } from "@/lib/storefront/meta-pixel";
 
+const YJ_HERO_IMAGE =
+  "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/LmReCutXJBRoMMXD.jpg";
+
 const YJ_DETAIL_IMAGES = [
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/XBIefkHnwPtfUyyZ.jpg",
-    title: "Durable zipped compartments",
-    body: "Organise books, lunch and daily school items so children can reach what they need more easily.",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/tgZNGGKvULUeAAfa.jpg",
+    title: "Room for school essentials",
+    body: "The visible compartments, front pocket and side pockets help organise books, stationery and daily items.",
   },
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/yWYSudxBprbdIVly.jpg",
-    title: "Adjustable padded shoulder straps",
-    body: "Adjustable straps help the bag sit more comfortably as your child carries it through the school day.",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/MVKuBizDAtvngpJu.jpg",
+    title: "Padded straps and back detail",
+    body: "The supplied product information highlights padded shoulder straps and a padded back cushion for everyday carrying.",
   },
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/bQsYelODbFkllzAQ.jpg",
-    title: "Breathable back support",
-    body: "The back and strap detail shown in the product image is designed for a more comfortable everyday carry.",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/UMYTnctJHTcAepoB.jpg",
+    title: "Water-resistant nylon exterior",
+    body: "The bag is described as made from durable, water-resistant nylon for school, travel and everyday use.",
   },
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/mxVDsFRuDCpwWphr.jpg",
-    title: "Dedicated laptop or tablet space",
-    body: "The interior compartment helps keep a tablet or laptop separate from the rest of the school essentials.",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/mnnshNnaYbQVnPEJ.jpg",
+    title: "Made for school mornings",
+    body: "A natural school setting shows how the Pink option can fit into a child’s daily routine.",
   },
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/FgIOJcfYIUWhpSXP.jpg",
-    title: "One-piece practical design",
-    body: "The opening and layout make it easier to see how the bag is arranged for school, travel or daily use.",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/QyFTHNSUTFayHMQW.jpg",
+    title: "A practical everyday carry",
+    body: "The Red option is shown in a school setting so parents can picture it as an everyday backpack choice.",
   },
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/FzJmGPDpiAXqzJKl.jpg",
-    title: "A bold colour children can enjoy",
-    body: "The red-and-green colour combination gives the available Green option a distinctive school-day look.",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/BalGDgovENQeadlQ.jpg",
+    title: "Choose a colour they enjoy",
+    body: "Pink, Red and Green are the currently available YJ Baby colour options shown together in the hero image.",
   },
 ] as const;
 
@@ -286,12 +289,14 @@ function FunnelPage() {
   const bumpProduct = orderBump
     ? (funnel?.offerProducts.find((offer) => offer.id === orderBump.productId) ?? null)
     : null;
-  const heroImage = selectedVariant?.imageUrl ?? product?.images[0] ?? null;
+  const heroImage = isYjBag
+    ? YJ_HERO_IMAGE
+    : selectedVariant?.imageUrl ?? product?.images[0] ?? null;
   const galleryImages = useMemo(() => {
     const candidates = [
       ...productVariants.map((variant) => variant.imageUrl),
       ...(product?.images ?? []),
-      ...(isYjBag ? YJ_DETAIL_IMAGES.map((image) => image.url) : []),
+      ...(isYjBag ? [YJ_HERO_IMAGE, ...YJ_DETAIL_IMAGES.map((image) => image.url)] : []),
     ].filter((image): image is string => Boolean(image));
     return Array.from(new Set(candidates));
   }, [isYjBag, product?.images, productVariants]);
@@ -439,7 +444,15 @@ function FunnelPage() {
 
           <section className="mt-8 space-y-6" aria-label="Product benefits and images">
             {visibleBenefits.map((benefit, index) => {
-              const image = galleryImages[index % Math.max(galleryImages.length, 1)];
+              const benefitImageUrls = isYjBag
+                ? [
+                    YJ_DETAIL_IMAGES[0].url,
+                    YJ_DETAIL_IMAGES[3].url,
+                    YJ_DETAIL_IMAGES[2].url,
+                    YJ_DETAIL_IMAGES[5].url,
+                  ]
+                : galleryImages;
+              const image = benefitImageUrls[index % Math.max(benefitImageUrls.length, 1)];
               return (
                 <article
                   key={`visual-${benefit.title}`}
@@ -471,90 +484,6 @@ function FunnelPage() {
               );
             })}
           </section>
-
-          {galleryImages.length > 0 ? (
-            <section
-              className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7"
-              aria-label="Available colours"
-            >
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
-                Choose your colour
-              </p>
-              <h2 className="mt-2 text-2xl font-black tracking-tight">
-                See the available options before you order.
-              </h2>
-              <div className="mt-5 grid gap-3">
-                {productVariants.map((variant) => {
-                  const variantQuantity = variantQuantities[variant.id] ?? 0;
-                  return (
-                    <div
-                      key={variant.id}
-                      className={`flex min-w-0 items-center gap-3 rounded-2xl border p-3 ${selectedVariant?.id === variant.id ? "border-primary ring-2 ring-primary/20" : "border-border"}`}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => setSelectedVariantId(variant.id)}
-                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
-                      >
-                        {variant.imageUrl ? (
-                          <img
-                            src={variant.imageUrl}
-                            alt={`${product.name} — ${variant.name}`}
-                            loading="lazy"
-                            decoding="async"
-                            className="h-16 w-16 shrink-0 rounded-xl object-contain"
-                          />
-                        ) : (
-                          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-xl bg-muted/40 text-[10px] text-muted-foreground">
-                            Image pending
-                          </div>
-                        )}
-                        <span className="min-w-0 break-words text-sm font-semibold">
-                          {variant.name}
-                        </span>
-                      </button>
-                      <div
-                        className="flex shrink-0 items-center gap-2"
-                        aria-label={`Quantity for ${variant.name}`}
-                      >
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() =>
-                            setVariantQuantities((current) => ({
-                              ...current,
-                              [variant.id]: Math.max(0, variantQuantity - 1),
-                            }))
-                          }
-                          aria-label={`Remove one ${variant.name}`}
-                        >
-                          −
-                        </Button>
-                        <span className="w-5 text-center text-sm font-bold">{variantQuantity}</span>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() =>
-                            setVariantQuantities((current) => ({
-                              ...current,
-                              [variant.id]: variantQuantity + 1,
-                            }))
-                          }
-                          aria-label={`Add one ${variant.name}`}
-                        >
-                          +
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          ) : null}
 
           {isYjBag ? (
             <section
@@ -607,6 +536,73 @@ function FunnelPage() {
         </div>
 
         <aside className="h-fit rounded-3xl border border-border bg-card p-5 shadow-xl lg:sticky lg:top-6 sm:p-6">
+          {galleryImages.length > 0 ? (
+            <section className="-m-1 mb-5 rounded-3xl border border-border bg-background p-4 sm:p-5" aria-label="Available colours">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                Choose your colour
+              </p>
+              <h2 className="mt-2 text-xl font-black tracking-tight">
+                See the available options before you order.
+              </h2>
+              <div className="mt-4 grid gap-3">
+                {productVariants.map((variant) => {
+                  const variantQuantity = variantQuantities[variant.id] ?? 0;
+                  return (
+                    <div
+                      key={variant.id}
+                      className={`flex min-w-0 items-center gap-3 rounded-2xl border p-3 ${selectedVariant?.id === variant.id ? "border-primary ring-2 ring-primary/20" : "border-border"}`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setSelectedVariantId(variant.id)}
+                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                      >
+                        {variant.imageUrl ? (
+                          <img
+                            src={variant.imageUrl}
+                            alt={`${product.name} — ${variant.name}`}
+                            loading="lazy"
+                            decoding="async"
+                            className="h-14 w-14 shrink-0 rounded-xl object-contain"
+                          />
+                        ) : (
+                          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-muted/40 text-[10px] text-muted-foreground">
+                            Image pending
+                          </div>
+                        )}
+                        <span className="min-w-0 break-words text-sm font-semibold">
+                          {variant.name}
+                        </span>
+                      </button>
+                      <div className="flex shrink-0 items-center gap-2" aria-label={`Quantity for ${variant.name}`}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => setVariantQuantities((current) => ({ ...current, [variant.id]: Math.max(0, variantQuantity - 1) }))}
+                          aria-label={`Remove one ${variant.name}`}
+                        >
+                          −
+                        </Button>
+                        <span className="w-5 text-center text-sm font-bold">{variantQuantity}</span>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => setVariantQuantities((current) => ({ ...current, [variant.id]: variantQuantity + 1 }))}
+                          aria-label={`Add one ${variant.name}`}
+                        >
+                          +
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             Your offer
           </p>

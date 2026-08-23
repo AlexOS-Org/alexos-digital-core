@@ -1,6 +1,7 @@
 ﻿{
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "alexos-business-os",
+  "account_id": "0589152be18f79fa5331e089b6055762",
   "compatibility_date": "2026-08-13",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
