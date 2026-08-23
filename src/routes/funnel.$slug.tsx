@@ -190,6 +190,13 @@ function FunnelPage() {
     ? (funnel?.offerProducts.find((offer) => offer.id === orderBump.productId) ?? null)
     : null;
   const heroImage = selectedVariant?.imageUrl ?? product?.images[0] ?? null;
+  const galleryImages = useMemo(() => {
+    const candidates = [
+      ...productVariants.map((variant) => variant.imageUrl),
+      ...(product?.images ?? []),
+    ].filter((image): image is string => Boolean(image));
+    return Array.from(new Set(candidates));
+  }, [product?.images, productVariants]);
 
   function addToCheckout() {
     if (!funnel || !product || outOfStock) return;
@@ -370,6 +377,80 @@ function FunnelPage() {
               ))}
             </div>
           </div>
+
+          <section className="mt-8 space-y-6" aria-label="Product benefits and images">
+            {(landingCopy?.benefits ?? []).map((benefit, index) => {
+              const image = galleryImages[index % Math.max(galleryImages.length, 1)];
+              return (
+                <article
+                  key={`visual-${benefit.title}`}
+                  className="grid items-center gap-5 rounded-3xl border border-emerald-500/20 bg-card p-4 shadow-sm sm:grid-cols-2 sm:p-6"
+                >
+                  <div className={index % 2 === 1 ? "sm:order-2" : ""}>
+                    {image ? (
+                      <img
+                        src={image}
+                        alt={`${product.name} — ${benefit.title}`}
+                        loading="lazy"
+                        decoding="async"
+                        className="aspect-[4/3] w-full rounded-2xl object-cover"
+                      />
+                    ) : (
+                      <div className="grid aspect-[4/3] place-items-center rounded-2xl bg-muted/40 text-muted-foreground">
+                        <ShoppingBag className="h-12 w-12" />
+                      </div>
+                    )}
+                  </div>
+                  <div className={index % 2 === 1 ? "sm:order-1" : ""}>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                      0{index + 1} · Why it fits
+                    </p>
+                    <h3 className="mt-2 text-2xl font-black tracking-tight">{benefit.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-muted-foreground">{benefit.body}</p>
+                  </div>
+                </article>
+              );
+            })}
+          </section>
+
+          {galleryImages.length > 0 ? (
+            <section
+              className="mt-8 rounded-3xl border border-emerald-500/20 bg-card p-5 shadow-sm sm:p-7"
+              aria-label="Available colours"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                Choose your colour
+              </p>
+              <h2 className="mt-2 text-2xl font-black tracking-tight">
+                See the available options before you order.
+              </h2>
+              <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {productVariants.map((variant) => (
+                  <button
+                    key={variant.id}
+                    type="button"
+                    onClick={() => setSelectedVariantId(variant.id)}
+                    className={`overflow-hidden rounded-2xl border text-left ${selectedVariant?.id === variant.id ? "border-emerald-500 ring-2 ring-emerald-500/30" : "border-border"}`}
+                  >
+                    {variant.imageUrl ? (
+                      <img
+                        src={variant.imageUrl}
+                        alt={`${product.name} — ${variant.name}`}
+                        loading="lazy"
+                        decoding="async"
+                        className="aspect-square w-full object-cover"
+                      />
+                    ) : (
+                      <div className="grid aspect-square place-items-center bg-muted/40 text-xs text-muted-foreground">
+                        Image pending
+                      </div>
+                    )}
+                    <span className="block px-3 py-2 text-xs font-semibold">{variant.name}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          ) : null}
 
           {bumpProduct ? (
             <div className="mt-4 rounded-3xl border border-primary/20 bg-primary/5 p-5">
