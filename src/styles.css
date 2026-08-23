@@ -1740,6 +1740,107 @@
 }
 
 @layer utilities {
+  .money-center-shell {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    margin: -1rem;
+    padding: 1rem;
+    color: oklch(0.96 0.02 250);
+    background-color: oklch(0.08 0.025 255);
+    background-position: center;
+    background-size: cover;
+    border-radius: 1.75rem;
+  }
+
+  .money-center-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in oklch, oklch(0.06 0.025 255) 84%, transparent),
+        color-mix(in oklch, oklch(0.08 0.035 255) 96%, transparent)
+      ),
+      radial-gradient(
+        circle at 86% 4%,
+        color-mix(in oklch, var(--alexos-blue) 24%, transparent),
+        transparent 28rem
+      );
+    pointer-events: none;
+  }
+
+  .money-center-shell .text-muted-foreground {
+    color: oklch(0.78 0.03 250 / 78%) !important;
+  }
+
+  .money-hero {
+    border: 1px solid oklch(0.9 0.04 250 / 14%) !important;
+    background: linear-gradient(
+      135deg,
+      oklch(0.12 0.04 255 / 96%),
+      oklch(0.09 0.045 275 / 96%)
+    ) !important;
+    box-shadow: 0 28px 80px -42px oklch(0.04 0.02 255 / 90%) !important;
+  }
+
+  .money-kpi-card,
+  .money-account-card,
+  .money-data-card {
+    border-color: oklch(0.9 0.04 250 / 13%);
+    background: color-mix(in oklch, oklch(0.12 0.04 255) 91%, transparent);
+    color: oklch(0.96 0.02 250);
+    box-shadow: 0 20px 50px -34px oklch(0.02 0.01 255 / 92%);
+    backdrop-filter: blur(18px);
+  }
+
+  .money-kpi-card[data-tone="emerald"] .money-kpi-strip,
+  .money-kpi-card[data-tone="green"] .money-kpi-strip,
+  .money-kpi-card[data-tone="teal"] .money-kpi-strip {
+    background: oklch(0.78 0.17 165);
+  }
+
+  .money-kpi-card[data-tone="amber"] .money-kpi-strip,
+  .money-kpi-card[data-tone="orange"] .money-kpi-strip {
+    background: oklch(0.82 0.16 80);
+  }
+
+  .money-kpi-card[data-tone="violet"] .money-kpi-strip {
+    background: oklch(0.72 0.2 292);
+  }
+
+  .money-kpi-card[data-tone="rose"] .money-kpi-strip {
+    background: oklch(0.7 0.2 20);
+  }
+
+  .money-kpi-icon,
+  .money-account-icon {
+    background: color-mix(in oklch, var(--alexos-blue) 18%, oklch(0.08 0.025 255));
+    color: oklch(0.86 0.12 230);
+    border: 1px solid oklch(0.9 0.04 250 / 12%);
+  }
+
+  .money-account-balance {
+    background: linear-gradient(135deg, oklch(0.16 0.05 255 / 84%), oklch(0.11 0.04 255 / 92%));
+    border: 1px solid oklch(0.9 0.04 250 / 10%);
+  }
+
+  .money-account-card[data-status="low"] .money-account-balance {
+    border-color: oklch(0.68 0.22 25 / 62%);
+    background: linear-gradient(135deg, oklch(0.2 0.07 25 / 86%), oklch(0.12 0.04 255 / 94%));
+  }
+
+  .money-account-card[data-status="low"] .money-account-balance-value,
+  .money-account-card[data-status="low"] .money-account-status {
+    color: oklch(0.78 0.18 25);
+  }
+
+  .money-data-card {
+    background: color-mix(in oklch, oklch(0.12 0.04 255) 94%, transparent) !important;
+  }
+
   .dailygear-store-header {
     background: color-mix(in oklch, var(--color-background) 92%, var(--alexos-green) 8%);
     border-color: color-mix(in oklch, var(--color-border) 72%, var(--alexos-green) 28%);

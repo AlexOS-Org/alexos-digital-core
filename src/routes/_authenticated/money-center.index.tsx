@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBalanceVisibility } from "@/components/money/BalanceVisibility";
+import { getDashboardSceneAsset } from "@/components/theme/dashboard-scene-assets";
 
 export const Route = createFileRoute("/_authenticated/money-center/")({
   component: MoneyDashboard,
@@ -114,8 +115,11 @@ function MoneyDashboard() {
   ];
 
   return (
-    <div className="space-y-7">
-      <Card className="relative overflow-hidden rounded-[2rem] border-0 bg-gradient-to-br from-emerald-700 via-teal-700 to-slate-800 text-white shadow-[0_24px_70px_-35px_rgba(16,185,129,0.65)]">
+    <div
+      className="money-center-shell space-y-7"
+      style={{ backgroundImage: `url(${getDashboardSceneAsset("mountains")})` }}
+    >
+      <Card className="money-hero relative overflow-hidden rounded-[2rem] border-0 bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white shadow-[0_24px_70px_-35px_rgba(15,23,42,0.65)]">
         <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-emerald-300/15 blur-3xl" />
         <div className="pointer-events-none absolute bottom-[-5rem] left-[30%] h-52 w-52 rounded-full bg-cyan-300/10 blur-3xl" />
         <CardContent className="relative p-6 sm:p-8 lg:p-10">
@@ -285,7 +289,7 @@ function MoneyDashboard() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
-        <Card className="rounded-[1.5rem] border-border/60 shadow-sm">
+        <Card className="money-data-card rounded-[1.5rem] border-border/60 shadow-sm">
           <CardHeader>
             <CardTitle className="text-base">Recent money movement</CardTitle>
           </CardHeader>
@@ -327,7 +331,7 @@ function MoneyDashboard() {
             )}
           </CardContent>
         </Card>
-        <Card className="rounded-[1.5rem] border-border/60 bg-gradient-to-br from-violet-50/80 to-background shadow-sm">
+        <Card className="money-data-card rounded-[1.5rem] border-border/60 bg-gradient-to-br from-violet-50/80 to-background shadow-sm">
           <CardHeader>
             <CardTitle className="text-base">What needs attention</CardTitle>
           </CardHeader>
