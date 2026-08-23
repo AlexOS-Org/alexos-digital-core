@@ -243,6 +243,24 @@ function FunnelPage() {
       ) ?? [],
     [funnel?.variants, product?.id],
   );
+  const availableColourNames = productVariants.map((variant) =>
+    variant.name.replace(/^YJ Baby\s*[–-]\s*/i, "").trim(),
+  );
+  const availableColoursLabel = availableColourNames.length
+    ? availableColourNames.length === 1
+      ? availableColourNames[0]
+      : `${availableColourNames.slice(0, -1).join(", ")} & ${availableColourNames.at(-1)}`
+    : "available options";
+  const visibleProof = (
+    landingCopy?.proof ?? ["Canonical product", "Clear offer", "Existing checkout"]
+  ).map((item) => item.replace(/Blue, Pink, Red & Green/gi, availableColoursLabel));
+  const visibleBenefits = (landingCopy?.benefits ?? []).map((benefit) => ({
+    ...benefit,
+    body: benefit.body.replace(
+      /currently available Blue, Pink, Red and Green options/gi,
+      `currently available ${availableColoursLabel} options`,
+    ),
+  }));
   const selectedVariant =
     productVariants.find((variant) => variant.id === selectedVariantId) ?? null;
   const price = product
@@ -374,14 +392,12 @@ function FunnelPage() {
       <section className="mx-auto grid max-w-6xl gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[1fr_22rem] lg:py-14">
         <div>
           <div className="grid gap-4">
-            {(landingCopy?.proof ?? ["Canonical product", "Clear offer", "Existing checkout"])
-              .slice(0, 3)
-              .map((item) => (
-                <div key={item} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-                  <Check className="h-4 w-4 text-primary" />
-                  <p className="mt-2 text-sm font-semibold">{item}</p>
-                </div>
-              ))}
+            {visibleProof.slice(0, 3).map((item) => (
+              <div key={item} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                <Check className="h-4 w-4 text-primary" />
+                <p className="mt-2 text-sm font-semibold">{item}</p>
+              </div>
+            ))}
           </div>
           <div className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
@@ -397,7 +413,7 @@ function FunnelPage() {
                 "Product information will appear here once it is confirmed in the DailyGear catalogue."}
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {(landingCopy?.benefits ?? []).map((benefit) => (
+              {visibleBenefits.map((benefit) => (
                 <div key={benefit.title} className="rounded-2xl border bg-muted/25 p-4">
                   <p className="font-semibold">{benefit.title}</p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">{benefit.body}</p>
@@ -407,7 +423,7 @@ function FunnelPage() {
           </div>
 
           <section className="mt-8 space-y-6" aria-label="Product benefits and images">
-            {(landingCopy?.benefits ?? []).map((benefit, index) => {
+            {visibleBenefits.map((benefit, index) => {
               const image = galleryImages[index % Math.max(galleryImages.length, 1)];
               return (
                 <article
