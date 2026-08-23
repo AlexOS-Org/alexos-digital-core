@@ -47,12 +47,12 @@ export function StoreHeader({
   return (
     <header className="dailygear-store-header sticky top-0 z-40 border-b backdrop-blur-xl">
       {store?.announcement ? (
-        <div className="dailygear-store-announcement px-4 py-2 text-center text-xs font-semibold">
+        <div className="dailygear-store-announcement break-words px-3 py-2 text-center text-[11px] font-semibold leading-4 sm:px-4 sm:text-xs sm:leading-5">
           {store.announcement}
         </div>
       ) : null}
 
-      <div className="mx-auto grid max-w-7xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:gap-6">
+      <div className="mx-auto grid min-w-0 max-w-7xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 py-3 sm:gap-6 sm:px-4">
         <div className="flex min-w-0 items-center gap-2">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
@@ -101,7 +101,7 @@ export function StoreHeader({
             </SheetContent>
           </Sheet>
 
-          <Link to="/shop" className="flex min-w-0 items-center gap-2.5">
+          <Link to="/shop" className="flex min-w-0 items-center gap-2 sm:gap-2.5">
             <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-black/5">
               <img
                 src={store?.logo_url ?? DAILYGEAR_LOGO}
@@ -112,7 +112,7 @@ export function StoreHeader({
                 className="h-full w-full object-contain"
               />
             </span>
-            <span className="truncate text-base font-black tracking-tight sm:text-lg">
+            <span className="min-w-0 truncate text-[15px] font-black tracking-tight sm:text-lg">
               {store?.name ?? DAILYGEAR_NAME}
             </span>
           </Link>
@@ -125,7 +125,7 @@ export function StoreHeader({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search products"
-              className="rounded-xl pl-9"
+              className="h-11 rounded-xl pl-9 text-sm sm:h-12 sm:text-base"
               aria-label="Search products"
             />
           </div>
@@ -157,14 +157,14 @@ export function StoreHeader({
         </div>
       </div>
 
-      <form onSubmit={search} className="border-t px-4 pb-3 pt-3 lg:hidden">
+      <form onSubmit={search} className="border-t px-3 pb-3 pt-3 sm:px-4 lg:hidden">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search DailyGear"
-            className="rounded-xl pl-9"
+            className="h-11 rounded-xl pl-9 text-sm sm:h-12 sm:text-base"
             aria-label="Search DailyGear"
           />
         </div>

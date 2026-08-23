@@ -75,10 +75,12 @@ function ProductsPage() {
   const hasFilters = Boolean(search.q || search.category || search.brand || search.sort);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
+    <div className="mx-auto min-w-0 max-w-7xl px-3 py-6 sm:px-4 sm:py-8">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:justify-between">
         <div className="min-w-0">
-          <h1 className="truncate text-2xl font-black tracking-tight">All products</h1>
+          <h1 className="break-words text-[1.75rem] font-black leading-tight tracking-tight sm:text-2xl">
+            All products
+          </h1>
           <p className="text-sm text-muted-foreground">
             {products.data?.length ?? 0} item{(products.data?.length ?? 0) === 1 ? "" : "s"}
           </p>
@@ -90,7 +92,7 @@ function ProductsPage() {
         ) : null}
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-5 grid min-w-0 grid-cols-1 gap-3 sm:mt-6 sm:grid-cols-2 lg:grid-cols-4">
         <Input
           value={search.q ?? ""}
           onChange={(e) => update({ q: e.target.value || undefined })}
@@ -153,19 +155,19 @@ function ProductsPage() {
 
       <div className="mt-8">
         {products.isLoading ? (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="grid min-w-0 grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {[...Array(8)].map((_, i) => (
               <Skeleton key={i} className="h-80 rounded-3xl" />
             ))}
           </div>
         ) : products.data?.length ? (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="grid min-w-0 grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {products.data.map((p) => (
               <ProductCard key={p.id} product={p} currency={currency} />
             ))}
           </div>
         ) : (
-          <div className="rounded-3xl border border-dashed p-12 text-center">
+          <div className="rounded-3xl border border-dashed p-8 text-center sm:p-12">
             <p className="text-sm font-medium">No products match your filters</p>
             <p className="mt-1 text-sm text-muted-foreground">
               Try a different search, or{" "}

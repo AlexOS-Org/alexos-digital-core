@@ -25,11 +25,11 @@ export function ProductCard({ product, currency }: Props) {
   const soldOut = product.status === "out_of_stock";
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-3xl border bg-card transition-shadow hover:shadow-lg">
+    <article className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border bg-card transition-shadow hover:shadow-lg sm:rounded-3xl">
       <Link
         to="/shop/product/$id"
         params={{ id: product.id }}
-        className="dailygear-product-media relative block aspect-square overflow-hidden bg-muted"
+        className="dailygear-product-media relative block aspect-[0.92] overflow-hidden bg-muted sm:aspect-square"
       >
         {image ? (
           <ResponsiveProductImage
@@ -65,17 +65,17 @@ export function ProductCard({ product, currency }: Props) {
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
+      <div className="flex min-w-0 flex-1 flex-col gap-2.5 p-3 sm:gap-3 sm:p-5">
         <div className="min-w-0 space-y-1">
           <Link
             to="/shop/product/$id"
             params={{ id: product.id }}
-            className="line-clamp-2 text-sm font-semibold leading-snug hover:underline"
+            className="line-clamp-2 break-words text-[13px] font-semibold leading-tight hover:underline sm:text-sm sm:leading-snug"
           >
             {product.name}
           </Link>
-          <div className="flex items-center gap-2">
-            <span className="text-base font-bold">{formatMoney(price, currency)}</span>
+          <div className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+            <span className="text-sm font-bold sm:text-base">{formatMoney(price, currency)}</span>
             {isOnSale(product) ? (
               <span className="text-xs text-muted-foreground line-through">
                 {formatMoney(Number(product.price), currency)}
@@ -84,14 +84,17 @@ export function ProductCard({ product, currency }: Props) {
           </div>
         </div>
 
-        <p className="text-xs leading-relaxed text-muted-foreground line-clamp-3">
+        <p className="line-clamp-2 break-words text-[11px] leading-5 text-muted-foreground sm:line-clamp-3 sm:text-xs sm:leading-relaxed">
           {soldOut
             ? "Currently unavailable. Browse the collection for another option."
             : (product.short_description ??
               "Choose the option that fits your needs, review the details, and continue to checkout.")}
         </p>
 
-        <Button asChild className="dailygear-product-cta mt-auto w-full rounded-xl">
+        <Button
+          asChild
+          className="dailygear-product-cta mt-auto h-10 w-full rounded-xl px-2 text-xs sm:h-11 sm:px-4 sm:text-sm"
+        >
           <Link to="/shop/product/$id" params={{ id: product.id }}>
             {soldOut ? "View details" : "Choose options & order"}
           </Link>
