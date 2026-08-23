@@ -20,40 +20,41 @@ import { readCheckoutProfile, saveCheckoutProfile } from "@/lib/storefront/check
 import { parseFunnelLandingContent } from "@/lib/storefront/funnel-copy";
 import { useStorefront } from "@/lib/storefront/api";
 import { initMetaPixel, trackMetaPixel, useMetaPixel } from "@/lib/storefront/meta-pixel";
+import { trackGoogleAnalytics } from "@/lib/storefront/google-analytics";
 
 const YJ_HERO_IMAGE =
   "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/LmReCutXJBRoMMXD.jpg";
 
 const YJ_DETAIL_IMAGES = [
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/tgZNGGKvULUeAAfa.jpg",
-    title: "Room for school essentials",
-    body: "The visible compartments, front pocket and side pockets help organise books, stationery and daily items.",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/uEnVUZZSqTxpWcpC.jpg",
+    title: "Water-resistant exterior for busy school days",
+    body: "The supplied product information describes a durable, water-resistant nylon exterior, and this image shows water on the outside of the bag.",
   },
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/MVKuBizDAtvngpJu.jpg",
-    title: "Padded straps and back detail",
-    body: "The supplied product information highlights padded shoulder straps and a padded back cushion for everyday carrying.",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/SmdTfvhZpfaalxcl.jpg",
+    title: "Zipped compartments and sturdy details",
+    body: "The close-up shows the zipper pulls and trim that help open the bag’s separate storage areas for books and daily essentials.",
   },
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/UMYTnctJHTcAepoB.jpg",
-    title: "Water-resistant nylon exterior",
-    body: "The bag is described as made from durable, water-resistant nylon for school, travel and everyday use.",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/tQXkhWbSuxGPqqhI.jpg",
+    title: "Adjustable padded shoulder straps",
+    body: "The supplied image highlights widened, adjustable shoulder straps and a ventilated back area for everyday carrying.",
   },
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/mnnshNnaYbQVnPEJ.jpg",
-    title: "Made for school mornings",
-    body: "A natural school setting shows how the Pink option can fit into a child’s daily routine.",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/NjLhYrHuvoVvJyWP.jpg",
+    title: "A fit that helps organise the school load",
+    body: "The backpack’s visible back padding, straps and side structure are designed around a more organised school-day carry.",
   },
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/QyFTHNSUTFayHMQW.jpg",
-    title: "A practical everyday carry",
-    body: "The Red option is shown in a school setting so parents can picture it as an everyday backpack choice.",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/jjxGUkCscisJIwCt.jpg",
+    title: "Space for a laptop or tablet",
+    body: "The supplied product image shows a laptop or tablet placed inside the padded compartment; check the device size against the bag before ordering.",
   },
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/BalGDgovENQeadlQ.jpg",
-    title: "Choose a colour they enjoy",
-    body: "Pink, Red and Green are the currently available YJ Baby colour options shown together in the hero image.",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/jeljxkzyPMfbYrlj.jpg",
+    title: "One-piece practical structure",
+    body: "The open view shows how the bag unfolds and how its sections work together for school, travel or daily use.",
   },
 ] as const;
 
@@ -395,6 +396,8 @@ function FunnelPage() {
                 <img
                   src={heroImage}
                   alt={selectedVariant ? `${product.name} — ${selectedVariant.name}` : product.name}
+                  width={1200}
+                  height={900}
                   fetchPriority="high"
                   decoding="async"
                   className="h-full w-full object-contain"
@@ -463,6 +466,8 @@ function FunnelPage() {
                       <img
                         src={image}
                         alt={`${product.name} — ${benefit.title}`}
+                        width={800}
+                        height={600}
                         loading="lazy"
                         decoding="async"
                         className="aspect-[4/3] w-full rounded-2xl object-cover"
@@ -505,6 +510,8 @@ function FunnelPage() {
                     <img
                       src={image.url}
                       alt={`${product.name} — ${image.title}`}
+                      width={800}
+                      height={800}
                       loading="lazy"
                       decoding="async"
                       className="aspect-square w-full object-cover"
@@ -536,14 +543,14 @@ function FunnelPage() {
 
           {isYjBag ? (
             <section
-              className="mt-8 rounded-3xl border border-border bg-card p-5 text-center shadow-sm sm:p-8"
+              className="mt-8 rounded-3xl border border-primary/30 bg-card p-5 text-center shadow-sm sm:p-8"
               aria-label="YJ offer details"
             >
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
                 YJ Baby premium school bag
               </p>
               <h2 className="mt-3 text-3xl font-black tracking-tight">
-                A practical school-day bag they can enjoy using
+                Stop the morning scramble. Give your child’s school essentials a place.
               </h2>
               <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-muted-foreground">
                 Choose the colours and quantities your family needs, then fill in your delivery
@@ -620,7 +627,17 @@ function FunnelPage() {
                     >
                       <button
                         type="button"
-                        onClick={() => setSelectedVariantId(variant.id)}
+                        onClick={() => {
+                          setSelectedVariantId(variant.id);
+                          trackGoogleAnalytics("select_item", {
+                            item_list_name: "YJ Baby school bag funnel",
+                            item_id: variant.sku ?? variant.id,
+                            item_name: product.name,
+                            item_variant: variant.color ?? variant.name,
+                            currency: product.currency,
+                            value: variantPrice(variant, product),
+                          });
+                        }}
                         className="flex min-w-0 flex-1 items-center gap-3 text-left"
                       >
                         {variant.imageUrl ? (
@@ -680,6 +697,27 @@ function FunnelPage() {
                   );
                 })}
               </div>
+            </section>
+          ) : null}
+          {isYjBag ? (
+            <section
+              className="mb-5 rounded-3xl border border-border bg-background p-4 sm:p-5"
+              aria-label="Customer reviews"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+                What customers say
+              </p>
+              <h2 className="mt-2 text-xl font-black tracking-tight">
+                Real feedback will appear here
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                DailyGear will publish verified YJ Baby customer feedback after delivered orders are
+                reviewed. We will not copy testimonials from another store or create customer
+                quotes.
+              </p>
+              <p className="mt-3 text-xs font-semibold text-muted-foreground">
+                Review status: awaiting verified YJ customer submissions.
+              </p>
             </section>
           ) : null}
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
