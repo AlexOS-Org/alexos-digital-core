@@ -23,7 +23,12 @@ import { initMetaPixel, trackMetaPixel, useMetaPixel } from "@/lib/storefront/me
 import { trackGoogleAnalytics } from "@/lib/storefront/google-analytics";
 
 const YJ_HERO_IMAGE =
-  "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/zjXCQvblIoPgFGyL.png";
+  "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/kgkuyAeqCnUWMUrq.jpg";
+const YJ_EXACT_COLOUR_IMAGES = [
+  "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/kgkuyAeqCnUWMUrq.jpg",
+  "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/lqYSLmnstKCbhSqy.png",
+  "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/oObQIxmoIjUtNsvS.png",
+] as const;
 
 const YJ_DETAIL_IMAGES = [
   {
@@ -250,7 +255,7 @@ function FunnelPage() {
         proof: [
           "Water-resistant nylon construction",
           "Separate pockets for everyday essentials",
-          "Pink, Red and Green options currently available",
+          "Red, Teal/Green and Navy Blue with Pink trim options currently available",
         ],
         benefits: [
           {
@@ -267,7 +272,7 @@ function FunnelPage() {
           },
           {
             title: "Let your child choose",
-            body: "Choose the available Pink, Red or Green colour that your child will be happy to carry to school.",
+            body: "Choose the available Red, Teal/Green or Navy Blue with Pink trim colour that your child will be happy to carry to school.",
           },
         ],
         deliveryNote:
@@ -330,7 +335,9 @@ function FunnelPage() {
     const candidates = [
       ...productVariants.map((variant) => variant.imageUrl),
       ...(product?.images ?? []),
-      ...(isYjBag ? [YJ_HERO_IMAGE, ...YJ_DETAIL_IMAGES.map((image) => image.url)] : []),
+      ...(isYjBag
+        ? [...YJ_EXACT_COLOUR_IMAGES, YJ_HERO_IMAGE, ...YJ_DETAIL_IMAGES.map((image) => image.url)]
+        : []),
     ].filter((image): image is string => Boolean(image));
     return Array.from(new Set(candidates));
   }, [isYjBag, product?.images, productVariants]);
@@ -602,7 +609,7 @@ function FunnelPage() {
                   ],
                   [
                     "Three available colours",
-                    "Pink, Red and Green are available for selection; unavailable colours stay hidden from customers.",
+                    "Red, Teal/Green and Navy Blue with Pink trim are available for selection; unavailable colours stay hidden from customers.",
                   ],
                 ].map(([title, body]) => (
                   <div key={title} className="rounded-2xl border border-border bg-background p-4">
