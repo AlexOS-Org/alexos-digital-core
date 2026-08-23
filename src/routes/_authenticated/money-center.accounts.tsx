@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { CryptoHoldingsPanel } from "@/components/money/CryptoHoldingsPanel";
+import { useBalanceVisibility } from "@/components/money/BalanceVisibility";
 import mpesaLogo from "@/assets/branding/accounts/mpesa.png";
 import kcbLogo from "@/assets/branding/accounts/kcb.png";
 import imBankLogo from "@/assets/branding/accounts/im-bank.jpg";
@@ -214,6 +215,9 @@ function accountLogo(name: string) {
 }
 
 function AccountsPage() {
+  const { maskBalance } = useBalanceVisibility();
+  const displayMoney = (value: number | string | null | undefined, currency = "KES") =>
+    maskBalance(formatMoney(value, currency));
   const [showArchived, setShowArchived] = useState(false);
   const { data: accounts = [], isLoading } = useAccounts(showArchived);
   const { data: balances = [] } = useAccountBalances();
@@ -332,14 +336,14 @@ function AccountsPage() {
                       isLowBalance && "text-red-600/90 dark:text-red-400/90",
                     )}
                   >
-                    {formatMoney(balance, a.currency)}
+                    {displayMoney(balance, a.currency)}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    Opening: {formatMoney(a.opening_balance, a.currency)}
+                    Opening: {displayMoney(a.opening_balance, a.currency)}
                   </div>
                   {isLowBalance && (
                     <div className="mt-1 text-[11px] text-red-600/75 dark:text-red-400/75">
-                      Below your {formatMoney(warningThreshold!, a.currency)} comfort level
+                      Below your {displayMoney(warningThreshold!, a.currency)} comfort level
                     </div>
                   )}
                 </div>

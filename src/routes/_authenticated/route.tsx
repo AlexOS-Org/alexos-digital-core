@@ -8,6 +8,10 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { modules } from "@/lib/modules";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { isAuthorizedAlexOSUser } from "@/lib/authz";
+import {
+  BalanceVisibilityProvider,
+  BalanceVisibilityToggle,
+} from "@/components/money/BalanceVisibility";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -68,6 +72,7 @@ function MobileWorkspaceHeader({
       >
         <Bell className="h-[19px] w-[19px]" />
       </Link>
+      <BalanceVisibilityToggle compact />
       <Link
         to="/settings"
         className="grid h-10 w-10 shrink-0 touch-manipulation place-items-center rounded-full bg-gradient-to-br from-[var(--alexos-blue)] to-[var(--alexos-purple)] text-[11px] font-bold text-white shadow-md shadow-[var(--alexos-glow)]"
@@ -103,55 +108,58 @@ function AuthenticatedLayout() {
   );
 
   return (
-    <SidebarProvider defaultOpen={false}>
-      <div className="min-h-screen flex w-full bg-background text-foreground transition-colors duration-300">
-        <AppSidebar />
-        <div className="flex min-w-0 flex-1 flex-col">
-          {!isMobile && (
-            <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border/70 bg-background/80 px-4 backdrop-blur-xl sm:px-6">
-              <SidebarTrigger className="tap-target rounded-xl" />
-              <div className="min-w-0">
-                <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
-                  {current?.group ?? "Workspace"}
+    <BalanceVisibilityProvider>
+      <SidebarProvider defaultOpen={false}>
+        <div className="min-h-screen flex w-full bg-background text-foreground transition-colors duration-300">
+          <AppSidebar />
+          <div className="flex min-w-0 flex-1 flex-col">
+            {!isMobile && (
+              <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border/70 bg-background/80 px-4 backdrop-blur-xl sm:px-6">
+                <SidebarTrigger className="tap-target rounded-xl" />
+                <div className="min-w-0">
+                  <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
+                    {current?.group ?? "Workspace"}
+                  </div>
+                  <div className="truncate text-sm font-semibold">{current?.title ?? "AlexOS"}</div>
+                  <div className="hidden items-center gap-1 text-[10px] text-muted-foreground sm:flex">
+                    {breadcrumb.map((label, index) => (
+                      <span key={`${label}-${index}`}>
+                        {index > 0 && <span className="mr-1 text-muted-foreground/50">/</span>}
+                        {label}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <div className="truncate text-sm font-semibold">{current?.title ?? "AlexOS"}</div>
-                <div className="hidden items-center gap-1 text-[10px] text-muted-foreground sm:flex">
-                  {breadcrumb.map((label, index) => (
-                    <span key={`${label}-${index}`}>
-                      {index > 0 && <span className="mr-1 text-muted-foreground/50">/</span>}
-                      {label}
-                    </span>
-                  ))}
+                <div className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
+                  <BalanceVisibilityToggle />
+                  <span className="hidden sm:inline">Settings control appearance</span>
+                  <Link
+                    to="/settings"
+                    className="rounded-lg px-2 py-1.5 font-medium text-primary hover:bg-primary/10"
+                  >
+                    Settings
+                  </Link>
                 </div>
+              </header>
+            )}
+            {isMobile && (
+              <MobileWorkspaceHeader
+                isDailyGearRoute={isDailyGearRoute}
+                currentTitle={current?.title}
+              />
+            )}
+            <SupabaseConfigBanner />
+            <main
+              className={`alexos-route-canvas min-w-0 flex-1 touch-pan-y overflow-x-hidden p-4 sm:p-6 lg:p-8 ${isMobile ? "pb-28" : "pb-8"}`}
+            >
+              <div className="alexos-route-content">
+                <Outlet />
               </div>
-              <div className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="hidden sm:inline">Settings control appearance</span>
-                <Link
-                  to="/settings"
-                  className="rounded-lg px-2 py-1.5 font-medium text-primary hover:bg-primary/10"
-                >
-                  Settings
-                </Link>
-              </div>
-            </header>
-          )}
-          {isMobile && (
-            <MobileWorkspaceHeader
-              isDailyGearRoute={isDailyGearRoute}
-              currentTitle={current?.title}
-            />
-          )}
-          <SupabaseConfigBanner />
-          <main
-            className={`alexos-route-canvas min-w-0 flex-1 touch-pan-y overflow-x-hidden p-4 sm:p-6 lg:p-8 ${isMobile ? "pb-28" : "pb-8"}`}
-          >
-            <div className="alexos-route-content">
-              <Outlet />
-            </div>
-          </main>
-          {!isDailyGearRoute && <MobileBottomNav />}
+            </main>
+            {!isDailyGearRoute && <MobileBottomNav />}
+          </div>
         </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </BalanceVisibilityProvider>
   );
 }

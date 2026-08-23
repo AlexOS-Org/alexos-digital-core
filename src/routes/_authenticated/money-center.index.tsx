@@ -20,12 +20,16 @@ import {
   CircleAlert,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useBalanceVisibility } from "@/components/money/BalanceVisibility";
 
 export const Route = createFileRoute("/_authenticated/money-center/")({
   component: MoneyDashboard,
 });
 
 function MoneyDashboard() {
+  const { maskBalance } = useBalanceVisibility();
+  const displayMoney = (value: number | string | null | undefined, currency = "KES") =>
+    maskBalance(formatMoney(value, currency));
   const { data: accounts = [], isLoading: accLoading } = useAccounts();
   const { data: balances = [] } = useAccountBalances();
   const { data: txs = [] } = useTransactions({ limit: 8 });
@@ -122,7 +126,7 @@ function MoneyDashboard() {
               </div>
               <p className="mt-4 text-sm text-white/65">Your financial picture right now</p>
               <div className="mt-1 text-4xl font-semibold tracking-tight sm:text-5xl">
-                {formatMoney(total)}
+                {displayMoney(total)}
               </div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-black/10 px-4 py-3 backdrop-blur-md">
@@ -134,7 +138,7 @@ function MoneyDashboard() {
                 )}
               >
                 {cashFlow >= 0 ? "+" : ""}
-                {formatMoney(cashFlow)}
+                {displayMoney(cashFlow)}
               </div>
               <div className="mt-1 text-xs text-white/50">
                 {cashFlow >= 0 ? "You are ahead of expenses" : "Expenses are ahead of income"}
@@ -144,11 +148,11 @@ function MoneyDashboard() {
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-sm">
               <div className="text-xs text-white/55">Income</div>
-              <div className="mt-1 text-lg font-semibold">{formatMoney(incomeMonth)}</div>
+              <div className="mt-1 text-lg font-semibold">{displayMoney(incomeMonth)}</div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-sm">
               <div className="text-xs text-white/55">Expenses</div>
-              <div className="mt-1 text-lg font-semibold">{formatMoney(expenseMonth)}</div>
+              <div className="mt-1 text-lg font-semibold">{displayMoney(expenseMonth)}</div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-sm">
               <div className="text-xs text-white/55">Savings rate</div>
@@ -185,7 +189,7 @@ function MoneyDashboard() {
                       {k.label}
                     </p>
                     <p className="mt-3 text-2xl font-semibold tracking-tight">
-                      {formatMoney(k.value)}
+                      {displayMoney(k.value)}
                     </p>
                   </div>
                   <div className="money-kpi-icon grid h-11 w-11 place-items-center rounded-2xl">
@@ -254,21 +258,21 @@ function MoneyDashboard() {
                         "money-account-balance-value text-2xl font-semibold tracking-tight",
                       )}
                     >
-                      {formatMoney(state.balance, a.currency)}
+                      {displayMoney(state.balance, a.currency)}
                     </div>
                     {state.low ? (
                       <div className="money-account-status mt-1 text-[11px]">
-                        Below {formatMoney(state.threshold!, a.currency)} comfort level
+                        Below {displayMoney(state.threshold!, a.currency)} comfort level
                       </div>
                     ) : (
                       <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
                         <span className="money-inflow flex items-center gap-1">
                           <ArrowDownRight className="h-3 w-3" />
-                          {formatMoney(bal?.money_in ?? 0, a.currency)}
+                          {displayMoney(bal?.money_in ?? 0, a.currency)}
                         </span>
                         <span className="money-outflow flex items-center gap-1">
                           <ArrowUpRight className="h-3 w-3" />
-                          {formatMoney(bal?.money_out ?? 0, a.currency)}
+                          {displayMoney(bal?.money_out ?? 0, a.currency)}
                         </span>
                       </div>
                     )}
@@ -314,7 +318,7 @@ function MoneyDashboard() {
                       </div>
                       <div className={cn("whitespace-nowrap text-sm font-semibold", tone)}>
                         {sign}
-                        {formatMoney(t.amount)}
+                        {displayMoney(t.amount)}
                       </div>
                     </li>
                   );
@@ -331,7 +335,7 @@ function MoneyDashboard() {
             <div className="rounded-2xl bg-amber-500/8 p-4">
               <div className="text-xs font-semibold text-amber-700 dark:text-amber-400">Bills</div>
               <div className="mt-1 text-xl font-semibold">
-                {formatMoney(upcomingBills.reduce((s, b) => s + Number(b.amount), 0))}
+                {displayMoney(upcomingBills.reduce((s, b) => s + Number(b.amount), 0))}
               </div>
               <div className="mt-1 text-xs text-muted-foreground">
                 {upcomingBills.length} due in the next 7 days
@@ -341,7 +345,7 @@ function MoneyDashboard() {
               <div className="text-xs font-semibold text-violet-700 dark:text-violet-400">
                 Expected money
               </div>
-              <div className="mt-1 text-xl font-semibold">{formatMoney(expectedTotal)}</div>
+              <div className="mt-1 text-xl font-semibold">{displayMoney(expectedTotal)}</div>
               <div className="mt-1 text-xs text-muted-foreground">Weighted incoming value</div>
             </div>
             <div className="rounded-2xl bg-emerald-500/8 p-4">
@@ -349,7 +353,7 @@ function MoneyDashboard() {
                 This month
               </div>
               <div className="mt-1 text-xl font-semibold">
-                {formatMoney(billsThisMonth.reduce((s, b) => s + Number(b.amount), 0))}
+                {displayMoney(billsThisMonth.reduce((s, b) => s + Number(b.amount), 0))}
               </div>
               <div className="mt-1 text-xs text-muted-foreground">Bills due this month</div>
             </div>
