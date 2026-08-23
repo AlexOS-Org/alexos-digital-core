@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -147,13 +147,21 @@ function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> 
                     className="h-16 w-16 rounded-lg border border-border/60 object-cover"
                   />
                 ) : (
-                  <div className="h-16 w-16 rounded-lg border border-dashed border-border/70 bg-muted/40" />
+                  <div
+                    className="grid h-16 w-16 shrink-0 place-items-center rounded-lg border border-dashed border-border/70 bg-muted/40 text-muted-foreground"
+                    title="Variant thumbnail unavailable"
+                    aria-label="Variant thumbnail unavailable"
+                  >
+                    <Package className="h-6 w-6" aria-hidden="true" />
+                  </div>
                 )}
-                <div>
+                <div className="min-w-0">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
                     Avatar preview
                   </p>
-                  <p className="mt-1 text-xs text-muted-foreground">External URL only</p>
+                  <p className="mt-1 text-pretty text-xs leading-5 text-muted-foreground">
+                    External URL only
+                  </p>
                 </div>
               </div>
               <div className="md:col-span-2">

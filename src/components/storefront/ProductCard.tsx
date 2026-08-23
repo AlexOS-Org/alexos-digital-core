@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingBag } from "lucide-react";
+import { Package } from "lucide-react";
 import { ResponsiveProductImage } from "@/components/storefront/ResponsiveProductImage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -42,7 +42,14 @@ export function ProductCard({ product, currency }: Props) {
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-            <ShoppingBag className="h-10 w-10" />
+            <div className="flex flex-col items-center gap-2 text-center">
+              <span className="grid h-14 w-14 place-items-center rounded-2xl bg-background/80 text-primary ring-1 ring-inset ring-border/60">
+                <Package className="h-7 w-7" aria-hidden="true" />
+              </span>
+              <span className="max-w-[12rem] text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                Product thumbnail unavailable
+              </span>
+            </div>
           </div>
         )}
         {secondaryImage ? (
@@ -70,7 +77,7 @@ export function ProductCard({ product, currency }: Props) {
           <Link
             to="/shop/product/$id"
             params={{ id: product.id }}
-            className="line-clamp-2 break-words text-[13px] font-semibold leading-tight hover:underline sm:text-sm sm:leading-snug"
+            className="min-h-[2.25rem] line-clamp-2 break-words text-balance text-[13px] font-semibold leading-[1.18] hover:underline sm:min-h-[2.5rem] sm:text-sm sm:leading-snug"
           >
             {product.name}
           </Link>
@@ -84,7 +91,7 @@ export function ProductCard({ product, currency }: Props) {
           </div>
         </div>
 
-        <p className="line-clamp-2 break-words text-[11px] leading-5 text-muted-foreground sm:line-clamp-3 sm:text-xs sm:leading-relaxed">
+        <p className="min-h-[2.5rem] line-clamp-2 break-words text-pretty text-[11px] leading-5 text-muted-foreground sm:min-h-[3.75rem] sm:line-clamp-3 sm:text-xs sm:leading-relaxed">
           {soldOut
             ? "Currently unavailable. Browse the collection for another option."
             : (product.short_description ??

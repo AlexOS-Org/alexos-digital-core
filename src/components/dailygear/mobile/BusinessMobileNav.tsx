@@ -56,51 +56,59 @@ export function BusinessMobileNav() {
       </Link>
 
       <nav
-        className="safe-bottom fixed bottom-0 left-2 right-2 z-30 rounded-3xl glass-panel soft-shadow"
+        className="safe-bottom fixed bottom-0 left-2 right-2 z-30 mx-auto max-w-xl rounded-3xl glass-panel soft-shadow"
         aria-label="DailyGear navigation"
       >
-        <div className="flex items-center justify-around px-1 py-1.5">
+        <div className="flex items-stretch justify-around gap-1 px-1 py-1.5">
           {TABS.map((t) => {
             const on = active(t.to, t.exact);
             return (
               <Link
                 key={t.to}
                 to={t.to as never}
+                aria-current={on ? "page" : undefined}
                 className={cn(
-                  "tap-target flex flex-1 flex-col items-center gap-1 rounded-2xl px-1 py-1.5 transition-colors",
+                  "tap-target flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-0.5 py-1.5 text-center leading-tight transition-colors",
                   on
                     ? "bg-primary/12 text-primary shadow-sm ring-1 ring-primary/15"
                     : "text-muted-foreground hover:bg-sidebar-accent/50",
                 )}
               >
                 <t.icon className="h-[18px] w-[18px]" />
-                <span className="text-[10px] font-medium">{t.label}</span>
+                <span className="max-w-full truncate text-[10px] font-medium leading-tight">
+                  {t.label}
+                </span>
               </Link>
             );
           })}
 
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
-              className="tap-target flex flex-1 flex-col items-center gap-1 rounded-2xl px-1 py-1.5 text-muted-foreground hover:bg-sidebar-accent/50"
+              className="tap-target flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-0.5 py-1.5 text-center leading-tight text-muted-foreground hover:bg-sidebar-accent/50"
               aria-label="More sections"
             >
               <MoreHorizontal className="h-[18px] w-[18px]" />
-              <span className="text-[10px] font-medium">More</span>
+              <span className="max-w-full truncate text-[10px] font-medium leading-tight">
+                More
+              </span>
             </SheetTrigger>
-            <SheetContent side="bottom" className="rounded-t-3xl p-5 pb-8">
+            <SheetContent side="bottom" className="rounded-t-3xl p-4 pb-8 sm:p-5">
               <SheetHeader className="p-0 text-left">
                 <SheetTitle className="text-base">DailyGear</SheetTitle>
               </SheetHeader>
-              <div className="mt-4 grid grid-cols-3 gap-3">
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {MORE.map((m) => (
                   <Link
                     key={m.to}
                     to={m.to as never}
+                    aria-current={active(m.to) ? "page" : undefined}
                     onClick={() => setOpen(false)}
-                    className="press flex flex-col items-center gap-2 rounded-2xl border border-border/60 px-2 py-4 text-center"
+                    className="press flex min-h-20 min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border border-border/60 px-2 py-3 text-center"
                   >
                     <m.icon className="h-5 w-5 text-primary" />
-                    <span className="text-[11px] font-medium">{m.label}</span>
+                    <span className="max-w-full text-balance text-[11px] font-medium leading-tight">
+                      {m.label}
+                    </span>
                   </Link>
                 ))}
               </div>
