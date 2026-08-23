@@ -241,6 +241,39 @@ function FunnelPage() {
         product.name,
       )
     : null;
+  const effectiveLandingCopy = isYjBag
+    ? {
+        eyebrow: "Made for busy school mornings",
+        headline: "Stop the school-morning scramble. Give your child’s essentials a place.",
+        subheadline:
+          "Books, lunch, stationery and everyday essentials should not end up scattered or carried separately. The YJ Children’s School Backpack brings practical organised storage, padded carrying areas and colour choices together for a more manageable school-day routine.",
+        proof: [
+          "Water-resistant nylon construction",
+          "Separate pockets for everyday essentials",
+          "Pink, Red and Green options currently available",
+        ],
+        benefits: [
+          {
+            title: "Keep the school-day essentials together",
+            body: "Use the front pocket, two side pockets, interior zipped pocket and organiser pockets to separate books, lunch and smaller items.",
+          },
+          {
+            title: "Make the daily carry easier",
+            body: "Padded shoulder straps and a cushioned back panel are designed for everyday school carrying without making medical or health promises.",
+          },
+          {
+            title: "Ready for everyday routines",
+            body: "The durable, water-resistant nylon exterior is suited to ordinary school-day use. It is water-resistant, not guaranteed waterproof.",
+          },
+          {
+            title: "Let your child choose",
+            body: "Choose the available Pink, Red or Green colour that your child will be happy to carry to school.",
+          },
+        ],
+        deliveryNote:
+          "Select the colour and quantity you need, then confirm your county, town or area, delivery details and payment method at checkout.",
+      }
+    : landingCopy;
   const productVariants = useMemo(
     () =>
       funnel?.variants.filter(
@@ -257,9 +290,9 @@ function FunnelPage() {
       : `${availableColourNames.slice(0, -1).join(", ")} & ${availableColourNames.at(-1)}`
     : "available options";
   const visibleProof = (
-    landingCopy?.proof ?? ["Canonical product", "Clear offer", "Existing checkout"]
+    effectiveLandingCopy?.proof ?? ["Canonical product", "Clear offer", "Existing checkout"]
   ).map((item) => item.replace(/Blue, Pink, Red & Green/gi, availableColoursLabel));
-  const visibleBenefits = (landingCopy?.benefits ?? []).map((benefit) => ({
+  const visibleBenefits = (effectiveLandingCopy?.benefits ?? []).map((benefit) => ({
     ...benefit,
     body: benefit.body.replace(
       /currently available Blue, Pink, Red and Green options/gi,
@@ -385,10 +418,10 @@ function FunnelPage() {
             DailyGear offer
           </Badge>
           <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-primary">
-            {landingCopy?.eyebrow ?? funnel.name}
+            {effectiveLandingCopy?.eyebrow ?? funnel.name}
           </p>
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl">
-            {landingCopy?.headline ?? product.name}
+            {effectiveLandingCopy?.headline ?? product.name}
           </h1>
           <div className="mt-8 w-full max-w-3xl rounded-2xl border border-border bg-card p-2 shadow-sm sm:p-3">
             <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted/30">
@@ -427,10 +460,10 @@ function FunnelPage() {
               Why it fits your day
             </p>
             <h2 className="mt-2 text-2xl font-black tracking-tight">
-              {landingCopy?.headline ?? `${product.name}, presented clearly.`}
+              {effectiveLandingCopy?.headline ?? `${product.name}, presented clearly.`}
             </h2>
             <p className="mt-3 text-sm leading-7 text-muted-foreground">
-              {landingCopy?.subheadline ??
+              {effectiveLandingCopy?.subheadline ??
                 product.description ??
                 product.shortDescription ??
                 "Product information will appear here once it is confirmed in the DailyGear catalogue."}
@@ -856,7 +889,7 @@ function FunnelPage() {
             </Button>
           </form>
           <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
-            {landingCopy?.deliveryNote ??
+            {effectiveLandingCopy?.deliveryNote ??
               "Payment and delivery options are confirmed in DailyGear checkout. No payment is treated as settled until confirmed."}
           </p>
           <Button
