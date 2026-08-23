@@ -291,7 +291,7 @@ function FunnelPage() {
     : null;
   const heroImage = isYjBag
     ? YJ_HERO_IMAGE
-    : selectedVariant?.imageUrl ?? product?.images[0] ?? null;
+    : (selectedVariant?.imageUrl ?? product?.images[0] ?? null);
   const galleryImages = useMemo(() => {
     const candidates = [
       ...productVariants.map((variant) => variant.imageUrl),
@@ -533,11 +533,77 @@ function FunnelPage() {
               </p>
             </div>
           ) : null}
+
+          {isYjBag ? (
+            <section
+              className="mt-8 rounded-3xl border border-border bg-card p-5 text-center shadow-sm sm:p-8"
+              aria-label="YJ offer details"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                YJ Baby premium school bag
+              </p>
+              <h2 className="mt-3 text-3xl font-black tracking-tight">
+                A practical school-day bag they can enjoy using
+              </h2>
+              <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-muted-foreground">
+                Choose the colours and quantities your family needs, then fill in your delivery
+                details below. The current selling price is{" "}
+                <strong className="text-foreground">KES 2,750 per bag</strong>.
+              </p>
+              <div className="mt-6 grid gap-3 text-left sm:grid-cols-3">
+                {[
+                  [
+                    "Organised storage",
+                    "Front, side, interior and organiser pockets help separate everyday school items.",
+                  ],
+                  [
+                    "Comfort-focused carry",
+                    "The supplied product information highlights padded straps and a cushioned back panel.",
+                  ],
+                  [
+                    "Three available colours",
+                    "Pink, Red and Green are available for selection; unavailable colours stay hidden from customers.",
+                  ],
+                ].map(([title, body]) => (
+                  <div key={title} className="rounded-2xl border border-border bg-background p-4">
+                    <p className="font-semibold">{title}</p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">{body}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {isYjBag ? (
+            <section
+              className="mt-8 rounded-3xl border border-border bg-muted/20 p-5 sm:p-7"
+              aria-label="YJ delivery and ordering information"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                Before you order
+              </p>
+              <h2 className="mt-2 text-2xl font-black tracking-tight">
+                Choose your colour, add your quantity, and tell us where to deliver.
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                Delivery and payment options are confirmed during checkout based on the customer’s
+                location and selected method. Review the product, colour, quantity, county, town and
+                delivery details before continuing.
+              </p>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                Your order is not treated as paid until payment is confirmed by DailyGear. No
+                reminder-email option is shown on this funnel.
+              </p>
+            </section>
+          ) : null}
         </div>
 
         <aside className="h-fit rounded-3xl border border-border bg-card p-5 shadow-xl lg:sticky lg:top-6 sm:p-6">
           {galleryImages.length > 0 ? (
-            <section className="-m-1 mb-5 rounded-3xl border border-border bg-background p-4 sm:p-5" aria-label="Available colours">
+            <section
+              className="-m-1 mb-5 rounded-3xl border border-border bg-background p-4 sm:p-5"
+              aria-label="Available colours"
+            >
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
                 Choose your colour
               </p>
@@ -574,13 +640,21 @@ function FunnelPage() {
                           {variant.name}
                         </span>
                       </button>
-                      <div className="flex shrink-0 items-center gap-2" aria-label={`Quantity for ${variant.name}`}>
+                      <div
+                        className="flex shrink-0 items-center gap-2"
+                        aria-label={`Quantity for ${variant.name}`}
+                      >
                         <Button
                           type="button"
                           variant="outline"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => setVariantQuantities((current) => ({ ...current, [variant.id]: Math.max(0, variantQuantity - 1) }))}
+                          onClick={() =>
+                            setVariantQuantities((current) => ({
+                              ...current,
+                              [variant.id]: Math.max(0, variantQuantity - 1),
+                            }))
+                          }
                           aria-label={`Remove one ${variant.name}`}
                         >
                           −
@@ -591,7 +665,12 @@ function FunnelPage() {
                           variant="outline"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => setVariantQuantities((current) => ({ ...current, [variant.id]: variantQuantity + 1 }))}
+                          onClick={() =>
+                            setVariantQuantities((current) => ({
+                              ...current,
+                              [variant.id]: variantQuantity + 1,
+                            }))
+                          }
                           aria-label={`Add one ${variant.name}`}
                         >
                           +
