@@ -44,6 +44,9 @@ export const INCOME_SOURCES = [
   "Other",
 ] as const;
 
+export const EXPENSE_SCOPES = ["personal", "business"] as const;
+export type ExpenseScope = (typeof EXPENSE_SCOPES)[number];
+
 export const EXPENSE_CATEGORIES = [
   "Rent",
   "Transport",
@@ -76,9 +79,8 @@ export const EXPENSE_CATEGORIES = [
 ] as const;
 
 /**
- * Older records used category suffixes such as " — Shared" and " — Business".
- * Scope is now the single source of truth, so keep historical records readable
- * while preventing new duplicate category values.
+ * Scope is the single source of truth, so category labels never encode a second
+ * allocation and cannot create duplicate ledger entries.
  */
 export function normalizeExpenseCategory(category: string | null | undefined) {
   return (category ?? "Other").replace(/\s+—\s+(Shared|Business)$/, "");

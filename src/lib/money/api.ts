@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { carryForwardBudgets } from "./budget-calculations";
+import type { ExpenseScope } from "./constants";
 
 export interface Account {
   id: string;
@@ -52,7 +53,7 @@ export interface Transaction {
   business_name: string | null;
   income_type: string | null;
   expense_type: string | null;
-  expense_scope: "personal" | "business" | "shared" | null;
+  expense_scope: ExpenseScope | null;
   attachment_url: string | null;
   status: "posted" | "pending" | "void";
   deleted_at: string | null;
