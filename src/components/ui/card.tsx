@@ -7,7 +7,7 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
     <div
       ref={ref}
       className={cn(
-        "group relative overflow-hidden rounded-3xl border border-border/60 bg-card text-card-foreground shadow-[0_10px_35px_-24px_rgba(15,23,42,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_-24px_rgba(15,23,42,0.42)]",
+        "alexos-module-card group relative overflow-hidden rounded-3xl border border-border/60 bg-card text-card-foreground shadow-[0_10px_35px_-24px_rgba(15,23,42,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_-24px_rgba(15,23,42,0.42)]",
         "before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-emerald-500/25 before:to-transparent",
         className,
       )}
