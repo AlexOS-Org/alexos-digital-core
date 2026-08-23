@@ -245,8 +245,8 @@ function FunnelPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background">
-      <section className="dailygear-workspace-hero relative overflow-hidden border-b text-white">
+    <main className="dailygear-funnel-green min-h-screen bg-background">
+      <section className="dailygear-workspace-hero relative overflow-hidden border-b border-emerald-400/30 text-white">
         <div className="dailygear-hero-overlay pointer-events-none absolute inset-0" />
         <div className="dailygear-hero-grid pointer-events-none absolute inset-0" />
         <div className="relative z-10 mx-auto grid max-w-6xl gap-8 px-5 py-10 sm:px-8 sm:py-16 lg:grid-cols-[1.02fr_.98fr] lg:items-center lg:gap-14">
@@ -292,7 +292,7 @@ function FunnelPage() {
                 ))}
             </div>
           </div>
-          <div className="rounded-[2rem] border border-white/15 bg-white/[0.08] p-3 shadow-2xl backdrop-blur-md">
+          <div className="rounded-[2rem] border border-emerald-300/25 bg-emerald-950/20 p-3 shadow-2xl shadow-emerald-950/25 backdrop-blur-md">
             <div className="aspect-square overflow-hidden rounded-[1.5rem] bg-black/20">
               {heroImage ? (
                 <img
@@ -319,7 +319,10 @@ function FunnelPage() {
             ["02", "Review at checkout", "Confirm delivery, payment, and your details."],
             ["03", "We follow up", "Track the order and receive delivery updates."],
           ].map(([step, title, body]) => (
-            <div key={step} className="flex gap-3 rounded-2xl border bg-background/70 p-4">
+            <div
+              key={step}
+              className="flex gap-3 rounded-2xl border border-emerald-500/20 bg-background/70 p-4"
+            >
               <span className="text-xs font-black text-primary">{step}</span>
               <div>
                 <p className="text-sm font-bold">{title}</p>
@@ -336,13 +339,16 @@ function FunnelPage() {
             {(landingCopy?.proof ?? ["Canonical product", "Clear offer", "Existing checkout"])
               .slice(0, 3)
               .map((item) => (
-                <div key={item} className="rounded-2xl border bg-card p-4 shadow-sm">
+                <div
+                  key={item}
+                  className="rounded-2xl border border-emerald-500/20 bg-card p-4 shadow-sm"
+                >
                   <Check className="h-4 w-4 text-primary" />
                   <p className="mt-2 text-sm font-semibold">{item}</p>
                 </div>
               ))}
           </div>
-          <div className="mt-8 rounded-3xl border bg-card p-5 shadow-sm sm:p-7">
+          <div className="mt-8 rounded-3xl border border-emerald-500/20 bg-card p-5 shadow-sm sm:p-7">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
               Why it fits your day
             </p>
@@ -379,7 +385,7 @@ function FunnelPage() {
           ) : null}
         </div>
 
-        <aside className="h-fit rounded-3xl border bg-card p-5 shadow-xl shadow-primary/10 lg:sticky lg:top-6 sm:p-6">
+        <aside className="h-fit rounded-3xl border border-emerald-500/25 bg-card p-5 shadow-xl shadow-emerald-500/10 lg:sticky lg:top-6 sm:p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             Your offer
           </p>
@@ -431,8 +437,7 @@ function FunnelPage() {
             </select>
           </div>
           <Button
-            size="lg"
-            className="mt-5 w-full rounded-xl"
+            className="mt-5 w-full rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400"
             disabled={outOfStock}
             onClick={addToCheckout}
           >
@@ -464,7 +469,11 @@ function FunnelPage() {
               {product.currency} {price.toLocaleString()}
             </p>
           </div>
-          <Button className="rounded-xl" disabled={outOfStock} onClick={addToCheckout}>
+          <Button
+            className="rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400"
+            disabled={outOfStock}
+            onClick={addToCheckout}
+          >
             {outOfStock ? "Unavailable" : "Order now"}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>

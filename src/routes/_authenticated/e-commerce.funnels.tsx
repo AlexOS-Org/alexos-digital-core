@@ -427,7 +427,7 @@ function FunnelsPage() {
   const activeFlow = getActiveFlowOrder();
 
   return (
-    <div className="space-y-6">
+    <div className="dailygear-funnel-green space-y-6">
       <PageHeader
         title="Funnels"
         description="Build focused product journeys for paid traffic while keeping DailyGear’s normal shop and checkout unchanged."
@@ -438,11 +438,11 @@ function FunnelsPage() {
         }
       />
 
-      <section className="alexos-mesh relative overflow-hidden rounded-3xl border p-5 sm:p-6">
+      <section className="alexos-mesh relative overflow-hidden rounded-3xl border border-emerald-500/35 bg-gradient-to-br from-emerald-500/[0.12] via-card/80 to-card p-5 sm:p-6">
         <div className="relative z-10 grid gap-5 lg:grid-cols-[1.1fr_.9fr] lg:items-center">
           <div>
             <div className="flex items-center gap-2 text-primary">
-              <span className="grid h-9 w-9 place-items-center rounded-2xl bg-primary/12">
+              <span className="grid h-9 w-9 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
                 <GitBranch className="h-5 w-5" />
               </span>
               <p className="text-xs font-bold uppercase tracking-[0.18em]">Native funnel engine</p>
@@ -461,7 +461,8 @@ function FunnelsPage() {
                 key={item}
                 className="flex items-center gap-2 rounded-2xl border bg-card/75 px-3 py-2.5 text-sm"
               >
-                <Check className="h-4 w-4 text-primary" />
+                <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+
                 <span>{item}</span>
               </div>
             ))}
@@ -482,7 +483,7 @@ function FunnelsPage() {
       ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[20rem_minmax(0,1fr)]">
-        <Card className="rounded-3xl">
+        <Card className="rounded-3xl border-emerald-500/25 bg-card/95">
           <CardHeader className="flex flex-row items-center justify-between gap-3">
             <div>
               <CardTitle>Configurations</CardTitle>
@@ -538,7 +539,7 @@ function FunnelsPage() {
                     key={funnel.id}
                     type="button"
                     onClick={() => selectFunnel(funnel)}
-                    className={`w-full rounded-2xl border p-3 text-left transition ${selectedId === funnel.id ? "border-primary bg-primary/8 shadow-sm" : "hover:bg-muted/50"}`}
+                    className={`w-full rounded-2xl border p-3 text-left transition ${selectedId === funnel.id ? "border-emerald-500 bg-emerald-500/10 shadow-sm" : "hover:border-emerald-500/40 hover:bg-emerald-500/[0.04]"}`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <span className="min-w-0 truncate text-sm font-semibold">{funnel.name}</span>
@@ -556,7 +557,7 @@ function FunnelsPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-3xl">
+        <Card className="rounded-3xl border-emerald-500/25 bg-card/95">
           <CardHeader className="flex flex-row items-start justify-between gap-3">
             <div>
               <CardTitle>{selectedId ? "Edit funnel" : "Create funnel"}</CardTitle>
