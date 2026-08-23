@@ -92,7 +92,7 @@ function Metric({
   icon: typeof CircleDollarSign;
 }) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-card/70 p-4">
+    <div className="auren-evidence-card min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
           {label}
@@ -109,8 +109,8 @@ function ForecastCard({ label, forecast }: { label: string; forecast: AurenForec
   const valuesAvailable =
     forecast.base !== null && forecast.lower !== null && forecast.upper !== null;
   return (
-    <div className="rounded-2xl border border-border/60 bg-card/70 p-4">
-      <div className="flex items-start justify-between gap-3">
+    <div className="auren-evidence-card min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4">
+      <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
         <p className="text-sm font-semibold">{label}</p>
         <Badge variant="outline" className="text-[10px]">
           {confidenceLabel(forecast.confidence)}
@@ -127,11 +127,13 @@ function ForecastCard({ label, forecast }: { label: string; forecast: AurenForec
           </p>
         </>
       ) : (
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+        <p className="mt-3 min-w-0 break-words text-sm leading-6 text-muted-foreground">
           A forecast will appear after Auren has enough comparable activity.
         </p>
       )}
-      <p className="mt-3 text-[11px] leading-5 text-muted-foreground">{forecast.assumptions[0]}</p>
+      <p className="mt-3 min-w-0 break-words text-[11px] leading-5 text-muted-foreground">
+        {forecast.assumptions[0]}
+      </p>
     </div>
   );
 }
@@ -379,9 +381,9 @@ function AurenPage() {
                 {advisory.liveEvidence.slice(0, 9).map((evidence) => (
                   <div
                     key={`${evidence.sourceType}-${evidence.sourceKey}-${evidence.observedAt}`}
-                    className="rounded-2xl border border-border/60 bg-card/70 p-4"
+                    className="auren-evidence-card min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4"
                   >
-                    <div className="flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                       <div>
                         <p className="text-sm font-semibold">
                           {evidence.sourceType.replaceAll("_", " ")}
@@ -392,10 +394,10 @@ function AurenPage() {
                         {evidence.status === "ok" ? "Fresh" : evidence.status}
                       </Badge>
                     </div>
-                    <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                    <p className="mt-3 min-w-0 break-words text-sm leading-6 text-muted-foreground">
                       {evidence.summary ?? "No source summary was returned."}
                     </p>
-                    <p className="mt-3 text-[11px] leading-5 text-muted-foreground">
+                    <p className="mt-3 min-w-0 break-words text-[11px] leading-5 text-muted-foreground">
                       Observed {new Date(evidence.observedAt).toLocaleString()} ·{" "}
                       {confidenceLabel(evidence.confidence)}
                     </p>
@@ -404,7 +406,7 @@ function AurenPage() {
                         href={evidence.sourceUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                        className="mt-2 inline-flex max-w-full min-w-0 items-center gap-1 break-all text-xs font-semibold text-primary hover:underline"
                       >
                         View source <ExternalLink className="h-3.5 w-3.5" />
                       </a>
@@ -430,9 +432,9 @@ function AurenPage() {
                 {advisory.externalContext.map((context) => (
                   <div
                     key={context.business}
-                    className="rounded-2xl border border-border/60 bg-card/70 p-4"
+                    className="auren-evidence-card min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4"
                   >
-                    <div className="flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                       <div>
                         <p className="text-sm font-semibold">{context.business}</p>
                         <p className="mt-1 text-xs text-muted-foreground">{context.sourceTitle}</p>
@@ -452,7 +454,7 @@ function AurenPage() {
                         ))}
                       </ul>
                     ) : (
-                      <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                      <p className="mt-3 min-w-0 break-words text-sm leading-6 text-muted-foreground">
                         No entity-verified public facts were added. Auren will rely on internal
                         records for this business.
                       </p>
@@ -462,15 +464,15 @@ function AurenPage() {
                         href={context.sourceUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                        className="mt-3 inline-flex max-w-full min-w-0 items-center gap-1 break-all text-xs font-semibold text-primary hover:underline"
                       >
                         View public source <ExternalLink className="h-3.5 w-3.5" />
                       </a>
                     ) : null}
-                    <p className="mt-3 text-[11px] leading-5 text-muted-foreground">
+                    <p className="mt-3 min-w-0 break-words text-[11px] leading-5 text-muted-foreground">
                       Retrieved {context.retrievedAt.slice(0, 10)} · {context.confidence} confidence
                     </p>
-                    <p className="mt-2 text-[11px] leading-5 text-muted-foreground">
+                    <p className="mt-2 min-w-0 break-words text-[11px] leading-5 text-muted-foreground">
                       Limitation: {context.limitations[0]}
                     </p>
                   </div>
@@ -494,7 +496,7 @@ function AurenPage() {
                     {advisory.dataQuality.coverageDays.previous} active days
                   </Badge>
                 </div>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                <p className="mt-3 min-w-0 break-words text-sm leading-6 text-muted-foreground">
                   This is a directional assessment from recorded income and expense movement. It is
                   not a guarantee or an investment recommendation.
                 </p>
@@ -540,7 +542,7 @@ function AurenPage() {
               {advisory.recommendations.map((recommendation) => (
                 <div
                   key={recommendation.id}
-                  className="rounded-2xl border border-border/60 bg-card/70 p-4"
+                  className="auren-evidence-card min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4"
                 >
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge
@@ -561,7 +563,7 @@ function AurenPage() {
                   {recommendation.action ? (
                     <Link
                       to={recommendation.action.to}
-                      className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                      className="mt-3 inline-flex max-w-full min-w-0 items-center gap-1 break-all text-xs font-semibold text-primary hover:underline"
                     >
                       {recommendation.action.label}
                       <ArrowRight className="h-3.5 w-3.5" />
@@ -583,7 +585,7 @@ function AurenPage() {
                 {advisory.businesses.map((business) => (
                   <div
                     key={`${business.id ?? "unassigned"}-${business.name}`}
-                    className="rounded-2xl border border-border/60 bg-card/70 p-4"
+                    className="auren-evidence-card min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <h3 className="font-semibold">{business.name}</h3>
