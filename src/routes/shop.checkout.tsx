@@ -21,7 +21,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cartStore, useCart } from "@/lib/storefront/cart";
 import { formatMoney, useStorefront } from "@/lib/storefront/api";
-import { loadCartSession, saveCartSession } from "@/lib/storefront/cart-session.functions";
+import { loadCartSession } from "@/lib/storefront/cart-session.functions";
 import { readCheckoutProfile, saveCheckoutProfile } from "@/lib/storefront/checkout-profile";
 import { placeGuestOrder } from "@/lib/storefront/checkout.functions";
 import { loadPublicFunnel } from "@/lib/storefront/funnel.functions";
@@ -125,7 +125,6 @@ function CheckoutPage() {
   const submit = useServerFn(placeGuestOrder);
   const loadRecovery = useServerFn(loadCartSession);
   const loadFunnel = useServerFn(loadPublicFunnel);
-  const saveRecovery = useServerFn(saveCartSession);
   const currency = store?.currency ?? "KES";
   const threshold = Number(store?.free_shipping_threshold ?? 0);
   const shipping =
@@ -151,8 +150,7 @@ function CheckoutPage() {
   const [recoveryState, setRecoveryState] = useState<"idle" | "loading" | "loaded" | "unavailable">(
     search.recovery ? "loading" : "idle",
   );
-  const [reminderOptIn, setReminderOptIn] = useState(false);
-  const [rememberDetails, setRememberDetails] = useState(false);
+  const rememberDetails = true;
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [townInputMode, setTownInputMode] = useState<"list" | "manual">("list");
   const [form, setForm] = useState({
@@ -233,7 +231,6 @@ function CheckoutPage() {
           phone: recovery.phone ?? previous.phone,
         }));
         setRecoveryToken(recovery.sessionToken);
-        setReminderOptIn(true);
         setRecoveryState("loaded");
       })
       .catch(() => {
@@ -306,38 +303,6 @@ function CheckoutPage() {
       );
     }
     setOrderBumpAccepted(checked);
-  }
-
-  async function captureCartSession(optIn = reminderOptIn) {
-    if (!optIn || !store?.slug || !form.email || cart.items.length === 0) return recoveryToken;
-    try {
-      const result = await saveRecovery({
-        data: {
-          storeSlug: store.slug,
-          sessionToken: recoveryToken,
-          email: form.email,
-          firstName: form.firstName,
-          phone: form.phone,
-          currency,
-          subtotal: cart.subtotal,
-          consent: true,
-          items: cart.items.map((item) => ({
-            productId: item.productId,
-            variantId: item.variantId,
-            quantity: item.quantity,
-            offerRole: item.offerRole,
-            funnelStepId: item.funnelStepId,
-          })),
-        },
-      });
-      if (result.saved && result.sessionToken) {
-        setRecoveryToken(result.sessionToken);
-        return result.sessionToken;
-      }
-    } catch (error) {
-      console.warn("[DailyGear] Checkout recovery capture skipped", error);
-    }
-    return recoveryToken;
   }
 
   const mutation = useMutation({
@@ -445,8 +410,7 @@ function CheckoutPage() {
             toast.error("Select or type a delivery town or area.");
             return;
           }
-          const token = await captureCartSession();
-          mutation.mutate(token);
+          mutation.mutate(recoveryToken);
         }}
       >
         <div className="space-y-6">
@@ -489,7 +453,6 @@ function CheckoutPage() {
                   value={form.phone}
 
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  onBlur={() => void captureCartSession()}
                 />
               </div>
               <div className="space-y-1.5">
@@ -501,46 +464,13 @@ function CheckoutPage() {
                   value={form.email}
 
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  onBlur={() => void captureCartSession()}
                 />
               </div>
               {profileLoaded ? (
-                <p className="text-xs text-emerald-700 sm:col-span-2">
-                  Your saved delivery details were filled on this device. Review them before
-                  ordering.
+                <p className="text-xs text-primary sm:col-span-2">
+                  Saved delivery details were filled from this device. Review them before ordering.
                 </p>
               ) : null}
-              <div className="flex items-start gap-3 rounded-xl bg-muted/60 p-3 sm:col-span-2">
-                <Checkbox
-                  id="checkout-reminder"
-                  checked={reminderOptIn}
-                  onCheckedChange={(checked) => {
-                    const optedIn = checked === true;
-                    setReminderOptIn(optedIn);
-                    if (optedIn) void captureCartSession(true);
-                  }}
-                />
-                <Label
-                  htmlFor="checkout-reminder"
-                  className="cursor-pointer text-xs leading-relaxed"
-                >
-                  Email me one reminder if I leave checkout before ordering. This is optional.
-                </Label>
-              </div>
-              <div className="flex items-start gap-3 rounded-xl bg-muted/60 p-3 sm:col-span-2">
-                <Checkbox
-                  id="checkout-remember-details"
-                  checked={rememberDetails}
-                  onCheckedChange={(checked) => setRememberDetails(checked === true)}
-                />
-                <Label
-                  htmlFor="checkout-remember-details"
-                  className="cursor-pointer text-xs leading-relaxed"
-                >
-                  Remember my delivery details on this device for faster checkout next time. You can
-                  clear them in your browser settings.
-                </Label>
-              </div>
               {recoveryState === "loaded" ? (
                 <p className="text-xs text-emerald-700 sm:col-span-2">
                   Your saved DailyGear bag has been restored.

@@ -36,7 +36,6 @@ const POLICIES: Record<string, { title: string; intro: string; body: string[] }>
     body: [
       "We collect the contact and delivery details needed to process, support and deliver an order. We do not sell this information.",
       "Order details may be shared with the courier or service provider handling delivery, only as needed to complete the requested service. We retain order information for operational and support records.",
-      "If you choose the optional checkout-reminder consent, your email may be used for one reminder when you leave checkout before ordering. You can continue checkout without opting in.",
       "For a privacy question or request, contact DailyGear through the support details shown on the Contact page.",
     ],
   },

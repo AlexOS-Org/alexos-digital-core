@@ -1,9 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { ArrowRight, Check, ShoppingBag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { DailyGearBrand } from "@/components/dailygear/DailyGearBrand";
 import { loadPublicFunnel } from "@/lib/storefront/funnel.functions";
 import type {
@@ -13,9 +16,43 @@ import type {
 } from "@/lib/storefront/funnel.server";
 import { rememberFunnelAttribution } from "@/lib/storefront/funnel-session";
 import { cartStore } from "@/lib/storefront/cart";
+import { readCheckoutProfile, saveCheckoutProfile } from "@/lib/storefront/checkout-profile";
 import { parseFunnelLandingContent } from "@/lib/storefront/funnel-copy";
 import { useStorefront } from "@/lib/storefront/api";
 import { initMetaPixel, trackMetaPixel, useMetaPixel } from "@/lib/storefront/meta-pixel";
+
+const YJ_DETAIL_IMAGES = [
+  {
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/XBIefkHnwPtfUyyZ.jpg",
+    title: "Durable zipped compartments",
+    body: "Organise books, lunch and daily school items so children can reach what they need more easily.",
+  },
+  {
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/yWYSudxBprbdIVly.jpg",
+    title: "Adjustable padded shoulder straps",
+    body: "Adjustable straps help the bag sit more comfortably as your child carries it through the school day.",
+  },
+  {
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/bQsYelODbFkllzAQ.jpg",
+    title: "Breathable back support",
+    body: "The back and strap detail shown in the product image is designed for a more comfortable everyday carry.",
+  },
+  {
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/mxVDsFRuDCpwWphr.jpg",
+    title: "Dedicated laptop or tablet space",
+    body: "The interior compartment helps keep a tablet or laptop separate from the rest of the school essentials.",
+  },
+  {
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/FgIOJcfYIUWhpSXP.jpg",
+    title: "One-piece practical design",
+    body: "The opening and layout make it easier to see how the bag is arranged for school, travel or daily use.",
+  },
+  {
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/FzJmGPDpiAXqzJKl.jpg",
+    title: "A bold colour children can enjoy",
+    body: "The red-and-green colour combination gives the available Green option a distinctive school-day look.",
+  },
+] as const;
 
 interface FunnelSearch {
   utm_source?: string;
@@ -81,6 +118,17 @@ function FunnelPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [profileLoaded, setProfileLoaded] = useState(false);
+  const [customer, setCustomer] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    address: "",
+    county: "",
+    town: "",
+    deliveryDetails: "",
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -138,6 +186,23 @@ function FunnelPage() {
   }, [load, search, slug, store?.meta_pixel_id]);
 
   const product = funnel?.product ?? null;
+  const isYjBag = slug === "quality-waterproof-yj-children-school-bag-funnel";
+
+  useEffect(() => {
+    const profile = readCheckoutProfile();
+    if (!profile) return;
+    setCustomer({
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      phone: profile.phone,
+      email: profile.email,
+      address: profile.address,
+      county: profile.county,
+      town: profile.town,
+      deliveryDetails: profile.deliveryDetails,
+    });
+    setProfileLoaded(true);
+  }, []);
 
   useEffect(() => {
     if (!product || typeof document === "undefined") return;
@@ -198,9 +263,10 @@ function FunnelPage() {
     const candidates = [
       ...productVariants.map((variant) => variant.imageUrl),
       ...(product?.images ?? []),
+      ...(isYjBag ? YJ_DETAIL_IMAGES.map((image) => image.url) : []),
     ].filter((image): image is string => Boolean(image));
     return Array.from(new Set(candidates));
-  }, [product?.images, productVariants]);
+  }, [isYjBag, product?.images, productVariants]);
 
   function addToCheckout() {
     if (!funnel || !product || outOfStock) return;
@@ -241,6 +307,21 @@ function FunnelPage() {
       </div>
     );
   }
+  function handleFirstPageCheckout(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (
+      !customer.firstName.trim() ||
+      !customer.phone.trim() ||
+      !customer.address.trim() ||
+      !customer.county.trim() ||
+      !customer.town.trim()
+    ) {
+      return;
+    }
+    saveCheckoutProfile(customer);
+    addToCheckout();
+  }
+
   if (error || !funnel || !product) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
@@ -420,6 +501,42 @@ function FunnelPage() {
             </section>
           ) : null}
 
+          {isYjBag ? (
+            <section
+              className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7"
+              aria-label="Product details"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                See the details
+              </p>
+              <h2 className="mt-2 text-2xl font-black tracking-tight">
+                Designed around the school-day routine.
+              </h2>
+              <div className="mt-6 grid min-w-0 gap-5 sm:grid-cols-2">
+                {YJ_DETAIL_IMAGES.map((image) => (
+                  <article
+                    key={image.url}
+                    className="min-w-0 overflow-hidden rounded-2xl border border-border bg-background"
+                  >
+                    <img
+                      src={image.url}
+                      alt={`${product.name} — ${image.title}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="aspect-square w-full object-cover"
+                    />
+                    <div className="p-4">
+                      <h3 className="break-words text-base font-bold">{image.title}</h3>
+                      <p className="mt-2 break-words text-sm leading-6 text-muted-foreground">
+                        {image.body}
+                      </p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
           {bumpProduct ? (
             <div className="mt-4 rounded-3xl border border-primary/20 bg-primary/5 p-5">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
@@ -485,14 +602,103 @@ function FunnelPage() {
               ))}
             </select>
           </div>
-          <Button
-            className="mt-5 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
-            disabled={outOfStock}
-            onClick={addToCheckout}
+          <form
+            className="mt-6 space-y-4 border-t border-border pt-5"
+            onSubmit={handleFirstPageCheckout}
           >
-            {outOfStock ? "Out of stock" : "Order now"}
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+                Checkout on this page
+              </p>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                Your saved details may be filled automatically on this device. Review everything
+                before continuing.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="min-w-0 space-y-1.5 sm:col-span-2">
+                <Label htmlFor="funnel-first-name">First name *</Label>
+                <Input
+                  id="funnel-first-name"
+                  required
+                  autoComplete="given-name"
+                  value={customer.firstName}
+                  onChange={(event) => setCustomer({ ...customer, firstName: event.target.value })}
+                />
+              </div>
+              <div className="min-w-0 space-y-1.5">
+                <Label htmlFor="funnel-phone">Phone *</Label>
+                <Input
+                  id="funnel-phone"
+                  required
+                  inputMode="tel"
+                  autoComplete="tel"
+                  value={customer.phone}
+                  onChange={(event) => setCustomer({ ...customer, phone: event.target.value })}
+                />
+              </div>
+              <div className="min-w-0 space-y-1.5">
+                <Label htmlFor="funnel-email">Email</Label>
+                <Input
+                  id="funnel-email"
+                  type="email"
+                  autoComplete="email"
+                  value={customer.email}
+                  onChange={(event) => setCustomer({ ...customer, email: event.target.value })}
+                />
+              </div>
+              <div className="min-w-0 space-y-1.5 sm:col-span-2">
+                <Label htmlFor="funnel-address">Street, building or house number *</Label>
+                <Input
+                  id="funnel-address"
+                  required
+                  autoComplete="street-address"
+                  value={customer.address}
+                  onChange={(event) => setCustomer({ ...customer, address: event.target.value })}
+                />
+              </div>
+              <div className="min-w-0 space-y-1.5">
+                <Label htmlFor="funnel-county">County *</Label>
+                <Input
+                  id="funnel-county"
+                  required
+                  autoComplete="address-level1"
+                  value={customer.county}
+                  onChange={(event) => setCustomer({ ...customer, county: event.target.value })}
+                />
+              </div>
+              <div className="min-w-0 space-y-1.5">
+                <Label htmlFor="funnel-town">Town or area *</Label>
+                <Input
+                  id="funnel-town"
+                  required
+                  autoComplete="address-level2"
+                  value={customer.town}
+                  onChange={(event) => setCustomer({ ...customer, town: event.target.value })}
+                />
+              </div>
+              <div className="min-w-0 space-y-1.5 sm:col-span-2">
+                <Label htmlFor="funnel-delivery-details">Landmark or delivery instructions</Label>
+                <Textarea
+                  id="funnel-delivery-details"
+                  autoComplete="street-address"
+                  value={customer.deliveryDetails}
+                  onChange={(event) =>
+                    setCustomer({ ...customer, deliveryDetails: event.target.value })
+                  }
+                />
+              </div>
+            </div>
+            {profileLoaded ? (
+              <p className="text-xs text-primary">
+                Saved details were filled from this browser. Please review them before continuing.
+              </p>
+            ) : null}
+            <Button type="submit" className="w-full rounded-xl" disabled={outOfStock}>
+              {outOfStock ? "Out of stock" : "Continue to secure checkout"}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </form>
           <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
             {landingCopy?.deliveryNote ??
               "Payment and delivery options are confirmed in DailyGear checkout. No payment is treated as settled until confirmed."}
