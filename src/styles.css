@@ -1,5 +1,6 @@
 ﻿@import "tw-animate-css";
 @import "tailwindcss";
+@import "./styles/alexos-4k-visual-system.css";
 @source "../src";
 
 @custom-variant dark (&:is(.dark *));
@@ -1808,5 +1809,111 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Phone-safe presentation: preserve the active desktop theme while allowing
+   every dashboard surface to atomize into readable single-column sections. */
+@media (max-width: 639px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .dashboard-canvas,
+  .dailygear-storefront-canvas,
+  .dashboard-canvas main,
+  .dailygear-storefront-canvas main {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .dashboard-canvas h1,
+  .dashboard-canvas h2,
+  .dashboard-canvas h3,
+  .dailygear-storefront-canvas h1,
+  .dailygear-storefront-canvas h2,
+  .dailygear-storefront-canvas h3 {
+    overflow-wrap: anywhere;
+  }
+
+  .dashboard-canvas img,
+  .dailygear-storefront-canvas img {
+    max-width: 100%;
+  }
+
+  .dashboard-canvas .grid,
+  .dailygear-storefront-canvas .grid {
+    min-width: 0;
+  }
+
+  .dashboard-canvas .overflow-x-auto,
+  .dailygear-storefront-canvas .overflow-x-auto {
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dashboard-canvas button,
+  .dashboard-canvas [role="button"],
+  .dailygear-storefront-canvas button,
+  .dailygear-storefront-canvas [role="button"] {
+    min-height: 2.75rem;
+  }
+
+  .institution-card {
+    min-width: 0;
+  }
+
+  .institution-card .institution-card-actions {
+    flex-wrap: wrap;
+  }
+}
+
+.institution-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: color-mix(in oklch, var(--institution-accent, var(--primary)) 34%, var(--border));
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in oklch, var(--institution-accent, var(--primary)) 18%, transparent), transparent 14rem),
+    linear-gradient(145deg, color-mix(in oklch, var(--institution-surface, var(--card)) 88%, white 12%), var(--card));
+  box-shadow: 0 24px 64px -48px color-mix(in oklch, var(--institution-accent, var(--primary)) 76%, transparent);
+}
+
+.institution-card::after {
+  position: absolute;
+  inset: auto -10% -30% 32%;
+  z-index: -1;
+  height: 68%;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--institution-accent, var(--primary)) 12%, transparent);
+  content: "";
+  filter: blur(30px);
+}
+
+.institution-logo-tile {
+  background: color-mix(in oklch, white 82%, var(--institution-accent, var(--primary)) 18%);
+  border-color: color-mix(in oklch, var(--institution-accent, var(--primary)) 24%, white);
+}
+
+@media (max-width: 639px) {
+  .institution-card {
+    border-radius: 1.25rem;
+  }
+
+  .institution-card .institution-card-content {
+    padding: 1rem;
+  }
+
+  .institution-card .institution-logo-tile {
+    height: 3.25rem;
+    width: 3.25rem;
+    border-radius: 1rem;
+  }
+
+  .institution-card .institution-logo-tile img {
+    height: 2.5rem;
+    width: 2.5rem;
   }
 }

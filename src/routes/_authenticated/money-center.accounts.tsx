@@ -260,6 +260,7 @@ function AccountsPage() {
           const Icon = ACCOUNT_ICONS[a.icon] ?? Wallet;
           const isArchived = a.status === "archived";
           const institution = institutionStyle(a.name);
+          const logo = accountLogo(a.name);
           const warningThreshold = institution.warningThreshold;
           const isLowBalance = warningThreshold !== null && balance < warningThreshold;
 
@@ -267,13 +268,13 @@ function AccountsPage() {
             <Card
               key={a.id}
               className={cn(
-                "relative overflow-hidden rounded-2xl shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
+                "institution-card relative min-w-0 overflow-hidden rounded-2xl shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
                 institution.cardClass,
                 isLowBalance &&
                   "border-red-400/90 bg-gradient-to-br from-red-200/95 via-red-100/80 to-red-50/70 dark:border-red-800/70 dark:from-red-950/70 dark:via-red-950/45 dark:to-background",
               )}
             >
-              <CardContent className="space-y-4 p-5 pt-6 text-slate-900 sm:p-6 sm:pt-7 dark:text-slate-100">
+              <CardContent className="institution-card-content space-y-4 p-5 pt-6 text-slate-900 sm:p-6 sm:pt-7 dark:text-slate-100">
                 <div
                   className={cn(
                     "absolute inset-x-0 top-0 h-1",
@@ -284,15 +285,15 @@ function AccountsPage() {
                   <div className="flex items-center gap-3">
                     <div
                       className={cn(
-                        "grid h-16 w-16 place-items-center rounded-2xl border-2 border-white/90 bg-white/90 shadow-md ring-4 ring-white/40 dark:border-white/15 dark:bg-background/70 dark:ring-background/40",
+                        "institution-logo-tile grid h-16 w-16 place-items-center rounded-2xl border-2 border-white/90 bg-white/90 shadow-md ring-4 ring-white/40 dark:border-white/15 dark:bg-background/70 dark:ring-background/40",
                         isLowBalance
                           ? "bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400"
                           : institution.iconClass,
                       )}
                     >
-                      {accountLogo(a.name) ? (
+                      {logo ? (
                         <img
-                          src={accountLogo(a.name)!}
+                          src={logo}
                           alt={`${a.name} logo`}
                           className="h-12 w-12 rounded-xl object-contain drop-shadow-md"
                           loading="lazy"
@@ -342,7 +343,7 @@ function AccountsPage() {
                     </div>
                   )}
                 </div>
-                <div className="flex gap-2">
+                <div className="institution-card-actions flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"
