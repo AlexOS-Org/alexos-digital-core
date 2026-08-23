@@ -31,7 +31,7 @@ export const Route = createFileRoute("/api/scheduled/abandoned-cart")({
         if (!authorized(request)) return json({ ok: false, error: "Forbidden" }, 403);
 
         try {
-          if (!process.env.RESEND_API_KEY || !process.env.RESEND_FROM_EMAIL) {
+          if (!process.env.RESEND_API_KEY || !process.env.DAILYGEAR_EMAIL_FROM) {
             return json({ ok: true, skipped: "transactional_email_not_configured" });
           }
 

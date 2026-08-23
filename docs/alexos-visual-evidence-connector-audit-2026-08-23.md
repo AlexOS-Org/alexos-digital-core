@@ -20,16 +20,16 @@ The enabled Firecrawl connector is available and accepted a read-only DailyGear 
 
 ## Worker secret inventory
 
-The canonical Worker secret listing succeeded without exposing any values. Present secrets are `DAILYGEAR_EMAIL_FROM`, `META_ACCESS_TOKEN`, `RESEND_API_KEY`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, and `SUPABASE_URL`.
+The canonical Worker secret listing succeeded without exposing any values. Present secrets are `DAILYGEAR_EMAIL_FROM`, `FIRECRAWL_API_KEY` (still missing), `INSTAGRAM_BUSINESS_ACCOUNT_ID`, `META_ACCESS_TOKEN`, `RESEND_API_KEY`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, and `SUPABASE_URL`. Cloudflare metadata confirms version 153 was created by the Instagram secret write and is the latest version observed.
 
-The requested `INSTAGRAM_BUSINESS_ACCOUNT_ID` and `FIRECRAWL_API_KEY` are not present. The Instagram connector account is confirmed, but the connector response does not expose the numeric Business Account ID required by the Worker. The Firecrawl connector is usable through the connector surface, but its API key is not available for direct Worker-secret insertion. No placeholder or guessed value was added.
+The Instagram connector account is confirmed and its numeric Business Account ID was safely added as the encrypted Worker secret `INSTAGRAM_BUSINESS_ACCOUNT_ID`; Cloudflare accepted the write with HTTP 201 and created Worker version 153. `FIRECRAWL_API_KEY` remains absent because the enabled Firecrawl connector does not expose its underlying API key for transfer into Worker secrets. No Firecrawl placeholder or guessed value was added.
 
 ## Validation and release state
 
-Local Prettier, TypeScript, ESLint, Vite production build, and `git diff --check` all passed. The visual and responsive source changes were pushed to `main` in commit `8716e14`.
+Local targeted Prettier, TypeScript, ESLint, Vitest, Vite production build, and `git diff --check` all passed. ESLint reports nine pre-existing Fast Refresh warnings and no errors; unrelated legacy documentation remains outside the targeted formatting check. The visual and responsive source changes were pushed to `main` in commit `8716e14`; the current audit changes are pending the final commit.
 
-The GitHub Actions runs for the previous head `825504f` were both successful: `Validate AlexOS` run [32599341571](https://github.com/dylextrends/alexos-digital-core/actions/runs/32599341571) and `Production Verify` run [32599341555](https://github.com/dylextrends/alexos-digital-core/actions/runs/32599341555). At the time of the final check, GitHub had not yet created a run for `8716e14`, so the new deployment is not yet proven by CI. Cloudflare version metadata also returned no version items in the inspected response; this is a verification limitation, not evidence of a failed deployment.
+GitHub Actions for the current head `c9e0452` are both completed successfully: `Validate AlexOS` and `Production Verify`. Cloudflare metadata confirms production version 152 was deployed from the release and version 153 was created by the subsequent Instagram secret write with 100% deployment allocation in the latest deployment metadata. Custom domains `dailygear.co.ke` and `www.dailygear.co.ke` are enabled in production, and the scheduled triggers are `*/30 * * * *` and `0 3 * * *`.
 
 ## Safe next action
 
-The connector path is ready for read-only Instagram and Firecrawl evidence collection. To enable the 30-minute Worker refresh directly, obtain the numeric Instagram Business Account ID from Meta Business settings and a Firecrawl API key, then add them as encrypted Worker secrets. Do not paste the values into source files or public chat. After they are configured, run one bounded Instagram lookup and one bounded Firecrawl request, then verify a new Worker version and the Auren snapshot freshness.
+The Instagram portion of the 30-minute Worker refresh is now configured through the encrypted `INSTAGRAM_BUSINESS_ACCOUNT_ID` secret. The remaining action is to add `FIRECRAWL_API_KEY` directly in Cloudflare, then verify the next bounded Auren refresh and snapshot freshness. Do not paste the Firecrawl key into source files or public chat. The current browser session redirected `/auren` to `/auth`, so the authenticated Auren card still requires a signed-in verification pass.

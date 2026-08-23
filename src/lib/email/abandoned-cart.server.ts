@@ -68,7 +68,7 @@ function renderEmail(
 
 export async function sendAbandonedCartEmail(session: AbandonedCartSession) {
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM_EMAIL;
+  const from = process.env.DAILYGEAR_EMAIL_FROM;
   if (!apiKey || !from) throw new EmailNotConfiguredError();
 
   const resolved = await resolveSessionCartForEmail(session.storefront_id, session.cart_json);

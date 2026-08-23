@@ -153,7 +153,7 @@ async function fetchPublicEvidence(env: WorkerEnv) {
           location: "Kenya",
           country: "KE",
           tbs: "qdr:2d",
-          scrapeOptions: { formats: [{ type: "markdown" }] },
+          scrapeOptions: { formats: ["markdown"] },
         }),
       });
       const body = (await response.json()) as { data?: { web?: unknown[] }; error?: string };
