@@ -1,0 +1,317 @@
+/*
+ * AlexOS 4K Visual System
+ *
+ * A shared presentation layer for every module/theme. It intentionally uses
+ * existing design tokens so visual themes remain user-selectable and no
+ * business logic or data contracts are changed.
+ */
+
+:root {
+  --alexos-visual-accent: var(--primary);
+  --alexos-visual-accent-soft: color-mix(in oklch, var(--primary) 16%, transparent);
+  --alexos-visual-accent-faint: color-mix(in oklch, var(--primary) 7%, transparent);
+  --alexos-visual-glow: 0 24px 80px -48px color-mix(in oklch, var(--primary) 62%, transparent);
+  --alexos-visual-line: color-mix(in oklch, var(--foreground) 8%, transparent);
+  --alexos-visual-panel: color-mix(in oklch, var(--card) 86%, transparent);
+}
+
+/* Theme-specific signal colours keep the visual language coherent when the
+   user changes theme without changing component markup. */
+:root[data-visual-theme="midnight"] {
+  --alexos-visual-accent: #6ea8ff;
+}
+:root[data-visual-theme="aurora"] {
+  --alexos-visual-accent: #b48cff;
+}
+:root[data-visual-theme="dailygear"] {
+  --alexos-visual-accent: #ff806f;
+}
+:root[data-visual-theme="paper"] {
+  --alexos-visual-accent: #2d9b78;
+}
+:root[data-visual-theme="ocean"],
+:root[data-visual-theme="ocean_mountain"] {
+  --alexos-visual-accent: #62d9df;
+}
+:root[data-visual-theme="plum"] {
+  --alexos-visual-accent: #d8a7ff;
+}
+:root[data-visual-theme="copper"] {
+  --alexos-visual-accent: #ffc27b;
+}
+:root[data-visual-theme="sage"] {
+  --alexos-visual-accent: #8fe3ba;
+}
+:root[data-visual-theme="opsmind"] {
+  --alexos-visual-accent: #c855ff;
+}
+:root[data-visual-theme="droneview"] {
+  --alexos-visual-accent: #ff8a4c;
+}
+:root[data-visual-theme="pulseai"] {
+  --alexos-visual-accent: #e9792c;
+}
+:root[data-visual-theme="pricepilot"] {
+  --alexos-visual-accent: #8b5cf6;
+}
+:root[data-visual-theme="finai"] {
+  --alexos-visual-accent: #44d9ff;
+}
+:root[data-visual-theme="custom"] {
+  --alexos-visual-accent: var(--alexos-custom-accent, #4f7cff);
+}
+
+/* Ambient canvas: gives modules the layered depth visible in the reference
+   dashboards while remaining lightweight and fully CSS-rendered. */
+body::before,
+body::after {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  content: "";
+}
+
+body::before {
+  background:
+    radial-gradient(circle at 8% 8%, color-mix(in oklch, var(--alexos-visual-accent) 10%, transparent), transparent 26rem),
+    radial-gradient(circle at 92% 12%, color-mix(in oklch, var(--alexos-purple) 8%, transparent), transparent 28rem),
+    radial-gradient(circle at 54% 92%, color-mix(in oklch, var(--alexos-blue) 7%, transparent), transparent 32rem);
+  opacity: 0.9;
+}
+
+body::after {
+  background-image:
+    linear-gradient(var(--alexos-visual-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--alexos-visual-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 86%);
+  opacity: 0.28;
+}
+
+/* Shared module treatment. Existing modules can adopt this class without
+   changing their data or behaviour. */
+.alexos-module-shell {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid color-mix(in oklch, var(--border) 78%, var(--alexos-visual-accent) 22%);
+  background:
+    radial-gradient(circle at 100% 0%, var(--alexos-visual-accent-soft), transparent 22rem),
+    linear-gradient(145deg, color-mix(in oklch, var(--card) 94%, var(--alexos-visual-accent) 6%), var(--card));
+  box-shadow: var(--alexos-visual-glow);
+}
+
+.alexos-module-shell::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(120deg, transparent 20%, color-mix(in oklch, white 7%, transparent), transparent 78%);
+  content: "";
+  opacity: 0.45;
+}
+
+.dashboard-canvas,
+.dailygear-store-hero-panel,
+.dailygear-workspace-hero {
+  background-attachment: fixed;
+}
+
+.dashboard-surface,
+.dashboard-surface-muted,
+.dashboard-feature-surface,
+.glass-panel,
+.alexos-surface,
+.alexos-inspiration-card,
+.dailygear-workspace-card,
+.dailygear-kpi-card {
+  position: relative;
+  overflow: hidden;
+  border-color: color-mix(in oklch, var(--border) 76%, var(--alexos-visual-accent) 24%);
+  box-shadow: var(--alexos-visual-glow);
+}
+
+.dashboard-surface::before,
+.dashboard-surface-muted::before,
+.dashboard-feature-surface::before,
+.glass-panel::before,
+.alexos-surface::before,
+.dailygear-workspace-card::before,
+.dailygear-kpi-card::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--alexos-visual-accent), transparent);
+  content: "";
+  opacity: 0.72;
+}
+
+/* Data representation: charts, tables and KPI strips get a restrained signal
+   layer rather than a flat card wall. */
+.dashboard-canvas svg,
+.dashboard-canvas canvas,
+.dashboard-canvas [role="img"] {
+  shape-rendering: geometricPrecision;
+}
+
+.dashboard-canvas table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.dashboard-canvas table thead th {
+  background: color-mix(in oklch, var(--alexos-visual-accent) 7%, var(--card));
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dashboard-canvas table tbody tr {
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.dashboard-canvas table tbody tr:hover {
+  background: color-mix(in oklch, var(--alexos-visual-accent) 5%, transparent);
+}
+
+/* Metric emphasis inspired by the reference analytics dashboards. */
+.alexos-data-metric {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--border) 72%, var(--alexos-visual-accent) 28%);
+  background:
+    linear-gradient(145deg, color-mix(in oklch, var(--card) 92%, var(--alexos-visual-accent) 8%), var(--card));
+  box-shadow: 0 18px 50px -38px color-mix(in oklch, var(--alexos-visual-accent) 70%, transparent);
+}
+
+.alexos-data-metric::after {
+  position: absolute;
+  right: -2rem;
+  bottom: -3rem;
+  width: 8rem;
+  height: 8rem;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--alexos-visual-accent) 14%, transparent);
+  filter: blur(22px);
+  content: "";
+}
+
+.alexos-data-sparkline {
+  background-image:
+    linear-gradient(90deg, transparent 0 92%, color-mix(in oklch, var(--alexos-visual-accent) 22%, transparent) 92%),
+    linear-gradient(0deg, var(--alexos-visual-line) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 25%;
+}
+
+/* DailyGear gets a retail-specific conversion surface without leaking into
+   the AlexOS operating modules. */
+[data-visual-theme="dailygear"] .dailygear-below-fold,
+[data-visual-theme="dailygear"] .dailygear-store-hero-media {
+  border-color: color-mix(in oklch, var(--border) 70%, var(--alexos-visual-accent) 30%);
+}
+
+[data-visual-theme="dailygear"] .dailygear-below-fold {
+  box-shadow: 0 22px 70px -52px color-mix(in oklch, var(--alexos-visual-accent) 70%, transparent);
+}
+
+[data-visual-theme="dailygear"] .dailygear-below-fold h2 {
+  letter-spacing: -0.035em;
+}
+
+/* 4K / ultra-wide presentation. We deliberately increase breathing room and
+   information density instead of simply enlarging every element. */
+@media (min-width: 1920px) {
+  body {
+    font-size: 16.5px;
+  }
+
+  .dashboard-canvas,
+  .dailygear-storefront-canvas {
+    min-height: calc(100vh - 2rem);
+  }
+
+  .dashboard-surface,
+  .dashboard-feature-surface,
+  .alexos-module-shell {
+    box-shadow: 0 28px 90px -58px color-mix(in oklch, var(--alexos-visual-accent) 58%, transparent);
+  }
+}
+
+@media (min-width: 2560px) {
+  body {
+    font-size: 18px;
+  }
+
+  .dashboard-canvas,
+  .dailygear-storefront-canvas {
+    max-width: 2200px;
+    margin-inline: auto;
+  }
+
+  .dashboard-canvas > *,
+  .dailygear-storefront-canvas > * {
+    max-width: 100%;
+  }
+
+  .dashboard-surface,
+  .dashboard-feature-surface,
+  .dashboard-surface-muted,
+  .alexos-module-shell {
+    border-radius: 2rem;
+  }
+
+  .dashboard-canvas table thead th {
+    font-size: 0.76rem;
+  }
+
+  .alexos-data-metric {
+    min-height: 148px;
+  }
+
+  body::after {
+    background-size: 64px 64px;
+    opacity: 0.22;
+  }
+}
+
+@media (min-width: 3840px) {
+  body {
+    font-size: 19px;
+  }
+
+  .dashboard-canvas,
+  .dailygear-storefront-canvas {
+    max-width: 3000px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dashboard-surface,
+  .dashboard-feature-surface,
+  .alexos-module-shell,
+  .alexos-data-metric {
+    transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  }
+
+  .dashboard-surface:hover,
+  .dashboard-feature-surface:hover,
+  .alexos-module-shell:hover,
+  .alexos-data-metric:hover {
+    border-color: color-mix(in oklch, var(--border) 55%, var(--alexos-visual-accent) 45%);
+    box-shadow: 0 30px 90px -58px color-mix(in oklch, var(--alexos-visual-accent) 72%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-surface,
+  .dashboard-feature-surface,
+  .alexos-module-shell,
+  .alexos-data-metric {
+    transition: none;
+  }
+}
