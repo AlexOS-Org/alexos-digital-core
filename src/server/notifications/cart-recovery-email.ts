@@ -33,17 +33,22 @@ function buildText(input: {
   return [
     greeting,
     "",
-    "You left a DailyGear bag ready for checkout. We kept the available items together so you can review the details before deciding.",
+    "Your DailyGear picks are still waiting.",
     "",
-    "Your bag:",
+    "You were one step away from completing your order. Take another look at your selection, confirm the details, and continue when you're ready.",
+    "",
+    "Your selection:",
     itemLines || "- Your selected items are available on the checkout page.",
     `Subtotal: ${input.currency} ${input.subtotal.toLocaleString()}`,
     "",
-    `Review your bag: ${input.orderUrl}`,
+    `Continue your order: ${input.orderUrl}`,
     "",
-    "Prices and availability are checked again when you place the order. If you no longer want the items, you can simply ignore this one reminder.",
+    "Prices and availability are checked again when you place the order. No pressure—if you've changed your mind, you can simply ignore this reminder.",
+    "",
+    "Need help before ordering? Reply to this email and DailyGear can help you confirm the details.",
     "",
     "DailyGear",
+    "Gear chosen for real life.",
   ].join("\n");
 }
 
@@ -79,7 +84,7 @@ export async function processAbandonedCartFollowUps(limit = 25) {
         apiKey,
         from,
         claimed.email,
-        `Your DailyGear bag is still available`,
+        `Still thinking it over? Your DailyGear picks are waiting`,
         buildText({
           firstName: claimed.first_name,
           orderUrl: url,

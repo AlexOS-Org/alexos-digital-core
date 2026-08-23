@@ -19,16 +19,20 @@ import dailyGearHeroPremiumMobile from "@/assets/visuals/dailygear-hero-premium-
 export const Route = createFileRoute("/shop/")({
   head: () => ({
     meta: [
-      { title: "DailyGear — Everyday essentials, delivered" },
+      { title: "DailyGear Kenya — Gear worth choosing for everyday life" },
       {
         name: "description",
         content:
-          "Shop curated everyday gear with fast local delivery, secure checkout and easy returns.",
+          "Shop practical tech, bags, fashion, home essentials and everyday gear from DailyGear Kenya. Clear choices, easy checkout and delivery across Kenya.",
       },
-      { property: "og:title", content: "DailyGear — Everyday essentials, delivered" },
+      {
+        property: "og:title",
+        content: "DailyGear Kenya — Gear worth choosing for everyday life",
+      },
       {
         property: "og:description",
-        content: "Curated everyday gear with fast delivery and secure checkout.",
+        content:
+          "Practical gear for work, home, travel and everyday life—with clear choices and a simple Kenya checkout.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -43,7 +47,7 @@ export const Route = createFileRoute("/shop/")({
           name: "DailyGear",
           url: "https://dailygear.co.ke/shop",
           description:
-            "Curated everyday gear with fast local delivery and secure checkout in Kenya.",
+            "Practical gear for work, home, travel and everyday life, with easy checkout and Kenya delivery.",
           areaServed: "KE",
           contactPoint: {
             "@type": "ContactPoint",
@@ -82,7 +86,7 @@ function StoreHome() {
               <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary-foreground/75">
                 <span className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-3 py-1.5">
                   <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                  {store?.tagline ?? "Everyday, elevated"}
+                  {store?.tagline ?? "Useful gear. Better choices."}
                 </span>
                 <span className="rounded-full border border-primary-foreground/20 px-3 py-1.5">
                   DailyGear / KE
@@ -90,11 +94,11 @@ function StoreHome() {
               </div>
               <div className="max-w-xl space-y-4">
                 <h1 className="text-4xl font-black leading-[0.98] tracking-[-0.04em] sm:text-6xl lg:text-7xl">
-                  {store?.hero_headline ?? "Everyday gear that actually lasts"}
+                  {store?.hero_headline ?? "Find gear that earns its place in your day."}
                 </h1>
                 <p className="max-w-lg text-sm leading-relaxed text-primary-foreground/75 sm:text-base">
                   {store?.hero_subheadline ??
-                    "Carefully chosen pieces for how the day moves — from the first commute to the last errand."}
+                    "Shop practical products across tech, bags, fashion, home and everyday essentials—with clear choices, straightforward details and a simple checkout."}
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -104,7 +108,7 @@ function StoreHome() {
                   className="rounded-xl bg-primary-foreground text-primary hover:bg-primary-foreground/90"
                 >
                   <Link to="/shop/products">
-                    Explore the collection <ArrowRight className="ml-2 h-4 w-4" />
+                    Shop the collection <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
                 <Button
@@ -113,23 +117,23 @@ function StoreHome() {
                   variant="outline"
                   className="rounded-xl border-primary-foreground/25 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
                 >
-                  <Link to="/shop/track">Track an order</Link>
+                  <Link to="/shop/track">Track my order</Link>
                 </Button>
               </div>
             </div>
 
             <div className="relative mt-10 grid grid-cols-3 gap-2 border-t border-primary-foreground/15 pt-4 text-xs text-primary-foreground/75 sm:gap-4">
               <div>
-                <p className="font-bold text-primary-foreground">Curated</p>
-                <p className="mt-1">Less clutter, better choices</p>
+                <p className="font-bold text-primary-foreground">Choose with confidence</p>
+                <p className="mt-1">Clear products and options</p>
               </div>
               <div>
-                <p className="font-bold text-primary-foreground">Transparent</p>
-                <p className="mt-1">Clear options and policies</p>
+                <p className="font-bold text-primary-foreground">Checkout simply</p>
+                <p className="mt-1">No account required</p>
               </div>
               <div>
-                <p className="font-bold text-primary-foreground">Connected</p>
-                <p className="mt-1">Support after checkout</p>
+                <p className="font-bold text-primary-foreground">Delivery in Kenya</p>
+                <p className="mt-1">Select your county and town</p>
               </div>
             </div>
           </div>
@@ -151,7 +155,7 @@ function StoreHome() {
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/70">
                   The DailyGear edit
                 </p>
-                <p className="mt-1 text-sm font-semibold">Carry · power · style</p>
+                <p className="mt-1 text-sm font-semibold">Carry · power · style · everyday</p>
               </div>
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-white/20 bg-black/25 text-white backdrop-blur-md">
                 <Compass className="h-5 w-5" aria-hidden="true" />
@@ -167,44 +171,43 @@ function StoreHome() {
 
       <MerchandisingSection
         eyebrow="Featured products"
-        title="A considered edit to start"
-        description="Explore the products currently available from DailyGear, with options shown clearly before checkout."
+        title="Start with what fits your day"
+        description="A focused selection of currently available DailyGear products. Open a product to compare its details, choose an available option and continue to checkout."
         products={featuredProducts}
         currency={currency}
         loading={products.isLoading}
-        emptyCopy="Featured products will appear here as the catalogue grows."
+        emptyCopy="We are refreshing the collection. Check back shortly for available products."
       />
 
       <MerchandisingSection
         eyebrow="Best selling"
-        title="Customer favourites"
-        description="This section uses confirmed paid-order history or products explicitly marked as popular."
+        title="What shoppers are choosing"
+        description="Products appear here when supported by confirmed order history or an approved popularity tag—so this section stays honest and useful."
         products={bestSelling.slice(0, 4)}
         currency={currency}
         loading={products.isLoading}
-        emptyCopy="Best-seller history is still building. Browse the current collection while customer orders accumulate."
+        emptyCopy="Customer favourites are still building. Explore the current collection and find your own pick."
       />
 
       <MerchandisingSection
         eyebrow="New arrivals"
-        title="Fresh to DailyGear"
-        description="The latest active products are placed here so returning customers can discover what has just been added."
+        title="Fresh finds, ready to explore"
+        description="See the latest active products added to DailyGear and discover something useful for work, home, travel or everyday life."
         products={newArrivals}
         currency={currency}
         loading={products.isLoading}
-        emptyCopy="New arrivals will appear here when active products are added."
+        emptyCopy="New arrivals will appear here as products are added to the live collection."
       />
 
       <section className="dailygear-below-fold mt-12 rounded-[2rem] border bg-card p-6 text-center sm:p-10">
         <Sparkles className="mx-auto h-6 w-6 text-primary" aria-hidden="true" />
-        <h2 className="mt-3 text-2xl font-black tracking-tight">Be first to see the next drop</h2>
+        <h2 className="mt-3 text-2xl font-black tracking-tight">Don't miss the next useful find.</h2>
         <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-          We keep the home page focused. For new arrivals and approved special offers, ask DailyGear
-          to add you to the email list.
+          Get DailyGear updates when new products and approved offers are added. No noisy promises—just useful gear worth seeing.
         </p>
         <Button asChild className="mt-5 rounded-xl">
           <a href="mailto:dailygear.co.ke@gmail.com?subject=DailyGear%20email%20updates">
-            Request email updates <ArrowRight className="ml-2 h-4 w-4" />
+            Get DailyGear updates <ArrowRight className="ml-2 h-4 w-4" />
           </a>
         </Button>
       </section>
@@ -243,7 +246,7 @@ function MerchandisingSection({
           to="/shop/products"
           className="shrink-0 text-sm font-semibold text-primary hover:underline"
         >
-          View all
+          Browse all products
         </Link>
       </div>
       {loading ? (

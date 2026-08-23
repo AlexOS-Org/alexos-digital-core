@@ -32,16 +32,16 @@ function paymentInstructions(input: OrderNotificationInput) {
   const nearbyCounties = new Set(["nairobi", "kiambu", "kajiado"]);
   const outsideNearby = !nearbyCounties.has(input.county.trim().toLowerCase());
   return [
-    "M-Pesa payment instructions:",
+    "Your M-Pesa payment details:",
     `Paybill: ${paybill}`,
     `Account: ${account}`,
     `Amount: ${input.currency} ${input.total.toLocaleString()}`,
     "Use your order number as the payment reference where your M-Pesa screen allows it.",
-    "After payment, reply with the M-Pesa transaction code so DailyGear can match and confirm the receipt.",
+    "After payment, reply with the M-Pesa transaction code so DailyGear can match and confirm your payment.",
     outsideNearby
-      ? "Your location is outside the Nairobi, Kiambu and Kajiado nearby-delivery area. Paying before dispatch lets us confirm the route and any approved prepayment delivery benefit before fulfilment; no discount is applied unless it is explicitly confirmed."
+      ? "Your location is outside the Nairobi, Kiambu and Kajiado nearby-delivery area. We will confirm the delivery route and any approved prepayment delivery benefit before fulfilment; no discount is applied unless it is explicitly confirmed."
       : "Your location is within our nearby-delivery area. We will confirm the delivery route and collection or prepayment details with you.",
-    "If you prefer pay on delivery, reply to this message and we will confirm whether that option is available for your route.",
+    "If you prefer pay on delivery, reply to this message and we will confirm whether it is available for your route.",
   ];
 }
 
@@ -58,24 +58,29 @@ function plainText(input: OrderNotificationInput, audience: "customer" | "owner"
     greeting,
     "",
     audience === "customer"
-      ? "We have received your DailyGear order. Keep this reference for delivery support:"
-      : "A new DailyGear order was received and needs fulfilment:",
-    `Order: ${input.orderNumber}`,
-    `Total: ${input.currency} ${input.total.toLocaleString()}`,
+      ? "Your DailyGear order is in. Here is everything you need to keep it moving."
+      : "A new DailyGear order is ready for fulfilment review:",
+    "",
+    `Order number: ${input.orderNumber}`,
+    `Order total: ${input.currency} ${input.total.toLocaleString()}`,
     `Payment method: ${input.paymentMethod.toUpperCase()}`,
     "",
-    "Items:",
+    "What you ordered:",
     itemLines || "- Item details are available in the Orders workspace.",
     "",
-    `Delivery: ${input.county} — ${input.town}`,
+    "Where we're delivering:",
+    `${input.county} — ${input.town}`,
     `Address: ${input.address}`,
     input.deliveryDetails ? `Delivery details: ${input.deliveryDetails}` : "",
     ...(audience === "customer" ? paymentInstructions(input) : []),
-    `Customer phone: ${input.customerPhone}`,
+    "",
+    audience === "customer"
+      ? "What happens next: DailyGear will contact you to confirm delivery and payment collection where applicable. Keep your order number handy if you need support."
+      : `Customer phone: ${input.customerPhone}`,
     input.customerEmail ? `Customer email: ${input.customerEmail}` : "",
     "",
     audience === "customer"
-      ? "DailyGear will contact you to confirm delivery and payment collection where applicable."
+      ? "Thanks for choosing DailyGear. We will help you get the order through the next step."
       : "Review the order in AlexOS before fulfilment. Payment status remains separate from order creation.",
   ]
     .filter(Boolean)
@@ -121,7 +126,7 @@ export async function sendOrderNotifications(input: OrderNotificationInput) {
       apiKey,
       from,
       input.customerEmail,
-      `DailyGear order received — ${input.orderNumber}`,
+      `Order ${input.orderNumber} is in — here's what happens next | DailyGear`,
       plainText(input, "customer"),
     );
   }
