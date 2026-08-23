@@ -23,21 +23,21 @@ import { initMetaPixel, trackMetaPixel, useMetaPixel } from "@/lib/storefront/me
 import { trackGoogleAnalytics } from "@/lib/storefront/google-analytics";
 
 const YJ_HERO_IMAGE =
-  "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/LmReCutXJBRoMMXD.jpg";
+  "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/zjXCQvblIoPgFGyL.png";
 
 const YJ_DETAIL_IMAGES = [
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/uEnVUZZSqTxpWcpC.jpg",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/zdihryKHXvTYmQVR.jpg",
     title: "Water-resistant exterior for busy school days",
     body: "The supplied product information describes a durable, water-resistant nylon exterior, and this image shows water on the outside of the bag.",
   },
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/SmdTfvhZpfaalxcl.jpg",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/ZThaZpSigdXfdxMX.jpg",
     title: "Zipped compartments and sturdy details",
     body: "The close-up shows the zipper pulls and trim that help open the bag’s separate storage areas for books and daily essentials.",
   },
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/tQXkhWbSuxGPqqhI.jpg",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/jZiCwDcdsBRHJvxJ.jpg",
     title: "Adjustable padded shoulder straps",
     body: "The supplied image highlights widened, adjustable shoulder straps and a ventilated back area for everyday carrying.",
   },
@@ -47,12 +47,12 @@ const YJ_DETAIL_IMAGES = [
     body: "The backpack’s visible back padding, straps and side structure are designed around a more organised school-day carry.",
   },
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/jjxGUkCscisJIwCt.jpg",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/tqWCFOcQTMsDwRzI.jpg",
     title: "Space for a laptop or tablet",
     body: "The supplied product image shows a laptop or tablet placed inside the padded compartment; check the device size against the bag before ordering.",
   },
   {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/jeljxkzyPMfbYrlj.jpg",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/ZvCeCZxYeJeetmuL.jpg",
     title: "One-piece practical structure",
     body: "The open view shows how the bag unfolds and how its sections work together for school, travel or daily use.",
   },
