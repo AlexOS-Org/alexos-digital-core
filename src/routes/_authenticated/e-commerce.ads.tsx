@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { IntelligencePanel } from "@/components/dailygear/IntelligencePanel";
+import { MetaPerformancePanel } from "@/components/dailygear/MetaPerformancePanel";
 import { useCommerceData } from "@/lib/dailygear/useCommerceData";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/ads")({
@@ -28,6 +29,7 @@ function AdsPage() {
         title="Ad Studio"
         description="Ad variants, creatives, audiences and budget guidance."
       />
+      <MetaPerformancePanel />
       <IntelligencePanel kind="advertising" ctx={context} ready={!isLoading} />
     </div>
   );

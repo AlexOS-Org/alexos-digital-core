@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { IntelligencePanel } from "@/components/dailygear/IntelligencePanel";
+import { MetaPerformancePanel } from "@/components/dailygear/MetaPerformancePanel";
 import { useCommerceData } from "@/lib/dailygear/useCommerceData";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/marketing")({
@@ -25,6 +26,7 @@ function MarketingPage() {
         title="Marketing Intelligence"
         description="Channel performance, ROAS, CTR, CPC and CPA."
       />
+      <MetaPerformancePanel />
       <IntelligencePanel kind="marketing" ctx={context} ready={!isLoading} />
     </div>
   );
