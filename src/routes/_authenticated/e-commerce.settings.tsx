@@ -1,7 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { ArrowLeft, Boxes, CheckCircle2, Palette, Save, ShieldCheck, Store } from "lucide-react";
+import { ArrowLeft, Boxes, CheckCircle2, Save, ShieldCheck, Store } from "lucide-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { VisualThemePicker } from "@/components/theme/VisualThemePicker";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -97,30 +96,6 @@ function SettingsPage() {
           description="Configure the canonical DailyGear storefront before opening the public catalogue."
         />
       </div>
-
-      <Card className="relative overflow-hidden rounded-[1.75rem] border-primary/20 bg-gradient-to-br from-card via-card to-primary/[0.07] shadow-[0_22px_60px_-36px_var(--alexos-glow)]">
-        <div className="alexos-visual-strip absolute inset-x-0 top-0 h-1 opacity-90" />
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
-              <Palette className="h-4 w-4" />
-            </span>
-            Workspace appearance
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-4 rounded-2xl border border-primary/15 bg-primary/[0.04] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-            <div>
-              <p className="text-sm font-semibold">Theme controls live in Settings</p>
-              <p className="mt-1 max-w-xl text-xs leading-5 text-muted-foreground">
-                Choose AlexOS Midnight, Aurora, DailyGear Operator, Paper Light or a custom accent.
-                The same preference applies across the AlexOS and DailyGear workspaces.
-              </p>
-            </div>
-            <VisualThemePicker />
-          </div>
-        </CardContent>
-      </Card>
 
       <Card className="rounded-[1.75rem] border-primary/20 bg-card/80">
         <CardHeader className="flex flex-row items-start justify-between gap-4">

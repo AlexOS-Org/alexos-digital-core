@@ -1,9 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Bell, Palette, Lock, Database, Globe, Save, Check } from "lucide-react";
+import { ArrowLeft, Bell, Lock, Database, Globe, Save, Check } from "lucide-react";
 import { useState } from "react";
-import { VisualThemePicker } from "@/components/theme/VisualThemePicker";
 
 export const Route = createFileRoute("/_authenticated/settings")({ component: Settings });
 
@@ -103,28 +102,6 @@ function Settings() {
             description="Reminder for debt payment due dates"
             defaultChecked
           />
-        </CardContent>
-      </Card>
-
-      <Card className="rounded-2xl">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Palette className="h-4 w-4" />
-            Appearance
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-2xl border border-primary/15 bg-primary/[0.04] p-4 sm:p-5">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold">Command-center style</p>
-                <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  Select the AlexOS or DailyGear visual preset, custom accent and appearance mode.
-                </p>
-              </div>
-              <VisualThemePicker />
-            </div>
-          </div>
         </CardContent>
       </Card>
 
