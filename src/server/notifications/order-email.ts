@@ -32,16 +32,16 @@ function paymentInstructions(input: OrderNotificationInput) {
   const nearbyCounties = new Set(["nairobi", "kiambu", "kajiado"]);
   const outsideNearby = !nearbyCounties.has(input.county.trim().toLowerCase());
   return [
-    "M-Pesa payment instructions:",
+    "Next step: complete your M-Pesa payment so we can match the order and move it into fulfilment.",
     `Paybill: ${paybill}`,
     `Account: ${account}`,
     `Amount: ${input.currency} ${input.total.toLocaleString()}`,
     "Use your order number as the payment reference where your M-Pesa screen allows it.",
     "After payment, reply with the M-Pesa transaction code so DailyGear can match and confirm the receipt.",
     outsideNearby
-      ? "Your location is outside the Nairobi, Kiambu and Kajiado nearby-delivery area. Paying before dispatch lets us confirm the route and any approved prepayment delivery benefit before fulfilment; no discount is applied unless it is explicitly confirmed."
+      ? "Your location is outside the Nairobi, Kiambu and Kajiado nearby-delivery area. We will confirm the delivery route and any approved prepayment delivery benefit before fulfilment; no discount is applied unless it is explicitly confirmed."
       : "Your location is within our nearby-delivery area. We will confirm the delivery route and collection or prepayment details with you.",
-    "If you prefer pay on delivery, reply to this message and we will confirm whether that option is available for your route.",
+    "Prefer pay on delivery? Reply to this email and we will confirm whether it is available for your route.",
   ];
 }
 
@@ -54,29 +54,36 @@ function plainText(input: OrderNotificationInput, audience: "customer" | "owner"
         `- ${item.name}${item.sku ? ` (SKU ${item.sku})` : ""} × ${item.quantity} — ${input.currency} ${item.lineTotal.toLocaleString()}`,
     )
     .join("\n");
+
   return [
     greeting,
     "",
     audience === "customer"
-      ? "We have received your DailyGear order. Keep this reference for delivery support:"
-      : "A new DailyGear order was received and needs fulfilment:",
+      ? "Thank you for choosing DailyGear. Your order is in our system and your reference below is the fastest way for us to help with any delivery question."
+      : "A new DailyGear order has been received and is ready for fulfilment review.",
+    "",
     `Order: ${input.orderNumber}`,
     `Total: ${input.currency} ${input.total.toLocaleString()}`,
     `Payment method: ${input.paymentMethod.toUpperCase()}`,
     "",
-    "Items:",
+    "Your order:",
     itemLines || "- Item details are available in the Orders workspace.",
     "",
     `Delivery: ${input.county} — ${input.town}`,
     `Address: ${input.address}`,
     input.deliveryDetails ? `Delivery details: ${input.deliveryDetails}` : "",
+    "",
     ...(audience === "customer" ? paymentInstructions(input) : []),
     `Customer phone: ${input.customerPhone}`,
     input.customerEmail ? `Customer email: ${input.customerEmail}` : "",
     "",
     audience === "customer"
-      ? "DailyGear will contact you to confirm delivery and payment collection where applicable."
-      : "Review the order in AlexOS before fulfilment. Payment status remains separate from order creation.",
+      ? "What happens next: DailyGear will confirm the delivery and payment/collection details where applicable. Keep this email and your order number until your order is delivered."
+      : "Action: review the order in AlexOS and move it through the fulfilment workflow. Payment status remains separate from order creation.",
+    "",
+    audience === "customer"
+      ? "Need help? Reply to this email or contact DailyGear using the support details on the storefront."
+      : "DailyGear — customer order notification",
   ]
     .filter(Boolean)
     .join("\n");
@@ -121,7 +128,7 @@ export async function sendOrderNotifications(input: OrderNotificationInput) {
       apiKey,
       from,
       input.customerEmail,
-      `DailyGear order received — ${input.orderNumber}`,
+      `Order ${input.orderNumber} received — your DailyGear order is on its way to confirmation`,
       plainText(input, "customer"),
     );
   }
@@ -130,7 +137,7 @@ export async function sendOrderNotifications(input: OrderNotificationInput) {
       apiKey,
       from,
       input.ownerEmail,
-      `New DailyGear order — ${input.orderNumber}`,
+      `New DailyGear order ${input.orderNumber} — fulfilment action required`,
       plainText(input, "owner"),
     );
   }
