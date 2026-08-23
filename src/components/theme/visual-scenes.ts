@@ -1,7 +1,22 @@
 export type GreetingTriggerId = "time" | "weather" | "geolocation";
 
 export type DashboardSceneId =
-  "auto" | "none" | "mountains" | "ocean" | "basketball" | "sunset" | "night";
+  | "auto"
+  | "none"
+  | "mountains"
+  | "ocean"
+  | "basketball"
+  | "cars"
+  | "sports"
+  | "city"
+  | "river"
+  | "nature"
+  | "birds"
+  | "waterfall"
+  | "rocks"
+  | "fish"
+  | "sunset"
+  | "night";
 
 export type DashboardScene = {
   id: DashboardSceneId;
@@ -41,9 +56,63 @@ export const DASHBOARD_SCENES: Record<DashboardSceneId, DashboardScene> = {
   },
   basketball: {
     id: "basketball",
-    label: "Basketball energy",
+    label: "Basketball court",
     description: "Warm court-inspired motion for active planning days",
     preview: { start: "#21131c", end: "#9a4628", accent: "#ff9f5b" },
+  },
+  cars: {
+    id: "cars",
+    label: "Performance cars",
+    description: "A cinematic road-and-motion scene for execution views",
+    preview: { start: "#0b1020", end: "#5f2338", accent: "#ff557f" },
+  },
+  sports: {
+    id: "sports",
+    label: "Sports arena",
+    description: "Energetic stadium atmosphere for active business reviews",
+    preview: { start: "#07131a", end: "#0e6a74", accent: "#5ce1e6" },
+  },
+  city: {
+    id: "city",
+    label: "City lights",
+    description: "Urban night illumination for command-centre dashboards",
+    preview: { start: "#080b18", end: "#3a2b70", accent: "#b18cff" },
+  },
+  river: {
+    id: "river",
+    label: "River valley",
+    description: "Layered flowing water for calm planning and cash-flow views",
+    preview: { start: "#081c2c", end: "#247b78", accent: "#86e5d6" },
+  },
+  nature: {
+    id: "nature",
+    label: "Nature trail",
+    description: "Quiet green landscape for reflective operating reviews",
+    preview: { start: "#0d1d17", end: "#4d8054", accent: "#b5e48c" },
+  },
+  birds: {
+    id: "birds",
+    label: "Birds at dawn",
+    description: "Open-sky scene for a lighter morning greeting",
+    preview: { start: "#234766", end: "#e0a96d", accent: "#fff0c2" },
+  },
+  waterfall: {
+    id: "waterfall",
+    label: "Waterfall",
+    description: "High-contrast flowing water for focus and momentum",
+    preview: { start: "#071d2d", end: "#2f87a5", accent: "#b7f7ff" },
+  },
+  rocks: {
+    id: "rocks",
+    label: "Rock formations",
+    description: "Textured earth tones for grounded review sessions",
+    preview: { start: "#1e1716", end: "#89644b", accent: "#efbd8d" },
+  },
+  fish: {
+    id: "fish",
+    label: "Underwater life",
+    description: "Deep-water colour and motion for discovery views",
+    preview: { start: "#031827", end: "#075d73", accent: "#63e6be" },
   },
   sunset: {
     id: "sunset",
