@@ -117,7 +117,7 @@ function FunnelPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
-  const [quantity, setQuantity] = useState(1);
+  const [variantQuantities, setVariantQuantities] = useState<Record<string, number>>({});
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [customer, setCustomer] = useState({
     firstName: "",
@@ -156,6 +156,7 @@ function FunnelPage() {
           availableVariants.find((variant) => variant.name.toLowerCase().includes("green")) ??
           availableVariants[0];
         setSelectedVariantId(firstVariant?.id ?? null);
+        setVariantQuantities(firstVariant ? { [firstVariant.id]: 1 } : {});
         if (typeof window !== "undefined") {
           rememberFunnelAttribution({
             source: search.utm_source ?? result.trafficSource ?? undefined,
@@ -263,6 +264,15 @@ function FunnelPage() {
   }));
   const selectedVariant =
     productVariants.find((variant) => variant.id === selectedVariantId) ?? null;
+  const selectedQuantity = selectedVariant ? (variantQuantities[selectedVariant.id] ?? 0) : 0;
+  const hasSelection = Object.values(variantQuantities).some((value) => value > 0);
+  const selectedTotal = product
+    ? productVariants.reduce(
+        (total, variant) =>
+          total + variantPrice(variant, product) * (variantQuantities[variant.id] ?? 0),
+        0,
+      )
+    : 0;
   const price = product
     ? selectedVariant
       ? variantPrice(selectedVariant, product)
@@ -287,33 +297,37 @@ function FunnelPage() {
   }, [isYjBag, product?.images, productVariants]);
 
   function addToCheckout() {
-    if (!funnel || !product || outOfStock) return;
-    cartStore.add(
-      {
-        productId: product.id,
-        variantId: selectedVariant?.id ?? null,
-        name: selectedVariant ? `${product.name} — ${selectedVariant.name}` : product.name,
-        sku: selectedVariant?.sku ?? product.sku,
-        price,
-        image: selectedVariant?.imageUrl ?? product.images[0] ?? null,
-        maxQuantity,
-        offerRole: "primary",
-        funnelSlug: funnel.slug,
-      },
-      quantity,
-    );
+    if (!funnel || !product || !hasSelection) return;
+    const selectedContents: Array<{ id: string; quantity: number }> = [];
+    productVariants.forEach((variant) => {
+      const selectedQuantity = variantQuantities[variant.id] ?? 0;
+      if (selectedQuantity <= 0) return;
+      cartStore.add(
+        {
+          productId: product.id,
+          variantId: variant.id,
+          name: `${product.name} — ${variant.name}`,
+          sku: variant.sku ?? product.sku,
+          price: variantPrice(variant, product),
+          image: variant.imageUrl ?? product.images[0] ?? null,
+          maxQuantity,
+          offerRole: "primary",
+          funnelSlug: funnel.slug,
+        },
+        selectedQuantity,
+      );
+      selectedContents.push({
+        id: variant.sku ?? product.sku ?? product.id,
+        quantity: Math.min(selectedQuantity, maxQuantity),
+      });
+    });
     trackMetaPixel("AddToCart", {
-      content_ids: [selectedVariant?.sku ?? product.sku ?? product.id],
+      content_ids: selectedContents.map((content) => content.id),
       content_name: product.name,
       content_type: "product",
-      contents: [
-        {
-          id: selectedVariant?.sku ?? product.sku ?? product.id,
-          quantity: Math.min(quantity, maxQuantity),
-        },
-      ],
+      contents: selectedContents,
       currency: product.currency,
-      value: price * Math.min(quantity, maxQuantity),
+      value: selectedTotal,
     });
     navigate({ to: "/shop/checkout", search: { funnel: funnel.slug } });
   }
@@ -328,6 +342,7 @@ function FunnelPage() {
   function handleFirstPageCheckout(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (
+      !hasSelection ||
       !customer.firstName.trim() ||
       !customer.phone.trim() ||
       !customer.address.trim() ||
@@ -468,30 +483,75 @@ function FunnelPage() {
               <h2 className="mt-2 text-2xl font-black tracking-tight">
                 See the available options before you order.
               </h2>
-              <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {productVariants.map((variant) => (
-                  <button
-                    key={variant.id}
-                    type="button"
-                    onClick={() => setSelectedVariantId(variant.id)}
-                    className={`overflow-hidden rounded-2xl border text-left ${selectedVariant?.id === variant.id ? "border-primary ring-2 ring-primary/30" : "border-border"}`}
-                  >
-                    {variant.imageUrl ? (
-                      <img
-                        src={variant.imageUrl}
-                        alt={`${product.name} — ${variant.name}`}
-                        loading="lazy"
-                        decoding="async"
-                        className="aspect-square w-full object-cover"
-                      />
-                    ) : (
-                      <div className="grid aspect-square place-items-center bg-muted/40 text-xs text-muted-foreground">
-                        Image pending
+              <div className="mt-5 grid gap-3">
+                {productVariants.map((variant) => {
+                  const variantQuantity = variantQuantities[variant.id] ?? 0;
+                  return (
+                    <div
+                      key={variant.id}
+                      className={`flex min-w-0 items-center gap-3 rounded-2xl border p-3 ${selectedVariant?.id === variant.id ? "border-primary ring-2 ring-primary/20" : "border-border"}`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setSelectedVariantId(variant.id)}
+                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                      >
+                        {variant.imageUrl ? (
+                          <img
+                            src={variant.imageUrl}
+                            alt={`${product.name} — ${variant.name}`}
+                            loading="lazy"
+                            decoding="async"
+                            className="h-16 w-16 shrink-0 rounded-xl object-contain"
+                          />
+                        ) : (
+                          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-xl bg-muted/40 text-[10px] text-muted-foreground">
+                            Image pending
+                          </div>
+                        )}
+                        <span className="min-w-0 break-words text-sm font-semibold">
+                          {variant.name}
+                        </span>
+                      </button>
+                      <div
+                        className="flex shrink-0 items-center gap-2"
+                        aria-label={`Quantity for ${variant.name}`}
+                      >
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() =>
+                            setVariantQuantities((current) => ({
+                              ...current,
+                              [variant.id]: Math.max(0, variantQuantity - 1),
+                            }))
+                          }
+                          aria-label={`Remove one ${variant.name}`}
+                        >
+                          −
+                        </Button>
+                        <span className="w-5 text-center text-sm font-bold">{variantQuantity}</span>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() =>
+                            setVariantQuantities((current) => ({
+                              ...current,
+                              [variant.id]: variantQuantity + 1,
+                            }))
+                          }
+                          aria-label={`Add one ${variant.name}`}
+                        >
+                          +
+                        </Button>
                       </div>
-                    )}
-                    <span className="block px-3 py-2 text-xs font-semibold">{variant.name}</span>
-                  </button>
-                ))}
+                    </div>
+                  );
+                })}
               </div>
             </section>
           ) : null}
@@ -553,49 +613,29 @@ function FunnelPage() {
           <h2 className="mt-2 text-xl font-black">{product.name}</h2>
           {productVariants.length > 0 ? (
             <div className="mt-5 space-y-2">
-              <label htmlFor="funnel-variant" className="text-sm font-semibold">
-                Choose an option
-              </label>
-              <select
-                id="funnel-variant"
-                value={selectedVariantId ?? ""}
-                onChange={(event) => setSelectedVariantId(event.target.value)}
-                className="h-10 w-full rounded-xl border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-              >
-                {productVariants.map((variant) => (
-                  <option key={variant.id} value={variant.id}>
-                    {variant.name} ·{" "}
-                    {variant.availabilityConfirmed === false ? "Unavailable" : "Available to order"}
-                  </option>
-                ))}
-              </select>
+              <p className="text-sm font-semibold">Your selected colours</p>
+              <div className="space-y-2">
+                {productVariants
+                  .filter((variant) => (variantQuantities[variant.id] ?? 0) > 0)
+                  .map((variant) => (
+                    <div
+                      key={variant.id}
+                      className="flex items-center justify-between gap-3 text-sm"
+                    >
+                      <span className="min-w-0 break-words">{variant.name}</span>
+                      <span className="shrink-0 font-bold">× {variantQuantities[variant.id]}</span>
+                    </div>
+                  ))}
+              </div>
             </div>
           ) : null}
           <div className="mt-5 flex items-end justify-between gap-3">
             <span className="text-3xl font-black">
-              {product.currency} {price.toLocaleString()}
+              {product.currency} {(hasSelection ? selectedTotal : price).toLocaleString()}
             </span>
             <span className="text-xs text-muted-foreground">
               {outOfStock ? "Out of stock" : "Available to order"}
             </span>
-          </div>
-          <div className="mt-4 flex items-center gap-3">
-            <label htmlFor="funnel-quantity" className="text-sm font-semibold">
-              Quantity
-            </label>
-            <select
-              id="funnel-quantity"
-              value={quantity}
-              onChange={(event) => setQuantity(Number(event.target.value))}
-              className="h-10 rounded-xl border bg-background px-3 text-sm"
-              disabled={outOfStock}
-            >
-              {Array.from({ length: 10 }, (_, index) => (
-                <option key={index + 1} value={index + 1}>
-                  {index + 1}
-                </option>
-              ))}
-            </select>
           </div>
           <form
             className="mt-6 space-y-4 border-t border-border pt-5"
@@ -689,8 +729,16 @@ function FunnelPage() {
                 Saved details were filled from this browser. Please review them before continuing.
               </p>
             ) : null}
-            <Button type="submit" className="w-full rounded-xl" disabled={outOfStock}>
-              {outOfStock ? "Out of stock" : "Continue to secure checkout"}
+            <Button
+              type="submit"
+              className="w-full rounded-xl"
+              disabled={outOfStock || !hasSelection}
+            >
+              {outOfStock
+                ? "Out of stock"
+                : hasSelection
+                  ? "Continue to secure checkout"
+                  : "Choose a colour to continue"}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </form>
@@ -708,27 +756,6 @@ function FunnelPage() {
           </Button>
         </aside>
       </section>
-
-      <div className="fixed inset-x-3 bottom-3 z-30 md:hidden">
-        <div className="flex items-center gap-3 rounded-2xl border bg-background/95 p-2 shadow-2xl backdrop-blur">
-          <div className="min-w-0 flex-1 px-2">
-            <p className="truncate text-xs font-semibold">
-              {selectedVariant?.name ?? product.name}
-            </p>
-            <p className="text-sm font-black">
-              {product.currency} {price.toLocaleString()}
-            </p>
-          </div>
-          <Button
-            className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
-            disabled={outOfStock}
-            onClick={addToCheckout}
-          >
-            {outOfStock ? "Unavailable" : "Order now"}
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-      </div>
     </main>
   );
 }
