@@ -31,16 +31,16 @@ export type VisualTheme = {
 export const VISUAL_THEMES: Record<VisualThemeId, VisualTheme> = {
   midnight: {
     id: "midnight",
-    label: "AlexOS Midnight",
-    description: "Deep command-center blue with a mountain option",
+    label: "Horizon Command",
+    description: "Deep navy command centre with alpine depth and glass surfaces",
     backdrop: "mountains",
     accent: "blue",
     preview: { start: "#101a3a", end: "#273b78", accent: "#6ea8ff" },
   },
   aurora: {
     id: "aurora",
-    label: "AlexOS Aurora",
-    description: "Violet-to-cyan colour field without a photo backdrop",
+    label: "Electric Aurora",
+    description: "Dark violet glass with a controlled cyan signal layer",
     backdrop: "gradient",
     accent: "purple",
     preview: { start: "#24134e", end: "#135f75", accent: "#b48cff" },
@@ -135,16 +135,16 @@ export const VISUAL_THEMES: Record<VisualThemeId, VisualTheme> = {
   },
   finai: {
     id: "finai",
-    label: "FinAI Neon Ledger",
-    description: "Deep navy finance wall with cyan and pink movement signals",
+    label: "Neon Ledger",
+    description: "Obsidian finance workspace with cyan and magenta chart signals",
     backdrop: "gradient",
     accent: "blue",
     preview: { start: "#071126", end: "#142461", accent: "#44d9ff" },
   },
   custom: {
     id: "custom",
-    label: "Custom Accent",
-    description: "Keep the layout and choose your own accent colour",
+    label: "Studio Custom",
+    description: "Keep the premium workspace and tune one controlled accent",
     backdrop: "gradient",
     accent: "custom",
     preview: { start: "#202337", end: "#394267", accent: "#7fa2ff" },
@@ -158,8 +158,8 @@ export const VISUAL_THEMES: Record<VisualThemeId, VisualTheme> = {
 export const CURATED_VISUAL_THEME_IDS: readonly VisualThemeId[] = [
   "midnight",
   "ocean_mountain",
-  "dailygear",
-  "paper",
+  "finai",
+  "aurora",
   "custom",
 ];
 

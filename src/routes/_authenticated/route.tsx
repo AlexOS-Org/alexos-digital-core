@@ -8,6 +8,7 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { modules } from "@/lib/modules";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { isAuthorizedAlexOSUser } from "@/lib/authz";
+import { getDashboardSceneAsset } from "@/components/theme/dashboard-scene-assets";
 import {
   BalanceVisibilityProvider,
   BalanceVisibilityToggle,
@@ -110,7 +111,14 @@ function AuthenticatedLayout() {
   return (
     <BalanceVisibilityProvider>
       <SidebarProvider defaultOpen={false}>
-        <div className="min-h-screen flex w-full bg-background text-foreground transition-colors duration-300">
+        <div
+          className={`min-h-screen flex w-full text-foreground transition-colors duration-300 ${isDailyGearRoute ? "bg-background" : "alexos-internal-workspace"}`}
+          style={
+            isDailyGearRoute
+              ? undefined
+              : { backgroundImage: `url(${getDashboardSceneAsset("mountains")})` }
+          }
+        >
           <AppSidebar />
           <div className="flex min-w-0 flex-1 flex-col">
             {!isMobile && (

@@ -1740,6 +1740,38 @@
 }
 
 @layer utilities {
+  .alexos-internal-workspace {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    background-color: oklch(0.07 0.025 255);
+    background-position: center;
+    background-size: cover;
+  }
+
+  .alexos-internal-workspace::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, oklch(0.06 0.025 255 / 82%), oklch(0.08 0.035 255 / 95%)),
+      radial-gradient(
+        circle at 84% 4%,
+        color-mix(in oklch, var(--alexos-blue) 22%, transparent),
+        transparent 32rem
+      );
+  }
+
+  .alexos-internal-workspace > div:not([data-sidebar="sidebar"]) {
+    background: color-mix(in oklch, oklch(0.07 0.025 255) 58%, transparent);
+  }
+
+  .alexos-internal-workspace .alexos-route-canvas {
+    background: transparent;
+  }
+
   .money-center-shell {
     position: relative;
     isolation: isolate;
