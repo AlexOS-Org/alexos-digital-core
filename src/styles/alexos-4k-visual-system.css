@@ -15,50 +15,9 @@
   --alexos-visual-panel: color-mix(in oklch, var(--card) 86%, transparent);
 }
 
-/* Theme-specific signal colours keep the visual language coherent when the
-   user changes theme without changing component markup. */
+/* One consistent internal AlexOS baseline. Public commerce surfaces keep their own styles. */
 :root[data-visual-theme="midnight"] {
   --alexos-visual-accent: #6ea8ff;
-}
-:root[data-visual-theme="aurora"] {
-  --alexos-visual-accent: #b48cff;
-}
-:root[data-visual-theme="dailygear"] {
-  --alexos-visual-accent: #ff806f;
-}
-:root[data-visual-theme="paper"] {
-  --alexos-visual-accent: #2d9b78;
-}
-:root[data-visual-theme="ocean"],
-:root[data-visual-theme="ocean_mountain"] {
-  --alexos-visual-accent: #62d9df;
-}
-:root[data-visual-theme="plum"] {
-  --alexos-visual-accent: #d8a7ff;
-}
-:root[data-visual-theme="copper"] {
-  --alexos-visual-accent: #ffc27b;
-}
-:root[data-visual-theme="sage"] {
-  --alexos-visual-accent: #8fe3ba;
-}
-:root[data-visual-theme="opsmind"] {
-  --alexos-visual-accent: #c855ff;
-}
-:root[data-visual-theme="droneview"] {
-  --alexos-visual-accent: #ff8a4c;
-}
-:root[data-visual-theme="pulseai"] {
-  --alexos-visual-accent: #e9792c;
-}
-:root[data-visual-theme="pricepilot"] {
-  --alexos-visual-accent: #8b5cf6;
-}
-:root[data-visual-theme="finai"] {
-  --alexos-visual-accent: #44d9ff;
-}
-:root[data-visual-theme="custom"] {
-  --alexos-visual-accent: var(--alexos-custom-accent, #4f7cff);
 }
 
 /* Ambient canvas: gives modules the layered depth visible in the reference
@@ -74,9 +33,21 @@ body::after {
 
 body::before {
   background:
-    radial-gradient(circle at 8% 8%, color-mix(in oklch, var(--alexos-visual-accent) 10%, transparent), transparent 26rem),
-    radial-gradient(circle at 92% 12%, color-mix(in oklch, var(--alexos-purple) 8%, transparent), transparent 28rem),
-    radial-gradient(circle at 54% 92%, color-mix(in oklch, var(--alexos-blue) 7%, transparent), transparent 32rem);
+    radial-gradient(
+      circle at 8% 8%,
+      color-mix(in oklch, var(--alexos-visual-accent) 10%, transparent),
+      transparent 26rem
+    ),
+    radial-gradient(
+      circle at 92% 12%,
+      color-mix(in oklch, var(--alexos-purple) 8%, transparent),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 54% 92%,
+      color-mix(in oklch, var(--alexos-blue) 7%, transparent),
+      transparent 32rem
+    );
   opacity: 0.9;
 }
 
@@ -97,7 +68,11 @@ body::after {
   border: 1px solid color-mix(in oklch, var(--border) 78%, var(--alexos-visual-accent) 22%);
   background:
     radial-gradient(circle at 100% 0%, var(--alexos-visual-accent-soft), transparent 22rem),
-    linear-gradient(145deg, color-mix(in oklch, var(--card) 94%, var(--alexos-visual-accent) 6%), var(--card));
+    linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--card) 94%, var(--alexos-visual-accent) 6%),
+      var(--card)
+    );
   box-shadow: var(--alexos-visual-glow);
 }
 
@@ -107,7 +82,12 @@ body::after {
   z-index: -1;
   pointer-events: none;
   border-radius: inherit;
-  background: linear-gradient(120deg, transparent 20%, color-mix(in oklch, white 7%, transparent), transparent 78%);
+  background: linear-gradient(
+    120deg,
+    transparent 20%,
+    color-mix(in oklch, white 7%, transparent),
+    transparent 78%
+  );
   content: "";
   opacity: 0.45;
 }
@@ -172,7 +152,9 @@ body::after {
 }
 
 .dashboard-canvas table tbody tr {
-  transition: background-color 160ms ease, transform 160ms ease;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
 }
 
 .dashboard-canvas table tbody tr:hover {
@@ -184,8 +166,11 @@ body::after {
   position: relative;
   overflow: hidden;
   border: 1px solid color-mix(in oklch, var(--border) 72%, var(--alexos-visual-accent) 28%);
-  background:
-    linear-gradient(145deg, color-mix(in oklch, var(--card) 92%, var(--alexos-visual-accent) 8%), var(--card));
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklch, var(--card) 92%, var(--alexos-visual-accent) 8%),
+    var(--card)
+  );
   box-shadow: 0 18px 50px -38px color-mix(in oklch, var(--alexos-visual-accent) 70%, transparent);
 }
 
@@ -203,9 +188,15 @@ body::after {
 
 .alexos-data-sparkline {
   background-image:
-    linear-gradient(90deg, transparent 0 92%, color-mix(in oklch, var(--alexos-visual-accent) 22%, transparent) 92%),
+    linear-gradient(
+      90deg,
+      transparent 0 92%,
+      color-mix(in oklch, var(--alexos-visual-accent) 22%, transparent) 92%
+    ),
     linear-gradient(0deg, var(--alexos-visual-line) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 25%;
+  background-size:
+    100% 100%,
+    100% 25%;
 }
 
 /* DailyGear gets a retail-specific conversion surface without leaking into
@@ -295,7 +286,10 @@ body::after {
   .dashboard-feature-surface,
   .alexos-module-shell,
   .alexos-data-metric {
-    transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
   }
 
   .dashboard-surface:hover,

@@ -53,7 +53,9 @@ function getSystemTheme(): ResolvedTheme {
 function getStoredVisualTheme(): VisualThemeId {
   if (typeof window === "undefined") return DEFAULT_VISUAL_THEME;
   const stored = window.localStorage.getItem(VISUAL_THEME_KEY);
-  return isVisualThemeId(stored) ? stored : DEFAULT_VISUAL_THEME;
+  if (isVisualThemeId(stored)) return stored;
+  if (stored !== null) window.localStorage.removeItem(VISUAL_THEME_KEY);
+  return DEFAULT_VISUAL_THEME;
 }
 function getStoredCustomAccent() {
   if (typeof window === "undefined") return DEFAULT_CUSTOM_ACCENT;

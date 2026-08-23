@@ -11,12 +11,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "./ThemeProvider";
 import {
-  CURATED_VISUAL_THEME_IDS,
-  getVisualTheme,
-  VISUAL_THEMES,
-  type VisualThemeId,
-} from "./visual-themes";
-import {
   DASHBOARD_SCENES,
   GREETING_TRIGGERS,
   type DashboardSceneId,
@@ -28,19 +22,14 @@ export function VisualThemePicker() {
     setTheme,
     resolvedTheme,
     visualTheme,
-    setVisualTheme,
     customAccent,
-    setCustomAccent,
     customSurface,
-    setCustomSurface,
     customSidebar,
-    setCustomSidebar,
     dashboardScene,
     setDashboardScene,
     greetingTrigger,
     setGreetingTrigger,
   } = useTheme();
-  const selected = getVisualTheme(visualTheme);
 
   const exportPreset = () => {
     const preset = {
@@ -100,50 +89,20 @@ export function VisualThemePicker() {
           variant="ghost"
           size="icon"
           className="tap-target rounded-xl text-muted-foreground hover:bg-accent/70 hover:text-foreground"
-          aria-label={`Visual theme: ${selected.label}`}
-          title={`Visual theme: ${selected.label}`}
+          aria-label="Dashboard scene and appearance settings"
+          title="Dashboard scene and appearance settings"
         >
           <Palette className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72 rounded-2xl p-2">
         <DropdownMenuLabel className="px-2 py-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-          Visual theme presets
+          Dashboard appearance
         </DropdownMenuLabel>
         <p className="px-2 pb-2 text-[11px] leading-4 text-muted-foreground">
-          Preview a palette and apply it across AlexOS, DailyGear, Money Center, and Auren.
+          AlexOS uses one consistent premium workspace. Choose only the background scene and display
+          mode.
         </p>
-        <DropdownMenuRadioGroup
-          value={visualTheme}
-          onValueChange={(value) => setVisualTheme(value as VisualThemeId)}
-        >
-          {CURATED_VISUAL_THEME_IDS.map((themeId) => {
-            const option = VISUAL_THEMES[themeId];
-            return (
-              <DropdownMenuRadioItem
-                key={option.id}
-                value={option.id}
-                className="rounded-xl py-2.5"
-              >
-                <span
-                  aria-hidden="true"
-                  className="h-8 w-8 shrink-0 rounded-lg border border-white/20 shadow-inner"
-                  style={{
-                    background: `linear-gradient(135deg, ${option.preview.start}, ${option.preview.end})`,
-                    boxShadow: `inset 0 -3px 0 ${option.preview.accent}`,
-                  }}
-                />
-                <span className="min-w-0">
-                  <span className="block text-sm font-medium">{option.label}</span>
-                  <span className="block truncate text-[11px] text-muted-foreground">
-                    {option.description}
-                  </span>
-                </span>
-              </DropdownMenuRadioItem>
-            );
-          })}
-        </DropdownMenuRadioGroup>
-        <DropdownMenuSeparator />
         <DropdownMenuLabel className="px-2 py-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
           Greeting background scene
         </DropdownMenuLabel>
@@ -195,38 +154,6 @@ export function VisualThemePicker() {
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel className="px-2 py-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-          Custom accent
-        </DropdownMenuLabel>
-        <div className="space-y-2 rounded-xl px-2 py-2">
-          {(
-            [
-              ["Accent", customAccent, setCustomAccent],
-              ["Surface", customSurface, setCustomSurface],
-              ["Sidebar", customSidebar, setCustomSidebar],
-            ] as const
-          ).map(([label, value, setter]) => (
-            <label key={label} className="flex min-h-10 items-center gap-3">
-              <input
-                type="color"
-                value={value}
-                onChange={(event) => setter(event.target.value)}
-                aria-label={`Choose custom ${label.toLowerCase()} colour`}
-                className="h-9 w-12 cursor-pointer rounded-lg border border-border bg-transparent p-0.5"
-              />
-              <span className="min-w-0 flex-1 text-xs font-medium">{label} colour</span>
-              <span
-                aria-hidden="true"
-                className="h-5 w-5 rounded-full border border-border"
-                style={{ backgroundColor: value }}
-              />
-            </label>
-          ))}
-          <p className="text-[11px] leading-4 text-muted-foreground">
-            Mix these three colours, then select Custom Accent to apply the palette.
-          </p>
-        </div>
         <DropdownMenuSeparator />
         <DropdownMenuLabel className="px-2 py-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
           Appearance
