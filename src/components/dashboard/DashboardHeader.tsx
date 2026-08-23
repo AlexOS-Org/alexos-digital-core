@@ -8,6 +8,7 @@ import { useLocalWeather } from "@/components/dashboard/greeting-context";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { getVisualTheme } from "@/components/theme/visual-themes";
 import { getDashboardSceneLabel, getGreetingScene } from "@/components/theme/visual-scenes";
+import { getDashboardSceneAsset } from "@/components/theme/dashboard-scene-assets";
 import alexosCommandCenterWide from "@/assets/visuals/alexos-command-center-wide.webp";
 import alexosCommandCenterMobile from "@/assets/visuals/alexos-command-center-mobile.webp";
 
@@ -76,11 +77,22 @@ export function DashboardHeader() {
         data-scene={activeScene}
         className="alexos-dashboard-hero relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/15 text-white shadow-[0_24px_70px_-30px_var(--alexos-glow)] transition-[background] duration-[1800ms] ease-in-out sm:min-h-[330px]"
       >
-        {activeScene === "mountains" ? (
+        {activeScene !== "none" ? (
           <picture className="alexos-dashboard-backdrop pointer-events-none absolute inset-0 block">
-            <source media="(max-width: 640px)" srcSet={alexosCommandCenterMobile} />
+            <source
+              media="(max-width: 640px)"
+              srcSet={
+                activeScene === "mountains"
+                  ? alexosCommandCenterMobile
+                  : getDashboardSceneAsset(activeScene)
+              }
+            />
             <img
-              src={alexosCommandCenterWide}
+              src={
+                activeScene === "mountains"
+                  ? alexosCommandCenterWide
+                  : getDashboardSceneAsset(activeScene)
+              }
               alt=""
               aria-hidden="true"
               fetchPriority="high"
@@ -195,11 +207,22 @@ export function MobileDashboardHeader() {
         data-scene={activeScene}
         className="alexos-dashboard-hero relative min-h-[250px] overflow-hidden rounded-[1.9rem] border border-white/15 p-5 text-white shadow-[0_22px_58px_-30px_var(--alexos-glow)]"
       >
-        {activeScene === "mountains" ? (
+        {activeScene !== "none" ? (
           <picture className="pointer-events-none absolute inset-0 block">
-            <source media="(max-width: 640px)" srcSet={alexosCommandCenterMobile} />
+            <source
+              media="(max-width: 640px)"
+              srcSet={
+                activeScene === "mountains"
+                  ? alexosCommandCenterMobile
+                  : getDashboardSceneAsset(activeScene)
+              }
+            />
             <img
-              src={alexosCommandCenterWide}
+              src={
+                activeScene === "mountains"
+                  ? alexosCommandCenterWide
+                  : getDashboardSceneAsset(activeScene)
+              }
               alt=""
               aria-hidden="true"
               decoding="async"

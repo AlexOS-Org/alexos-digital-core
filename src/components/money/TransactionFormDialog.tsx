@@ -47,39 +47,13 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
   const [source, setSource] = useState<string>(INCOME_SOURCES[0]);
   const [description, setDescription] = useState("");
   const [reference, setReference] = useState("");
-  const [scope, setScope] = useState<"personal" | "business" | "shared">("personal");
+  const [scope, setScope] = useState<"personal" | "business">("personal");
   const [businessId, setBusinessId] = useState("");
-  const [expenseType, setExpenseType] = useState("other");
-
-  const expenseTypes = [
-    ["cost_of_goods", "Cost of goods"],
-    ["packaging", "Packaging"],
-    ["delivery", "Delivery"],
-    ["logistics", "Logistics"],
-    ["advertising", "Advertising"],
-    ["platform_fee", "Platform fee"],
-    ["supplier", "Supplier"],
-    ["payroll", "Payroll"],
-    ["rent", "Rent"],
-    ["utilities", "Utilities"],
-    ["tax", "Tax"],
-    ["transport", "Transport"],
-    ["airtime", "Airtime / mobile data"],
-    ["personal_living", "Personal living"],
-    ["education", "Education"],
-    ["health", "Health"],
-    ["other", "Other"],
-  ] as const;
 
   const eligibleAccounts =
     mode !== "expense"
       ? accounts
-      : accounts.filter((account) => {
-          const accountScope = account.financial_scope ?? "personal";
-          if (scope === "business") return accountScope === "business";
-          if (scope === "personal") return accountScope === "personal";
-          return true;
-        });
+      : accounts.filter((account) => (account.financial_scope ?? "personal") === scope);
 
   useEffect(() => {
     if (!open || mode !== "expense") return;
@@ -100,15 +74,9 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       setDescription(editing.description ?? "");
       setReference(editing.reference ?? "");
       setScope(
-        editing.expense_type === "shared_living" || editing.expense_scope === "shared"
-          ? "shared"
-          : editing.business_id
-            ? "business"
-            : "personal",
+        editing.expense_scope === "business" || editing.business_id ? "business" : "personal",
       );
       setBusinessId(editing.business_id ?? "");
-      setExpenseType(editing.expense_type ?? "other");
-      setScope(editing.expense_scope ?? (editing.business_id ? "business" : "personal"));
     } else {
       setDate(new Date().toISOString().slice(0, 16));
       setAmount("");
@@ -120,7 +88,6 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       setReference("");
       setScope("personal");
       setBusinessId(businesses[0]?.id ?? "");
-      setExpenseType("other");
     }
   }, [open, editing, accounts, businesses]);
 
@@ -147,7 +114,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       selectedAccount?.business_id &&
       selectedAccount.business_id !== businessId
     ) {
-      toast.error("Choose an account owned by the selected business, or record it as shared.");
+      toast.error("Choose an account owned by the selected business.");
       return;
     }
     await save.mutateAsync({
@@ -163,7 +130,12 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       reference: reference || null,
       business_id: mode === "expense" && scope === "business" ? businessId : null,
       financial_scope: mode === "expense" ? (selectedAccount?.financial_scope ?? "personal") : null,
-      expense_type: mode === "expense" ? expenseType : null,
+      expense_type:
+        mode === "expense"
+          ? normalizeExpenseCategory(category)
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "_")
+          : null,
       expense_scope: mode === "expense" ? scope : null,
     });
     onOpenChange(false);
@@ -261,15 +233,14 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
                 <Label>Expense scope</Label>
                 <Select
                   value={scope}
-                  onValueChange={(value) => setScope(value as "personal" | "business" | "shared")}
+                  onValueChange={(value) => setScope(value as "personal" | "business")}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="personal">Personal expense</SelectItem>
-                    <SelectItem value="shared">Shared expense</SelectItem>
-                    <SelectItem value="business">Business expense</SelectItem>
+                    <SelectItem value="personal">Personal</SelectItem>
+                    <SelectItem value="business">Business</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -290,36 +261,16 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
                   </Select>
                 </div>
               )}
-              <p className="text-xs text-muted-foreground">
-                Shared expenses remain one cash-outflow from the selected account and are labelled
-                shared for reporting. They are not split into duplicate personal and business
-                entries.
-              </p>
               <div className="space-y-1.5">
                 <Label>Expense purpose</Label>
-                <Select value={expenseType} onValueChange={setExpenseType}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {expenseTypes.map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label>Category</Label>
                 <Select value={category} onValueChange={setCategory}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {EXPENSE_CATEGORIES.map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {c}
+                    {EXPENSE_CATEGORIES.map((purpose) => (
+                      <SelectItem key={purpose} value={purpose}>
+                        {purpose}
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -43,6 +43,7 @@ import { useLocalWeather } from "@/components/dashboard/greeting-context";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { getVisualTheme } from "@/components/theme/visual-themes";
 import { getGreetingScene } from "@/components/theme/visual-scenes";
+import { getDashboardSceneAsset } from "@/components/theme/dashboard-scene-assets";
 import { debtRemaining, useDebts } from "@/lib/debts/api";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/")({
@@ -152,7 +153,17 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
     return () => window.clearInterval(timer);
   }, []);
-  const isMountainPreset = activeScene === "mountains";
+  const isSceneImage = activeScene !== "none";
+  const sceneAsset = isSceneImage
+    ? activeScene === "mountains"
+      ? dailyGearMountainWide
+      : getDashboardSceneAsset(activeScene)
+    : undefined;
+  const sceneMobileAsset = isSceneImage
+    ? activeScene === "mountains"
+      ? dailyGearMountainMobile
+      : sceneAsset
+    : undefined;
 
   return (
     <section
@@ -168,11 +179,11 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
       data-scene={activeScene}
       className="dashboard-hero-frame dailygear-workspace-hero rise-in relative overflow-hidden rounded-[1.75rem] p-5 text-white sm:p-7"
     >
-      {isMountainPreset ? (
+      {isSceneImage ? (
         <picture className="pointer-events-none absolute inset-0 z-0 block">
-          <source media="(max-width: 640px)" srcSet={dailyGearMountainMobile} />
+          <source media="(max-width: 640px)" srcSet={sceneMobileAsset} />
           <img
-            src={dailyGearMountainWide}
+            src={sceneAsset}
             alt=""
             aria-hidden="true"
             decoding="async"
