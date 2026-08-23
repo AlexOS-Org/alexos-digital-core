@@ -10,7 +10,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "./ThemeProvider";
-import { getVisualTheme, VISUAL_THEMES, type VisualThemeId } from "./visual-themes";
+import {
+  CURATED_VISUAL_THEME_IDS,
+  getVisualTheme,
+  VISUAL_THEMES,
+  type VisualThemeId,
+} from "./visual-themes";
 import {
   DASHBOARD_SCENES,
   GREETING_TRIGGERS,
@@ -112,24 +117,31 @@ export function VisualThemePicker() {
           value={visualTheme}
           onValueChange={(value) => setVisualTheme(value as VisualThemeId)}
         >
-          {Object.values(VISUAL_THEMES).map((option) => (
-            <DropdownMenuRadioItem key={option.id} value={option.id} className="rounded-xl py-2.5">
-              <span
-                aria-hidden="true"
-                className="h-8 w-8 shrink-0 rounded-lg border border-white/20 shadow-inner"
-                style={{
-                  background: `linear-gradient(135deg, ${option.preview.start}, ${option.preview.end})`,
-                  boxShadow: `inset 0 -3px 0 ${option.preview.accent}`,
-                }}
-              />
-              <span className="min-w-0">
-                <span className="block text-sm font-medium">{option.label}</span>
-                <span className="block truncate text-[11px] text-muted-foreground">
-                  {option.description}
+          {CURATED_VISUAL_THEME_IDS.map((themeId) => {
+            const option = VISUAL_THEMES[themeId];
+            return (
+              <DropdownMenuRadioItem
+                key={option.id}
+                value={option.id}
+                className="rounded-xl py-2.5"
+              >
+                <span
+                  aria-hidden="true"
+                  className="h-8 w-8 shrink-0 rounded-lg border border-white/20 shadow-inner"
+                  style={{
+                    background: `linear-gradient(135deg, ${option.preview.start}, ${option.preview.end})`,
+                    boxShadow: `inset 0 -3px 0 ${option.preview.accent}`,
+                  }}
+                />
+                <span className="min-w-0">
+                  <span className="block text-sm font-medium">{option.label}</span>
+                  <span className="block truncate text-[11px] text-muted-foreground">
+                    {option.description}
+                  </span>
                 </span>
-              </span>
-            </DropdownMenuRadioItem>
-          ))}
+              </DropdownMenuRadioItem>
+            );
+          })}
         </DropdownMenuRadioGroup>
         <DropdownMenuSeparator />
         <DropdownMenuLabel className="px-2 py-1.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">

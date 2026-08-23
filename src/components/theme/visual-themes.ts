@@ -151,6 +151,18 @@ export const VISUAL_THEMES: Record<VisualThemeId, VisualTheme> = {
   },
 };
 
+/**
+ * The visible presets are intentionally curated. Legacy theme IDs remain in the registry so
+ * existing saved preferences and exported presets continue to resolve safely.
+ */
+export const CURATED_VISUAL_THEME_IDS: readonly VisualThemeId[] = [
+  "midnight",
+  "ocean_mountain",
+  "dailygear",
+  "paper",
+  "custom",
+];
+
 export const DEFAULT_VISUAL_THEME: VisualThemeId = "midnight";
 export const DEFAULT_CUSTOM_ACCENT = "#4f7cff";
 export function isVisualThemeId(value: string | null | undefined): value is VisualThemeId {
