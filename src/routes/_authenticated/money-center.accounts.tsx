@@ -202,6 +202,25 @@ function institutionStyle(name: string) {
   };
 }
 
+function institutionKey(name: string) {
+  const value = name.toLowerCase();
+  if (/m[- ]?pesa/.test(value)) return "mpesa";
+  if (/kcb/.test(value)) return "kcb";
+  if (/i&m|im bank/.test(value)) return "im";
+  if (/sbm/.test(value)) return "sbm";
+  if (/equity/.test(value)) return "equity";
+  if (/co[- ]?operative|co-op|coop/.test(value)) return "coop";
+  if (/ncba/.test(value)) return "ncba";
+  if (/absa/.test(value)) return "absa";
+  if (/stanbic/.test(value)) return "stanbic";
+  if (/family bank/.test(value)) return "family";
+  if (/airtel/.test(value)) return "airtel";
+  if (/salary/.test(value)) return "salary";
+  if (/binance|crypto/.test(value)) return "binance";
+  if (/cash/.test(value)) return "cash";
+  return "default";
+}
+
 function accountLogo(name: string) {
   const value = name.toLowerCase();
   if (/m[- ]?pesa/.test(value)) return mpesaLogo;
@@ -274,11 +293,29 @@ function AccountsPage() {
               className={cn(
                 "institution-card relative min-w-0 overflow-hidden rounded-2xl shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
                 institution.cardClass,
+                `institution-card-${institutionKey(a.name)}`,
+                isLowBalance && "institution-card-low",
                 isLowBalance &&
                   "border-red-400/90 bg-gradient-to-br from-red-200/95 via-red-100/80 to-red-50/70 dark:border-red-800/70 dark:from-red-950/70 dark:via-red-950/45 dark:to-background",
               )}
             >
-              <CardContent className="institution-card-content space-y-4 p-5 pt-6 text-slate-900 sm:p-6 sm:pt-7 dark:text-slate-100">
+              {logo ? (
+                <img
+                  src={logo}
+                  alt=""
+                  aria-hidden="true"
+                  className="institution-card-watermark pointer-events-none absolute inset-y-0 right-[-3rem] z-0 h-full w-3/4 object-contain opacity-[0.16]"
+                  loading="lazy"
+                />
+              ) : (
+                <div
+                  className="institution-card-watermark pointer-events-none absolute inset-y-0 right-[-2rem] z-0 grid w-3/4 place-items-center opacity-[0.12]"
+                  aria-hidden="true"
+                >
+                  <Icon className="h-40 w-40" strokeWidth={1} />
+                </div>
+              )}
+              <CardContent className="institution-card-content relative z-10 space-y-4 p-5 pt-6 text-slate-100 sm:p-6 sm:pt-7">
                 <div
                   className={cn(
                     "absolute inset-x-0 top-0 h-1",
@@ -289,7 +326,7 @@ function AccountsPage() {
                   <div className="flex items-center gap-3">
                     <div
                       className={cn(
-                        "institution-logo-tile grid h-16 w-16 place-items-center rounded-2xl border-2 border-white/90 bg-white/90 shadow-md ring-4 ring-white/40 dark:border-white/15 dark:bg-background/70 dark:ring-background/40",
+                        "institution-logo-tile grid h-16 w-16 place-items-center rounded-2xl border border-white/35 bg-white/95 shadow-lg ring-4 ring-white/10",
                         isLowBalance
                           ? "bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400"
                           : institution.iconClass,
@@ -317,7 +354,7 @@ function AccountsPage() {
                 </div>
                 <div
                   className={cn(
-                    "rounded-xl px-3 py-2.5",
+                    "institution-card-balance rounded-xl px-3 py-2.5",
                     isLowBalance ? "bg-red-50/70 dark:bg-red-950/20" : institution.panelClass,
                   )}
                 >
@@ -352,7 +389,10 @@ function AccountsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => openEdit(a)}
-                    className={cn("flex-1 rounded-lg", institution.actionClass)}
+                    className={cn(
+                      "institution-card-action flex-1 rounded-lg",
+                      institution.actionClass,
+                    )}
                   >
                     <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
                   </Button>
@@ -360,7 +400,10 @@ function AccountsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => archive.mutate({ id: a.id, archived: !isArchived })}
-                    className={cn("flex-1 rounded-lg", institution.actionClass)}
+                    className={cn(
+                      "institution-card-action flex-1 rounded-lg",
+                      institution.actionClass,
+                    )}
                   >
                     {isArchived ? (
                       <>
