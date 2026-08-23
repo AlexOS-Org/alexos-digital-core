@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import "../../styles/alexos-4k-visual-system.css";
 import {
   DEFAULT_CUSTOM_ACCENT,
   DEFAULT_VISUAL_THEME,
