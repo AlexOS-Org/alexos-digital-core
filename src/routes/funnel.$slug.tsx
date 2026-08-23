@@ -432,7 +432,27 @@ function FunnelPage() {
           </h1>
           <div className="mt-8 w-full max-w-3xl rounded-2xl border border-border bg-card p-2 shadow-sm sm:p-3">
             <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted/30">
-              {heroImage ? (
+              {isYjBag ? (
+                <div className="grid h-full grid-cols-3 gap-2 bg-background p-2 sm:gap-3 sm:p-3">
+                  {YJ_EXACT_COLOUR_IMAGES.map((image, index) => (
+                    <div
+                      key={image}
+                      className="flex min-h-0 items-center justify-center overflow-hidden rounded-xl bg-muted/20"
+                    >
+                      <img
+                        src={image}
+                        alt={`${product.name} — ${["Red", "Teal/Green", "Navy Blue with Pink Trim"][index]}`}
+                        width={800}
+                        height={800}
+                        fetchPriority={index === 0 ? "high" : "low"}
+                        loading={index === 0 ? "eager" : "lazy"}
+                        decoding="async"
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : heroImage ? (
                 <img
                   src={heroImage}
                   alt={selectedVariant ? `${product.name} — ${selectedVariant.name}` : product.name}
