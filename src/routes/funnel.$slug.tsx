@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Check, ShieldCheck, ShoppingBag, Truck, Zap } from "lucide-react";
+import { ArrowRight, Check, ShoppingBag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DailyGearBrand } from "@/components/dailygear/DailyGearBrand";
 import { loadPublicFunnel } from "@/lib/storefront/funnel.functions";
 import type {
   PublicFunnel,
@@ -100,9 +101,12 @@ function FunnelPage() {
           currency: result.product.currency,
           value: sellingPrice(result.product),
         });
-        const firstVariant = result.variants.find(
+        const availableVariants = result.variants.filter(
           (variant) => variant.productId === result.product.id && variant.stockQuantity > 0,
         );
+        const firstVariant =
+          availableVariants.find((variant) => variant.name.toLowerCase().includes("green")) ??
+          availableVariants[0];
         setSelectedVariantId(firstVariant?.id ?? null);
         if (typeof window !== "undefined") {
           rememberFunnelAttribution({
@@ -252,65 +256,32 @@ function FunnelPage() {
   }
 
   return (
-    <main className="dailygear-funnel-green min-h-screen bg-background">
-      <section className="dailygear-workspace-hero relative overflow-hidden border-b border-emerald-400/30 text-white">
-        <div className="dailygear-hero-overlay pointer-events-none absolute inset-0" />
-        <div className="dailygear-hero-grid pointer-events-none absolute inset-0" />
-        <div className="relative z-10 mx-auto grid max-w-6xl gap-8 px-5 py-10 sm:px-8 sm:py-16 lg:grid-cols-[1.02fr_.98fr] lg:items-center lg:gap-14">
-          <div>
-            <Badge className="rounded-full border-white/20 bg-white/10 px-3 py-1 text-white hover:bg-white/10">
-              DailyGear offer
-            </Badge>
-            <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-primary">
-              {landingCopy?.eyebrow ?? funnel.name}
-            </p>
-            <h1 className="mt-3 max-w-3xl text-4xl font-black tracking-tight sm:text-6xl">
-              {landingCopy?.headline ?? product.name}
-            </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-white/75 sm:text-lg">
-              {landingCopy?.subheadline ??
-                product.shortDescription ??
-                product.description ??
-                "A focused DailyGear offer with clear product information and a fast path to checkout."}
-            </p>
-            <div className="mt-7 flex flex-wrap gap-2 text-xs text-white/75">
-              {(
-                landingCopy?.proof ?? [
-                  "Secure guest checkout",
-                  "Kenya delivery",
-                  "Stock checked at order",
-                ]
-              )
-                .slice(0, 3)
-                .map((point, index) => (
-                  <TrustMini
-                    key={`${point}-${index}`}
-                    icon={
-                      index === 0 ? (
-                        <ShieldCheck className="h-4 w-4" />
-                      ) : index === 1 ? (
-                        <Truck className="h-4 w-4" />
-                      ) : (
-                        <Zap className="h-4 w-4" />
-                      )
-                    }
-                    text={point}
-                  />
-                ))}
-            </div>
-          </div>
-          <div className="rounded-[2rem] border border-emerald-300/25 bg-emerald-950/20 p-3 shadow-2xl shadow-emerald-950/25 backdrop-blur-md">
-            <div className="aspect-square overflow-hidden rounded-[1.5rem] bg-black/20">
+    <main className="min-h-screen bg-background text-foreground">
+      <section className="border-b border-border bg-background">
+        <div className="mx-auto flex max-w-5xl flex-col items-center px-5 pb-10 pt-8 text-center sm:px-8 sm:pb-14 sm:pt-12">
+          <DailyGearBrand />
+          <div className="mt-8 h-px w-full max-w-3xl bg-border" />
+          <Badge className="mt-8 rounded-full border-border bg-muted text-muted-foreground hover:bg-muted">
+            DailyGear offer
+          </Badge>
+          <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-primary">
+            {landingCopy?.eyebrow ?? funnel.name}
+          </p>
+          <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl">
+            {landingCopy?.headline ?? product.name}
+          </h1>
+          <div className="mt-8 w-full max-w-3xl rounded-2xl border border-border bg-card p-2 shadow-sm sm:p-3">
+            <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted/30">
               {heroImage ? (
                 <img
                   src={heroImage}
                   alt={selectedVariant ? `${product.name} — ${selectedVariant.name}` : product.name}
                   fetchPriority="high"
                   decoding="async"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain"
                 />
               ) : (
-                <div className="grid h-full place-items-center text-white/60">
+                <div className="grid h-full place-items-center text-muted-foreground">
                   <ShoppingBag className="h-20 w-20" />
                 </div>
               )}
@@ -319,7 +290,7 @@ function FunnelPage() {
         </div>
       </section>
 
-      <section className="border-b bg-card/60">
+      <section className="border-b border-border bg-card/60">
         <div className="mx-auto grid max-w-6xl gap-3 px-5 py-5 sm:grid-cols-3 sm:px-8">
           {[
             ["01", "Choose your option", "Select the colour or SKU that fits you."],
@@ -328,7 +299,7 @@ function FunnelPage() {
           ].map(([step, title, body]) => (
             <div
               key={step}
-              className="flex gap-3 rounded-2xl border border-emerald-500/20 bg-background/70 p-4"
+              className="flex gap-3 rounded-2xl border border-border bg-background/70 p-4"
             >
               <span className="text-xs font-black text-primary">{step}</span>
               <div>
@@ -346,16 +317,13 @@ function FunnelPage() {
             {(landingCopy?.proof ?? ["Canonical product", "Clear offer", "Existing checkout"])
               .slice(0, 3)
               .map((item) => (
-                <div
-                  key={item}
-                  className="rounded-2xl border border-emerald-500/20 bg-card p-4 shadow-sm"
-                >
+                <div key={item} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                   <Check className="h-4 w-4 text-primary" />
                   <p className="mt-2 text-sm font-semibold">{item}</p>
                 </div>
               ))}
           </div>
-          <div className="mt-8 rounded-3xl border border-emerald-500/20 bg-card p-5 shadow-sm sm:p-7">
+          <div className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
               Why it fits your day
             </p>
@@ -384,7 +352,7 @@ function FunnelPage() {
               return (
                 <article
                   key={`visual-${benefit.title}`}
-                  className="grid items-center gap-5 rounded-3xl border border-emerald-500/20 bg-card p-4 shadow-sm sm:grid-cols-2 sm:p-6"
+                  className="grid items-center gap-5 rounded-3xl border border-border bg-card p-4 shadow-sm sm:grid-cols-2 sm:p-6"
                 >
                   <div className={index % 2 === 1 ? "sm:order-2" : ""}>
                     {image ? (
@@ -415,7 +383,7 @@ function FunnelPage() {
 
           {galleryImages.length > 0 ? (
             <section
-              className="mt-8 rounded-3xl border border-emerald-500/20 bg-card p-5 shadow-sm sm:p-7"
+              className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7"
               aria-label="Available colours"
             >
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
@@ -430,7 +398,7 @@ function FunnelPage() {
                     key={variant.id}
                     type="button"
                     onClick={() => setSelectedVariantId(variant.id)}
-                    className={`overflow-hidden rounded-2xl border text-left ${selectedVariant?.id === variant.id ? "border-emerald-500 ring-2 ring-emerald-500/30" : "border-border"}`}
+                    className={`overflow-hidden rounded-2xl border text-left ${selectedVariant?.id === variant.id ? "border-primary ring-2 ring-primary/30" : "border-border"}`}
                   >
                     {variant.imageUrl ? (
                       <img
@@ -466,7 +434,7 @@ function FunnelPage() {
           ) : null}
         </div>
 
-        <aside className="h-fit rounded-3xl border border-emerald-500/25 bg-card p-5 shadow-xl shadow-emerald-500/10 lg:sticky lg:top-6 sm:p-6">
+        <aside className="h-fit rounded-3xl border border-border bg-card p-5 shadow-xl lg:sticky lg:top-6 sm:p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             Your offer
           </p>
@@ -518,7 +486,7 @@ function FunnelPage() {
             </select>
           </div>
           <Button
-            className="mt-5 w-full rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400"
+            className="mt-5 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
             disabled={outOfStock}
             onClick={addToCheckout}
           >
@@ -551,7 +519,7 @@ function FunnelPage() {
             </p>
           </div>
           <Button
-            className="rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400"
+            className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
             disabled={outOfStock}
             onClick={addToCheckout}
           >
@@ -561,14 +529,5 @@ function FunnelPage() {
         </div>
       </div>
     </main>
-  );
-}
-
-function TrustMini({ icon, text }: { icon: React.ReactNode; text: string }) {
-  return (
-    <span className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.08] px-3 py-2">
-      {icon}
-      {text}
-    </span>
   );
 }
