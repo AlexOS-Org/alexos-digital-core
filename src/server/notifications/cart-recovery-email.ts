@@ -30,18 +30,24 @@ function buildText(input: {
         `- ${item.name} × ${item.quantity} — ${input.currency} ${(item.price * item.quantity).toLocaleString()}`,
     )
     .join("\n");
+
   return [
     greeting,
     "",
-    "You left a DailyGear bag ready for checkout. We kept the available items together so you can review the details before deciding.",
+    "You were close to checking out at DailyGear. Your selected items are still saved so you can pick up where you left off without rebuilding your basket.",
     "",
-    "Your bag:",
+    "Your saved bag:",
     itemLines || "- Your selected items are available on the checkout page.",
     `Subtotal: ${input.currency} ${input.subtotal.toLocaleString()}`,
     "",
-    `Review your bag: ${input.orderUrl}`,
+    "Why finish now?",
+    "- Your basket is already prepared.",
+    "- Product availability and prices are checked again before the order is placed.",
+    "- You can review your delivery details before committing to the purchase.",
     "",
-    "Prices and availability are checked again when you place the order. If you no longer want the items, you can simply ignore this one reminder.",
+    `Continue your order: ${input.orderUrl}`,
+    "",
+    "No pressure: if you changed your mind, you can ignore this reminder. If something stopped you at checkout, reply to this email and tell us what you need help with.",
     "",
     "DailyGear",
   ].join("\n");
@@ -79,7 +85,7 @@ export async function processAbandonedCartFollowUps(limit = 25) {
         apiKey,
         from,
         claimed.email,
-        `Your DailyGear bag is still available`,
+        `Still thinking it over? Your DailyGear bag is saved`,
         buildText({
           firstName: claimed.first_name,
           orderUrl: url,
