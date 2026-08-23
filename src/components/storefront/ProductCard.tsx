@@ -87,8 +87,8 @@ export function ProductCard({ product, currency }: Props) {
         <p className="text-xs leading-relaxed text-muted-foreground line-clamp-3">
           {soldOut
             ? "Currently unavailable. Browse the collection for another option."
-            : product.short_description ??
-              "Choose the option that fits your needs, review the details, and continue to checkout."}
+            : (product.short_description ??
+              "Choose the option that fits your needs, review the details, and continue to checkout.")}
         </p>
 
         <Button asChild className="dailygear-product-cta mt-auto w-full rounded-xl">
