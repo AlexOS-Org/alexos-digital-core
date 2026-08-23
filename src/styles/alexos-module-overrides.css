@@ -1,0 +1,43 @@
+.alexos-route-canvas {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 12% 0%, color-mix(in oklch, var(--alexos-visual-accent) 6%, transparent), transparent 30rem),
+    radial-gradient(circle at 94% 18%, color-mix(in oklch, var(--alexos-purple) 5%, transparent), transparent 28rem);
+}
+
+.alexos-route-content {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+}
+
+.alexos-module-card {
+  border-color: color-mix(in oklch, var(--border) 72%, var(--alexos-visual-accent) 28%) !important;
+  background:
+    radial-gradient(circle at 100% 0%, var(--alexos-visual-accent-faint), transparent 18rem),
+    color-mix(in oklch, var(--card) 96%, var(--alexos-visual-accent) 4%);
+  box-shadow: 0 22px 68px -48px color-mix(in oklch, var(--alexos-visual-accent) 66%, transparent);
+}
+
+.alexos-module-card:hover {
+  border-color: color-mix(in oklch, var(--border) 54%, var(--alexos-visual-accent) 46%) !important;
+  box-shadow: 0 28px 82px -52px color-mix(in oklch, var(--alexos-visual-accent) 74%, transparent);
+}
+
+@media (min-width: 2560px) {
+  .alexos-route-canvas {
+    padding-inline: clamp(2rem, 3vw, 5rem);
+  }
+
+  .alexos-route-content {
+    max-width: 2400px;
+    margin-inline: auto;
+  }
+}
+
+@media (min-width: 3840px) {
+  .alexos-route-content {
+    max-width: 3200px;
+  }
+}

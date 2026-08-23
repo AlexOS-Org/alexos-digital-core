@@ -84,15 +84,16 @@ export function ProductCard({ product, currency }: Props) {
           </div>
         </div>
 
-        <p className="text-xs leading-relaxed text-muted-foreground">
+        <p className="text-xs leading-relaxed text-muted-foreground line-clamp-3">
           {soldOut
-            ? "This item is currently unavailable. Browse the collection for available options."
-            : "See the details, choose your available option, and continue to checkout."}
+            ? "Currently unavailable. Browse the collection for another option."
+            : product.short_description ??
+              "Choose the option that fits your needs, review the details, and continue to checkout."}
         </p>
 
         <Button asChild className="dailygear-product-cta mt-auto w-full rounded-xl">
           <Link to="/shop/product/$id" params={{ id: product.id }}>
-            {soldOut ? "View details" : "See product & order"}
+            {soldOut ? "View details" : "Choose options & order"}
           </Link>
         </Button>
       </div>

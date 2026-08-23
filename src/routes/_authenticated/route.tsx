@@ -143,9 +143,11 @@ function AuthenticatedLayout() {
           )}
           <SupabaseConfigBanner />
           <main
-            className={`min-w-0 flex-1 touch-pan-y overflow-x-hidden p-4 sm:p-6 lg:p-8 ${isMobile ? "pb-28" : "pb-8"}`}
+            className={`alexos-route-canvas min-w-0 flex-1 touch-pan-y overflow-x-hidden p-4 sm:p-6 lg:p-8 ${isMobile ? "pb-28" : "pb-8"}`}
           >
-            <Outlet />
+            <div className="alexos-route-content">
+              <Outlet />
+            </div>
           </main>
           {!isDailyGearRoute && <MobileBottomNav />}
         </div>
