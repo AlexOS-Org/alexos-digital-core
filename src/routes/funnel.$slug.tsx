@@ -371,30 +371,9 @@ function FunnelPage() {
         </div>
       </section>
 
-      <section className="border-b border-border bg-card/60">
-        <div className="mx-auto grid max-w-6xl gap-3 px-5 py-5 sm:grid-cols-3 sm:px-8">
-          {[
-            ["01", "Choose your option", "Select the colour or SKU that fits you."],
-            ["02", "Review at checkout", "Confirm delivery, payment, and your details."],
-            ["03", "We follow up", "Track the order and receive delivery updates."],
-          ].map(([step, title, body]) => (
-            <div
-              key={step}
-              className="flex gap-3 rounded-2xl border border-border bg-background/70 p-4"
-            >
-              <span className="text-xs font-black text-primary">{step}</span>
-              <div>
-                <p className="text-sm font-bold">{title}</p>
-                <p className="mt-1 text-xs leading-5 text-muted-foreground">{body}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       <section className="mx-auto grid max-w-6xl gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[1fr_22rem] lg:py-14">
         <div>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4">
             {(landingCopy?.proof ?? ["Canonical product", "Clear offer", "Existing checkout"])
               .slice(0, 3)
               .map((item) => (
