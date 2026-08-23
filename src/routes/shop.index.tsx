@@ -201,9 +201,12 @@ function StoreHome() {
 
       <section className="dailygear-below-fold mt-12 rounded-[2rem] border bg-card p-6 text-center sm:p-10">
         <Sparkles className="mx-auto h-6 w-6 text-primary" aria-hidden="true" />
-        <h2 className="mt-3 text-2xl font-black tracking-tight">Don't miss the next useful find.</h2>
+        <h2 className="mt-3 text-2xl font-black tracking-tight">
+          Don't miss the next useful find.
+        </h2>
         <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-          Get DailyGear updates when new products and approved offers are added. No noisy promises—just useful gear worth seeing.
+          Get DailyGear updates when new products and approved offers are added. No noisy
+          promises—just useful gear worth seeing.
         </p>
         <Button asChild className="mt-5 rounded-xl">
           <a href="mailto:dailygear.co.ke@gmail.com?subject=DailyGear%20email%20updates">
