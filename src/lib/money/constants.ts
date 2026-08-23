@@ -46,33 +46,24 @@ export const INCOME_SOURCES = [
 
 export const EXPENSE_CATEGORIES = [
   "Rent",
-  "Rent — Shared",
   "Transport",
-  "Transport — Shared",
   "Fuel",
   "Food",
-  "Food — Shared",
   "Electricity",
-  "Electricity — Shared",
   "Water",
-  "Water — Shared",
   "Water — Home",
   "Water — Office",
   "WiFi",
-  "WiFi — Shared",
   "Internet",
-  "Internet — Shared",
   "Airtime",
-  "Airtime — Shared",
   "Facebook Ads",
   "Google Ads",
-  "Ads — Business",
-  "Rider / Delivery — Business",
-  "Packaging — Business",
-  "Supplier — Business",
+  "Ads",
+  "Rider / Delivery",
+  "Packaging",
+  "Supplier",
   "Business",
   "Office",
-  "Office — Shared",
   "Shopping",
   "Medical",
   "Kids",
@@ -83,6 +74,15 @@ export const EXPENSE_CATEGORIES = [
   "Entertainment",
   "Other",
 ] as const;
+
+/**
+ * Older records used category suffixes such as " — Shared" and " — Business".
+ * Scope is now the single source of truth, so keep historical records readable
+ * while preventing new duplicate category values.
+ */
+export function normalizeExpenseCategory(category: string | null | undefined) {
+  return (category ?? "Other").replace(/\s+—\s+(Shared|Business)$/, "");
+}
 
 export const EXPECTED_SOURCES = [
   "Salary",

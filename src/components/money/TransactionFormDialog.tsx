@@ -19,7 +19,11 @@ import {
 } from "@/components/ui/select";
 import { useAccounts, useBusinesses, useSaveTransaction, type Transaction } from "@/lib/money/api";
 import { toast } from "sonner";
-import { EXPENSE_CATEGORIES, INCOME_SOURCES } from "@/lib/money/constants";
+import {
+  EXPENSE_CATEGORIES,
+  INCOME_SOURCES,
+  normalizeExpenseCategory,
+} from "@/lib/money/constants";
 
 type Mode = "income" | "expense" | "transfer";
 
@@ -91,12 +95,12 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       setAmount(String(editing.amount));
       setAccountId(editing.account_id);
       setToAccountId(editing.transfer_account_id ?? "");
-      setCategory(editing.category ?? EXPENSE_CATEGORIES[0]);
+      setCategory(normalizeExpenseCategory(editing.category));
       setSource(editing.source ?? INCOME_SOURCES[0]);
       setDescription(editing.description ?? "");
       setReference(editing.reference ?? "");
       setScope(
-        editing.expense_type === "shared_living" || editing.category?.endsWith(" — Shared")
+        editing.expense_type === "shared_living" || editing.expense_scope === "shared"
           ? "shared"
           : editing.business_id
             ? "business"
@@ -153,7 +157,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       account_id: accountId,
       transfer_account_id: mode === "transfer" ? toAccountId : null,
       amount: amt,
-      category: mode === "expense" ? category : null,
+      category: mode === "expense" ? normalizeExpenseCategory(category) : null,
       source: mode === "income" ? source : null,
       description: description || null,
       reference: reference || null,

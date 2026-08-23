@@ -35,6 +35,7 @@ import { formatDate, formatMoney, formatTime } from "@/lib/money/format";
 import { Download, MoreHorizontal, Printer, Search, Trash2 } from "lucide-react";
 import { TransactionFormDialog } from "@/components/money/TransactionFormDialog";
 import { cn } from "@/lib/utils";
+import { normalizeExpenseCategory } from "@/lib/money/constants";
 
 export const Route = createFileRoute("/_authenticated/money-center/transactions")({
   component: TransactionsPage,
@@ -84,7 +85,9 @@ function TransactionsPage() {
         t.type,
         accountName[t.account_id] ?? "",
         t.transfer_account_id ? (accountName[t.transfer_account_id] ?? "") : "",
-        t.category ?? t.source ?? "",
+        t.type === "expense"
+          ? normalizeExpenseCategory(t.category)
+          : (t.category ?? t.source ?? ""),
         t.expense_scope ?? t.financial_scope ?? "",
         t.description ?? "",
         t.reference ?? "",
@@ -233,7 +236,11 @@ function TransactionsPage() {
                         </span>
                       )}
                     </TableCell>
-                    <TableCell className="text-sm">{t.category ?? t.source ?? "—"}</TableCell>
+                    <TableCell className="text-sm">
+                      {t.type === "expense"
+                        ? normalizeExpenseCategory(t.category)
+                        : (t.category ?? t.source ?? "—")}
+                    </TableCell>
                     <TableCell className="text-xs capitalize">
                       {t.expense_scope ?? t.financial_scope ?? "—"}
                     </TableCell>

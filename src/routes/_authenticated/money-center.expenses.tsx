@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAccounts, useTransactions } from "@/lib/money/api";
 import { formatDate, formatMoney, formatTime } from "@/lib/money/format";
 import { ArrowUpCircle, Plus } from "lucide-react";
+import { normalizeExpenseCategory } from "@/lib/money/constants";
 import { TransactionFormDialog } from "@/components/money/TransactionFormDialog";
 
 export const Route = createFileRoute("/_authenticated/money-center/expenses")({
@@ -24,12 +25,17 @@ function ExpensesPage() {
     .reduce((s, t) => s + Number(t.amount), 0);
   const total = txs.reduce((s, t) => s + Number(t.amount), 0);
   const businessTotal = txs
-    .filter((t) => Boolean(t.business_id))
+    .filter((t) => t.expense_scope === "business")
     .reduce((s, t) => s + Number(t.amount), 0);
-  const personalTotal = txs.filter((t) => !t.business_id).reduce((s, t) => s + Number(t.amount), 0);
+  const personalTotal = txs
+    .filter((t) => t.expense_scope === "personal" || (!t.expense_scope && !t.business_id))
+    .reduce((s, t) => s + Number(t.amount), 0);
+  const sharedTotal = txs
+    .filter((t) => t.expense_scope === "shared")
+    .reduce((s, t) => s + Number(t.amount), 0);
 
   const byCat = txs.reduce<Record<string, number>>((acc, t) => {
-    const k = t.category ?? "Other";
+    const k = normalizeExpenseCategory(t.category);
     acc[k] = (acc[k] ?? 0) + Number(t.amount);
     return acc;
   }, {});
@@ -46,7 +52,7 @@ function ExpensesPage() {
         </Button>
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
         <Card className="rounded-2xl">
           <CardHeader className="pb-1">
             <CardTitle className="text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -97,6 +103,16 @@ function ExpensesPage() {
             <div className="text-xl font-semibold">{formatMoney(personalTotal)}</div>
           </CardContent>
         </Card>
+        <Card className="rounded-2xl border-amber-500/20 bg-amber-500/[0.04]">
+          <CardHeader className="pb-1">
+            <CardTitle className="text-[10px] uppercase tracking-widest text-amber-700 dark:text-amber-300">
+              Shared allocation
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl font-semibold">{formatMoney(sharedTotal)}</div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -115,14 +131,18 @@ function ExpensesPage() {
                   <li key={t.id} className="py-3 flex items-center justify-between gap-3">
                     <div className="min-w-0">
                       <div className="text-sm font-medium truncate">
-                        {t.description || t.category}
+                        {t.description || normalizeExpenseCategory(t.category)}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         {formatDate(t.occurred_at)} · {formatTime(t.occurred_at)} ·{" "}
-                        {accName[t.account_id]} · {t.category}
+                        {accName[t.account_id]} · {normalizeExpenseCategory(t.category)}
                       </div>
                       <div className="mt-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                        {t.business_id ? "Business expense" : "Personal expense"}
+                        {t.expense_scope === "shared"
+                          ? "Shared expense"
+                          : t.expense_scope === "business" || t.business_id
+                            ? "Business expense"
+                            : "Personal expense"}
                         {t.expense_type ? ` · ${t.expense_type.replace(/_/g, " ")}` : ""}
                       </div>
                     </div>
