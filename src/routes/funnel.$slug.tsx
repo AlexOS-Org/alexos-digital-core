@@ -442,50 +442,6 @@ function FunnelPage() {
               />
             </div>
           ) : null}
-          <div className="mt-6 w-full max-w-3xl rounded-2xl border border-border bg-card p-2 shadow-sm sm:mt-8 sm:p-3">
-            <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted/30">
-              {isYjBag ? (
-                <div className="grid h-full grid-cols-3 gap-2 bg-background p-2 sm:gap-3 sm:p-3">
-                  {YJ_COLOUR_CARDS.map((card, index) => (
-                    <figure
-                      key={card.label}
-                      className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl bg-muted/20"
-                    >
-                      <div className="flex min-h-0 flex-1 items-center justify-center">
-                        <img
-                          src={card.image}
-                          alt={`${product.name} — ${card.label}`}
-                          width={800}
-                          height={800}
-                          fetchPriority={index === 0 ? "high" : "low"}
-                          loading={index === 0 ? "eager" : "lazy"}
-                          decoding="async"
-                          className="h-full w-full object-contain"
-                        />
-                      </div>
-                      <figcaption className="break-words px-2 pb-2 pt-1 text-center text-[10px] font-bold leading-tight text-foreground sm:text-xs">
-                        {card.label}
-                      </figcaption>
-                    </figure>
-                  ))}
-                </div>
-              ) : heroImage ? (
-                <img
-                  src={heroImage}
-                  alt={selectedVariant ? `${product.name} — ${selectedVariant.name}` : product.name}
-                  width={1200}
-                  height={900}
-                  fetchPriority="high"
-                  decoding="async"
-                  className="h-full w-full object-contain"
-                />
-              ) : (
-                <div className="grid h-full place-items-center text-muted-foreground">
-                  <ShoppingBag className="h-20 w-20" />
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       </section>
 
