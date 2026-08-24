@@ -462,9 +462,9 @@ function FunnelPage() {
               {visibleBenefits.map((benefit, index) => {
                 const benefitSummaryImages = isYjBag
                   ? [
-                      "/assets/yj-reference-device-compartment.webp",
-                      "/assets/yj-reference-back-comfort.webp",
-                      "/assets/yj-reference-zipper-base.webp",
+                      "/assets/yj-reference-card-organised-storage.webp",
+                      "/assets/yj-reference-card-comfort.webp",
+                      "/assets/yj-reference-card-everyday.webp",
                     ]
                   : galleryImages;
                 const image =
@@ -553,19 +553,19 @@ function FunnelPage() {
               <div className="mt-6 grid gap-4 sm:grid-cols-3">
                 {[
                   [
-                    "/assets/yj-reference-back-comfort.webp",
+                    "/assets/yj-reference-card-comfort.webp",
                     "Comfort-focused carry",
-                    "Widened breathable straps, an adjustable buckle, ventilation grooves, and protective base feet.",
+                    "Widened breathable straps, adjustable buckles, and a ventilated back area shown from the rear.",
                   ],
                   [
-                    "/assets/yj-reference-device-compartment.webp",
-                    "Organised device space",
-                    "The supplied reference shows the padded compartment inside the backpack; check device size before ordering.",
+                    "/assets/yj-reference-card-organised-storage.webp",
+                    "Organised storage",
+                    "Open views show practical space for school essentials, notebooks, and a lunch container.",
                   ],
                   [
-                    "/assets/yj-reference-zipper-base.webp",
-                    "Zippers and base details",
-                    "The supplied detail image shows the zipper pulls, top handle, trim, and base feet.",
+                    "/assets/yj-reference-card-everyday.webp",
+                    "Ready for everyday routines",
+                    "Front, side, and base views show the three colourways and the bag’s everyday details.",
                   ],
                 ].map(([url, title, body]) => (
                   <article
