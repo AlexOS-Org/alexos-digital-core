@@ -10,6 +10,7 @@ import { formatMoney, monthKey, monthLabel } from "@/lib/money/format";
 import { BudgetFormDialog } from "@/components/money/BudgetFormDialog";
 import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { normalizeExpenseCategory } from "@/lib/money/constants";
 
 export const Route = createFileRoute("/_authenticated/money-center/budgets")({
   component: BudgetsPage,
@@ -39,7 +40,7 @@ function BudgetsPage() {
   const spentByCat = useMemo(() => {
     const map: Record<string, number> = {};
     for (const t of txs) {
-      const k = t.category ?? "Other";
+      const k = normalizeExpenseCategory(t.category);
       map[k] = (map[k] ?? 0) + Number(t.amount);
     }
     return map;

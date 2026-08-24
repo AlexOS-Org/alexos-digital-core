@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import {
   EXPENSE_CATEGORIES,
   INCOME_SOURCES,
+  expenseTypeForCategory,
   normalizeExpenseCategory,
 } from "@/lib/money/constants";
 
@@ -32,41 +33,6 @@ interface Props {
   onOpenChange: (v: boolean) => void;
   mode: Mode;
   editing?: Transaction | null;
-}
-
-const EXPENSE_TYPE_BY_CATEGORY: Record<string, string> = {
-  Rent: "rent",
-  Transport: "transport",
-  Fuel: "transport",
-  Food: "personal_living",
-  Electricity: "utilities",
-  Water: "utilities",
-  "Water — Home": "utilities",
-  "Water — Office": "utilities",
-  WiFi: "utilities",
-  Internet: "utilities",
-  Airtime: "airtime",
-  "Facebook Ads": "advertising",
-  "Google Ads": "advertising",
-  Ads: "advertising",
-  "Rider / Delivery": "delivery",
-  Packaging: "packaging",
-  Supplier: "supplier",
-  Business: "other",
-  Office: "other",
-  Shopping: "personal_living",
-  Medical: "health",
-  Kids: "personal_living",
-  "Kids — School Fees": "education",
-  "Kids — Expenses": "personal_living",
-  "Kids — Shopping": "personal_living",
-  Tithe: "personal_living",
-  Entertainment: "personal_living",
-  Other: "other",
-};
-
-function toExpenseType(category: string) {
-  return EXPENSE_TYPE_BY_CATEGORY[normalizeExpenseCategory(category)] ?? "other";
 }
 
 export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Props) {
@@ -149,12 +115,11 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       toast.error("Select the account that paid this expense.");
       return;
     }
-    if (
-      mode === "expense" &&
-      scope === "business" &&
-      selectedAccount?.business_id &&
-      selectedAccount.business_id !== businessId
-    ) {
+    if (mode === "expense" && selectedAccount?.financial_scope !== scope) {
+      toast.error(`Choose a ${scope} account for this expense.`);
+      return;
+    }
+    if (mode === "expense" && scope === "business" && selectedAccount?.business_id !== businessId) {
       toast.error("Choose an account owned by the selected business.");
       return;
     }
@@ -175,7 +140,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       reference: reference || null,
       business_id: mode === "expense" && scope === "business" ? businessId : null,
       financial_scope: financialScope,
-      expense_type: mode === "expense" ? toExpenseType(category) : null,
+      expense_type: mode === "expense" ? expenseTypeForCategory(category) : null,
       expense_scope: expenseScope,
     });
     onOpenChange(false);
@@ -183,12 +148,12 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-h-[90dvh] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{editing ? `Edit ${title}` : title}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Date & Time</Label>
               <Input type="datetime-local" value={date} onChange={(e) => setDate(e.target.value)} />

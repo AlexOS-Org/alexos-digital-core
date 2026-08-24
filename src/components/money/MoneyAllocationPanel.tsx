@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatMoney } from "@/lib/money/format";
+import { isGiftIncome, isSalaryIncome } from "@/lib/money/constants";
 import {
   useAccountBalances,
   useAccounts,
@@ -77,7 +78,10 @@ export function MoneyAllocationPanel() {
     const posted = transactions.filter((transaction) => transaction.status === "posted");
     const ledgerBusinessProfit = posted.reduce((total, transaction) => {
       if (transaction.financial_scope !== "business") return total;
-      if (transaction.type === "income") return total + Number(transaction.amount);
+      if (transaction.type === "income") {
+        if (isGiftIncome(transaction)) return total;
+        return total + Number(transaction.amount);
+      }
       if (transaction.type === "expense") {
         if (transaction.category === "Tithe") return total;
         return total - Number(transaction.amount);
@@ -89,7 +93,7 @@ export function MoneyAllocationPanel() {
         (transaction) =>
           transaction.type === "income" &&
           transaction.financial_scope !== "business" &&
-          (transaction.income_type === "salary" || transaction.source === "Salary"),
+          isSalaryIncome(transaction),
       )
       .reduce((total, transaction) => total + Number(transaction.amount), 0);
     const personalReceipts = posted

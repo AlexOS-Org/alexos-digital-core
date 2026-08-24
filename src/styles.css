@@ -1775,6 +1775,8 @@
   .money-center-shell {
     position: relative;
     isolation: isolate;
+    min-width: 0;
+    max-width: 100%;
     overflow: clip;
     margin: -1rem;
     padding: 1rem;
@@ -1783,6 +1785,28 @@
     background-position: center;
     background-size: cover;
     border-radius: 1.75rem;
+  }
+
+  .money-center-shell > *,
+  .money-center-shell .money-data-card,
+  .money-center-shell .money-account-card,
+  .money-center-shell .money-kpi-card {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  @media (max-width: 639px) {
+    .money-center-shell {
+      margin: -0.5rem;
+      padding: 0.75rem;
+      border-radius: 1rem;
+    }
+
+    .money-center-shell .money-hero .text-4xl,
+    .money-center-shell .money-hero .text-5xl,
+    .money-center-shell .money-account-balance-value {
+      overflow-wrap: anywhere;
+    }
   }
 
   .money-center-shell::before {
