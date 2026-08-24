@@ -29,24 +29,6 @@ const YJ_EXACT_COLOUR_IMAGES = [
   "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/lqYSLmnstKCbhSqy.png",
   "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/oObQIxmoIjUtNsvS.png",
 ] as const;
-const YJ_HERO_FOUR_COLOUR_IMAGES = [
-  {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/GdgxGfkdKdZdPhqi.png",
-    label: "Green",
-  },
-  {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/fyjHyiVtbwfnvOXw.jpg",
-    label: "Red",
-  },
-  {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/SoneUDRCmyoARtOn.webp",
-    label: "Blue",
-  },
-  {
-    url: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/uVrooxodZiHbRvZh.jpg",
-    label: "Pink",
-  },
-] as const;
 
 const YJ_DETAIL_IMAGES = [
   {
@@ -273,7 +255,7 @@ function FunnelPage() {
         proof: [
           "Water-resistant nylon construction",
           "Separate pockets for everyday essentials",
-          "Green, Red, Blue and Pink visual options",
+          "Red, Teal/Green and Navy Blue with Pink trim options currently available",
         ],
         benefits: [
           {
@@ -290,7 +272,7 @@ function FunnelPage() {
           },
           {
             title: "Let your child choose",
-            body: "Choose the available colour that your child will be happy to carry to school. Only colours confirmed as purchasable should be presented as live variants.",
+            body: "Choose the available Red, Teal/Green or Navy Blue with Pink trim colour that your child will be happy to carry to school.",
           },
         ],
         deliveryNote:
@@ -354,12 +336,7 @@ function FunnelPage() {
       ...productVariants.map((variant) => variant.imageUrl),
       ...(product?.images ?? []),
       ...(isYjBag
-        ? [
-            ...YJ_HERO_FOUR_COLOUR_IMAGES.map((image) => image.url),
-            ...YJ_EXACT_COLOUR_IMAGES,
-            YJ_HERO_IMAGE,
-            ...YJ_DETAIL_IMAGES.map((image) => image.url),
-          ]
+        ? [...YJ_EXACT_COLOUR_IMAGES, YJ_HERO_IMAGE, ...YJ_DETAIL_IMAGES.map((image) => image.url)]
         : []),
     ].filter((image): image is string => Boolean(image));
     return Array.from(new Set(candidates));
@@ -453,21 +430,18 @@ function FunnelPage() {
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl">
             {effectiveLandingCopy?.headline ?? product.name}
           </h1>
-          <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
-            {effectiveLandingCopy?.subheadline}
-          </p>
           <div className="mt-8 w-full max-w-3xl rounded-2xl border border-border bg-card p-2 shadow-sm sm:p-3">
             <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted/30">
               {isYjBag ? (
-                <div className="grid h-full grid-cols-2 gap-2 bg-background p-2 sm:grid-cols-4 sm:gap-3 sm:p-3">
-                  {YJ_HERO_FOUR_COLOUR_IMAGES.map((image, index) => (
+                <div className="grid h-full grid-cols-3 gap-2 bg-background p-2 sm:gap-3 sm:p-3">
+                  {YJ_EXACT_COLOUR_IMAGES.map((image, index) => (
                     <div
-                      key={image.url}
-                      className="relative flex min-h-0 items-center justify-center overflow-hidden rounded-xl bg-muted/20"
+                      key={image}
+                      className="flex min-h-0 items-center justify-center overflow-hidden rounded-xl bg-muted/20"
                     >
                       <img
-                        src={image.url}
-                        alt={`${product.name} — ${image.label} colour`}
+                        src={image}
+                        alt={`${product.name} — ${["Red", "Teal/Green", "Navy Blue with Pink Trim"][index]}`}
                         width={800}
                         height={800}
                         fetchPriority={index === 0 ? "high" : "low"}
@@ -475,9 +449,6 @@ function FunnelPage() {
                         decoding="async"
                         className="h-full w-full object-contain"
                       />
-                      <span className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-background/90 px-3 py-1 text-[11px] font-bold shadow-sm">
-                        {image.label}
-                      </span>
                     </div>
                   ))}
                 </div>
@@ -498,9 +469,6 @@ function FunnelPage() {
               )}
             </div>
           </div>
-          <p className="mt-4 text-sm font-semibold text-foreground">
-            See the colours first. Choose the option that feels right for your child, then order.
-          </p>
         </div>
       </section>
 
@@ -650,3 +618,317 @@ function FunnelPage() {
                 <strong className="text-foreground">KES 2,750 per bag</strong>.
               </p>
               <div className="mt-6 grid gap-3 text-left sm:grid-cols-3">
+                {[
+                  [
+                    "Organised storage",
+                    "Front, side, interior and organiser pockets help separate everyday school items.",
+                  ],
+                  [
+                    "Comfort-focused carry",
+                    "The supplied product information highlights padded straps and a cushioned back panel.",
+                  ],
+                  [
+                    "Three available colours",
+                    "Red, Teal/Green and Navy Blue with Pink trim are available for selection; unavailable colours stay hidden from customers.",
+                  ],
+                ].map(([title, body]) => (
+                  <div key={title} className="rounded-2xl border border-border bg-background p-4">
+                    <p className="font-semibold">{title}</p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">{body}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {isYjBag ? (
+            <section
+              className="mt-8 rounded-3xl border border-border bg-muted/20 p-5 sm:p-7"
+              aria-label="YJ delivery and ordering information"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                Before you order
+              </p>
+              <h2 className="mt-2 text-2xl font-black tracking-tight">
+                Choose your colour, add your quantity, and tell us where to deliver.
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                Delivery and payment options are confirmed during checkout based on the customer’s
+                location and selected method. Review the product, colour, quantity, county, town and
+                delivery details before continuing.
+              </p>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                Your order is not treated as paid until payment is confirmed by DailyGear. No
+                reminder-email option is shown on this funnel.
+              </p>
+            </section>
+          ) : null}
+        </div>
+
+        <aside className="h-fit rounded-3xl border border-border bg-card p-5 shadow-xl lg:sticky lg:top-6 sm:p-6">
+          {galleryImages.length > 0 ? (
+            <section
+              className="-m-1 mb-5 rounded-3xl border border-border bg-background p-4 sm:p-5"
+              aria-label="Available colours"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                Choose your colour
+              </p>
+              <h2 className="mt-2 text-xl font-black tracking-tight">
+                See the available options before you order.
+              </h2>
+              <div className="mt-4 grid gap-3">
+                {productVariants.map((variant) => {
+                  const variantQuantity = variantQuantities[variant.id] ?? 0;
+                  return (
+                    <div
+                      key={variant.id}
+                      className={`flex min-w-0 items-center gap-3 rounded-2xl border p-3 ${selectedVariant?.id === variant.id ? "border-primary ring-2 ring-primary/20" : "border-border"}`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedVariantId(variant.id);
+                          trackGoogleAnalytics("select_item", {
+                            item_list_name: "YJ Baby school bag funnel",
+                            item_id: variant.sku ?? variant.id,
+                            item_name: product.name,
+                            item_variant: variant.color ?? variant.name,
+                            currency: product.currency,
+                            value: variantPrice(variant, product),
+                          });
+                        }}
+                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                      >
+                        {variant.imageUrl ? (
+                          <img
+                            src={variant.imageUrl}
+                            alt={`${product.name} — ${variant.name}`}
+                            loading="lazy"
+                            decoding="async"
+                            className="h-14 w-14 shrink-0 rounded-xl object-contain"
+                          />
+                        ) : (
+                          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-muted/40 text-[10px] text-muted-foreground">
+                            Image pending
+                          </div>
+                        )}
+                        <span className="min-w-0 break-words text-sm font-semibold">
+                          {variant.name}
+                        </span>
+                      </button>
+                      <div
+                        className="flex shrink-0 items-center gap-2"
+                        aria-label={`Quantity for ${variant.name}`}
+                      >
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() =>
+                            setVariantQuantities((current) => ({
+                              ...current,
+                              [variant.id]: Math.max(0, variantQuantity - 1),
+                            }))
+                          }
+                          aria-label={`Remove one ${variant.name}`}
+                        >
+                          −
+                        </Button>
+                        <span className="w-5 text-center text-sm font-bold">{variantQuantity}</span>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() =>
+                            setVariantQuantities((current) => ({
+                              ...current,
+                              [variant.id]: variantQuantity + 1,
+                            }))
+                          }
+                          aria-label={`Add one ${variant.name}`}
+                        >
+                          +
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
+          {isYjBag ? (
+            <section
+              className="mb-5 rounded-3xl border border-border bg-background p-4 sm:p-5"
+              aria-label="Customer reviews"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+                What customers say
+              </p>
+              <h2 className="mt-2 text-xl font-black tracking-tight">
+                Real feedback will appear here
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                DailyGear will publish verified YJ Baby customer feedback after delivered orders are
+                reviewed. We will not copy testimonials from another store or create customer
+                quotes.
+              </p>
+              <p className="mt-3 text-xs font-semibold text-muted-foreground">
+                Review status: awaiting verified YJ customer submissions.
+              </p>
+            </section>
+          ) : null}
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            Your offer
+          </p>
+          <h2 className="mt-2 text-xl font-black">{product.name}</h2>
+          {productVariants.length > 0 ? (
+            <div className="mt-5 space-y-2">
+              <p className="text-sm font-semibold">Your selected colours</p>
+              <div className="space-y-2">
+                {productVariants
+                  .filter((variant) => (variantQuantities[variant.id] ?? 0) > 0)
+                  .map((variant) => (
+                    <div
+                      key={variant.id}
+                      className="flex items-center justify-between gap-3 text-sm"
+                    >
+                      <span className="min-w-0 break-words">{variant.name}</span>
+                      <span className="shrink-0 font-bold">× {variantQuantities[variant.id]}</span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          ) : null}
+          <div className="mt-5 flex items-end justify-between gap-3">
+            <span className="text-3xl font-black">
+              {product.currency} {(hasSelection ? selectedTotal : price).toLocaleString()}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {outOfStock ? "Out of stock" : "Available to order"}
+            </span>
+          </div>
+          <form
+            className="mt-6 space-y-4 border-t border-border pt-5"
+            onSubmit={handleFirstPageCheckout}
+          >
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+                Checkout on this page
+              </p>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                Your saved details may be filled automatically on this device. Review everything
+                before continuing.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="min-w-0 space-y-1.5 sm:col-span-2">
+                <Label htmlFor="funnel-first-name">First name *</Label>
+                <Input
+                  id="funnel-first-name"
+                  required
+                  autoComplete="given-name"
+                  value={customer.firstName}
+                  onChange={(event) => setCustomer({ ...customer, firstName: event.target.value })}
+                />
+              </div>
+              <div className="min-w-0 space-y-1.5">
+                <Label htmlFor="funnel-phone">Phone *</Label>
+                <Input
+                  id="funnel-phone"
+                  required
+                  inputMode="tel"
+                  autoComplete="tel"
+                  value={customer.phone}
+                  onChange={(event) => setCustomer({ ...customer, phone: event.target.value })}
+                />
+              </div>
+              <div className="min-w-0 space-y-1.5">
+                <Label htmlFor="funnel-email">Email</Label>
+                <Input
+                  id="funnel-email"
+                  type="email"
+                  autoComplete="email"
+                  value={customer.email}
+                  onChange={(event) => setCustomer({ ...customer, email: event.target.value })}
+                />
+              </div>
+              <div className="min-w-0 space-y-1.5 sm:col-span-2">
+                <Label htmlFor="funnel-address">Street, building or house number *</Label>
+                <Input
+                  id="funnel-address"
+                  required
+                  autoComplete="street-address"
+                  value={customer.address}
+                  onChange={(event) => setCustomer({ ...customer, address: event.target.value })}
+                />
+              </div>
+              <div className="min-w-0 space-y-1.5">
+                <Label htmlFor="funnel-county">County *</Label>
+                <Input
+                  id="funnel-county"
+                  required
+                  autoComplete="address-level1"
+                  value={customer.county}
+                  onChange={(event) => setCustomer({ ...customer, county: event.target.value })}
+                />
+              </div>
+              <div className="min-w-0 space-y-1.5">
+                <Label htmlFor="funnel-town">Town or area *</Label>
+                <Input
+                  id="funnel-town"
+                  required
+                  autoComplete="address-level2"
+                  value={customer.town}
+                  onChange={(event) => setCustomer({ ...customer, town: event.target.value })}
+                />
+              </div>
+              <div className="min-w-0 space-y-1.5 sm:col-span-2">
+                <Label htmlFor="funnel-delivery-details">Landmark or delivery instructions</Label>
+                <Textarea
+                  id="funnel-delivery-details"
+                  autoComplete="street-address"
+                  value={customer.deliveryDetails}
+                  onChange={(event) =>
+                    setCustomer({ ...customer, deliveryDetails: event.target.value })
+                  }
+                />
+              </div>
+            </div>
+            {profileLoaded ? (
+              <p className="text-xs text-primary">
+                Saved details were filled from this browser. Please review them before continuing.
+              </p>
+            ) : null}
+            <Button
+              type="submit"
+              className="w-full rounded-xl"
+              disabled={outOfStock || !hasSelection}
+            >
+              {outOfStock
+                ? "Out of stock"
+                : hasSelection
+                  ? "Continue to secure checkout"
+                  : "Choose a colour to continue"}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </form>
+          <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">
+            {effectiveLandingCopy?.deliveryNote ??
+              "Payment and delivery options are confirmed in DailyGear checkout. No payment is treated as settled until confirmed."}
+          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            className="mt-2 w-full rounded-xl"
+            onClick={() => navigate({ to: "/shop" })}
+          >
+            <ShoppingBag className="mr-2 h-4 w-4" /> Continue shopping
+          </Button>
+        </aside>
+      </section>
+    </main>
+  );
+}
