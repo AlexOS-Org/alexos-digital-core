@@ -21,40 +21,13 @@ import { parseFunnelLandingContent } from "@/lib/storefront/funnel-copy";
 import { useStorefront } from "@/lib/storefront/api";
 import { initMetaPixel, trackMetaPixel, useMetaPixel } from "@/lib/storefront/meta-pixel";
 import { trackGoogleAnalytics } from "@/lib/storefront/google-analytics";
+import {
+  YJ_COLOUR_CARDS,
+  YJ_EXACT_COLOUR_IMAGES,
+  yjColourImage,
+} from "@/lib/storefront/yj-colours";
 
-const YJ_HERO_IMAGE =
-  "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/kgkuyAeqCnUWMUrq.jpg";
-const YJ_COLOUR_CARDS = [
-  {
-    label: "Red",
-    image:
-      "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/kgkuyAeqCnUWMUrq.jpg",
-  },
-  {
-    label: "Teal/Green",
-    image:
-      "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/lqYSLmnstKCbhSqy.png",
-  },
-  {
-    label: "Navy Blue with Pink Trim",
-    image:
-      "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/oObQIxmoIjUtNsvS.png",
-  },
-] as const;
-const YJ_EXACT_COLOUR_IMAGES = YJ_COLOUR_CARDS.map((card) => card.image);
-
-function yjColourImage(variant: Pick<PublicFunnelVariant, "name" | "color" | "imageUrl">) {
-  const colour = `${variant.color ?? ""} ${variant.name}`.toLowerCase();
-  const card =
-    colour.includes("teal") || colour.includes("green")
-      ? YJ_COLOUR_CARDS[1]
-      : colour.includes("navy") || (colour.includes("blue") && colour.includes("pink"))
-        ? YJ_COLOUR_CARDS[2]
-        : colour.includes("red")
-          ? YJ_COLOUR_CARDS[0]
-          : null;
-  return card?.image ?? variant.imageUrl ?? null;
-}
+const YJ_HERO_IMAGE = YJ_COLOUR_CARDS[0].image;
 
 const YJ_DETAIL_IMAGES = [
   {
