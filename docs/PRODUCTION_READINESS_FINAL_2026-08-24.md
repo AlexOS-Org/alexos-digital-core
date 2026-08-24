@@ -11,7 +11,7 @@
 
 **Final production status: NO-GO.**
 
-The local application gates pass and the live DailyGear storefront and YJ funnel render successfully in a read-only browser smoke test. The latest GitHub Workers Builds check observed for the prior application checkpoint `5aa39df` is still `in_progress`; the current documentation-only descendants are `adc7452`, `bbb2032`, and `e04c324`, so CI/CD is not fully concluded. The score remains below the production target because Cloudflare publication and live security-header verification are blocked by authentication, the exposed Cloudflare token requires containment, and Supabase, Meta, Auren, catalogue, accounting, and backup/restore evidence is not currently available through the authorized connector path.
+The local application gates pass, including the latest Money Center regression run, and the live DailyGear storefront and YJ funnel render successfully in a read-only browser smoke test. The latest GitHub Workers Builds check observed for the prior application checkpoint `5aa39df` is still `in_progress`; the current documentation-only descendants are `adc7452`, `bbb2032`, and `e04c324`, so CI/CD is not fully concluded. The score remains below the production target because Cloudflare publication and live security-header verification are blocked by authentication, the exposed Cloudflare token requires containment, and Supabase, Meta, Auren, catalogue, accounting, and backup/restore evidence is not currently available through the authorized connector path.
 
 ## Scorecard
 
@@ -35,16 +35,22 @@ The local application gates pass and the live DailyGear storefront and YJ funnel
 
 ## Verified repository state
 
-| Item              | Result                                                                                                                                |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Repository        | `dylextrends/alexos-digital-core`                                                                                                     |
-| Branch            | `production-readiness/2026-08-24`                                                                                                     |
-| Current commit    | `e04c324` (`docs: finalize incident readiness checkpoint`)                                                                            |
-| Rollback baseline | `72e6060f04842b07d9dd3644ac6a3936ec323dc1`, recoverable                                                                               |
-| Branch checkpoint | `e04c324`, recoverable; prior `bbb2032`, `adc7452`, `5aa39df`, and `b79f495` remain in history                                        |
-| Working tree      | Clean after the final documentation commit                                                                                            |
-| Deployment path   | `npm run deploy` builds and targets `dist/server/wrangler.json` for `alexos-business-os`                                              |
-| Local gates       | `npm install`, lint, TypeScript, Vitest, production build, Prettier checks, and `git diff --check` passed after formatting correction |
+| Item                           | Result                                                                                                                                                                            |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repository                     | `dylextrends/alexos-digital-core`                                                                                                                                                 |
+| Branch                         | `production-readiness/2026-08-24`                                                                                                                                                 |
+| Current application checkpoint | `31b1e9c` (`fix: preserve account scope on money entries`)                                                                                                                        |
+| Rollback baseline              | `72e6060f04842b07d9dd3644ac6a3936ec323dc1`, recoverable                                                                                                                           |
+| Branch checkpoint              | `31b1e9c`, recoverable; prior `6f1d678`, `db1cf7a`, `e04c324`, `bbb2032`, `adc7452`, `5aa39df`, and `b79f495` remain in history                                                   |
+| Working tree                   | Clean after the final documentation commit                                                                                                                                        |
+| Deployment path                | `npm run deploy` builds and targets `dist/server/wrangler.json` for `alexos-business-os`                                                                                          |
+| Local gates                    | Focused Money Center: 5 passed; full suite: 14 files / 45 tests passed; lint, TypeScript, build, changed-file Prettier, and `git diff --check` passed; 10 lint warnings, 0 errors |
+
+## Latest Money Center regression evidence
+
+The reported `financial_scope` null-constraint path is fixed in local application code. Receive Money, Transfer Money, and expected-income receipt paths now derive a non-null scope from the authenticated selected account, with deterministic tests covering personal, business, null, and unknown account scopes. This is **FIXED IN LOCAL APPLICATION CODE**, not production-verified. No database constraint, RLS policy, RPC grant, production record, deployment, or `main` branch changed.
+
+This result closes only the reported local regression. It does not clear the connector-dependent Supabase authorization, live Cloudflare, Meta, Auren, catalogue, finance reconciliation, backup/restore, responsive, or end-to-end checkout controls below.
 
 ## Cloudflare security incident and deployment
 
