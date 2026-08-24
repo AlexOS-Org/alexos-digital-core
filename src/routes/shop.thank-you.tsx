@@ -10,7 +10,8 @@ import type {
   PublicFunnelStep,
 } from "@/lib/storefront/funnel.server";
 import { cartStore } from "@/lib/storefront/cart";
-import { trackMetaPixel } from "@/lib/storefront/meta-pixel";
+import { useStorefront } from "@/lib/storefront/api";
+import { trackMetaPixel, useMetaPixel } from "@/lib/storefront/meta-pixel";
 
 interface ConfirmationSnapshot {
   customerName: string | null;
@@ -70,6 +71,8 @@ function ThankYou() {
     currency,
     contentIds,
   } = Route.useSearch() as ThankYouSearch;
+  const { data: store } = useStorefront();
+  useMetaPixel(store?.meta_pixel_id);
   const loadFunnel = useServerFn(loadPublicFunnel);
   const [funnel, setFunnel] = useState<PublicFunnel | null>(null);
   const [confirmation, setConfirmation] = useState<ConfirmationSnapshot | null>(null);
@@ -125,7 +128,14 @@ function ThankYou() {
   }, [funnel?.id]);
 
   useEffect(() => {
-    if (!order || value == null || !currency || typeof window === "undefined") return;
+    if (
+      !order ||
+      value == null ||
+      !currency ||
+      !store?.meta_pixel_id ||
+      typeof window === "undefined"
+    )
+      return;
     const eventKey = `dailygear:purchase-tracked:${order}`;
     if (window.sessionStorage.getItem(eventKey) === "1") return;
     trackMetaPixel("Purchase", {
@@ -136,7 +146,7 @@ function ThankYou() {
       value,
     });
     window.sessionStorage.setItem(eventKey, "1");
-  }, [contentIds, currency, order, value]);
+  }, [contentIds, currency, order, store?.meta_pixel_id, value]);
 
   function acceptOffer(step: PublicFunnelStep, product: PublicFunnelProduct) {
     if (!funnel) return;
