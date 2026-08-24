@@ -4,6 +4,8 @@
 
 **Final status: FIXED IN BRANCH — CONTROLLED PRODUCTION VERIFICATION PENDING.**
 
+The second audit found that the earlier fix covered the primary dialog but did not enforce the invariant centrally. The shared `useSaveTransaction` hook now resolves the authenticated account before every insert/update and overwrites `financial_scope` from that account. Bill auto-posting now uses the same scope model and no longer ignores transaction insert errors.
+
 The targeted application fix is present on the protected remediation branch. No production database, financial record, account balance, order, inventory, constraint, RLS policy, RPC permission, or deployment was changed. The production-readiness decision remains **80/100 — NO-GO** until the reviewed branch is deployed through the secure process and the live expense flow is verified without creating unapproved production test data.
 
 The protected recovery points remain available: `db1cf7a` and rollback `72e6060`. The branch working tree must remain clean before delivery.
@@ -86,6 +88,12 @@ The current form presents 28 categories. The previous slugification sent the fol
 
 The approved-tithe path in `src/components/money/MoneyAllocationPanel.tsx:134–146` previously submitted `expense_type: "charitable"`, which is also absent from the live allowlist. The fix routes `Tithe` through the same canonical mapper and stores the valid internal code `other`, while retaining `category: "Tithe"` and its existing description/reference for user-facing and audit context. A distinct `charitable` reporting code would require a separately approved database migration and historical-data review; it was not invented or added here.
 
+## Deeper audit findings
+
+The complete transaction-emitter audit covered the primary transaction dialog, the shared `useSaveTransaction` hook, expected-income receipt confirmation, tithe and emergency-fund allocation, debt proceeds and debt payments, and bill auto-posting. The primary dialog and expected-income path already supplied scope after the first fix. The remaining systemic gap was that the shared hook trusted caller payloads, while bill auto-posting bypassed the hook and inserted a transaction without `financial_scope`, `expense_scope`, or `expense_type`.
+
+The second fix makes the account scope authoritative at the shared hook boundary and closes the bill emitter separately. Emergency-fund transfers also pass through the shared resolver, so their scope is no longer trusted from a hardcoded value. No database constraint was weakened.
+
 ## Root cause
 
 **Root cause 1 — expense type:** the UI treated descriptive category labels as if they were the constrained internal database codes. `TransactionFormDialog` lowercased and slugified labels, so `Food` became `food`; the database model instead requires canonical codes such as `personal_living`, `utilities`, `advertising`, `delivery`, and `health`. `useSaveTransaction` forwarded that invalid value unchanged. A second invalid emitter, the tithe approval path, hardcoded `charitable`.
@@ -94,13 +102,13 @@ The database constraint is not weakened or dropped. The application now maps lab
 
 **Root cause 2 — financial scope:** the Receive Money form previously set `financial_scope` to `null` for income and transfer modes. The live `transactions_financial_scope_check` constraint requires `personal` or `business`, and the screenshot confirms the resulting database error. Expected-income receipt insertion also omitted `financial_scope`, so it was a second latent failure path.
 
-The application now resolves the selected account under the authenticated user and uses the shared `financialScopeForAccount` normalizer. Business accounts emit `business`; personal, null, or unknown account scope values safely emit `personal`. No database constraint was weakened.
+The application now resolves the selected account under the authenticated user and uses the shared `financialScopeForAccount` normalizer at the shared transaction-save boundary. Business accounts emit `business`; personal, null, or unknown account scope values safely emit `personal`. Bill auto-posting applies the same rule and includes the required expense classification. No database constraint was weakened.
 
 ## Fix applied
 
 The smallest safe fix is an explicit `EXPENSE_TYPE_BY_CATEGORY` mapping and `expenseTypeForCategory` helper in `src/lib/money/constants.ts`. The transaction form now calls this mapper rather than slugifying labels. The tithe approval path uses the same mapper. The visible `category`, `expense_scope`, `financial_scope`, `business_id`, amount, account, date, description, and reference fields are unchanged.
 
-The single-account debit model is unchanged: an expense still creates one transaction against `account_id`; transfers remain a separate transaction type. No balance calculation or historical transaction rewrite was introduced.
+The single-account debit model is unchanged: an expense still creates one transaction against `account_id`; transfers remain a separate transaction type. No balance calculation or historical transaction rewrite was introduced. Direct bill auto-post errors are now surfaced instead of allowing the bill status flow to continue silently.
 
 ## Regression test
 
@@ -117,17 +125,17 @@ The focused test result now covers 5 tests, including the non-null financial-sco
 
 ## Validation and production safety
 
-| Check                                   | Result                              |
-| --------------------------------------- | ----------------------------------- |
-| Database changed                        | **NO**                              |
-| Production data changed                 | **NO**                              |
-| Database constraint dropped or weakened | **NO**                              |
-| Historical transactions rewritten       | **NO**                              |
-| Expense vs transfer behavior changed    | **NO**                              |
-| Personal/business scope model changed   | **NO**                              |
-| Focused category regression test        | **PASS**                            |
-| Full local gates                        | **PENDING FINAL RUN**               |
-| Live production expense/income save     | **PENDING CONTROLLED VERIFICATION** |
+| Check                                   | Result                                                                        |
+| --------------------------------------- | ----------------------------------------------------------------------------- |
+| Database changed                        | **NO**                                                                        |
+| Production data changed                 | **NO**                                                                        |
+| Database constraint dropped or weakened | **NO**                                                                        |
+| Historical transactions rewritten       | **NO**                                                                        |
+| Expense vs transfer behavior changed    | **NO**                                                                        |
+| Personal/business scope model changed   | **NO**                                                                        |
+| Focused category regression test        | **PASS**                                                                      |
+| Full local gates                        | **PASS: 14 files / 45 tests; lint, typecheck, build, formatting, diff check** |
+| Live production expense/income save     | **PENDING CONTROLLED VERIFICATION**                                           |
 
 The final controlled test must use a disposable/non-production environment or an owner-approved existing test fixture. It must verify personal Food, business Advertising, account selection, amount, date/time, description, reference, transaction creation, exact account balance reduction once, recent-expense display, analytics, and the distinction between Expense and Transfer. Do not create a fake financial transaction in production merely to test this fix.
 

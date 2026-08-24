@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { expenseTypeForCategory, financialScopeForAccount } from "./constants";
 
 export type BillFrequency = Database["public"]["Enums"]["bill_frequency"];
 export type BillStatus = Database["public"]["Enums"]["bill_status"];
@@ -137,15 +138,30 @@ export function useMarkBillPaid() {
         } = await supabase.auth.getUser();
 
         if (user) {
-          await supabase.from("transactions").insert({
+          const { data: account, error: accountError } = await supabase
+            .from("accounts")
+            .select("financial_scope,business_id")
+            .eq("id", bill.account_id)
+            .eq("user_id", user.id)
+            .maybeSingle();
+          if (accountError) throw accountError;
+          if (!account) throw new Error("The bill account was not found.");
+
+          const scope = financialScopeForAccount(account.financial_scope);
+          const { error: transactionError } = await supabase.from("transactions").insert({
             user_id: user.id,
             type: "expense",
             account_id: bill.account_id,
             amount: bill.amount,
             category: bill.category,
+            expense_type: expenseTypeForCategory(bill.category),
+            expense_scope: scope,
+            financial_scope: scope,
+            business_id: scope === "business" ? account.business_id : null,
             description: `Bill: ${bill.name}`,
             occurred_at: now,
           });
+          if (transactionError) throw transactionError;
         }
       }
 

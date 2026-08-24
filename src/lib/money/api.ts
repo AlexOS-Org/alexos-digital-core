@@ -214,12 +214,45 @@ export function useTransactions(filter: TxFilter = {}) {
   });
 }
 
+async function accountScopeForTransaction(user_id: string, account_id: string) {
+  const { data, error } = await supabase
+    .from("accounts")
+    .select("financial_scope,business_id")
+    .eq("id", account_id)
+    .eq("user_id", user_id)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error("Selected account was not found.");
+  return {
+    financial_scope: financialScopeForAccount(data.financial_scope),
+    business_id: data.business_id ?? null,
+  };
+}
+
 export function useSaveTransaction() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: Partial<Transaction> & { id?: string }) => {
       const user_id = await uid();
-      const payload = { ...input, user_id };
+      if (!input.account_id) throw new Error("Select an account for this transaction.");
+      const accountScope = await accountScopeForTransaction(user_id, input.account_id);
+      if (
+        input.type === "expense" &&
+        input.expense_scope === "business" &&
+        input.business_id &&
+        input.business_id !== accountScope.business_id
+      ) {
+        throw new Error("Business expense must use an account owned by the selected business.");
+      }
+      const payload = {
+        ...input,
+        user_id,
+        financial_scope: accountScope.financial_scope,
+        business_id:
+          input.type === "expense" && input.expense_scope === "business"
+            ? (input.business_id ?? accountScope.business_id)
+            : null,
+      };
       if (input.id) {
         const { error } = await supabase
           .from("transactions")
