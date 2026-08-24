@@ -3,6 +3,7 @@
 Claude is the independent senior reviewer for AlexOS. Review GitHub `main`, the connected Supabase project and Cloudflare deployment as one system. Do not treat old local clones or legacy Lovable projects as sources of truth.
 
 ## Review order
+
 1. Establish GitHub `main` commit and working tree state.
 2. Inspect repository architecture, routes, modules, services, migrations and configuration.
 3. Compare the application schema/migrations against Supabase runtime schema.
@@ -10,11 +11,12 @@ Claude is the independent senior reviewer for AlexOS. Review GitHub `main`, the 
 5. Identify duplicate, dead, conflicting or legacy implementations.
 6. Validate the end-to-end personal/business financial flow.
 7. Validate Command Center and each business dashboard for clarity and actionability.
-8. Validate Auren naming and ensure Orion/Lovable are not reintroduced.
+8. Validate Auren naming and ensure retired AI/Lovable references are not reintroduced.
 9. Validate empty-data behavior without requiring seeded fake records.
 10. Run or inspect build/lint/typecheck/test evidence where available.
 
 ## Financial flow to test
+
 - Personal income: salary, commission, business profit/owner distribution, personal deal, gift, investment, refund, other.
 - Business income: sales revenue and other operating income.
 - Business costs: COGS, packaging, delivery, logistics, advertising, platform fees, suppliers, payroll, rent, utilities, tax, interest and other costs.
@@ -24,10 +26,13 @@ Claude is the independent senior reviewer for AlexOS. Review GitHub `main`, the 
 - Personal and business net worth/debt must be separately inspectable and also consolidatable.
 
 ## DailyGear review
+
 Confirm existing commerce capabilities remain intact and are connected to the financial business dimension rather than duplicated. Review sales, orders, inventory, customers, marketing, advertising, delivery/logistics, gross profit and operating profit together.
 
 ## Command Center review
+
 The first screen should answer:
+
 - What is my net worth?
 - How much personal/business cash do I have?
 - What debt needs attention?
@@ -40,11 +45,14 @@ The first screen should answer:
 Review the 4K-friendly mountain hero/background concept and user-changeable background without accepting arbitrary hard-coded external image URLs.
 
 ## Security review
+
 Check RLS, grants, server/client boundaries, secrets, Supabase functions, authentication/authorization, exposed data, unsafe SECURITY DEFINER patterns and Cloudflare environment configuration. Distinguish new blockers from pre-existing warnings.
 
 ## Legacy cleanup review
+
 Search for:
-- Orion
+
+- retired AI naming
 - Lovable imports/dependencies/configuration/URLs
 - duplicate business identity systems
 - duplicate financial calculation paths
@@ -54,7 +62,9 @@ Search for:
 Do not delete functionality merely because it is old. First establish whether it is referenced or provides unique required behavior.
 
 ## Output
+
 Return:
+
 1. EXECUTIVE VERDICT — PASS / PASS WITH FIXES / BLOCKED
 2. Critical blockers
 3. High-priority fixes

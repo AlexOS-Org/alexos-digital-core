@@ -1,9 +1,11 @@
 # AlexOS Source of Truth
 
 ## Purpose
+
 This document defines the canonical development model for AlexOS. The goal is one coherent application across GitHub, local development, Supabase and Cloudflare, with independent review instead of competing implementations.
 
 ## Canonical source
+
 - **Repository:** `dylextrends/alexos-digital-core`
 - **Canonical branch:** `main`
 - **GitHub main is the source of truth for application code and version-controlled database migrations.**
@@ -11,8 +13,11 @@ This document defines the canonical development model for AlexOS. The goal is on
 - Do not recover or merge legacy local clones merely because they contain older code.
 
 ## Agent responsibilities
+
 ### ChatGPT — architecture and primary implementation
+
 ChatGPT is responsible for:
+
 - architecture and product decisions;
 - implementing approved features in GitHub;
 - inspecting existing code before changing it;
@@ -23,7 +28,9 @@ ChatGPT is responsible for:
 - coordinating final acceptance after independent review.
 
 ### Cline — local execution and synchronization
+
 Cline is responsible for:
+
 - cloning/pulling GitHub `main` into the canonical local workspace;
 - keeping the local tree synchronized with GitHub;
 - running local development, lint, typecheck, build and focused tests;
@@ -34,7 +41,9 @@ Cline is responsible for:
 Cline must not treat old local clones, Lovable projects or stale branches as sources of truth.
 
 ### Claude — independent senior review
+
 Claude is responsible for adversarial review across the connected GitHub, Supabase and Cloudflare environments:
+
 - architecture and data-flow review;
 - duplicate/dead functionality detection;
 - financial logic validation;
@@ -48,6 +57,7 @@ Claude is responsible for adversarial review across the connected GitHub, Supaba
 Claude should review and recommend rather than create a competing application architecture. Any implementation recommendation returns to GitHub/main through the controlled workflow.
 
 ## Controlled development loop
+
 1. ChatGPT inspects the current GitHub/Supabase state and implements approved architecture/features in `main`.
 2. Cline synchronizes the canonical local workspace from GitHub `main` and validates the local build/test state.
 3. Claude independently audits GitHub, Supabase and Cloudflare against the current `main` commit.
@@ -60,6 +70,7 @@ Claude should review and recommend rather than create a competing application ar
 10. No environment is allowed to become an independent source of truth.
 
 ## Environment model
+
 ```text
                          CHATGPT
                  architecture + implementation
@@ -73,7 +84,7 @@ Claude should review and recommend rather than create a competing application ar
                 CLINE          CLAUDE
              local execution   independent audit
                    |              |
-                   +------>------+ 
+                   +------>------+
                            |
                            v
                     approved changes
@@ -91,16 +102,19 @@ Claude should review and recommend rather than create a competing application ar
 ```
 
 ## Database rule
+
 Supabase is the runtime database/backend, but schema changes must be represented by migrations in GitHub. Do not make undocumented manual schema changes and assume the repository will catch up later.
 
 ## Product identity
+
 - Product/platform: **AlexOS**
 - Primary dashboard: **Command Center**
 - In-product AI: **Auren**
-- **Orion is retired and must not be reintroduced.**
+- **Retired AI naming is not permitted and must not be reintroduced.**
 - Lovable is retired from the architecture. Do not reintroduce Lovable dependencies, URLs, configuration wrappers or runtime assumptions.
 
 ## Financial architecture
+
 AlexOS models personal finances and businesses as connected but distinct scopes.
 
 A business can receive revenue, pay COGS and operating expenses, generate profit, retain cash and transfer money to the owner. A business-to-personal transfer is movement of already-earned money, not a second expense or new consolidated income.
@@ -120,8 +134,11 @@ Target net worth:
 Personal and business net worth must remain separately inspectable as well as consolidated.
 
 ## Dashboard principles
+
 ### AlexOS Command Center
+
 The user should immediately understand:
+
 - total net worth;
 - personal net worth;
 - business net worth;
@@ -137,22 +154,26 @@ The user should immediately understand:
 The Command Center should prioritize decisions and actions over decorative charts.
 
 ### Business dashboards
+
 Each business should expose a coherent operating view: revenue, COGS, gross profit, operating expenses, advertising, delivery/logistics, operating profit, cash, debt, assets/inventory, sales/orders where applicable, marketing performance, customer signals, research/recommendations and actions requiring attention.
 
 DailyGear should retain its existing commerce capabilities and connect them to the financial business dimension rather than duplicating financial systems.
 
 ## Visual direction
+
 The Command Center should support a 4K-friendly mountain hero/background with a user-changeable background. Do not hard-code arbitrary third-party image URLs into the database. Prefer a controlled asset/configuration mechanism with readable overlays and responsive fallbacks.
 
 ## Empty-data principle
+
 AlexOS is intentionally starting fresh. Do not seed fake transactions, accounts, businesses, debts, orders or test records merely to make dashboards appear populated. Empty states must be useful and action-oriented.
 
 ## Change-control rules
+
 1. Inspect before modifying.
 2. Prefer extending existing functionality over creating parallel functionality.
 3. Do not duplicate existing business, finance, marketing, checkout or dashboard logic.
 4. Do not silently change accounting semantics.
-5. Do not reintroduce Lovable or Orion.
+5. Do not reintroduce Lovable or retired AI naming.
 6. Do not make production database changes without a versioned migration.
 7. Do not deploy broken builds.
 8. When uncertain, stop and report the conflict rather than guessing.
@@ -162,7 +183,9 @@ AlexOS is intentionally starting fresh. Do not seed fake transactions, accounts,
 12. No agent may silently create a second implementation of an existing domain capability.
 
 ## Acceptance gate
+
 A feature is not complete until:
+
 - the code exists in GitHub `main`;
 - database changes have a corresponding migration;
 - types/contracts are synchronized;
