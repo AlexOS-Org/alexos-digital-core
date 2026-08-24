@@ -31,44 +31,24 @@ const YJ_HERO_IMAGE = YJ_COLOUR_CARDS[0].image;
 
 const YJ_DETAIL_IMAGES = [
   {
-    url: "/assets/yj-feature-card-01.webp",
-    title: "Ergonomic back support",
-    body: "Breathable mesh padding, adjustable straps, and a cushioned back panel shown in the supplied reference.",
+    url: "/assets/yj-reference-back-comfort.webp",
+    title: "Widened breathable shoulder straps",
+    body: "The supplied feature reference shows the widened straps, adjustable buckle, ventilation groove, and base feet.",
   },
   {
-    url: "/assets/yj-feature-card-02.webp",
-    title: "Stylish, modern colour choices",
-    body: "The supplied artwork shows the exact navy/pink, red, and teal/green colourways together.",
+    url: "/assets/yj-reference-device-compartment.webp",
+    title: "Padded device compartment",
+    body: "The supplied reference shows a laptop or tablet compartment inside the backpack; check device size before ordering.",
   },
   {
-    url: "/assets/yj-feature-card-03.webp",
-    title: "Water-resistant protection",
-    body: "Water-resistant outer material for ordinary school-day use; not guaranteed waterproof.",
+    url: "/assets/yj-reference-strap-buckle.webp",
+    title: "Adjustable chest buckle",
+    body: "The supplied reference shows the adjustable front buckle and strap placement for everyday carrying.",
   },
   {
-    url: "/assets/yj-feature-card-04.webp",
-    title: "Comfortable carry handle",
-    body: "The close-up highlights the soft-grip handle and reinforced trim for quick grab-and-go carrying.",
-  },
-  {
-    url: "/assets/yj-feature-card-05.webp",
-    title: "Stable base design",
-    body: "Anti-slip bottom pads help the bag stand upright and reduce contact with dirt and wear.",
-  },
-  {
-    url: "/assets/yj-feature-card-06.webp",
-    title: "Spacious, smart storage",
-    body: "The supplied cutaway shows the side pocket, front pocket, main compartment, and top compartment.",
-  },
-  {
-    url: "/assets/yj-feature-card-07.webp",
-    title: "Smooth, durable zippers",
-    body: "A close-up of the zipper construction and pulls used across the backpack’s storage sections.",
-  },
-  {
-    url: "/assets/yj-feature-card-08.webp",
-    title: "Side pockets for quick access",
-    body: "The side pocket is positioned for quick access to a bottle, umbrella, or other small essential.",
+    url: "/assets/yj-reference-zipper-base.webp",
+    title: "Zippers, handle, and base details",
+    body: "The supplied detail reference shows the zipper pulls, top handle, trim, and protective base feet.",
   },
 ] as const;
 
@@ -482,9 +462,9 @@ function FunnelPage() {
               {visibleBenefits.map((benefit, index) => {
                 const benefitSummaryImages = isYjBag
                   ? [
-                      "/assets/yj-feature-card-01.webp",
-                      "/assets/yj-feature-card-02.webp",
-                      "/assets/yj-feature-card-03.webp",
+                      "/assets/yj-direct-card-storage.webp",
+                      "/assets/yj-direct-card-comfort.webp",
+                      "/assets/yj-direct-card-everyday.webp",
                     ]
                   : galleryImages;
                 const image =
@@ -573,19 +553,19 @@ function FunnelPage() {
               <div className="mt-6 grid gap-4 sm:grid-cols-3">
                 {[
                   [
-                    "/assets/yj-feature-card-04.webp",
-                    "Comfortable carry handle",
-                    "A soft-grip handle for quick carrying between home, school, and the car.",
+                    "/assets/yj-reference-back-comfort.webp",
+                    "Comfort-focused carry",
+                    "Widened breathable straps, adjustable buckles, and a ventilated back area shown from the rear.",
                   ],
                   [
-                    "/assets/yj-feature-card-06.webp",
-                    "Spacious, smart storage",
-                    "Separate pockets help keep books, stationery, a lunch box, and smaller items organised.",
+                    "/assets/yj-reference-device-compartment.webp",
+                    "Organised device space",
+                    "The supplied reference shows the padded compartment inside the backpack; check device size before ordering.",
                   ],
                   [
-                    "/assets/yj-feature-card-08.webp",
-                    "Side pockets for quick access",
-                    "Keep a bottle, umbrella, or other small essential close at hand.",
+                    "/assets/yj-reference-zipper-base.webp",
+                    "Zippers and base details",
+                    "The supplied detail image shows the zipper pulls, top handle, trim, and base feet.",
                   ],
                 ].map(([url, title, body]) => (
                   <article
