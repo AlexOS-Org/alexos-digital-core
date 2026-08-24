@@ -31,34 +31,24 @@ const YJ_HERO_IMAGE = YJ_COLOUR_CARDS[0].image;
 
 const YJ_DETAIL_IMAGES = [
   {
-    url: "/assets/yj-baby-feature-water-resistant.webp",
-    title: "Water-resistant exterior for busy school days",
-    body: "The supplied product information describes a durable, water-resistant nylon exterior, and this image shows water on the outside of the bag.",
+    url: "/assets/yj-reference-back-comfort.webp",
+    title: "Widened breathable shoulder straps",
+    body: "The supplied feature reference shows the widened straps, adjustable buckle, ventilation groove, and base feet.",
   },
   {
-    url: "/assets/yj-baby-feature-zipper-detail.webp",
-    title: "Zipped compartments and sturdy details",
-    body: "The close-up shows the zipper pulls and trim that help open the bag’s separate storage areas for books and daily essentials.",
+    url: "/assets/yj-reference-device-compartment.webp",
+    title: "Padded device compartment",
+    body: "The supplied reference shows a laptop or tablet compartment inside the backpack; check the device size before ordering.",
   },
   {
-    url: "/assets/yj-baby-feature-comfort-straps.webp",
-    title: "Adjustable padded shoulder straps",
-    body: "The supplied image highlights widened, adjustable shoulder straps and a ventilated back area for everyday carrying.",
+    url: "/assets/yj-reference-strap-buckle.webp",
+    title: "Adjustable chest buckle",
+    body: "The supplied reference shows the adjustable front buckle and strap placement for a more secure everyday carry.",
   },
   {
-    url: "/assets/yj-baby-feature-compartments.webp",
-    title: "A fit that helps organise the school load",
-    body: "The backpack’s visible back padding, straps and side structure are designed around a more organised school-day carry.",
-  },
-  {
-    url: "/assets/yj-baby-feature-device-compartment.webp",
-    title: "Space for a laptop or tablet",
-    body: "The supplied product information includes a laptop or tablet compartment; check the device size against the bag before ordering.",
-  },
-  {
-    url: "/assets/yj-baby-feature-one-piece.webp",
-    title: "One-piece practical structure",
-    body: "The open view shows how the bag unfolds and how its sections work together for school, travel or daily use.",
+    url: "/assets/yj-reference-zipper-base.webp",
+    title: "Zippers, handle, and base details",
+    body: "The supplied detail reference shows the zipper pulls, top handle, trim, and protective base feet.",
   },
 ] as const;
 
@@ -472,9 +462,9 @@ function FunnelPage() {
               {visibleBenefits.map((benefit, index) => {
                 const benefitSummaryImages = isYjBag
                   ? [
-                      "/assets/yj-baby-feature-storage-trio.webp",
-                      "/assets/yj-baby-feature-comfort-trio.webp",
-                      "/assets/yj-baby-feature-protection-trio.webp",
+                      "/assets/yj-reference-device-compartment.webp",
+                      "/assets/yj-reference-back-comfort.webp",
+                      "/assets/yj-reference-zipper-base.webp",
                     ]
                   : galleryImages;
                 const image =
@@ -508,12 +498,7 @@ function FunnelPage() {
           <section className="mt-8 space-y-6" aria-label="Product benefits and images">
             {visibleBenefits.map((benefit, index) => {
               const benefitImageUrls = isYjBag
-                ? [
-                    YJ_DETAIL_IMAGES[0].url,
-                    YJ_DETAIL_IMAGES[2].url,
-                    YJ_DETAIL_IMAGES[3].url,
-                    YJ_DETAIL_IMAGES[5].url,
-                  ]
+                ? YJ_DETAIL_IMAGES.map((image) => image.url)
                 : galleryImages;
               const image = benefitImageUrls[index % Math.max(benefitImageUrls.length, 1)];
               return (
@@ -568,19 +553,19 @@ function FunnelPage() {
               <div className="mt-6 grid gap-4 sm:grid-cols-3">
                 {[
                   [
-                    "/assets/yj-baby-feature-comfort-trio.webp",
+                    "/assets/yj-reference-back-comfort.webp",
                     "Comfort-focused carry",
-                    "Widened straps, adjustable buckles, and a ventilated back area shown from the rear.",
+                    "Widened breathable straps, an adjustable buckle, ventilation grooves, and protective base feet.",
                   ],
                   [
-                    "/assets/yj-baby-feature-storage-trio.webp",
-                    "Organised storage",
-                    "Open views show practical space for school essentials, notebooks, and a lunch container.",
+                    "/assets/yj-reference-device-compartment.webp",
+                    "Organised device space",
+                    "The supplied reference shows the padded compartment inside the backpack; check device size before ordering.",
                   ],
                   [
-                    "/assets/yj-baby-feature-protection-trio.webp",
-                    "Ready for busy days",
-                    "The supplied references show the exterior, zippers, and base details across all three colours.",
+                    "/assets/yj-reference-zipper-base.webp",
+                    "Zippers and base details",
+                    "The supplied detail image shows the zipper pulls, top handle, trim, and base feet.",
                   ],
                 ].map(([url, title, body]) => (
                   <article
