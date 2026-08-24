@@ -24,11 +24,37 @@ import { trackGoogleAnalytics } from "@/lib/storefront/google-analytics";
 
 const YJ_HERO_IMAGE =
   "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/kgkuyAeqCnUWMUrq.jpg";
-const YJ_EXACT_COLOUR_IMAGES = [
-  "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/kgkuyAeqCnUWMUrq.jpg",
-  "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/lqYSLmnstKCbhSqy.png",
-  "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/oObQIxmoIjUtNsvS.png",
+const YJ_COLOUR_CARDS = [
+  {
+    label: "Red",
+    image:
+      "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/kgkuyAeqCnUWMUrq.jpg",
+  },
+  {
+    label: "Teal/Green",
+    image:
+      "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/lqYSLmnstKCbhSqy.png",
+  },
+  {
+    label: "Navy Blue with Pink Trim",
+    image:
+      "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/oObQIxmoIjUtNsvS.png",
+  },
 ] as const;
+const YJ_EXACT_COLOUR_IMAGES = YJ_COLOUR_CARDS.map((card) => card.image);
+
+function yjColourImage(variant: Pick<PublicFunnelVariant, "name" | "color" | "imageUrl">) {
+  const colour = `${variant.color ?? ""} ${variant.name}`.toLowerCase();
+  const card =
+    colour.includes("teal") || colour.includes("green")
+      ? YJ_COLOUR_CARDS[1]
+      : colour.includes("navy") || (colour.includes("blue") && colour.includes("pink"))
+        ? YJ_COLOUR_CARDS[2]
+        : colour.includes("red")
+          ? YJ_COLOUR_CARDS[0]
+          : null;
+  return card?.image ?? variant.imageUrl ?? null;
+}
 
 const YJ_DETAIL_IMAGES = [
   {
@@ -355,7 +381,7 @@ function FunnelPage() {
           name: `${product.name} — ${variant.name}`,
           sku: variant.sku ?? product.sku,
           price: variantPrice(variant, product),
-          image: variant.imageUrl ?? product.images[0] ?? null,
+          image: isYjBag ? yjColourImage(variant) : (variant.imageUrl ?? product.images[0] ?? null),
           maxQuantity,
           offerRole: "primary",
           funnelSlug: funnel.slug,
@@ -434,22 +460,27 @@ function FunnelPage() {
             <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted/30">
               {isYjBag ? (
                 <div className="grid h-full grid-cols-3 gap-2 bg-background p-2 sm:gap-3 sm:p-3">
-                  {YJ_EXACT_COLOUR_IMAGES.map((image, index) => (
-                    <div
-                      key={image}
-                      className="flex min-h-0 items-center justify-center overflow-hidden rounded-xl bg-muted/20"
+                  {YJ_COLOUR_CARDS.map((card, index) => (
+                    <figure
+                      key={card.label}
+                      className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl bg-muted/20"
                     >
-                      <img
-                        src={image}
-                        alt={`${product.name} — ${["Red", "Teal/Green", "Navy Blue with Pink Trim"][index]}`}
-                        width={800}
-                        height={800}
-                        fetchPriority={index === 0 ? "high" : "low"}
-                        loading={index === 0 ? "eager" : "lazy"}
-                        decoding="async"
-                        className="h-full w-full object-contain"
-                      />
-                    </div>
+                      <div className="flex min-h-0 flex-1 items-center justify-center">
+                        <img
+                          src={card.image}
+                          alt={`${product.name} — ${card.label}`}
+                          width={800}
+                          height={800}
+                          fetchPriority={index === 0 ? "high" : "low"}
+                          loading={index === 0 ? "eager" : "lazy"}
+                          decoding="async"
+                          className="h-full w-full object-contain"
+                        />
+                      </div>
+                      <figcaption className="break-words px-2 pb-2 pt-1 text-center text-[10px] font-bold leading-tight text-foreground sm:text-xs">
+                        {card.label}
+                      </figcaption>
+                    </figure>
                   ))}
                 </div>
               ) : heroImage ? (
@@ -700,9 +731,13 @@ function FunnelPage() {
                         }}
                         className="flex min-w-0 flex-1 items-center gap-3 text-left"
                       >
-                        {variant.imageUrl ? (
+                        {(isYjBag ? yjColourImage(variant) : variant.imageUrl) ? (
                           <img
-                            src={variant.imageUrl}
+                            src={
+                              isYjBag
+                                ? (yjColourImage(variant) ?? undefined)
+                                : (variant.imageUrl ?? undefined)
+                            }
                             alt={`${product.name} — ${variant.name}`}
                             loading="lazy"
                             decoding="async"
