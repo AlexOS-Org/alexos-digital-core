@@ -34,6 +34,41 @@ interface Props {
   editing?: Transaction | null;
 }
 
+const EXPENSE_TYPE_BY_CATEGORY: Record<string, string> = {
+  Rent: "rent",
+  Transport: "transport",
+  Fuel: "transport",
+  Food: "personal_living",
+  Electricity: "utilities",
+  Water: "utilities",
+  "Water — Home": "utilities",
+  "Water — Office": "utilities",
+  WiFi: "utilities",
+  Internet: "utilities",
+  Airtime: "airtime",
+  "Facebook Ads": "advertising",
+  "Google Ads": "advertising",
+  Ads: "advertising",
+  "Rider / Delivery": "delivery",
+  Packaging: "packaging",
+  Supplier: "supplier",
+  Business: "other",
+  Office: "other",
+  Shopping: "personal_living",
+  Medical: "health",
+  Kids: "personal_living",
+  "Kids — School Fees": "education",
+  "Kids — Expenses": "personal_living",
+  "Kids — Shopping": "personal_living",
+  Tithe: "personal_living",
+  Entertainment: "personal_living",
+  Other: "other",
+};
+
+function toExpenseType(category: string) {
+  return EXPENSE_TYPE_BY_CATEGORY[normalizeExpenseCategory(category)] ?? "other";
+}
+
 export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Props) {
   const { data: accounts = [] } = useAccounts();
   const { data: businesses = [] } = useBusinesses();
@@ -98,8 +133,14 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
 
   const submit = async () => {
     const amt = Number(amount);
-    if (!amt || amt <= 0 || !accountId) return;
-    if (mode === "transfer" && (!toAccountId || toAccountId === accountId)) return;
+    if (!Number.isFinite(amt) || amt <= 0 || !accountId) {
+      toast.error("Enter an amount greater than zero and select an account.");
+      return;
+    }
+    if (mode === "transfer" && (!toAccountId || toAccountId === accountId)) {
+      toast.error("Select a different destination account.");
+      return;
+    }
     if (mode === "expense" && scope === "business" && !businessId) {
       toast.error("Select the business this expense belongs to.");
       return;
@@ -117,6 +158,10 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       toast.error("Choose an account owned by the selected business.");
       return;
     }
+
+    const financialScope = selectedAccount?.financial_scope ?? scope;
+    const expenseScope = mode === "expense" ? scope : "personal";
+
     await save.mutateAsync({
       id: editing?.id,
       type: mode,
@@ -129,14 +174,9 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       description: description || null,
       reference: reference || null,
       business_id: mode === "expense" && scope === "business" ? businessId : null,
-      financial_scope: mode === "expense" ? (selectedAccount?.financial_scope ?? "personal") : null,
-      expense_type:
-        mode === "expense"
-          ? normalizeExpenseCategory(category)
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, "_")
-          : null,
-      expense_scope: mode === "expense" ? scope : null,
+      financial_scope: financialScope,
+      expense_type: mode === "expense" ? toExpenseType(category) : null,
+      expense_scope: expenseScope,
     });
     onOpenChange(false);
   };
@@ -158,6 +198,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
               <Input
                 type="number"
                 step="0.01"
+                min="0.01"
                 inputMode="decimal"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
