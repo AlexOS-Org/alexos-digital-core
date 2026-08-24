@@ -29,29 +29,6 @@ import {
 
 const YJ_HERO_IMAGE = YJ_COLOUR_CARDS[0].image;
 
-const YJ_DETAIL_IMAGES = [
-  {
-    url: "/assets/yj-reference-back-comfort.webp",
-    title: "Widened breathable shoulder straps",
-    body: "The supplied feature reference shows the widened straps, adjustable buckle, ventilation groove, and base feet.",
-  },
-  {
-    url: "/assets/yj-reference-device-compartment.webp",
-    title: "Padded device compartment",
-    body: "The supplied reference shows a laptop or tablet compartment inside the backpack; check device size before ordering.",
-  },
-  {
-    url: "/assets/yj-reference-strap-buckle.webp",
-    title: "Adjustable chest buckle",
-    body: "The supplied reference shows the adjustable front buckle and strap placement for everyday carrying.",
-  },
-  {
-    url: "/assets/yj-reference-zipper-base.webp",
-    title: "Zippers, handle, and base details",
-    body: "The supplied detail reference shows the zipper pulls, top handle, trim, and protective base feet.",
-  },
-] as const;
-
 interface FunnelSearch {
   utm_source?: string;
   utm_medium?: string;
@@ -324,9 +301,7 @@ function FunnelPage() {
     const candidates = [
       ...productVariants.map((variant) => variant.imageUrl),
       ...(product?.images ?? []),
-      ...(isYjBag
-        ? [...YJ_EXACT_COLOUR_IMAGES, YJ_HERO_IMAGE, ...YJ_DETAIL_IMAGES.map((image) => image.url)]
-        : []),
+      ...(isYjBag ? [...YJ_EXACT_COLOUR_IMAGES, YJ_HERO_IMAGE] : []),
     ].filter((image): image is string => Boolean(image));
     return Array.from(new Set(candidates));
   }, [isYjBag, product?.images, productVariants]);
@@ -462,9 +437,10 @@ function FunnelPage() {
               {visibleBenefits.map((benefit, index) => {
                 const benefitSummaryImages = isYjBag
                   ? [
-                      "/assets/yj-direct-card-storage.webp",
-                      "/assets/yj-direct-card-comfort.webp",
-                      "/assets/yj-direct-card-everyday.webp",
+                      "/assets/yj-feature-card-01-clean.webp",
+                      "/assets/yj-feature-card-02-clean.webp",
+                      "/assets/yj-feature-card-03-clean.webp",
+                      "/assets/yj-feature-card-04-clean.webp",
                     ]
                   : galleryImages;
                 const image =
@@ -498,7 +474,12 @@ function FunnelPage() {
           <section className="mt-8 space-y-6" aria-label="Product benefits and images">
             {visibleBenefits.map((benefit, index) => {
               const benefitImageUrls = isYjBag
-                ? YJ_DETAIL_IMAGES.map((image) => image.url)
+                ? [
+                    "/assets/yj-feature-card-05-clean.webp",
+                    "/assets/yj-feature-card-06-clean.webp",
+                    "/assets/yj-feature-card-07-clean.webp",
+                    "/assets/yj-feature-card-08-clean.webp",
+                  ]
                 : galleryImages;
               const image = benefitImageUrls[index % Math.max(benefitImageUrls.length, 1)];
               return (
@@ -534,102 +515,6 @@ function FunnelPage() {
               );
             })}
           </section>
-
-          {isYjBag ? (
-            <section
-              className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7"
-              aria-label="YJ product visual details"
-            >
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
-                See it in use
-              </p>
-              <h2 className="mt-2 text-2xl font-black tracking-tight">
-                Built around the school-day routine.
-              </h2>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-muted-foreground">
-                Explore the same YJ Baby design in the three available colourways, with visual
-                details for carrying comfort, organised storage, and everyday protection.
-              </p>
-              <div className="mt-6 grid gap-4 sm:grid-cols-3">
-                {[
-                  [
-                    "/assets/yj-reference-back-comfort.webp",
-                    "Comfort-focused carry",
-                    "Widened breathable straps, adjustable buckles, and a ventilated back area shown from the rear.",
-                  ],
-                  [
-                    "/assets/yj-reference-device-compartment.webp",
-                    "Organised device space",
-                    "The supplied reference shows the padded compartment inside the backpack; check device size before ordering.",
-                  ],
-                  [
-                    "/assets/yj-reference-zipper-base.webp",
-                    "Zippers and base details",
-                    "The supplied detail image shows the zipper pulls, top handle, trim, and base feet.",
-                  ],
-                ].map(([url, title, body]) => (
-                  <article
-                    key={url}
-                    className="min-w-0 overflow-hidden rounded-2xl border border-border bg-background"
-                  >
-                    <img
-                      src={url}
-                      alt={`${product.name} — ${title}`}
-                      width={800}
-                      height={600}
-                      loading="lazy"
-                      decoding="async"
-                      className="aspect-[4/3] w-full object-contain"
-                    />
-                    <div className="p-4">
-                      <h3 className="break-words text-base font-bold">{title}</h3>
-                      <p className="mt-2 break-words text-sm leading-6 text-muted-foreground">
-                        {body}
-                      </p>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          {isYjBag ? (
-            <section
-              className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7"
-              aria-label="Product details"
-            >
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
-                See the details
-              </p>
-              <h2 className="mt-2 text-2xl font-black tracking-tight">
-                Designed around the school-day routine.
-              </h2>
-              <div className="mt-6 grid min-w-0 gap-5 sm:grid-cols-2">
-                {YJ_DETAIL_IMAGES.map((image) => (
-                  <article
-                    key={image.url}
-                    className="min-w-0 overflow-hidden rounded-2xl border border-border bg-background"
-                  >
-                    <img
-                      src={image.url}
-                      alt={`${product.name} — ${image.title}`}
-                      width={800}
-                      height={800}
-                      loading="lazy"
-                      decoding="async"
-                      className="aspect-square w-full object-cover"
-                    />
-                    <div className="p-4">
-                      <h3 className="break-words text-base font-bold">{image.title}</h3>
-                      <p className="mt-2 break-words text-sm leading-6 text-muted-foreground">
-                        {image.body}
-                      </p>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-          ) : null}
 
           {bumpProduct ? (
             <div className="mt-4 rounded-3xl border border-primary/20 bg-primary/5 p-5">
