@@ -526,6 +526,64 @@ function FunnelPage() {
           {isYjBag ? (
             <section
               className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7"
+              aria-label="YJ product visual details"
+            >
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                See it in use
+              </p>
+              <h2 className="mt-2 text-2xl font-black tracking-tight">
+                Built around the school-day routine.
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-muted-foreground">
+                Explore the same YJ Baby design in the three available colourways, with visual
+                details for carrying comfort, organised storage, and everyday protection.
+              </p>
+              <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                {[
+                  [
+                    "/assets/yj-baby-feature-comfort-trio.webp",
+                    "Comfort-focused carry",
+                    "Widened straps, adjustable buckles, and a ventilated back area shown from the rear.",
+                  ],
+                  [
+                    "/assets/yj-baby-feature-storage-trio.webp",
+                    "Organised storage",
+                    "Open views show practical space for school essentials, notebooks, and a lunch container.",
+                  ],
+                  [
+                    "/assets/yj-baby-feature-protection-trio.webp",
+                    "Ready for busy days",
+                    "The supplied references show the exterior, zippers, and base details across all three colours.",
+                  ],
+                ].map(([url, title, body]) => (
+                  <article
+                    key={url}
+                    className="min-w-0 overflow-hidden rounded-2xl border border-border bg-background"
+                  >
+                    <img
+                      src={url}
+                      alt={`${product.name} — ${title}`}
+                      width={800}
+                      height={600}
+                      loading="lazy"
+                      decoding="async"
+                      className="aspect-[4/3] w-full object-contain"
+                    />
+                    <div className="p-4">
+                      <h3 className="break-words text-base font-bold">{title}</h3>
+                      <p className="mt-2 break-words text-sm leading-6 text-muted-foreground">
+                        {body}
+                      </p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {isYjBag ? (
+            <section
+              className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7"
               aria-label="Product details"
             >
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
@@ -608,6 +666,27 @@ function FunnelPage() {
                   <div key={title} className="rounded-2xl border border-border bg-background p-4">
                     <p className="font-semibold">{title}</p>
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">{body}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 grid gap-3 border-t border-border pt-5 text-left sm:grid-cols-3">
+                {[
+                  ["Colour choice", "Select only the colour and quantity currently available."],
+                  [
+                    "Delivery clarity",
+                    "Review county, town, payment method, and delivery details before ordering.",
+                  ],
+                  [
+                    "Honest feedback",
+                    "Verified customer feedback will be added after delivered orders are reviewed.",
+                  ],
+                ].map(([title, body]) => (
+                  <div key={title} className="flex gap-3 rounded-2xl bg-primary/5 p-4">
+                    <Check className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+                    <div>
+                      <p className="font-semibold">{title}</p>
+                      <p className="mt-1 text-sm leading-6 text-muted-foreground">{body}</p>
+                    </div>
                   </div>
                 ))}
               </div>
