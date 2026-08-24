@@ -7,20 +7,20 @@
 
 ## Scorecard
 
-| Area | Score | Evidence status | Main residual risk |
-|---|---:|---|---|
-| AlexOS core | 82/100 | Partially verified | Full authenticated module matrix not completed |
-| DailyGear | 84/100 | Partially verified | Live deployment is behind latest main commit |
-| Supabase | 78/100 | Partially verified | Five authenticated SECURITY DEFINER advisor warnings remain |
-| Security | 72/100 | Partially verified | Leaked-password protection and sensitive RPC exposure require review |
-| Checkout | 88/100 | Strong source evidence | Live end-to-end order test remains UNVERIFIED |
-| Order system | 84/100 | Partially verified | Full lifecycle transition matrix remains UNVERIFIED |
-| Accounting | 78/100 | Partially verified | No production mutation performed; full reconciliation remains UNVERIFIED |
-| Marketing | 68/100 | Partially verified | Pixel live verification and Meta Insights data unavailable |
-| SEO | 76/100 | Partially verified | Full route-by-route metadata audit remains UNVERIFIED |
-| Performance | 74/100 | Measured locally | Public bundle and large image optimization still need broader measurement |
-| UX | 80/100 | Partial visual evidence | Complete viewport matrix remains UNVERIFIED |
-| CI/CD | 82/100 | Workflows confirmed | Production workflow hardening is applied but Cloudflare deployment is blocked |
+| Area         |  Score | Evidence status         | Main residual risk                                                            |
+| ------------ | -----: | ----------------------- | ----------------------------------------------------------------------------- |
+| AlexOS core  | 82/100 | Partially verified      | Full authenticated module matrix not completed                                |
+| DailyGear    | 84/100 | Partially verified      | Live deployment is behind latest main commit                                  |
+| Supabase     | 78/100 | Partially verified      | Five authenticated SECURITY DEFINER advisor warnings remain                   |
+| Security     | 72/100 | Partially verified      | Leaked-password protection and sensitive RPC exposure require review          |
+| Checkout     | 88/100 | Strong source evidence  | Live end-to-end order test remains UNVERIFIED                                 |
+| Order system | 84/100 | Partially verified      | Full lifecycle transition matrix remains UNVERIFIED                           |
+| Accounting   | 78/100 | Partially verified      | No production mutation performed; full reconciliation remains UNVERIFIED      |
+| Marketing    | 68/100 | Partially verified      | Pixel live verification and Meta Insights data unavailable                    |
+| SEO          | 76/100 | Partially verified      | Full route-by-route metadata audit remains UNVERIFIED                         |
+| Performance  | 74/100 | Measured locally        | Public bundle and large image optimization still need broader measurement     |
+| UX           | 80/100 | Partial visual evidence | Complete viewport matrix remains UNVERIFIED                                   |
+| CI/CD        | 82/100 | Workflows confirmed     | Production workflow hardening is applied but Cloudflare deployment is blocked |
 
 ## Overall production readiness
 
@@ -32,6 +32,10 @@ The repository now contains the Phase 0 audit and remediation plan. The Producti
 
 No production database, order, payment, inventory, account balance, or financial record was mutated during this audit.
 
+## Phase 2 re-audit result
+
+The Phase 2 gap audit confirmed that the 79/100 baseline remains the honest score. No additional production mutation, database grant revocation, Cloudflare deployment, real payment, or real customer order was performed. The five authenticated `SECURITY DEFINER` findings remain **UNVERIFIED / REQUIRES OWNER ACTION** until the intended server/admin boundary is tested on non-production. Leaked-password protection remains **REQUIRES OWNER ACTION**. The safe CI gates and Worker response headers remain applied from the baseline, but live header verification is blocked by the deployment authorization issue.
+
 ## Unresolved blockers and required owner input
 
 1. Cloudflare deployment remains blocked by error `10000`. A fresh, unexposed account-scoped token with Workers Scripts Edit, Account Settings Read, and Workers AI Read is required.
@@ -40,6 +44,11 @@ No production database, order, payment, inventory, account balance, or financial
 4. Meta Pixel `402601214245203` must be verified in Events Manager Test Events after the latest build is live. The connector returned no last-30-day insight rows for the queried DailyGear accounts, so spend and ROAS are **UNAVAILABLE**, not zero.
 5. Auren research freshness requires verified server-only Firecrawl and Instagram credentials, or a clear unavailable state.
 6. Catalogue, inventory, and finance reconciliation require current read-only production queries and owner confirmation for any missing supplier costs or payment references.
+
+## Phase 2 evidence files
+
+- `docs/PRODUCTION_PHASE2_GAP_AUDIT_2026-08-24.md`
+- `docs/PRODUCTION_PHASE2_REMEDIATION_PLAN_2026-08-24.md`
 
 ## Rollback point
 
