@@ -429,7 +429,20 @@ function FunnelPage() {
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl">
             {effectiveLandingCopy?.headline ?? product.name}
           </h1>
-          <div className="mt-8 w-full max-w-3xl rounded-2xl border border-border bg-card p-2 shadow-sm sm:p-3">
+          {isYjBag ? (
+            <div className="mt-8 w-full max-w-5xl overflow-hidden rounded-3xl border border-border bg-card p-2 shadow-sm sm:p-3">
+              <img
+                src="/assets/yj-baby-hero-classroom.webp"
+                alt="YJ Baby school bags in navy blue with pink trim, red, and teal-green"
+                width={2560}
+                height={1440}
+                fetchPriority="high"
+                decoding="async"
+                className="aspect-video w-full rounded-2xl object-cover"
+              />
+            </div>
+          ) : null}
+          <div className="mt-6 w-full max-w-3xl rounded-2xl border border-border bg-card p-2 shadow-sm sm:mt-8 sm:p-3">
             <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted/30">
               {isYjBag ? (
                 <div className="grid h-full grid-cols-3 gap-2 bg-background p-2 sm:gap-3 sm:p-3">
