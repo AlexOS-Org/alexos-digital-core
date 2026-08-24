@@ -462,9 +462,9 @@ function FunnelPage() {
               {visibleBenefits.map((benefit, index) => {
                 const benefitSummaryImages = isYjBag
                   ? [
-                      "/assets/yj-reference-card-organised-storage.webp",
-                      "/assets/yj-reference-card-comfort.webp",
-                      "/assets/yj-reference-card-everyday.webp",
+                      "/assets/yj-direct-card-storage.webp",
+                      "/assets/yj-direct-card-comfort.webp",
+                      "/assets/yj-direct-card-everyday.webp",
                     ]
                   : galleryImages;
                 const image =
@@ -553,17 +553,17 @@ function FunnelPage() {
               <div className="mt-6 grid gap-4 sm:grid-cols-3">
                 {[
                   [
-                    "/assets/yj-reference-card-comfort.webp",
+                    "/assets/yj-direct-card-comfort.webp",
                     "Comfort-focused carry",
                     "Widened breathable straps, adjustable buckles, and a ventilated back area shown from the rear.",
                   ],
                   [
-                    "/assets/yj-reference-card-organised-storage.webp",
+                    "/assets/yj-direct-card-storage.webp",
                     "Organised storage",
                     "Open views show practical space for school essentials, notebooks, and a lunch container.",
                   ],
                   [
-                    "/assets/yj-reference-card-everyday.webp",
+                    "/assets/yj-direct-card-everyday.webp",
                     "Ready for everyday routines",
                     "Front, side, and base views show the three colourways and the bag’s everyday details.",
                   ],
