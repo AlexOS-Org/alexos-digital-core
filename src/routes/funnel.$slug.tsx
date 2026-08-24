@@ -468,13 +468,40 @@ function FunnelPage() {
                 product.shortDescription ??
                 "Product information will appear here once it is confirmed in the DailyGear catalogue."}
             </p>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {visibleBenefits.map((benefit) => (
-                <div key={benefit.title} className="rounded-2xl border bg-muted/25 p-4">
-                  <p className="font-semibold">{benefit.title}</p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{benefit.body}</p>
-                </div>
-              ))}
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              {visibleBenefits.map((benefit, index) => {
+                const benefitSummaryImages = isYjBag
+                  ? [
+                      "/assets/yj-baby-feature-storage-trio.webp",
+                      "/assets/yj-baby-feature-comfort-trio.webp",
+                      "/assets/yj-baby-feature-protection-trio.webp",
+                    ]
+                  : galleryImages;
+                const image =
+                  benefitSummaryImages[index % Math.max(benefitSummaryImages.length, 1)];
+                return (
+                  <article
+                    key={benefit.title}
+                    className="overflow-hidden rounded-2xl border border-border bg-muted/25"
+                  >
+                    {image ? (
+                      <img
+                        src={image}
+                        alt={`${product.name} — ${benefit.title}`}
+                        width={800}
+                        height={600}
+                        loading="lazy"
+                        decoding="async"
+                        className="aspect-[4/3] w-full object-contain"
+                      />
+                    ) : null}
+                    <div className="p-4">
+                      <p className="font-semibold">{benefit.title}</p>
+                      <p className="mt-1 text-sm leading-6 text-muted-foreground">{benefit.body}</p>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           </div>
 
