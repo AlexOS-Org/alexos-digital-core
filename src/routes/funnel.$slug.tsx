@@ -641,11 +641,19 @@ function FunnelPage() {
                 YJ Baby premium school bag
               </p>
               <h2 className="mt-3 text-3xl font-black tracking-tight">
-                Stop the morning scramble. Give your child’s school essentials a place.
+                Stop the morning scramble. Give school essentials a place.
               </h2>
+              <img
+                src="/assets/yj-baby-offer-colours.webp"
+                alt="YJ Baby school bags in red, teal-green, and navy blue with pink trim"
+                width={1400}
+                height={1050}
+                loading="lazy"
+                decoding="async"
+                className="mx-auto mt-6 aspect-[4/3] w-full max-w-2xl rounded-2xl object-contain"
+              />
               <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-muted-foreground">
-                Choose the colours and quantities your family needs, then fill in your delivery
-                details below. The current selling price is{" "}
+                Choose your available colours and quantities.{" "}
                 <strong className="text-foreground">KES 2,750 per bag</strong>.
               </p>
               <div className="mt-6 grid gap-3 text-left sm:grid-cols-3">
@@ -689,6 +697,45 @@ function FunnelPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </section>
+          ) : null}
+
+          {isYjBag ? (
+            <section
+              className="mt-8 grid items-center gap-6 rounded-3xl border border-border bg-card p-5 shadow-sm sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] sm:p-7"
+              aria-label="YJ quality and trust"
+            >
+              <img
+                src="/assets/yj-baby-quality-detail.webp"
+                alt="Close-up details of YJ Baby school bag stitching, zippers, and structured base"
+                width={1400}
+                height={1050}
+                loading="lazy"
+                decoding="async"
+                className="aspect-[4/3] w-full rounded-2xl object-contain"
+              />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                  Quality and confidence
+                </p>
+                <h2 className="mt-2 text-2xl font-black tracking-tight">
+                  See the details before you order.
+                </h2>
+                <div className="mt-4 grid gap-3 text-sm leading-6 text-muted-foreground">
+                  <p>
+                    <strong className="text-foreground">Product details:</strong> water-resistant
+                    nylon, zipped storage, padded straps, and organiser space.
+                  </p>
+                  <p>
+                    <strong className="text-foreground">Delivery clarity:</strong> confirm your
+                    county, town, and payment method at checkout.
+                  </p>
+                  <p>
+                    <strong className="text-foreground">Honest feedback:</strong> verified customer
+                    feedback will be added after delivered orders are reviewed.
+                  </p>
+                </div>
               </div>
             </section>
           ) : null}
@@ -823,7 +870,16 @@ function FunnelPage() {
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
                 What customers say
               </p>
-              <h2 className="mt-2 text-xl font-black tracking-tight">
+              <img
+                src="/assets/yj-baby-trust-schoolday.webp"
+                alt="Child carrying a navy YJ Baby school bag with red and teal-green bags nearby"
+                width={1400}
+                height={1050}
+                loading="lazy"
+                decoding="async"
+                className="mt-4 aspect-[4/3] w-full rounded-2xl object-contain"
+              />
+              <h2 className="mt-4 text-xl font-black tracking-tight">
                 Real feedback will appear here
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
