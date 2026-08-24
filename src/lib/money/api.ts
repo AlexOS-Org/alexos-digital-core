@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { carryForwardBudgets } from "./budget-calculations";
-import type { ExpenseScope } from "./constants";
+import { financialScopeForAccount, type ExpenseScope } from "./constants";
 
 export interface Account {
   id: string;
@@ -376,6 +376,15 @@ export function useMarkExpectedReceived() {
   return useMutation({
     mutationFn: async ({ expected, accountId }: { expected: Expected; accountId: string }) => {
       const user_id = await uid();
+      const { data: account, error: accountError } = await supabase
+        .from("accounts")
+        .select("financial_scope")
+        .eq("id", accountId)
+        .eq("user_id", user_id)
+        .maybeSingle();
+      if (accountError) throw accountError;
+      if (!account) throw new Error("Selected account was not found.");
+
       const { data: tx, error: txErr } = await supabase
         .from("transactions")
         .insert({
@@ -386,6 +395,7 @@ export function useMarkExpectedReceived() {
           source: expected.source,
           description: expected.description ?? `Expected: ${expected.source}`,
           occurred_at: new Date().toISOString(),
+          financial_scope: financialScopeForAccount(account.financial_scope),
         })
         .select("id")
         .single();

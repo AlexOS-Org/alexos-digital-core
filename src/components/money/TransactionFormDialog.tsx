@@ -23,6 +23,7 @@ import {
   EXPENSE_CATEGORIES,
   INCOME_SOURCES,
   expenseTypeForCategory,
+  financialScopeForAccount,
   normalizeExpenseCategory,
 } from "@/lib/money/constants";
 
@@ -130,7 +131,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       description: description || null,
       reference: reference || null,
       business_id: mode === "expense" && scope === "business" ? businessId : null,
-      financial_scope: mode === "expense" ? (selectedAccount?.financial_scope ?? "personal") : null,
+      financial_scope: financialScopeForAccount(selectedAccount?.financial_scope),
       expense_type: mode === "expense" ? expenseTypeForCategory(category) : null,
       expense_scope: mode === "expense" ? scope : null,
     });

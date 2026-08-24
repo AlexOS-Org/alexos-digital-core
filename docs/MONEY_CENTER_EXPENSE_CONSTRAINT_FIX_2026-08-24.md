@@ -88,9 +88,13 @@ The approved-tithe path in `src/components/money/MoneyAllocationPanel.tsx:134–
 
 ## Root cause
 
-**Root cause:** the UI treated descriptive category labels as if they were the constrained internal database codes. `TransactionFormDialog` lowercased and slugified labels, so `Food` became `food`; the database model instead requires canonical codes such as `personal_living`, `utilities`, `advertising`, `delivery`, and `health`. `useSaveTransaction` forwarded that invalid value unchanged. A second invalid emitter, the tithe approval path, hardcoded `charitable`.
+**Root cause 1 — expense type:** the UI treated descriptive category labels as if they were the constrained internal database codes. `TransactionFormDialog` lowercased and slugified labels, so `Food` became `food`; the database model instead requires canonical codes such as `personal_living`, `utilities`, `advertising`, `delivery`, and `health`. `useSaveTransaction` forwarded that invalid value unchanged. A second invalid emitter, the tithe approval path, hardcoded `charitable`.
 
 The database constraint is not weakened or dropped. The application now maps labels to the existing accepted model.
+
+**Root cause 2 — financial scope:** the Receive Money form previously set `financial_scope` to `null` for income and transfer modes. The live `transactions_financial_scope_check` constraint requires `personal` or `business`, and the screenshot confirms the resulting database error. Expected-income receipt insertion also omitted `financial_scope`, so it was a second latent failure path.
+
+The application now resolves the selected account under the authenticated user and uses the shared `financialScopeForAccount` normalizer. Business accounts emit `business`; personal, null, or unknown account scope values safely emit `personal`. No database constraint was weakened.
 
 ## Fix applied
 
@@ -103,11 +107,13 @@ The single-account debit model is unchanged: an expense still creates one transa
 **Regression test: PASS.** `src/lib/money/constants.test.ts` proves that:
 
 - Every current UI category maps to one of the 19 live database-accepted `expense_type` values.
+- Receive Money and Transfer Money emit a non-null `financial_scope` from the selected account.
+- Expected-income receipts verify account ownership and emit the selected account’s non-null `financial_scope`.
 - `Food` maps to `personal_living`.
 - `Tithe` maps to the valid fallback `other`.
 - The mapping contains an explicit entry for every current UI category, preventing silent drift when labels change.
 
-The focused test result was 4 tests passed.
+The focused test result now covers 5 tests, including the non-null financial-scope normalizer.
 
 ## Validation and production safety
 
@@ -121,7 +127,7 @@ The focused test result was 4 tests passed.
 | Personal/business scope model changed   | **NO**                              |
 | Focused category regression test        | **PASS**                            |
 | Full local gates                        | **PENDING FINAL RUN**               |
-| Live production expense save            | **PENDING CONTROLLED VERIFICATION** |
+| Live production expense/income save     | **PENDING CONTROLLED VERIFICATION** |
 
 The final controlled test must use a disposable/non-production environment or an owner-approved existing test fixture. It must verify personal Food, business Advertising, account selection, amount, date/time, description, reference, transaction creation, exact account balance reduction once, recent-expense display, analytics, and the distinction between Expense and Transfer. Do not create a fake financial transaction in production merely to test this fix.
 

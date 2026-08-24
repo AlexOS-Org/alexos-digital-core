@@ -47,6 +47,10 @@ export const INCOME_SOURCES = [
 export const EXPENSE_SCOPES = ["personal", "business"] as const;
 export type ExpenseScope = (typeof EXPENSE_SCOPES)[number];
 
+export function financialScopeForAccount(scope: string | null | undefined): ExpenseScope {
+  return scope === "business" ? "business" : "personal";
+}
+
 export const EXPENSE_CATEGORIES = [
   "Rent",
   "Transport",

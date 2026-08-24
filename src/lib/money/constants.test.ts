@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { EXPENSE_CATEGORIES, EXPENSE_TYPE_BY_CATEGORY, expenseTypeForCategory } from "./constants";
+import {
+  EXPENSE_CATEGORIES,
+  EXPENSE_TYPE_BY_CATEGORY,
+  expenseTypeForCategory,
+  financialScopeForAccount,
+} from "./constants";
 
 const DATABASE_EXPENSE_TYPES = new Set([
   "cost_of_goods",
@@ -40,5 +45,12 @@ describe("expense category to database type mapping", () => {
 
   it("keeps the mapping explicit for every UI category", () => {
     expect(Object.keys(EXPENSE_TYPE_BY_CATEGORY).sort()).toEqual([...EXPENSE_CATEGORIES].sort());
+  });
+
+  it("normalizes every account scope to a non-null database value", () => {
+    expect(financialScopeForAccount("business")).toBe("business");
+    expect(financialScopeForAccount("personal")).toBe("personal");
+    expect(financialScopeForAccount(null)).toBe("personal");
+    expect(financialScopeForAccount(undefined)).toBe("personal");
   });
 });
