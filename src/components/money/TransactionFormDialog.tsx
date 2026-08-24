@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import {
   EXPENSE_CATEGORIES,
   INCOME_SOURCES,
+  expenseTypeForCategory,
   normalizeExpenseCategory,
 } from "@/lib/money/constants";
 
@@ -130,12 +131,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       reference: reference || null,
       business_id: mode === "expense" && scope === "business" ? businessId : null,
       financial_scope: mode === "expense" ? (selectedAccount?.financial_scope ?? "personal") : null,
-      expense_type:
-        mode === "expense"
-          ? normalizeExpenseCategory(category)
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, "_")
-          : null,
+      expense_type: mode === "expense" ? expenseTypeForCategory(category) : null,
       expense_scope: mode === "expense" ? scope : null,
     });
     onOpenChange(false);

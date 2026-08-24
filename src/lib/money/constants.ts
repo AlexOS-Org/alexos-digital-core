@@ -86,6 +86,47 @@ export function normalizeExpenseCategory(category: string | null | undefined) {
   return (category ?? "Other").replace(/\s+—\s+(Shared|Business)$/, "");
 }
 
+/**
+ * The UI category is descriptive; transactions.expense_type is a constrained
+ * internal reporting code. Keep this mapping explicit so adding a label cannot
+ * silently create an invalid database value.
+ */
+export const EXPENSE_TYPE_BY_CATEGORY: Record<string, string> = {
+  Rent: "rent",
+  Transport: "transport",
+  Fuel: "transport",
+  Food: "personal_living",
+  Electricity: "utilities",
+  Water: "utilities",
+  "Water — Home": "utilities",
+  "Water — Office": "utilities",
+  WiFi: "utilities",
+  Internet: "utilities",
+  Airtime: "airtime",
+  "Facebook Ads": "advertising",
+  "Google Ads": "advertising",
+  Ads: "advertising",
+  "Rider / Delivery": "delivery",
+  Packaging: "packaging",
+  Supplier: "supplier",
+  Business: "other",
+  Office: "other",
+  Shopping: "personal_living",
+  Medical: "health",
+  Kids: "personal_living",
+  "Kids — School Fees": "education",
+  "Kids — Expenses": "personal_living",
+  "Kids — Shopping": "personal_living",
+  Tithe: "other",
+  Entertainment: "personal_living",
+  Other: "other",
+};
+
+export function expenseTypeForCategory(category: string | null | undefined) {
+  const normalized = normalizeExpenseCategory(category);
+  return EXPENSE_TYPE_BY_CATEGORY[normalized] ?? "other";
+}
+
 export const EXPECTED_SOURCES = [
   "Salary",
   "Vehicle Commission",

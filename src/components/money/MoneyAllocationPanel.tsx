@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatMoney } from "@/lib/money/format";
+import { expenseTypeForCategory } from "@/lib/money/constants";
 import {
   useAccountBalances,
   useAccounts,
@@ -137,7 +138,7 @@ export function MoneyAllocationPanel() {
       account_id: selectedTitheAccount.id,
       amount: titheTotal,
       category: "Tithe",
-      expense_type: "charitable",
+      expense_type: expenseTypeForCategory("Tithe"),
       financial_scope: selectedTitheAccount.financial_scope ?? "personal",
       business_id: selectedTitheAccount.business_id ?? null,
       source: "Approved tithe suggestion",
