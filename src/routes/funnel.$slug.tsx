@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { ArrowRight, Check, ShoppingBag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -94,6 +94,7 @@ function FunnelPage() {
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [variantQuantities, setVariantQuantities] = useState<Record<string, number>>({});
   const [profileLoaded, setProfileLoaded] = useState(false);
+  const viewContentTrackedRef = useRef<string | null>(null);
   const [customer, setCustomer] = useState({
     firstName: "",
     lastName: "",
@@ -116,14 +117,6 @@ function FunnelPage() {
           return;
         }
         setFunnel(result);
-        initMetaPixel(store?.meta_pixel_id);
-        trackMetaPixel("ViewContent", {
-          content_ids: [result.product.sku ?? result.product.id],
-          content_name: result.product.name,
-          content_type: "product",
-          currency: result.product.currency,
-          value: sellingPrice(result.product),
-        });
         const availableVariants = result.variants.filter(
           (variant) => variant.productId === result.product.id && variant.stockQuantity > 0,
         );
@@ -163,6 +156,20 @@ function FunnelPage() {
 
   const product = funnel?.product ?? null;
   const isYjBag = slug === "quality-waterproof-yj-children-school-bag-funnel";
+
+  useEffect(() => {
+    const pixelId = store?.meta_pixel_id;
+    if (!funnel || !pixelId || viewContentTrackedRef.current === funnel.slug) return;
+    initMetaPixel(pixelId);
+    trackMetaPixel("ViewContent", {
+      content_ids: [funnel.product.sku ?? funnel.product.id],
+      content_name: funnel.product.name,
+      content_type: "product",
+      currency: funnel.product.currency,
+      value: sellingPrice(funnel.product),
+    });
+    viewContentTrackedRef.current = funnel.slug;
+  }, [funnel, store?.meta_pixel_id]);
 
   useEffect(() => {
     const profile = readCheckoutProfile();
