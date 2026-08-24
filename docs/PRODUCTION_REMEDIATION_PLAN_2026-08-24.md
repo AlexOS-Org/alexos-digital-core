@@ -20,16 +20,16 @@
 
 ## P2 / quality, performance, and observability
 
-| Change                                                      | Status                                | Verification                                                           |
-| ----------------------------------------------------------- | ------------------------------------- | ---------------------------------------------------------------------- |
-| Add `npm test` and `npm run typecheck` to Production Verify | **Applied and locally validated** | GitHub workflow run on the remediation commit |
+| Change                                                      | Status                            | Verification                                        |
+| ----------------------------------------------------------- | --------------------------------- | --------------------------------------------------- |
+| Add `npm test` and `npm run typecheck` to Production Verify | **Applied and locally validated** | GitHub workflow run on the remediation commit       |
 | Add global security response headers at the Worker boundary | **Applied and locally validated** | `curl -I` on public custom domains and asset routes |
 
-| Measure and reduce public bundle/image payloads             | Needs measurement                     | Before/after bundle and mobile loading report                          |
-| Run catalogue and variant/image reconciliation              | Read-only first                       | Counts, duplicates, SKU/variant/image mapping                          |
-| Run read-only finance reconciliation                        | Safe read-only                        | Order receipts, costs, balances, transfers, and duplicate-posting scan |
-| Verify Meta Pixel through Events Manager                    | Needs Meta Events Manager access      | Test Events evidence for PageView, ViewContent, AddToCart, Purchase    |
-| Verify Auren/Firebase/Instagram/Firecrawl freshness         | Needs server-only secret state        | Timestamped success or explicit unavailable state                      |
+| Measure and reduce public bundle/image payloads | Needs measurement | Before/after bundle and mobile loading report |
+| Run catalogue and variant/image reconciliation | Read-only first | Counts, duplicates, SKU/variant/image mapping |
+| Run read-only finance reconciliation | Safe read-only | Order receipts, costs, balances, transfers, and duplicate-posting scan |
+| Verify Meta Pixel through Events Manager | Needs Meta Events Manager access | Test Events evidence for PageView, ViewContent, AddToCart, Purchase |
+| Verify Auren/Firebase/Instagram/Firecrawl freshness | Needs server-only secret state | Timestamped success or explicit unavailable state |
 
 ## Applied safe changes in this audit cycle
 
