@@ -39,10 +39,10 @@ The local application gates pass and the live DailyGear storefront and YJ funnel
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | Repository        | `dylextrends/alexos-digital-core`                                                                                                     |
 | Branch            | `production-readiness/2026-08-24`                                                                                                     |
-| Current commit    | `adc7452` (`docs: update final checkpoint evidence`)                                                                                  |
+| Current commit    | `bbb2032` (`docs: enforce Auren-only naming`)                                                                                         |
 | Rollback baseline | `72e6060f04842b07d9dd3644ac6a3936ec323dc1`, recoverable                                                                               |
-| Branch checkpoint | `adc7452`, recoverable; prior `5aa39df` and `b79f495` remain in history                                                               |
-| Working tree      | Clean at the last committed checkpoint; current report evidence files are pending the final documentation commit                      |
+| Branch checkpoint | `bbb2032`, recoverable; prior `adc7452`, `5aa39df`, and `b79f495` remain in history                                                   |
+| Working tree      | Clean after the final documentation commit                                                                                            |
 | Deployment path   | `npm run deploy` builds and targets `dist/server/wrangler.json` for `alexos-business-os`                                              |
 | Local gates       | `npm install`, lint, TypeScript, Vitest, production build, Prettier checks, and `git diff --check` passed after formatting correction |
 
@@ -66,7 +66,7 @@ Supabase authorization tests, leaked-password protection verification, database 
 
 ## Required containment and next actions
 
-The exposed Cloudflare token must be revoked immediately in the Cloudflare dashboard or secure account-management connection. A replacement must be configured outside chat with only the permission names required by the application: `Workers Scripts Edit`, `Account Settings Read`, and `Workers AI Read`, plus any additional permission proven necessary by the deployment configuration. After the secure connection is restored, deploy only commit `adc7452` or a newly reviewed descendant of `production-readiness/2026-08-24`, then verify the Worker version, custom domains, DNS, bindings, schedules, secrets by name, live headers, and read-only storefront routes.
+The exposed Cloudflare token must be revoked immediately in the Cloudflare dashboard or secure account-management connection. A replacement must be configured outside chat with only the permission names required by the application: `Workers Scripts Edit`, `Account Settings Read`, and `Workers AI Read`, plus any additional permission proven necessary by the deployment configuration. After the secure connection is restored, deploy only commit `bbb2032` or a newly reviewed descendant of `production-readiness/2026-08-24`, then verify the Worker version, custom domains, DNS, bindings, schedules, secrets by name, live headers, and read-only storefront routes.
 
 The Supabase connector must be restored before performing non-production RPC authorization tests for anonymous, normal authenticated, authorized admin, and service-role contexts. The same connection is required to verify leaked-password protection, advisor findings, catalogue/inventory state, finance invariants, and backup/restore capability. Meta and Auren connectors must be restored before claiming event delivery, spend, ROAS, public research, or fresh evidence.
 
