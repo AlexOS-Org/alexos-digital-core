@@ -29,8 +29,8 @@ import {
 
 const YJ_HERO_IMAGE = "/assets/yj-baby-three-colour-card.png";
 const YJ_BENEFIT_IMAGES = [
-  "/assets/yj-baby-organised-storage-card.png",
-  "/assets/yj-baby-comfort-carry-card.png",
+  "/assets/yj-feature-card-01-repaired-with-wording.png",
+  "/assets/yj-feature-card-02-repaired-with-wording.png",
   "/assets/yj-baby-waterproof-card.png",
   "/assets/yj-baby-three-colour-card.png",
 ] as const;
