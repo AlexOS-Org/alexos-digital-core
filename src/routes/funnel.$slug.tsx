@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { ArrowRight, Check, ShoppingBag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -500,26 +500,43 @@ function FunnelPage() {
                 const image =
                   benefitSummaryImages[index % Math.max(benefitSummaryImages.length, 1)];
                 return (
-                  <article
-                    key={benefit.title}
-                    className="overflow-hidden rounded-2xl border border-border bg-muted/25"
-                  >
-                    {image ? (
-                      <img
-                        src={image}
-                        alt={`${product.name} — ${benefit.title}`}
-                        width={800}
-                        height={600}
-                        loading="lazy"
-                        decoding="async"
-                        className="aspect-[4/3] w-full object-contain"
-                      />
+                  <Fragment key={benefit.title}>
+                    <article
+                      key={benefit.title}
+                      className="overflow-hidden rounded-2xl border border-border bg-muted/25"
+                    >
+                      {image ? (
+                        <img
+                          src={image}
+                          alt={`${product.name} — ${benefit.title}`}
+                          width={800}
+                          height={600}
+                          loading="lazy"
+                          decoding="async"
+                          className="aspect-[4/3] w-full object-contain"
+                        />
+                      ) : null}
+                      <div className="p-4">
+                        <p className="text-center font-semibold">{benefit.title}</p>
+                        <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                          {benefit.body}
+                        </p>
+                      </div>
+                    </article>
+                    {isYjBag && index === 0 ? (
+                      <div className="sm:col-span-2 rounded-2xl border border-border bg-background p-2">
+                        <img
+                          src="/assets/yj-baby-interior-one-piece-combined.png"
+                          alt="YJ Baby backpack interior compartments and one-piece open design"
+                          width={2560}
+                          height={1440}
+                          loading="lazy"
+                          decoding="async"
+                          className="aspect-video w-full rounded-xl object-contain"
+                        />
+                      </div>
                     ) : null}
-                    <div className="p-4">
-                      <p className="text-center font-semibold">{benefit.title}</p>
-                      <p className="mt-1 text-sm leading-6 text-muted-foreground">{benefit.body}</p>
-                    </div>
-                  </article>
+                  </Fragment>
                 );
               })}
             </div>
