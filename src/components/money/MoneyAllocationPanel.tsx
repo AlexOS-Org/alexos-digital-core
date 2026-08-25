@@ -20,7 +20,11 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatMoney } from "@/lib/money/format";
-import { isGiftIncome, isTitheEligibleIncome } from "@/lib/money/constants";
+import {
+  isGiftIncome,
+  isSavingsEligibleIncome,
+  isTitheEligibleIncome,
+} from "@/lib/money/constants";
 import {
   useAccountBalances,
   useAccounts,
@@ -100,10 +104,12 @@ export function MoneyAllocationPanel() {
           isTitheEligibleIncome(transaction),
       )
       .reduce((total, transaction) => total + Number(transaction.amount), 0);
-    const personalReceipts = posted
+    const eligiblePersonalReceipts = posted
       .filter(
         (transaction) =>
-          transaction.type === "income" && transaction.financial_scope !== "business",
+          transaction.type === "income" &&
+          transaction.financial_scope !== "business" &&
+          isSavingsEligibleIncome(transaction),
       )
       .reduce((total, transaction) => total + Number(transaction.amount), 0);
     const canonicalBusinessProfit = profitResponse?.financials.operatingProfit;
@@ -113,7 +119,7 @@ export function MoneyAllocationPanel() {
       eligiblePersonalIncome,
       businessTithe: Math.max(0, businessProfit) * ALLOCATION_RATE,
       personalIncomeTithe: eligiblePersonalIncome * ALLOCATION_RATE,
-      savingsSuggestion: personalReceipts * ALLOCATION_RATE,
+      savingsSuggestion: eligiblePersonalReceipts * ALLOCATION_RATE,
     };
   }, [transactions, profitResponse]);
 
