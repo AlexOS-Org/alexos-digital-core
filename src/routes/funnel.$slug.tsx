@@ -27,7 +27,20 @@ import {
   yjColourImage,
 } from "@/lib/storefront/yj-colours";
 
-const YJ_HERO_IMAGE = YJ_COLOUR_CARDS[0].image;
+const YJ_HERO_IMAGE = "/assets/yj-baby-three-colour-card.png";
+const YJ_BENEFIT_IMAGES = [
+  "/assets/yj-baby-organised-storage-card.png",
+  "/assets/yj-baby-comfort-carry-card.png",
+  "/assets/yj-baby-waterproof-card.png",
+  "/assets/yj-baby-three-colour-card.png",
+] as const;
+const YJ_DETAIL_IMAGES = [
+  ["/assets/yj-baby-waterproof-fabric-detail.png", "Water droplets on YJ Baby Oxford fabric"],
+  ["/assets/yj-baby-zipper-detail.png", "Close-up of YJ Baby backpack zipper pulls"],
+  ["/assets/yj-baby-adjustable-straps-detail.png", "Close-up of YJ Baby adjustable shoulder strap"],
+  ["/assets/yj-baby-cushioned-back-detail.png", "YJ Baby backpack cushioned back panel"],
+  ["/assets/yj-baby-reinforced-bottom-detail.png", "YJ Baby backpack reinforced protective bottom"],
+] as const;
 
 interface FunnelSearch {
   utm_source?: string;
@@ -480,14 +493,7 @@ function FunnelPage() {
 
           <section className="mt-8 space-y-6" aria-label="Product benefits and images">
             {visibleBenefits.map((benefit, index) => {
-              const benefitImageUrls = isYjBag
-                ? [
-                    "/assets/yj-feature-card-05-clean.webp",
-                    "/assets/yj-feature-card-06-clean.webp",
-                    "/assets/yj-feature-card-07-clean.webp",
-                    "/assets/yj-feature-card-08-clean.webp",
-                  ]
-                : galleryImages;
+              const benefitImageUrls = isYjBag ? YJ_BENEFIT_IMAGES : galleryImages;
               const image = benefitImageUrls[index % Math.max(benefitImageUrls.length, 1)];
               return (
                 <article
@@ -611,15 +617,20 @@ function FunnelPage() {
               className="mt-8 grid items-center gap-6 rounded-3xl border border-border bg-card p-5 shadow-sm sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] sm:p-7"
               aria-label="YJ quality and trust"
             >
-              <img
-                src="/assets/yj-baby-quality-detail.webp"
-                alt="Close-up details of YJ Baby school bag stitching, zippers, and structured base"
-                width={1400}
-                height={1050}
-                loading="lazy"
-                decoding="async"
-                className="aspect-[4/3] w-full rounded-2xl object-contain"
-              />
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                {YJ_DETAIL_IMAGES.map(([image, alt]) => (
+                  <img
+                    key={image}
+                    src={image}
+                    alt={alt}
+                    width={900}
+                    height={675}
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-[4/3] w-full rounded-2xl object-contain"
+                  />
+                ))}
+              </div>
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
                   Confidence before you order

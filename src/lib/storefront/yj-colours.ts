@@ -13,8 +13,7 @@ export const YJ_COLOUR_CARDS = [
   },
   {
     label: "Navy Blue with Pink Trim",
-    image:
-      "https://files.manuscdn.com/user_upload_by_module/session_file/310519663584190080/oObQIxmoIjUtNsvS.png",
+    image: "/assets/yj-baby-navy-pink-trim-exact.jpg",
   },
 ] as const;
 
