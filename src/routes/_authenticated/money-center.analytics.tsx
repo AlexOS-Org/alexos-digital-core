@@ -9,6 +9,7 @@ import {
   useTransactions,
 } from "@/lib/money/api";
 import { formatMoney, monthKey } from "@/lib/money/format";
+import { normalizeExpenseCategory } from "@/lib/money/constants";
 
 const MoneyCenterCharts = lazy(() =>
   import("@/components/money/MoneyCenterCharts").then((module) => ({
@@ -48,7 +49,7 @@ function AnalyticsPage() {
     const map: Record<string, number> = {};
     for (const t of txs) {
       if (t.type !== "expense") continue;
-      const key = t.category ?? "Other";
+      const key = normalizeExpenseCategory(t.category);
       map[key] = (map[key] ?? 0) + Number(t.amount);
     }
     return Object.entries(map)
@@ -76,7 +77,7 @@ function AnalyticsPage() {
     const spent: Record<string, number> = {};
     for (const t of txs) {
       if (t.type !== "expense" || new Date(t.occurred_at) < monthStart) continue;
-      const key = t.category ?? "Other";
+      const key = normalizeExpenseCategory(t.category);
       spent[key] = (spent[key] ?? 0) + Number(t.amount);
     }
     return budgets.map((b) => ({

@@ -109,13 +109,21 @@ function ProductsPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All categories</SelectItem>
-            {(categories ?? []).map((c) => (
-              <SelectItem key={c.id} value={c.slug ?? c.id}>
-                {c.parent_id
-                  ? `${categoryNames.get(c.parent_id) ?? "Category"} / ${c.name}`
-                  : c.name}
-              </SelectItem>
-            ))}
+            {(categories ?? []).map((c) => {
+              const fullLabel = c.parent_id
+                ? `${categoryNames.get(c.parent_id) ?? "Category"} / ${c.name}`
+                : c.name;
+              return (
+                <SelectItem
+                  key={c.id}
+                  value={c.slug ?? c.id}
+                  title={fullLabel}
+                  className="max-w-[min(78vw,24rem)] truncate"
+                >
+                  {c.parent_id ? c.name : fullLabel}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
         <Select

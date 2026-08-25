@@ -192,7 +192,7 @@ const Sidebar = React.forwardRef<
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-(--sidebar-width) bg-sidebar/75 p-0 text-sidebar-foreground backdrop-blur-xl [&>button]:hidden"
+            className="w-[min(var(--sidebar-width),85vw)] bg-sidebar/75 p-0 text-sidebar-foreground backdrop-blur-xl [&>button]:hidden"
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -204,7 +204,7 @@ const Sidebar = React.forwardRef<
               <SheetTitle>Sidebar</SheetTitle>
               <SheetDescription>Displays the mobile sidebar.</SheetDescription>
             </SheetHeader>
-            <div className="flex h-full w-full flex-col">{children}</div>
+            <div className="flex min-h-0 h-full w-full flex-col">{children}</div>
           </SheetContent>
         </Sheet>
       );

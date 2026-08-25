@@ -54,8 +54,6 @@ export const EXPENSE_CATEGORIES = [
   "Food",
   "Electricity",
   "Water",
-  "Water — Home",
-  "Water — Office",
   "WiFi",
   "Internet",
   "Airtime",
@@ -83,7 +81,63 @@ export const EXPENSE_CATEGORIES = [
  * allocation and cannot create duplicate ledger entries.
  */
 export function normalizeExpenseCategory(category: string | null | undefined) {
-  return (category ?? "Other").replace(/\s+—\s+(Shared|Business)$/, "");
+  const normalized = (category ?? "Other").replace(/\s+—\s+(Shared|Business)$/, "");
+  if (normalized === "Water — Home" || normalized === "Water — Office") return "Water";
+  return normalized;
+}
+
+export function isSalaryIncome(input: { income_type?: string | null; source?: string | null }) {
+  return (
+    input.income_type?.trim().toLowerCase() === "salary" ||
+    input.source?.trim().toLowerCase() === "salary"
+  );
+}
+
+export function isGiftIncome(input: { income_type?: string | null; source?: string | null }) {
+  return (
+    input.income_type?.trim().toLowerCase() === "gift" ||
+    input.source?.trim().toLowerCase() === "gift"
+  );
+}
+
+export function isTitheEligibleIncome(input: {
+  income_type?: string | null;
+  source?: string | null;
+}) {
+  return !isGiftIncome(input);
+}
+
+const EXPENSE_TYPE_BY_CATEGORY: Record<string, string> = {
+  Rent: "rent",
+  Transport: "transport",
+  Fuel: "transport",
+  Food: "personal_living",
+  Electricity: "utilities",
+  Water: "utilities",
+  WiFi: "utilities",
+  Internet: "utilities",
+  Airtime: "airtime",
+  "Facebook Ads": "advertising",
+  "Google Ads": "advertising",
+  Ads: "advertising",
+  "Rider / Delivery": "delivery",
+  Packaging: "packaging",
+  Supplier: "supplier",
+  Business: "other",
+  Office: "other",
+  Shopping: "personal_living",
+  Medical: "health",
+  Kids: "personal_living",
+  "Kids — School Fees": "education",
+  "Kids — Expenses": "personal_living",
+  "Kids — Shopping": "personal_living",
+  Tithe: "personal_living",
+  Entertainment: "personal_living",
+  Other: "other",
+};
+
+export function expenseTypeForCategory(category: string | null | undefined) {
+  return EXPENSE_TYPE_BY_CATEGORY[normalizeExpenseCategory(category)] ?? "other";
 }
 
 export const EXPECTED_SOURCES = [
