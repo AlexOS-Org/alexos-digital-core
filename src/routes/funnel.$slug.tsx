@@ -536,6 +536,19 @@ function FunnelPage() {
                         />
                       </div>
                     ) : null}
+                    {isYjBag && index === 1 ? (
+                      <div className="sm:col-span-2 rounded-2xl border border-border bg-background p-2">
+                        <img
+                          src="/assets/yj-baby-rain-red-pink-lifestyle.png"
+                          alt="Child carrying a red YJ Baby backpack and a woman carrying the navy backpack with pink trim in light rain"
+                          width={2560}
+                          height={1440}
+                          loading="lazy"
+                          decoding="async"
+                          className="aspect-video w-full rounded-xl object-contain"
+                        />
+                      </div>
+                    ) : null}
                   </Fragment>
                 );
               })}
