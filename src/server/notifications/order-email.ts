@@ -1,3 +1,6 @@
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import dailyGearLogo from "@/assets/branding/dailygear-logo.jpg";
+
 export interface OrderNotificationInput {
   orderNumber: string;
   total: number;
@@ -17,6 +20,7 @@ export interface OrderNotificationInput {
     sku: string | null;
     quantity: number;
     lineTotal: number;
+    imageUrl?: string | null;
   }>;
 }
 
@@ -25,24 +29,330 @@ function requiredEnv(name: string) {
   return value || null;
 }
 
+function money(currency: string, value: number) {
+  return `${currency} ${Number(value || 0).toLocaleString("en-KE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+function wrapText(text: string, maxChars: number) {
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    const next = current ? `${current} ${word}` : word;
+    if (next.length > maxChars && current) {
+      lines.push(current);
+      current = word;
+    } else current = next;
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
 function paymentInstructions(input: OrderNotificationInput) {
-  if (input.paymentMethod !== "mpesa") return [];
-  const paybill = requiredEnv("DAILYGEAR_MPESA_PAYBILL") || "542542";
-  const account = requiredEnv("DAILYGEAR_MPESA_ACCOUNT") || "184545";
   const nearbyCounties = new Set(["nairobi", "kiambu", "kajiado"]);
   const outsideNearby = !nearbyCounties.has(input.county.trim().toLowerCase());
+  if (input.paymentMethod === "mpesa") {
+    const paybill = requiredEnv("DAILYGEAR_MPESA_PAYBILL") || "542542";
+    const account = requiredEnv("DAILYGEAR_MPESA_ACCOUNT") || "184545";
+    return [
+      "M-Pesa payment instructions",
+      `Paybill ${paybill} · Account ${account} · Amount ${money(input.currency, input.total)}`,
+      "Use the order number as your reference where supported and send the confirmation code to DailyGear.",
+      outsideNearby
+        ? "Your location is outside the nearby Nairobi delivery area. DailyGear will confirm the route and any approved upfront delivery requirement before fulfilment."
+        : "Online payment helps DailyGear confirm and prioritise dispatch for the delivery route.",
+    ];
+  }
+  if (input.paymentMethod.toLowerCase().includes("cod")) {
+    return [
+      "Cash on delivery",
+      outsideNearby
+        ? "Cash on delivery is intended for Nairobi and its environs. DailyGear will confirm whether your route qualifies before dispatch."
+        : "Pay when your order arrives. Keep your phone available so the delivery team can confirm the route.",
+      outsideNearby
+        ? "Do not send an upfront payment until DailyGear confirms your order and provides the approved instructions."
+        : "No online payment is required before delivery unless DailyGear confirms a different arrangement with you.",
+    ];
+  }
   return [
-    "Your M-Pesa payment details:",
-    `Paybill: ${paybill}`,
-    `Account: ${account}`,
-    `Amount: ${input.currency} ${input.total.toLocaleString()}`,
-    "Use your order number as the payment reference where your M-Pesa screen allows it.",
-    "After payment, reply with the M-Pesa transaction code so DailyGear can match and confirm your payment.",
-    outsideNearby
-      ? "Your location is outside the Nairobi, Kiambu and Kajiado nearby-delivery area. We will confirm the delivery route and any approved prepayment delivery benefit before fulfilment; no discount is applied unless it is explicitly confirmed."
-      : "Your location is within our nearby-delivery area. We will confirm the delivery route and collection or prepayment details with you.",
-    "If you prefer pay on delivery, reply to this message and we will confirm whether it is available for your route.",
+    `Payment method: ${input.paymentMethod}`,
+    "DailyGear will confirm the next payment step with you before fulfilment.",
   ];
+}
+
+async function fetchBytes(url: string) {
+  try {
+    const resolved = url.startsWith("/") ? new URL(url, "https://dailygear.co.ke").toString() : url;
+    const response = await fetch(resolved);
+    if (!response.ok) return null;
+    return {
+      bytes: new Uint8Array(await response.arrayBuffer()),
+      contentType: response.headers.get("content-type")?.toLowerCase() ?? "",
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function createOrderPdf(input: OrderNotificationInput) {
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage([595, 842]);
+  const regular = await pdf.embedFont(StandardFonts.Helvetica);
+  const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+  const navy = rgb(0.04, 0.08, 0.18);
+  const teal = rgb(0.02, 0.55, 0.52);
+  const ink = rgb(0.11, 0.14, 0.19);
+  const muted = rgb(0.38, 0.42, 0.48);
+  const line = rgb(0.87, 0.89, 0.92);
+  const pale = rgb(0.96, 0.98, 0.98);
+  const white = rgb(1, 1, 1);
+  const pageWidth = 595;
+  const left = 42;
+  const right = 553;
+  let cursor = 800;
+
+  page.drawRectangle({ x: 0, y: 726, width: pageWidth, height: 116, color: navy });
+  const logoResult = await fetchBytes(dailyGearLogo);
+  if (logoResult?.contentType.includes("jpeg") || logoResult?.contentType.includes("jpg")) {
+    try {
+      const logo = await pdf.embedJpg(logoResult.bytes);
+      const ratio = logo.height / logo.width;
+      page.drawImage(logo, { x: left, y: 770, width: 92, height: 92 * ratio });
+    } catch {
+      page.drawText("DAILYGEAR", { x: left, y: 780, size: 20, font: bold, color: white });
+    }
+  } else {
+    page.drawText("DAILYGEAR", { x: left, y: 780, size: 20, font: bold, color: white });
+  }
+  page.drawText("Sell more. Grow daily.", {
+    x: left,
+    y: 748,
+    size: 8,
+    font: regular,
+    color: rgb(0.82, 0.9, 0.92),
+  });
+  page.drawText("ORDER CONFIRMATION", { x: 360, y: 783, size: 16, font: bold, color: white });
+  page.drawText(input.orderNumber, {
+    x: 360,
+    y: 762,
+    size: 9,
+    font: regular,
+    color: rgb(0.82, 0.9, 0.92),
+  });
+
+  cursor = 690;
+  page.drawText("Thank you for your order", {
+    x: left,
+    y: cursor,
+    size: 20,
+    font: bold,
+    color: ink,
+  });
+  page.drawText(`Hello ${input.customerName || "Customer"}, your order has been received.`, {
+    x: left,
+    y: cursor - 22,
+    size: 10,
+    font: regular,
+    color: muted,
+  });
+  cursor -= 66;
+
+  const firstImage = input.items.find((item) => item.imageUrl)?.imageUrl;
+  if (firstImage) {
+    const imageResult = await fetchBytes(firstImage);
+    if (imageResult) {
+      try {
+        const image = imageResult.contentType.includes("png")
+          ? await pdf.embedPng(imageResult.bytes)
+          : imageResult.contentType.includes("jpeg") || imageResult.contentType.includes("jpg")
+            ? await pdf.embedJpg(imageResult.bytes)
+            : null;
+        if (image) {
+          const scale = Math.min(150 / image.width, 120 / image.height);
+          page.drawImage(image, {
+            x: right - image.width * scale,
+            y: cursor - image.height * scale + 8,
+            width: image.width * scale,
+            height: image.height * scale,
+          });
+        }
+      } catch {
+        // The PDF remains useful when a remote image is unavailable or unsupported.
+      }
+    }
+  }
+
+  page.drawText("Customer and delivery details", {
+    x: left,
+    y: cursor,
+    size: 11,
+    font: bold,
+    color: ink,
+  });
+  page.drawText(`Phone: ${input.customerPhone || "—"}`, {
+    x: left,
+    y: cursor - 18,
+    size: 9,
+    font: regular,
+    color: muted,
+  });
+  page.drawText(`Email: ${input.customerEmail || "—"}`, {
+    x: left,
+    y: cursor - 34,
+    size: 9,
+    font: regular,
+    color: muted,
+  });
+  page.drawText(`Delivery: ${input.town || "—"}, ${input.county || "—"}`, {
+    x: left,
+    y: cursor - 50,
+    size: 9,
+    font: regular,
+    color: muted,
+  });
+  page.drawText(`Address: ${input.address || "—"}`, {
+    x: left,
+    y: cursor - 66,
+    size: 9,
+    font: regular,
+    color: muted,
+    maxWidth: 285,
+  });
+  if (input.deliveryDetails)
+    page.drawText(`Note: ${input.deliveryDetails}`, {
+      x: left,
+      y: cursor - 82,
+      size: 8,
+      font: regular,
+      color: muted,
+      maxWidth: 285,
+    });
+  cursor -= 125;
+
+  page.drawRectangle({ x: left, y: cursor - 22, width: 511, height: 28, color: pale });
+  page.drawText("ITEM", { x: 52, y: cursor - 12, size: 8, font: bold, color: muted });
+  page.drawText("SKU", { x: 325, y: cursor - 12, size: 8, font: bold, color: muted });
+  page.drawText("QTY", { x: 420, y: cursor - 12, size: 8, font: bold, color: muted });
+  page.drawText("AMOUNT", { x: 475, y: cursor - 12, size: 8, font: bold, color: muted });
+  cursor -= 48;
+  for (const item of input.items) {
+    const itemLines = wrapText(item.name, 40);
+    page.drawText(itemLines[0] || "Item", {
+      x: 52,
+      y: cursor,
+      size: 9,
+      font: regular,
+      color: ink,
+      maxWidth: 255,
+    });
+    if (itemLines.length > 1)
+      page.drawText(itemLines.slice(1).join(" "), {
+        x: 52,
+        y: cursor - 11,
+        size: 8,
+        font: regular,
+        color: muted,
+        maxWidth: 255,
+      });
+    page.drawText(item.sku || "—", {
+      x: 325,
+      y: cursor,
+      size: 8,
+      font: regular,
+      color: muted,
+      maxWidth: 78,
+    });
+    page.drawText(String(item.quantity), { x: 425, y: cursor, size: 9, font: regular, color: ink });
+    page.drawText(money(input.currency, item.lineTotal), {
+      x: 475,
+      y: cursor,
+      size: 9,
+      font: regular,
+      color: ink,
+    });
+    cursor -= itemLines.length > 1 ? 30 : 22;
+  }
+  page.drawLine({
+    start: { x: left, y: cursor + 7 },
+    end: { x: right, y: cursor + 7 },
+    thickness: 1,
+    color: line,
+  });
+  cursor -= 14;
+  const subtotal = input.items.reduce((sum, item) => sum + Number(item.lineTotal || 0), 0);
+  const deliveryFee = Math.max(0, Number(input.shippingFee || 0));
+  const totals: Array<[string, number]> = [
+    ["Subtotal", subtotal],
+    [deliveryFee > 0 ? "Delivery" : "Delivery (free)", deliveryFee],
+    ["Total", input.total],
+  ];
+  for (const [label, amount] of totals) {
+    const totalRow = label === "Total";
+    page.drawText(label, {
+      x: 385,
+      y: cursor,
+      size: totalRow ? 11 : 9,
+      font: totalRow ? bold : regular,
+      color: totalRow ? ink : muted,
+    });
+    page.drawText(money(input.currency, amount), {
+      x: 475,
+      y: cursor,
+      size: totalRow ? 11 : 9,
+      font: totalRow ? bold : regular,
+      color: totalRow ? teal : ink,
+    });
+    cursor -= totalRow ? 27 : 19;
+  }
+
+  const paymentLines = paymentInstructions(input);
+  page.drawRectangle({
+    x: left,
+    y: cursor - 98,
+    width: 511,
+    height: 88,
+    color: pale,
+    borderColor: line,
+    borderWidth: 1,
+  });
+  page.drawText(paymentLines[0] || "Payment instructions", {
+    x: 56,
+    y: cursor - 28,
+    size: 10,
+    font: bold,
+    color: ink,
+  });
+  paymentLines.slice(1).forEach((text, index) => {
+    page.drawText(text, {
+      x: 56,
+      y: cursor - 47 - index * 16,
+      size: 8,
+      font: regular,
+      color: index === 0 && input.paymentMethod === "mpesa" ? teal : muted,
+      maxWidth: 475,
+    });
+  });
+  cursor -= 126;
+  page.drawText(
+    "This document confirms the order details. It is not proof of payment unless payment is separately confirmed.",
+    { x: left, y: cursor, size: 8, font: bold, color: muted, maxWidth: 511 },
+  );
+  page.drawText("Thank you for choosing DailyGear.", {
+    x: left,
+    y: cursor - 20,
+    size: 9,
+    font: regular,
+    color: muted,
+  });
+  page.drawText(
+    `${requiredEnv("DAILYGEAR_EMAIL_FROM") || "DailyGear"} · ${requiredEnv("DAILYGEAR_SUPPORT_PHONE") || "0722658824"}`,
+    { x: left, y: 32, size: 8, font: regular, color: muted },
+  );
+
+  return pdf.save();
 }
 
 function plainText(input: OrderNotificationInput, audience: "customer" | "owner") {
@@ -51,18 +361,18 @@ function plainText(input: OrderNotificationInput, audience: "customer" | "owner"
   const itemLines = input.items
     .map(
       (item) =>
-        `- ${item.name}${item.sku ? ` (SKU ${item.sku})` : ""} × ${item.quantity} — ${input.currency} ${item.lineTotal.toLocaleString()}`,
+        `- ${item.name}${item.sku ? ` (SKU ${item.sku})` : ""} × ${item.quantity} — ${money(input.currency, item.lineTotal)}`,
     )
     .join("\n");
   return [
     greeting,
     "",
     audience === "customer"
-      ? "Your DailyGear order is in. Here is everything you need to keep it moving."
+      ? "Your DailyGear order has been received. A branded PDF confirmation is attached."
       : "A new DailyGear order is ready for fulfilment review:",
     "",
     `Order number: ${input.orderNumber}`,
-    `Order total: ${input.currency} ${input.total.toLocaleString()}`,
+    `Order total: ${money(input.currency, input.total)}`,
     `Payment method: ${input.paymentMethod.toUpperCase()}`,
     "",
     "What you ordered:",
@@ -75,26 +385,42 @@ function plainText(input: OrderNotificationInput, audience: "customer" | "owner"
     ...(audience === "customer" ? paymentInstructions(input) : []),
     "",
     audience === "customer"
-      ? "What happens next: DailyGear will contact you to confirm delivery and payment collection where applicable. Keep your order number handy if you need support."
+      ? "DailyGear will contact you to confirm delivery and payment collection where applicable."
       : `Customer phone: ${input.customerPhone}`,
     input.customerEmail ? `Customer email: ${input.customerEmail}` : "",
-    "",
-    audience === "customer"
-      ? "Thanks for choosing DailyGear. We will help you get the order through the next step."
-      : "Review the order in AlexOS before fulfilment. Payment status remains separate from order creation.",
   ]
     .filter(Boolean)
     .join("\n");
 }
 
-async function sendEmail(apiKey: string, from: string, to: string, subject: string, text: string) {
+function toBase64(bytes: Uint8Array) {
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let index = 0; index < bytes.length; index += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(index, index + chunkSize));
+  }
+  return btoa(binary);
+}
+
+async function sendEmail(
+  apiKey: string,
+  from: string,
+  to: string,
+  subject: string,
+  text: string,
+  pdf: Uint8Array,
+  orderNumber: string,
+) {
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ from, to: [to], subject, text }),
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from,
+      to: [to],
+      subject,
+      text,
+      attachments: [{ filename: `dailygear-order-${orderNumber}.pdf`, content: toBase64(pdf) }],
+    }),
   });
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
@@ -121,24 +447,26 @@ export async function sendOrderNotifications(input: OrderNotificationInput) {
     };
   }
 
-  if (input.customerEmail) {
+  const pdf = await createOrderPdf(input);
+  if (input.customerEmail)
     await sendEmail(
       apiKey,
       from,
       input.customerEmail,
-      `Order ${input.orderNumber} is in — here's what happens next | DailyGear`,
+      `Order ${input.orderNumber} is confirmed | DailyGear`,
       plainText(input, "customer"),
+      pdf,
+      input.orderNumber,
     );
-  }
-  if (input.ownerEmail && input.ownerEmail !== input.customerEmail) {
+  if (input.ownerEmail && input.ownerEmail !== input.customerEmail)
     await sendEmail(
       apiKey,
       from,
       input.ownerEmail,
-      `New DailyGear order — ${input.orderNumber}`,
+      `New DailyGear order ${input.orderNumber}`,
       plainText(input, "owner"),
+      pdf,
+      input.orderNumber,
     );
-  }
-
   return { sent: true as const, recipients };
 }
