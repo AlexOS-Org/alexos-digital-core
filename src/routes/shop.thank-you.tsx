@@ -219,7 +219,7 @@ function ThankYou() {
 
       {confirmation ? (
         <section className="mt-8 space-y-4 rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
-          <div>
+          <div className="text-center">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
               Order details
             </p>
@@ -261,7 +261,12 @@ function ThankYou() {
           </div>
           {confirmation.paymentInstructions ? (
             <div className="rounded-2xl border border-primary/20 bg-primary/[0.05] p-4 text-sm">
-              <p className="font-bold">Complete M-Pesa payment before dispatch</p>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <span className="inline-flex items-center rounded-md bg-[#35a839] px-2.5 py-1 text-xs font-black tracking-wide text-white">
+                  M-PESA
+                </span>
+                <p className="font-bold">Complete M-Pesa payment before dispatch</p>
+              </div>
               <p className="mt-1 text-muted-foreground">
                 Pay KES {confirmation.paymentInstructions.amount.toLocaleString()} via M-Pesa
                 Paybill {confirmation.paymentInstructions.paybill}, account{" "}
@@ -269,8 +274,9 @@ function ThankYou() {
                 reference and keep the confirmation message.
               </p>
               <p className="mt-2 text-muted-foreground">
-                Online payment helps us prioritise dispatch. Any free-delivery or approved saving is
-                shown in the order total before placement; no extra discount is added here.
+                Online payment helps us prioritise dispatch. An approved online-payment offer may
+                save up to <strong className="text-foreground">KES 75</strong> when active; the
+                exact amount is valid only when it is reflected in the confirmed order total.
               </p>
             </div>
           ) : confirmation.paymentMethod.toLowerCase().includes("cod") ? (
@@ -296,7 +302,7 @@ function ThankYou() {
 
       {confirmation ? (
         <section className="mt-8 rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+          <p className="text-center text-xs font-bold uppercase tracking-[0.16em] text-primary">
             Need help or want to confirm payment?
           </p>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -335,11 +341,11 @@ function ThankYou() {
 
       {confirmation ? (
         <section className="mt-8 rounded-3xl border bg-muted/20 p-5 sm:p-6">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+          <p className="text-center text-xs font-bold uppercase tracking-[0.16em] text-primary">
             You may also like
           </p>
-          <h2 className="mt-1 text-xl font-black">Shop more from DailyGear</h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          <h2 className="mt-1 text-center text-xl font-black">Shop more from DailyGear</h2>
+          <p className="mt-2 text-center text-sm leading-6 text-muted-foreground">
             Browse the live catalogue for kids' school shoes, ladies' products, boys' products, and
             other available items.
           </p>
