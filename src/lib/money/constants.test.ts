@@ -3,6 +3,7 @@ import {
   expenseTypeForCategory,
   isGiftIncome,
   isSalaryIncome,
+  isTitheEligibleIncome,
   normalizeExpenseCategory,
 } from "./constants";
 
@@ -23,5 +24,14 @@ describe("Money Center category and income rules", () => {
   it("marks gifts as non-salary income", () => {
     expect(isGiftIncome({ source: "Gift", income_type: null })).toBe(true);
     expect(isGiftIncome({ source: "Salary", income_type: "salary" })).toBe(false);
+  });
+
+  it("includes every non-gift income source in tithe eligibility", () => {
+    expect(isTitheEligibleIncome({ source: "Salary", income_type: "salary" })).toBe(true);
+    expect(isTitheEligibleIncome({ source: "Customer Payment", income_type: "commission" })).toBe(
+      true,
+    );
+    expect(isTitheEligibleIncome({ source: "Interest", income_type: "interest" })).toBe(true);
+    expect(isTitheEligibleIncome({ source: "Gift", income_type: "gift" })).toBe(false);
   });
 });

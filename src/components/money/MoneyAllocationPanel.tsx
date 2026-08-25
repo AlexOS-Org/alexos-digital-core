@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatMoney } from "@/lib/money/format";
-import { isGiftIncome, isSalaryIncome } from "@/lib/money/constants";
+import { isGiftIncome, isTitheEligibleIncome } from "@/lib/money/constants";
 import {
   useAccountBalances,
   useAccounts,
@@ -69,7 +69,11 @@ export function MoneyAllocationPanel() {
     };
   }, []);
 
-  const emergencyAccount = accounts.find((account) => /emergency fund/i.test(account.name));
+  const emergencyAccount = accounts.find(
+    (account) =>
+      /emergency fund/i.test(account.name) &&
+      (account.financial_scope ?? "personal") !== "business",
+  );
   const emergencyBalance = Number(
     balances.find((balance) => balance.account_id === emergencyAccount?.id)?.balance ?? 0,
   );
@@ -88,12 +92,12 @@ export function MoneyAllocationPanel() {
       }
       return total;
     }, 0);
-    const salaryReceived = posted
+    const eligiblePersonalIncome = posted
       .filter(
         (transaction) =>
           transaction.type === "income" &&
           transaction.financial_scope !== "business" &&
-          isSalaryIncome(transaction),
+          isTitheEligibleIncome(transaction),
       )
       .reduce((total, transaction) => total + Number(transaction.amount), 0);
     const personalReceipts = posted
@@ -106,9 +110,9 @@ export function MoneyAllocationPanel() {
     const businessProfit = canonicalBusinessProfit ?? ledgerBusinessProfit;
     return {
       businessProfit: canonicalBusinessProfit ?? ledgerBusinessProfit,
-      salaryReceived,
+      eligiblePersonalIncome,
       businessTithe: Math.max(0, businessProfit) * ALLOCATION_RATE,
-      salaryTithe: salaryReceived * ALLOCATION_RATE,
+      personalIncomeTithe: eligiblePersonalIncome * ALLOCATION_RATE,
       savingsSuggestion: personalReceipts * ALLOCATION_RATE,
     };
   }, [transactions, profitResponse]);
@@ -123,7 +127,7 @@ export function MoneyAllocationPanel() {
   const selectedTitheAccount = availableAccounts.find((account) => account.id === titheAccountId);
   const balanceFor = (id: string) =>
     Number(balances.find((balance) => balance.account_id === id)?.balance ?? 0);
-  const titheTotal = metrics.businessTithe + metrics.salaryTithe;
+  const titheTotal = metrics.businessTithe + metrics.personalIncomeTithe;
   const titheKey = `${window.from}:tithe:${titheTotal.toFixed(2)}`;
   const savingsKey = `${window.from}:savings:${metrics.savingsSuggestion.toFixed(2)}`;
 
@@ -141,11 +145,11 @@ export function MoneyAllocationPanel() {
       account_id: selectedTitheAccount.id,
       amount: titheTotal,
       category: "Tithe",
-      expense_type: "charitable",
+      expense_type: "other",
       financial_scope: selectedTitheAccount.financial_scope ?? "personal",
       business_id: selectedTitheAccount.business_id ?? null,
       source: "Approved tithe suggestion",
-      description: `Approved 10% tithe: business profit ${formatMoney(metrics.businessTithe)} + salary ${formatMoney(metrics.salaryTithe)}`,
+      description: `Approved 10% tithe: business profit ${formatMoney(metrics.businessTithe)} + eligible personal income excluding gifts ${formatMoney(metrics.personalIncomeTithe)}`,
       reference: titheReference,
     });
     setApprovedTitheKeys((keys) => [...keys, titheKey]);
@@ -211,9 +215,9 @@ export function MoneyAllocationPanel() {
           </div>
           <p className="text-xs text-muted-foreground">
             10% of today’s net business profit ({formatMoney(metrics.businessTithe)}) plus 10% of
-            confirmed salary received ({formatMoney(metrics.salaryTithe)}). Net business profit
-            includes recognized revenue, COGS, order costs, business expenses, and available
-            read-only Meta spend.
+            eligible personal income excluding gifts ({formatMoney(metrics.personalIncomeTithe)}).
+            Net business profit includes recognized revenue, COGS, order costs, business expenses,
+            and available read-only Meta spend.
           </p>
           {profitResponse?.financials.dataQuality.warnings.length ? (
             <p className="text-xs text-amber-700 dark:text-amber-300">

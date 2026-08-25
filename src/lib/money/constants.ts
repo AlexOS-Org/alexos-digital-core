@@ -100,6 +100,13 @@ export function isGiftIncome(input: { income_type?: string | null; source?: stri
   );
 }
 
+export function isTitheEligibleIncome(input: {
+  income_type?: string | null;
+  source?: string | null;
+}) {
+  return !isGiftIncome(input);
+}
+
 const EXPENSE_TYPE_BY_CATEGORY: Record<string, string> = {
   Rent: "rent",
   Transport: "transport",

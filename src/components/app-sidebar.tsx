@@ -63,7 +63,11 @@ export function AppSidebar() {
 
   // Groups rendered in the scrollable content area (excluding Home and System)
   const contentGroups = moduleGroups.filter(
-    (g) => g !== "Home" && g !== BUSINESS_GROUP && g !== "System",
+    (g) =>
+      g !== "Home" &&
+      g !== BUSINESS_GROUP &&
+      g !== "System" &&
+      !(g === "Money" && isMoneyCenterRoute),
   );
 
   return (

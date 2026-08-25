@@ -103,7 +103,7 @@ export function ProductCard({ product, currency }: Props) {
           className="dailygear-product-cta mt-auto h-10 w-full rounded-xl px-2 text-xs sm:h-11 sm:px-4 sm:text-sm"
         >
           <Link to="/shop/product/$id" params={{ id: product.id }}>
-            {soldOut ? "View details" : "Choose options & order"}
+            {soldOut ? "View details" : "Order now"}
           </Link>
         </Button>
       </div>
