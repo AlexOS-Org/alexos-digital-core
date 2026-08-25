@@ -236,7 +236,8 @@ function FunnelPage() {
   const effectiveLandingCopy = isYjBag
     ? {
         eyebrow: "A calmer start to every school day",
-        headline: "Stop the morning scramble. Give every school essential a reliable place.",
+        headline:
+          "Stop the morning scramble. Give your child’s school essentials one reliable place.",
         subheadline:
           "No more searching for a missing exercise book while the school morning is already moving. The YJ Baby Oxford School Backpack helps keep books, stationery, water bottles and personal items organised in one dependable bag—so your child can leave ready for the day.",
         proof: [
