@@ -3,6 +3,7 @@ import {
   expenseTypeForCategory,
   isGiftIncome,
   isSalaryIncome,
+  isSavingsEligibleIncome,
   isTitheEligibleIncome,
   normalizeExpenseCategory,
 } from "./constants";
@@ -33,5 +34,22 @@ describe("Money Center category and income rules", () => {
     );
     expect(isTitheEligibleIncome({ source: "Interest", income_type: "interest" })).toBe(true);
     expect(isTitheEligibleIncome({ source: "Gift", income_type: "gift" })).toBe(false);
+  });
+
+  it("uses the same gift exclusion for Emergency Fund savings", () => {
+    const eligibleCategories = [
+      { source: "Salary", income_type: "salary" },
+      { source: "Customer Payment", income_type: "sales_revenue" },
+      { source: "Commission", income_type: "commission" },
+      { source: "Interest", income_type: "investment" },
+      { source: "Refund", income_type: "refund" },
+      { source: "Personal Deal", income_type: "personal_deal" },
+    ];
+
+    for (const income of eligibleCategories) {
+      expect(isSavingsEligibleIncome(income)).toBe(true);
+    }
+    expect(isSavingsEligibleIncome({ source: "Gift", income_type: "gift" })).toBe(false);
+    expect(isSavingsEligibleIncome({ source: "Gift", income_type: null })).toBe(false);
   });
 });

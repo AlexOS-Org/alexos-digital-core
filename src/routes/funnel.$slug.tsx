@@ -221,35 +221,35 @@ function FunnelPage() {
     : null;
   const effectiveLandingCopy = isYjBag
     ? {
-        eyebrow: "Made for busy school mornings",
-        headline: "Stop the school-morning scramble. Give your child’s essentials a place.",
+        eyebrow: "A calmer start to every school day",
+        headline: "Stop the morning scramble. Give every school essential a reliable place.",
         subheadline:
-          "Books, lunch, stationery and everyday essentials should not end up scattered or carried separately. The YJ Children’s School Backpack brings practical organised storage, padded carrying areas and colour choices together for a more manageable school-day routine.",
+          "No more searching for a missing exercise book while the school morning is already moving. The YJ Baby Oxford School Backpack helps keep books, stationery, water bottles and personal items organised in one dependable bag—so your child can leave ready for the day.",
         proof: [
-          "Water-resistant nylon construction",
-          "Separate pockets for everyday essentials",
-          "Red, Teal/Green and Navy Blue with Pink trim options currently available",
+          "Waterproof Oxford fabric helps protect supplies from rain and spills",
+          "Multiple zipped compartments plus two side pockets for organised storage",
+          "Padded straps and a cushioned back panel for a more comfortable daily carry",
         ],
         benefits: [
           {
-            title: "Keep the school-day essentials together",
-            body: "Use the front pocket, two side pockets, interior zipped pocket and organiser pockets to separate books, lunch and smaller items.",
+            title: "Turn rushed mornings into organised starts",
+            body: "The spacious interior, front pocket, two side pockets, interior zipped pocket and organiser pockets give books, stationery, water bottles and personal items a clear place.",
           },
           {
-            title: "Make the daily carry easier",
-            body: "Padded shoulder straps and a cushioned back panel are designed for everyday school carrying without making medical or health promises.",
+            title: "Make the school-day carry feel more manageable",
+            body: "Ergonomic padded shoulder straps, a cushioned back panel and a sturdy top handle support the everyday routine from home to class and back again.",
           },
           {
-            title: "Ready for everyday routines",
-            body: "The durable, water-resistant nylon exterior is suited to ordinary school-day use. It is water-resistant, not guaranteed waterproof.",
+            title: "Protect the things your child needs",
+            body: "High-quality waterproof Oxford fabric helps protect school supplies and electronic gadgets from unexpected rain, dampness and spills.",
           },
           {
-            title: "Let your child choose",
-            body: "Choose the available Red, Teal/Green or Navy Blue with Pink trim colour that your child will be happy to carry to school.",
+            title: "Choose a bag they will be happy to carry",
+            body: "Select an available colour for school days, outdoor trips and excursions—a practical backpack designed for primary and secondary students.",
           },
         ],
         deliveryNote:
-          "Select the colour and quantity you need, then confirm your county, town or area, delivery details and payment method at checkout.",
+          "Choose the colour and quantity your child needs, enter the delivery details, and review the available payment and delivery options at checkout.",
       }
     : landingCopy;
   const productVariants = useMemo(
@@ -545,7 +545,7 @@ function FunnelPage() {
                 YJ Baby premium school bag
               </p>
               <h2 className="mt-3 text-3xl font-black tracking-tight">
-                Stop the morning scramble. Give school essentials a place.
+                Stop the morning scramble. Give your child’s school essentials one reliable place.
               </h2>
               <img
                 src="/assets/yj-baby-offer-colours.webp"
@@ -557,22 +557,23 @@ function FunnelPage() {
                 className="mx-auto mt-6 aspect-[4/3] w-full max-w-2xl rounded-2xl object-contain"
               />
               <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-muted-foreground">
-                Choose your available colours and quantities.{" "}
+                Give books, stationery and everyday essentials a dependable home. Choose the
+                available colour and quantity, then continue to checkout.{" "}
                 <strong className="text-foreground">KES 2,750 per bag</strong>.
               </p>
               <div className="mt-6 grid gap-3 text-left sm:grid-cols-3">
                 {[
                   [
-                    "Organised storage",
-                    "Front, side, interior and organiser pockets help separate everyday school items.",
+                    "Less searching, more getting ready",
+                    "Multiple zipped compartments and two side pockets help separate books, stationery, water bottles and personal items.",
                   ],
                   [
-                    "Comfort-focused carry",
-                    "The supplied product information highlights padded straps and a cushioned back panel.",
+                    "Comfort-focused everyday design",
+                    "Ergonomic padded shoulder straps, a cushioned back panel and a sturdy top handle support daily carrying.",
                   ],
                   [
-                    "Three available colours",
-                    "Red, Teal/Green and Navy Blue with Pink trim are available for selection; unavailable colours stay hidden from customers.",
+                    "Ready for school days and trips",
+                    "Waterproof Oxford fabric, organised storage and side pockets suit school routines, outdoor trips and excursions.",
                   ],
                 ].map(([title, body]) => (
                   <div key={title} className="rounded-2xl border border-border bg-background p-4">
@@ -621,23 +622,30 @@ function FunnelPage() {
               />
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
-                  Quality and confidence
+                  Confidence before you order
                 </p>
                 <h2 className="mt-2 text-2xl font-black tracking-tight">
-                  See the details before you order.
+                  A school bag you can understand before it arrives.
                 </h2>
+                <p className="mt-4 text-sm leading-7 text-muted-foreground">
+                  Choosing a school bag is about more than appearance. Review the material, storage,
+                  carrying design, available colour, and ordering details before you decide.
+                </p>
                 <div className="mt-4 grid gap-3 text-sm leading-6 text-muted-foreground">
                   <p>
-                    <strong className="text-foreground">Product details:</strong> water-resistant
-                    nylon, zipped storage, padded straps, and organiser space.
+                    <strong className="text-foreground">Clear product details:</strong> waterproof
+                    Oxford fabric, multiple zipped compartments, two side pockets, padded straps, a
+                    cushioned back panel, a sturdy top handle, and reinforced stitching.
                   </p>
                   <p>
-                    <strong className="text-foreground">Delivery clarity:</strong> confirm your
-                    county, town, and payment method at checkout.
+                    <strong className="text-foreground">Built around everyday use:</strong>{" "}
+                    organised space for books, stationery, water bottles, personal items, and
+                    electronic gadgets.
                   </p>
                   <p>
-                    <strong className="text-foreground">Honest feedback:</strong> verified customer
-                    feedback will be added after delivered orders are reviewed.
+                    <strong className="text-foreground">Straightforward ordering:</strong> select an
+                    available colour and quantity, enter delivery details, and review payment and
+                    delivery options before continuing.
                   </p>
                 </div>
               </div>
@@ -653,14 +661,45 @@ function FunnelPage() {
                 Before you order
               </p>
               <h2 className="mt-2 text-2xl font-black tracking-tight">
-                Choose your colour, add your quantity, and tell us where to deliver.
+                Choose the colour they will love, add the quantity you need, and tell us where to
+                deliver.
               </h2>
               <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                Delivery and payment options are confirmed during checkout based on the customer’s
-                location and selected method. Review the product, colour, quantity, county, town and
-                delivery details before continuing.
+                Delivery and payment options are confirmed during checkout based on your location
+                and selected method. Review the colour, quantity, county, town and delivery details
+                before continuing.
               </p>
-              <p className="mt-3 text-sm leading-7 text-muted-foreground">
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border border-border bg-card p-4">
+                  <p className="font-semibold">Will it hold the essentials?</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    The spacious interior, zipped compartments, organiser pockets, and side pockets
+                    help give books, stationery, bottles, and personal items a clear place.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-border bg-card p-4">
+                  <p className="font-semibold">What if the weather changes?</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    Waterproof Oxford fabric helps protect school supplies from unexpected rain,
+                    dampness, and spills.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-border bg-card p-4">
+                  <p className="font-semibold">What happens after I order?</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    Review your delivery details and payment method at checkout. Payment is not
+                    treated as settled until confirmed by DailyGear.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-border bg-card p-4">
+                  <p className="font-semibold">What if I need support?</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    Contact DailyGear through the support channel shown on the store if you have a
+                    question about the product or delivery.
+                  </p>
+                </div>
+              </div>
+              <p className="mt-5 text-sm leading-7 text-muted-foreground">
                 Your order is not treated as paid until payment is confirmed by DailyGear. No
                 reminder-email option is shown on this funnel.
               </p>
@@ -784,15 +823,16 @@ function FunnelPage() {
                 className="mt-4 aspect-[4/3] w-full rounded-2xl object-contain"
               />
               <h2 className="mt-4 text-xl font-black tracking-tight">
-                Real feedback will appear here
+                Real feedback belongs to real deliveries.
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                DailyGear will publish verified YJ Baby customer feedback after delivered orders are
-                reviewed. We will not copy testimonials from another store or create customer
-                quotes.
+                We are collecting verified feedback from YJ Baby customers after their orders are
+                delivered. Once customers share their experience, this section will feature genuine
+                comments about storage, material, carrying design, and everyday use. We do not copy
+                testimonials from another store or create customer quotes.
               </p>
               <p className="mt-3 text-xs font-semibold text-muted-foreground">
-                Review status: awaiting verified YJ customer submissions.
+                Review status: awaiting verified YJ Baby customer submissions.
               </p>
             </section>
           ) : null}
@@ -832,11 +872,12 @@ function FunnelPage() {
           >
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
-                Checkout on this page
+                Finish your order below
               </p>
               <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                Your saved details may be filled automatically on this device. Review everything
-                before continuing.
+                Choose your colour and quantity, add your delivery details, and review your order
+                before continuing to secure checkout. Saved details may be filled automatically on
+                this device.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -924,10 +965,10 @@ function FunnelPage() {
               disabled={outOfStock || !hasSelection}
             >
               {outOfStock
-                ? "Out of stock"
+                ? "Currently unavailable"
                 : hasSelection
                   ? "Continue to secure checkout"
-                  : "Choose a colour to continue"}
+                  : "Choose a colour to get started"}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </form>

@@ -107,6 +107,17 @@ export function isTitheEligibleIncome(input: {
   return !isGiftIncome(input);
 }
 
+/**
+ * Emergency Fund savings follow the same income eligibility policy as tithe:
+ * gifts are excluded, while every other posted personal income remains eligible.
+ */
+export function isSavingsEligibleIncome(input: {
+  income_type?: string | null;
+  source?: string | null;
+}) {
+  return isTitheEligibleIncome(input);
+}
+
 const EXPENSE_TYPE_BY_CATEGORY: Record<string, string> = {
   Rent: "rent",
   Transport: "transport",
