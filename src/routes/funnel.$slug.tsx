@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { ArrowRight, Check, ShoppingBag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -236,7 +236,8 @@ function FunnelPage() {
   const effectiveLandingCopy = isYjBag
     ? {
         eyebrow: "A calmer start to every school day",
-        headline: "Stop the morning scramble. Give every school essential a reliable place.",
+        headline:
+          "Stop the morning scramble. Give your child’s school essentials one reliable place.",
         subheadline:
           "No more searching for a missing exercise book while the school morning is already moving. The YJ Baby Oxford School Backpack helps keep books, stationery, water bottles and personal items organised in one dependable bag—so your child can leave ready for the day.",
         proof: [
@@ -410,7 +411,7 @@ function FunnelPage() {
   if (error || !funnel || !product) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
-        <h1 className="text-2xl font-black">Offer unavailable</h1>
+        <h1 className="text-center text-2xl font-black">Offer unavailable</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {error ?? "This offer is not available right now."}
         </p>
@@ -475,10 +476,10 @@ function FunnelPage() {
             ) : null}
           </div>
           <div className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+            <p className="text-center text-xs font-bold uppercase tracking-[0.18em] text-primary">
               Why it fits your day
             </p>
-            <h2 className="mt-2 text-2xl font-black tracking-tight">
+            <h2 className="mt-2 text-center text-2xl font-black tracking-tight">
               {effectiveLandingCopy?.headline ?? `${product.name}, presented clearly.`}
             </h2>
             <p className="mt-3 text-sm leading-7 text-muted-foreground">
@@ -500,26 +501,56 @@ function FunnelPage() {
                 const image =
                   benefitSummaryImages[index % Math.max(benefitSummaryImages.length, 1)];
                 return (
-                  <article
-                    key={benefit.title}
-                    className="overflow-hidden rounded-2xl border border-border bg-muted/25"
-                  >
-                    {image ? (
-                      <img
-                        src={image}
-                        alt={`${product.name} — ${benefit.title}`}
-                        width={800}
-                        height={600}
-                        loading="lazy"
-                        decoding="async"
-                        className="aspect-[4/3] w-full object-contain"
-                      />
+                  <Fragment key={benefit.title}>
+                    <article
+                      key={benefit.title}
+                      className="overflow-hidden rounded-2xl border border-border bg-muted/25"
+                    >
+                      {image ? (
+                        <img
+                          src={image}
+                          alt={`${product.name} — ${benefit.title}`}
+                          width={800}
+                          height={600}
+                          loading="lazy"
+                          decoding="async"
+                          className="aspect-[4/3] w-full object-contain"
+                        />
+                      ) : null}
+                      <div className="p-4">
+                        <p className="text-center font-semibold">{benefit.title}</p>
+                        <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                          {benefit.body}
+                        </p>
+                      </div>
+                    </article>
+                    {isYjBag && index === 0 ? (
+                      <div className="sm:col-span-2 rounded-2xl border border-border bg-background p-2">
+                        <img
+                          src="/assets/yj-baby-interior-one-piece-combined.png"
+                          alt="YJ Baby backpack interior compartments and one-piece open design"
+                          width={2560}
+                          height={1440}
+                          loading="lazy"
+                          decoding="async"
+                          className="aspect-video w-full rounded-xl object-contain"
+                        />
+                      </div>
                     ) : null}
-                    <div className="p-4">
-                      <p className="font-semibold">{benefit.title}</p>
-                      <p className="mt-1 text-sm leading-6 text-muted-foreground">{benefit.body}</p>
-                    </div>
-                  </article>
+                    {isYjBag && index === 1 ? (
+                      <div className="sm:col-span-2 rounded-2xl border border-border bg-background p-2">
+                        <img
+                          src="/assets/yj-baby-rain-red-pink-lifestyle.png"
+                          alt="Child carrying a red YJ Baby backpack and a woman carrying the navy backpack with pink trim in light rain"
+                          width={2560}
+                          height={1440}
+                          loading="lazy"
+                          decoding="async"
+                          className="aspect-video w-full rounded-xl object-contain"
+                        />
+                      </div>
+                    ) : null}
+                  </Fragment>
                 );
               })}
             </div>
@@ -552,10 +583,12 @@ function FunnelPage() {
                     )}
                   </div>
                   <div className={index % 2 === 1 ? "sm:order-1" : ""}>
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                    <p className="text-center text-xs font-bold uppercase tracking-[0.18em] text-primary">
                       0{index + 1} · Why it fits
                     </p>
-                    <h3 className="mt-2 text-2xl font-black tracking-tight">{benefit.title}</h3>
+                    <h3 className="mt-2 text-center text-2xl font-black tracking-tight">
+                      {benefit.title}
+                    </h3>
                     <p className="mt-3 text-sm leading-7 text-muted-foreground">{benefit.body}</p>
                   </div>
                 </article>
@@ -666,10 +699,10 @@ function FunnelPage() {
                 ))}
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                <p className="text-center text-xs font-bold uppercase tracking-[0.18em] text-primary">
                   Confidence before you order
                 </p>
-                <h2 className="mt-2 text-2xl font-black tracking-tight">
+                <h2 className="mt-2 text-center text-2xl font-black tracking-tight">
                   A school bag you can understand before it arrives.
                 </h2>
                 <p className="mt-4 text-sm leading-7 text-muted-foreground">
@@ -702,10 +735,10 @@ function FunnelPage() {
               className="mt-8 rounded-3xl border border-border bg-muted/20 p-5 sm:p-7"
               aria-label="YJ delivery and ordering information"
             >
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+              <p className="text-center text-xs font-bold uppercase tracking-[0.18em] text-primary">
                 Before you order
               </p>
-              <h2 className="mt-2 text-2xl font-black tracking-tight">
+              <h2 className="mt-2 text-center text-2xl font-black tracking-tight">
                 Choose the colour they will love, add the quantity you need, and tell us where to
                 deliver.
               </h2>
@@ -758,10 +791,10 @@ function FunnelPage() {
               className="-m-1 mb-5 rounded-3xl border border-border bg-background p-4 sm:p-5"
               aria-label="Available colours"
             >
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+              <p className="text-center text-xs font-bold uppercase tracking-[0.18em] text-primary">
                 Choose your colour
               </p>
-              <h2 className="mt-2 text-xl font-black tracking-tight">
+              <h2 className="mt-2 text-center text-xl font-black tracking-tight">
                 See the available options before you order.
               </h2>
               <div className="mt-4 grid gap-3">
@@ -855,7 +888,7 @@ function FunnelPage() {
               className="mb-5 rounded-3xl border border-border bg-background p-4 sm:p-5"
               aria-label="Customer reviews"
             >
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+              <p className="text-center text-xs font-bold uppercase tracking-[0.16em] text-primary">
                 What customers say
               </p>
               <img
@@ -867,7 +900,7 @@ function FunnelPage() {
                 decoding="async"
                 className="mt-4 aspect-[4/3] w-full rounded-2xl object-contain"
               />
-              <h2 className="mt-4 text-xl font-black tracking-tight">
+              <h2 className="mt-4 text-center text-xl font-black tracking-tight">
                 Real feedback belongs to real deliveries.
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -881,10 +914,10 @@ function FunnelPage() {
               </p>
             </section>
           ) : null}
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <p className="text-center text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             Your offer
           </p>
-          <h2 className="mt-2 text-xl font-black">{product.name}</h2>
+          <h2 className="mt-2 text-center text-xl font-black">{product.name}</h2>
           {productVariants.length > 0 ? (
             <div className="mt-5 space-y-2">
               <p className="text-sm font-semibold">Your selected colours</p>
@@ -918,7 +951,7 @@ function FunnelPage() {
             onSubmit={handleFirstPageCheckout}
           >
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+              <p className="text-center text-xs font-bold uppercase tracking-[0.16em] text-primary">
                 Finish your order below
               </p>
               <p className="mt-1 text-xs leading-5 text-muted-foreground">

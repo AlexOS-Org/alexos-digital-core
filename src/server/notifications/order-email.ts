@@ -138,6 +138,8 @@ async function createOrderPdf(input: OrderNotificationInput) {
   const pageWidth = 595;
   const left = 42;
   const right = 553;
+  const centerTextX = (text: string, size: number, font = regular) =>
+    (pageWidth - font.widthOfTextAtSize(text, size)) / 2;
   let cursor = 804;
 
   page.drawRectangle({ x: 0, y: 734, width: pageWidth, height: 108, color: navy });
@@ -160,9 +162,16 @@ async function createOrderPdf(input: OrderNotificationInput) {
     font: regular,
     color: rgb(0.82, 0.9, 0.92),
   });
-  page.drawText("ORDER CONFIRMATION", { x: 360, y: 783, size: 16, font: bold, color: white });
+  const headerTitle = "ORDER CONFIRMATION";
+  page.drawText(headerTitle, {
+    x: centerTextX(headerTitle, 16, bold),
+    y: 783,
+    size: 16,
+    font: bold,
+    color: white,
+  });
   page.drawText(input.orderNumber, {
-    x: 360,
+    x: centerTextX(input.orderNumber, 9),
     y: 762,
     size: 9,
     font: regular,
@@ -170,21 +179,36 @@ async function createOrderPdf(input: OrderNotificationInput) {
   });
 
   cursor = 704;
-  page.drawText("Thank you for your order", {
-    x: left,
+  const confirmationTitle = "Thank you for your order";
+  page.drawText(confirmationTitle, {
+    x: centerTextX(confirmationTitle, 18, bold),
     y: cursor,
     size: 18,
     font: bold,
     color: ink,
   });
-  page.drawText(`Hello ${input.customerName || "Customer"}, your order has been received.`, {
-    x: left,
+  const greeting = `Hello ${input.customerName || "Customer"}, your order has been received.`;
+  page.drawText(greeting, {
+    x: centerTextX(greeting, 10),
     y: cursor - 22,
     size: 10,
     font: regular,
     color: muted,
   });
-  cursor -= 54;
+  const isYjOrder = input.items.some((item) => /YJ Baby|school backpack/i.test(item.name));
+  if (isYjOrder) {
+    const yjHeadline =
+      "Stop the morning scramble. Give your child’s school essentials one reliable place.";
+    page.drawText(yjHeadline, {
+      x: centerTextX(yjHeadline, 8.5),
+      y: cursor - 38,
+      size: 8.5,
+      font: bold,
+      color: teal,
+      maxWidth: 511,
+    });
+  }
+  cursor -= isYjOrder ? 70 : 54;
 
   const firstImage = input.items.find((item) => item.imageUrl)?.imageUrl;
   if (firstImage) {
@@ -211,8 +235,9 @@ async function createOrderPdf(input: OrderNotificationInput) {
     }
   }
 
-  page.drawText("Customer and delivery details", {
-    x: left,
+  const customerHeading = "Customer and delivery details";
+  page.drawText(customerHeading, {
+    x: centerTextX(customerHeading, 11, bold),
     y: cursor,
     size: 11,
     font: bold,
@@ -345,8 +370,9 @@ async function createOrderPdf(input: OrderNotificationInput) {
     borderColor: line,
     borderWidth: 1,
   });
-  page.drawText(paymentLines[0] || "Payment instructions", {
-    x: 56,
+  const paymentHeading = paymentLines[0] || "Payment instructions";
+  page.drawText(paymentHeading, {
+    x: centerTextX(paymentHeading, 9, bold),
     y: cursor - 26,
     size: 9,
     font: bold,
