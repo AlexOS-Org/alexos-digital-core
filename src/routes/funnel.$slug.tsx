@@ -27,19 +27,25 @@ import {
   yjColourImage,
 } from "@/lib/storefront/yj-colours";
 
-const YJ_HERO_IMAGE = "/assets/yj-baby-three-colour-card.png";
+const YJ_HERO_IMAGE = "/assets/yj-baby-three-colour-card.webp";
 const YJ_BENEFIT_IMAGES = [
-  "/assets/yj-feature-card-01-top-repaired.png",
-  "/assets/yj-feature-card-02-top-repaired.png",
-  "/assets/yj-baby-waterproof-card.png",
-  "/assets/yj-baby-three-colour-card.png",
+  "/assets/yj-feature-card-01-top-repaired.webp",
+  "/assets/yj-feature-card-02-top-repaired.webp",
+  "/assets/yj-baby-waterproof-card.webp",
+  "/assets/yj-baby-three-colour-card.webp",
 ] as const;
 const YJ_DETAIL_IMAGES = [
-  ["/assets/yj-baby-waterproof-fabric-detail.png", "Water droplets on YJ Baby Oxford fabric"],
-  ["/assets/yj-baby-zipper-detail.png", "Close-up of YJ Baby backpack zipper pulls"],
-  ["/assets/yj-baby-adjustable-straps-detail.png", "Close-up of YJ Baby adjustable shoulder strap"],
-  ["/assets/yj-baby-cushioned-back-detail.png", "YJ Baby backpack cushioned back panel"],
-  ["/assets/yj-baby-reinforced-bottom-detail.png", "YJ Baby backpack reinforced protective bottom"],
+  ["/assets/yj-baby-waterproof-fabric-detail.webp", "Water droplets on YJ Baby Oxford fabric"],
+  ["/assets/yj-baby-zipper-detail.webp", "Close-up of YJ Baby backpack zipper pulls"],
+  [
+    "/assets/yj-baby-adjustable-straps-detail.webp",
+    "Close-up of YJ Baby adjustable shoulder strap",
+  ],
+  ["/assets/yj-baby-cushioned-back-detail.webp", "YJ Baby backpack cushioned back panel"],
+  [
+    "/assets/yj-baby-reinforced-bottom-detail.webp",
+    "YJ Baby backpack reinforced protective bottom",
+  ],
 ] as const;
 
 interface FunnelSearch {
@@ -492,8 +498,8 @@ function FunnelPage() {
               {visibleBenefits.map((benefit, index) => {
                 const benefitSummaryImages = isYjBag
                   ? [
-                      "/assets/yj-feature-card-01-top-repaired.png",
-                      "/assets/yj-feature-card-02-top-repaired.png",
+                      "/assets/yj-feature-card-01-top-repaired.webp",
+                      "/assets/yj-feature-card-02-top-repaired.webp",
                       "/assets/yj-feature-card-03-clean.webp",
                       "/assets/yj-feature-card-04-clean.webp",
                     ]
@@ -527,7 +533,7 @@ function FunnelPage() {
                     {isYjBag && index === 0 ? (
                       <div className="sm:col-span-2 rounded-2xl border border-border bg-background p-2">
                         <img
-                          src="/assets/yj-baby-interior-one-piece-combined.png"
+                          src="/assets/yj-baby-interior-one-piece-combined.webp"
                           alt="YJ Baby backpack interior compartments and one-piece open design"
                           width={2560}
                           height={1440}
@@ -540,7 +546,7 @@ function FunnelPage() {
                     {isYjBag && index === 1 ? (
                       <div className="sm:col-span-2 rounded-2xl border border-border bg-background p-2">
                         <img
-                          src="/assets/yj-baby-rain-red-pink-lifestyle.png"
+                          src="/assets/yj-baby-rain-red-pink-lifestyle.webp"
                           alt="Child carrying a red YJ Baby backpack and a woman carrying the navy backpack with pink trim in light rain"
                           width={2560}
                           height={1440}
