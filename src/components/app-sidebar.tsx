@@ -32,9 +32,10 @@ const BUSINESS_GROUP = "Businesses" as const;
 const MoneyCenterIcon = MONEY_CENTER_SECTIONS[0].icon;
 
 export function AppSidebar() {
-  const { state, setOpenMobile } = useSidebar();
+  const { isMobile, state, setOpenMobile } = useSidebar();
   const [hoverExpanded, setHoverExpanded] = useState(false);
-  const collapsed = state === "collapsed" && !hoverExpanded;
+  // Mobile needs the full labelled module list; desktop may use the icon-collapsed state.
+  const collapsed = !isMobile && state === "collapsed" && !hoverExpanded;
   const [businessesOpen, setBusinessesOpen] = useState(true);
   const [moneyCenterOpen, setMoneyCenterOpen] = useState(true);
 

@@ -37,6 +37,7 @@ const requiredShellGuards = [
   ["src/components/ui/sidebar.tsx", /overflow-y-auto/],
   ["src/components/ui/sidebar.tsx", /min-h-0/],
   ["src/components/app-sidebar.tsx", /isMoneyCenterRoute/],
+  ["src/components/app-sidebar.tsx", /!isMobile && state === "collapsed"/],
   ["src/routes/shop.products.tsx", /max-w-\[min\(78vw,24rem\)\]/],
   ["src/components/storefront/ProductCard.tsx", /Order now/],
 ];
