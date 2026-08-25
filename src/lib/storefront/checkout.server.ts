@@ -204,14 +204,44 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
   const { data: createdItems } = createdOrder
     ? await supabaseAdmin
         .from("dg_order_items")
-        .select("name,sku,quantity,total")
+        .select("name,sku,quantity,total,product_id,variant_id")
         .eq("order_id", createdOrder.id)
     : { data: null };
+  const notificationItems = createdItems
+    ? await (async () => {
+        const productIds = createdItems.map((item) => item.product_id).filter(Boolean) as string[];
+        const variantIds = createdItems.map((item) => item.variant_id).filter(Boolean) as string[];
+        const [{ data: products }, { data: variants }] = await Promise.all([
+          productIds.length
+            ? supabaseAdmin.from("dg_products").select("id,images").in("id", productIds)
+            : Promise.resolve({ data: [] }),
+          variantIds.length
+            ? supabaseAdmin.from("dg_product_variants").select("id,image_url").in("id", variantIds)
+            : Promise.resolve({ data: [] }),
+        ]);
+        const productImages = new Map(
+          (products ?? []).map((product) => [product.id, product.images?.[0] ?? null]),
+        );
+        const variantImages = new Map(
+          (variants ?? []).map((variant) => [variant.id, variant.image_url ?? null]),
+        );
+        return createdItems.map((item) => ({
+          name: item.name,
+          sku: item.sku,
+          quantity: Number(item.quantity ?? 0),
+          lineTotal: Number(item.total ?? 0),
+          imageUrl:
+            (item.variant_id ? variantImages.get(item.variant_id) : null) ??
+            (item.product_id ? productImages.get(item.product_id) : null),
+        }));
+      })()
+    : null;
   try {
     const { sendOrderNotifications } = await import("@/server/notifications/order-email");
     const notification = await sendOrderNotifications({
       orderNumber: result.orderNumber,
       total: Number(result.total ?? 0),
+      shippingFee: Number(result.shippingFee ?? 0),
       currency: typeof result.currency === "string" ? result.currency : "KES",
       paymentMethod: input.paymentMethod,
       customerName: [input.firstName, input.lastName].filter(Boolean).join(" "),
@@ -223,17 +253,13 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
       deliveryDetails: input.deliveryDetails ?? null,
       ownerEmail: storefront?.support_email ?? null,
       items:
-        createdItems?.map((item) => ({
-          name: item.name,
-          sku: item.sku,
-          quantity: Number(item.quantity ?? 0),
-          lineTotal: Number(item.total ?? 0),
-        })) ??
+        notificationItems ??
         input.items.map((item) => ({
           name: item.productId,
           sku: item.variantId ?? null,
           quantity: item.quantity,
           lineTotal: 0,
+          imageUrl: null,
         })),
     });
     if (!notification.sent)
