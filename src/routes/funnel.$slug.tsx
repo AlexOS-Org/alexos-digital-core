@@ -29,8 +29,8 @@ import {
 
 const YJ_HERO_IMAGE = "/assets/yj-baby-three-colour-card.png";
 const YJ_BENEFIT_IMAGES = [
-  "/assets/yj-feature-card-01-repaired-with-wording.png",
-  "/assets/yj-feature-card-02-repaired-with-wording.png",
+  "/assets/yj-feature-card-01-top-repaired.png",
+  "/assets/yj-feature-card-02-top-repaired.png",
   "/assets/yj-baby-waterproof-card.png",
   "/assets/yj-baby-three-colour-card.png",
 ] as const;
@@ -437,22 +437,6 @@ function FunnelPage() {
             {effectiveLandingCopy?.headline ?? product.name}
           </h1>
           {isYjBag ? (
-            <>
-              <p className="mt-4 max-w-3xl text-sm leading-7 text-muted-foreground sm:text-base">
-                Choose an available colour, tell us where to deliver, and use the same secure
-                checkout flow to complete your order.
-              </p>
-              <Button
-                type="button"
-                onClick={focusOrderForm}
-                className="mt-5 rounded-xl bg-foreground px-6 text-background hover:bg-foreground/90"
-                aria-controls="yj-order-form"
-              >
-                Order Now <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </>
-          ) : null}
-          {isYjBag ? (
             <div className="mt-8 w-full max-w-5xl overflow-hidden rounded-3xl border border-border bg-card p-2 shadow-sm sm:p-3">
               <img
                 src="/assets/yj-baby-hero-classroom.webp"
@@ -478,6 +462,18 @@ function FunnelPage() {
               </div>
             ))}
           </div>
+          <div className="mt-5 flex justify-center">
+            {isYjBag ? (
+              <Button
+                type="button"
+                onClick={focusOrderForm}
+                className="rounded-xl bg-foreground px-7 text-background hover:bg-foreground/90"
+                aria-controls="yj-order-form"
+              >
+                Order Now <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : null}
+          </div>
           <div className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
               Why it fits your day
@@ -495,8 +491,8 @@ function FunnelPage() {
               {visibleBenefits.map((benefit, index) => {
                 const benefitSummaryImages = isYjBag
                   ? [
-                      "/assets/yj-feature-card-01-clean.webp",
-                      "/assets/yj-feature-card-02-clean.webp",
+                      "/assets/yj-feature-card-01-top-repaired.png",
+                      "/assets/yj-feature-card-02-top-repaired.png",
                       "/assets/yj-feature-card-03-clean.webp",
                       "/assets/yj-feature-card-04-clean.webp",
                     ]

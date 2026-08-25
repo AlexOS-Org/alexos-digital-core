@@ -9,3 +9,7 @@ The page HTML and screenshot were saved by the browser session for audit purpose
 ## Local preview limitation
 
 A local Vite dev preview could not start because the Cloudflare Vite plugin attempted to create a remote edge-preview session and the current token returned Cloudflare error 10000. The production build and TypeScript checks passed; a local interactive browser capture of the new code therefore remains pending until the existing Cloudflare authentication issue is resolved. This does not change the live-site evidence above.
+
+## Post-merge live verification
+
+After main merged at commit `799cf5b`, the public page was reloaded and still rendered the old `Continue to secure checkout` CTA. The expected new `Order Now` marker was not present in the browser-visible controls. A direct read-only Cloudflare API request to the canonical Worker versions endpoint returned HTTP 403 with Cloudflare error 10000, confirming that the current environment token cannot verify or mutate Worker version state. No manual production deployment was attempted with that token.
