@@ -1,4 +1,5 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import QRCode from "qrcode";
 import dailyGearLogo from "@/assets/branding/dailygear-logo.jpg";
 
 export interface OrderNotificationInput {
@@ -83,6 +84,30 @@ function paymentInstructions(input: OrderNotificationInput) {
   ];
 }
 
+async function createMpesaQr(input: OrderNotificationInput) {
+  if (input.paymentMethod !== "mpesa") return null;
+  const paybill = requiredEnv("DAILYGEAR_MPESA_PAYBILL") || "542542";
+  const account = requiredEnv("DAILYGEAR_MPESA_ACCOUNT") || "184545";
+  const payload = [
+    "DailyGear M-Pesa payment instructions",
+    `Paybill: ${paybill}`,
+    `Account: ${account}`,
+    `Amount: ${money(input.currency, input.total)}`,
+    `Order: ${input.orderNumber}`,
+    "This QR opens payment instructions; it does not trigger an STK Push.",
+  ].join("\\n");
+  const dataUrl = await QRCode.toDataURL(payload, {
+    errorCorrectionLevel: "M",
+    margin: 1,
+    width: 220,
+    color: { dark: "#07152f", light: "#ffffff" },
+  });
+  const encoded = dataUrl.split(",", 2)[1];
+  if (!encoded) return null;
+  const binary = atob(encoded);
+  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
+}
+
 async function fetchBytes(url: string) {
   try {
     const resolved = url.startsWith("/") ? new URL(url, "https://dailygear.co.ke").toString() : url;
@@ -100,6 +125,7 @@ async function fetchBytes(url: string) {
 async function createOrderPdf(input: OrderNotificationInput) {
   const pdf = await PDFDocument.create();
   const page = pdf.addPage([595, 842]);
+  const mpesaQrBytes = await createMpesaQr(input);
   const regular = await pdf.embedFont(StandardFonts.Helvetica);
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
   const navy = rgb(0.04, 0.08, 0.18);
@@ -112,9 +138,9 @@ async function createOrderPdf(input: OrderNotificationInput) {
   const pageWidth = 595;
   const left = 42;
   const right = 553;
-  let cursor = 800;
+  let cursor = 804;
 
-  page.drawRectangle({ x: 0, y: 726, width: pageWidth, height: 116, color: navy });
+  page.drawRectangle({ x: 0, y: 734, width: pageWidth, height: 108, color: navy });
   const logoResult = await fetchBytes(dailyGearLogo);
   if (logoResult?.contentType.includes("jpeg") || logoResult?.contentType.includes("jpg")) {
     try {
@@ -143,11 +169,11 @@ async function createOrderPdf(input: OrderNotificationInput) {
     color: rgb(0.82, 0.9, 0.92),
   });
 
-  cursor = 690;
+  cursor = 704;
   page.drawText("Thank you for your order", {
     x: left,
     y: cursor,
-    size: 20,
+    size: 18,
     font: bold,
     color: ink,
   });
@@ -158,7 +184,7 @@ async function createOrderPdf(input: OrderNotificationInput) {
     font: regular,
     color: muted,
   });
-  cursor -= 66;
+  cursor -= 54;
 
   const firstImage = input.items.find((item) => item.imageUrl)?.imageUrl;
   if (firstImage) {
@@ -230,7 +256,7 @@ async function createOrderPdf(input: OrderNotificationInput) {
       color: muted,
       maxWidth: 285,
     });
-  cursor -= 125;
+  cursor -= 105;
 
   page.drawRectangle({ x: left, y: cursor - 22, width: 511, height: 28, color: pale });
   page.drawText("ITEM", { x: 52, y: cursor - 12, size: 8, font: bold, color: muted });
@@ -309,36 +335,52 @@ async function createOrderPdf(input: OrderNotificationInput) {
   }
 
   const paymentLines = paymentInstructions(input);
+  const paymentBoxHeight = input.paymentMethod === "mpesa" && mpesaQrBytes ? 104 : 78;
   page.drawRectangle({
     x: left,
-    y: cursor - 98,
+    y: cursor - paymentBoxHeight - 10,
     width: 511,
-    height: 88,
+    height: paymentBoxHeight,
     color: pale,
     borderColor: line,
     borderWidth: 1,
   });
   page.drawText(paymentLines[0] || "Payment instructions", {
     x: 56,
-    y: cursor - 28,
-    size: 10,
+    y: cursor - 26,
+    size: 9,
     font: bold,
     color: ink,
   });
   paymentLines.slice(1).forEach((text, index) => {
     page.drawText(text, {
       x: 56,
-      y: cursor - 47 - index * 16,
-      size: 8,
+      y: cursor - 44 - index * 15,
+      size: 7.5,
       font: regular,
       color: index === 0 && input.paymentMethod === "mpesa" ? teal : muted,
-      maxWidth: 475,
+      maxWidth: mpesaQrBytes ? 360 : 475,
     });
   });
-  cursor -= 126;
+  if (mpesaQrBytes) {
+    try {
+      const qr = await pdf.embedPng(mpesaQrBytes);
+      page.drawImage(qr, { x: 466, y: cursor - 86, width: 70, height: 70 });
+      page.drawText("Scan for details", {
+        x: 464,
+        y: cursor - 96,
+        size: 6.5,
+        font: regular,
+        color: muted,
+      });
+    } catch {
+      // Keep the payment text when QR embedding is unavailable.
+    }
+  }
+  cursor -= paymentBoxHeight + 28;
   page.drawText(
     "This document confirms the order details. It is not proof of payment unless payment is separately confirmed.",
-    { x: left, y: cursor, size: 8, font: bold, color: muted, maxWidth: 511 },
+    { x: left, y: cursor, size: 7.5, font: bold, color: muted, maxWidth: 511 },
   );
   page.drawText("Thank you for choosing DailyGear.", {
     x: left,
