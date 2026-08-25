@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, CheckCircle2, ShieldCheck } from "lucide-react";
+import { ArrowRight, CheckCircle2, Mail, MessageCircle, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DailyGearBrand } from "@/components/dailygear/DailyGearBrand";
 import { loadPublicFunnel } from "@/lib/storefront/funnel.functions";
 import type {
   PublicFunnel,
@@ -12,6 +13,8 @@ import type {
 import { cartStore } from "@/lib/storefront/cart";
 import { useStorefront } from "@/lib/storefront/api";
 import { trackMetaPixel, useMetaPixel } from "@/lib/storefront/meta-pixel";
+import { trackGoogleAnalytics } from "@/lib/storefront/google-analytics";
+import { DAILYGEAR_SOCIAL_LINKS, whatsappHref } from "@/lib/storefront/social-links";
 
 interface ConfirmationSnapshot {
   customerName: string | null;
@@ -122,6 +125,11 @@ function ThankYou() {
   const activeOfferProduct = activeOfferStep
     ? (funnel?.offerProducts.find((product) => product.id === activeOfferStep.productId) ?? null)
     : null;
+  const nearbyDeliveryArea = new Set(["nairobi", "kiambu", "kajiado"]).has(
+    confirmation?.shippingCounty?.trim().toLowerCase() ?? "",
+  );
+  const whatsapp = whatsappHref(store?.whatsapp);
+  const supportEmail = store?.support_email?.trim() || null;
 
   useEffect(() => {
     setOfferIndex(0);
@@ -145,6 +153,21 @@ function ThankYou() {
       num_items: contentIds ? contentIds.split(",").filter(Boolean).length : undefined,
       value,
     });
+    const gaEventKey = `dailygear:ga-purchase-tracked:${order}`;
+    if (window.sessionStorage.getItem(gaEventKey) !== "1") {
+      trackGoogleAnalytics("purchase", {
+        transaction_id: order,
+        currency,
+        value,
+        items: contentIds
+          ? contentIds
+              .split(",")
+              .filter(Boolean)
+              .map((itemId) => ({ item_id: itemId }))
+          : undefined,
+      });
+      window.sessionStorage.setItem(gaEventKey, "1");
+    }
     window.sessionStorage.setItem(eventKey, "1");
   }, [contentIds, currency, order, store?.meta_pixel_id, value]);
 
@@ -169,8 +192,11 @@ function ThankYou() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-14 sm:py-20">
-      <div className="text-center">
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:py-12">
+      <div className="flex justify-center">
+        <DailyGearBrand />
+      </div>
+      <div className="mt-10 text-center">
         <CheckCircle2 className="mx-auto h-12 w-12 text-primary" />
         <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-primary">
           DailyGear order received
@@ -235,15 +261,111 @@ function ThankYou() {
           </div>
           {confirmation.paymentInstructions ? (
             <div className="rounded-2xl border border-primary/20 bg-primary/[0.05] p-4 text-sm">
-              <p className="font-bold">Pay before dispatch</p>
+              <p className="font-bold">Complete M-Pesa payment before dispatch</p>
               <p className="mt-1 text-muted-foreground">
                 Pay KES {confirmation.paymentInstructions.amount.toLocaleString()} via M-Pesa
                 Paybill {confirmation.paymentInstructions.paybill}, account{" "}
                 {confirmation.paymentInstructions.account}. Use your order number as an optional
                 reference and keep the confirmation message.
               </p>
+              <p className="mt-2 text-muted-foreground">
+                Online payment helps us prioritise dispatch. Any free-delivery or approved saving is
+                shown in the order total before placement; no extra discount is added here.
+              </p>
+            </div>
+          ) : confirmation.paymentMethod.toLowerCase().includes("cod") ? (
+            <div className="rounded-2xl border border-primary/20 bg-primary/[0.05] p-4 text-sm">
+              <p className="font-bold">Cash on delivery</p>
+              <p className="mt-1 text-muted-foreground">
+                {nearbyDeliveryArea
+                  ? "For Nairobi, Kiambu, Kajiado and nearby delivery routes, pay when your order arrives. Keep your phone available so the delivery team can confirm the route."
+                  : "Cash on delivery is intended for Nairobi and its environs. For delivery outside that area, contact us first so the team can confirm the route and whether the KES 350 upfront dispatch payment applies."}
+              </p>
+              {!nearbyDeliveryArea ? (
+                <p className="mt-2 text-muted-foreground">
+                  Do not send an upfront payment until DailyGear confirms your order. If confirmed,
+                  use M-Pesa Paybill <strong className="text-foreground">542542</strong>, account{" "}
+                  <strong className="text-foreground">184545</strong>, and send the M-Pesa code with
+                  your customer name and order number.
+                </p>
+              ) : null}
             </div>
           ) : null}
+        </section>
+      ) : null}
+
+      {confirmation ? (
+        <section className="mt-8 rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+            Need help or want to confirm payment?
+          </p>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Send your order number, customer name, and payment question through an official
+            DailyGear channel. Do not share card details or your full payment credentials in a
+            public post.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <a
+              href={whatsapp}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+            >
+              <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp 0722658824
+            </a>
+            {supportEmail ? (
+              <a
+                href={`mailto:${supportEmail}`}
+                className="inline-flex items-center rounded-xl border px-4 py-2 text-sm font-semibold"
+              >
+                <Mail className="mr-2 h-4 w-4" /> Email support
+              </a>
+            ) : null}
+            <a
+              href={DAILYGEAR_SOCIAL_LINKS.facebook.href}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center rounded-xl border px-4 py-2 text-sm font-semibold"
+            >
+              Facebook
+            </a>
+          </div>
+        </section>
+      ) : null}
+
+      {confirmation ? (
+        <section className="mt-8 rounded-3xl border bg-muted/20 p-5 sm:p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+            You may also like
+          </p>
+          <h2 className="mt-1 text-xl font-black">Shop more from DailyGear</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Browse the live catalogue for kids' school shoes, ladies' products, boys' products, and
+            other available items.
+          </p>
+          <div className="mt-4 grid gap-2 sm:grid-cols-3">
+            <Link
+              to="/shop/products"
+              search={{ q: "school shoes" }}
+              className="rounded-xl border bg-card px-3 py-3 text-sm font-semibold hover:border-primary"
+            >
+              Kids' school shoes
+            </Link>
+            <Link
+              to="/shop/products"
+              search={{ q: "ladies" }}
+              className="rounded-xl border bg-card px-3 py-3 text-sm font-semibold hover:border-primary"
+            >
+              Ladies' products
+            </Link>
+            <Link
+              to="/shop/products"
+              search={{ q: "boys" }}
+              className="rounded-xl border bg-card px-3 py-3 text-sm font-semibold hover:border-primary"
+            >
+              Boys' products
+            </Link>
+          </div>
         </section>
       ) : null}
 

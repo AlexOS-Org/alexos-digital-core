@@ -1,7 +1,7 @@
 const SCRIPT_ID = "dailygear-google-analytics-script";
 const DEFAULT_MEASUREMENT_ID = "";
 
-type AnalyticsParams = Record<string, string | number | boolean | undefined>;
+type AnalyticsParams = Record<string, unknown>;
 type Gtag = (command: string, action: string, params?: AnalyticsParams) => void;
 
 declare global {
