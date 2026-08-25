@@ -108,6 +108,7 @@ function FunnelPage() {
   const [variantQuantities, setVariantQuantities] = useState<Record<string, number>>({});
   const [profileLoaded, setProfileLoaded] = useState(false);
   const viewContentTrackedRef = useRef<string | null>(null);
+  const orderFormRef = useRef<HTMLFormElement>(null);
   const [customer, setCustomer] = useState({
     firstName: "",
     lastName: "",
@@ -326,6 +327,19 @@ function FunnelPage() {
     return Array.from(new Set(candidates));
   }, [isYjBag, product?.images, productVariants]);
 
+  function focusOrderForm() {
+    trackGoogleAnalytics("select_promotion", {
+      promotion_id: funnel?.slug,
+      promotion_name: "YJ Baby Order Now CTA",
+      creative_name: "first-page-cta",
+    });
+    orderFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.setTimeout(
+      () => orderFormRef.current?.querySelector<HTMLInputElement>("input")?.focus(),
+      350,
+    );
+  }
+
   function addToCheckout() {
     if (!funnel || !product || !hasSelection) return;
     const selectedContents: Array<{ id: string; quantity: number }> = [];
@@ -358,6 +372,14 @@ function FunnelPage() {
       contents: selectedContents,
       currency: product.currency,
       value: selectedTotal,
+    });
+    trackGoogleAnalytics("begin_checkout", {
+      currency: product.currency,
+      value: selectedTotal,
+      items: selectedContents.map((content) => ({
+        item_id: content.id,
+        quantity: content.quantity,
+      })),
     });
     navigate({ to: "/shop/checkout", search: { funnel: funnel.slug } });
   }
@@ -414,6 +436,22 @@ function FunnelPage() {
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl">
             {effectiveLandingCopy?.headline ?? product.name}
           </h1>
+          {isYjBag ? (
+            <>
+              <p className="mt-4 max-w-3xl text-sm leading-7 text-muted-foreground sm:text-base">
+                Choose an available colour, tell us where to deliver, and use the same secure
+                checkout flow to complete your order.
+              </p>
+              <Button
+                type="button"
+                onClick={focusOrderForm}
+                className="mt-5 rounded-xl bg-foreground px-6 text-background hover:bg-foreground/90"
+                aria-controls="yj-order-form"
+              >
+                Order Now <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </>
+          ) : null}
           {isYjBag ? (
             <div className="mt-8 w-full max-w-5xl overflow-hidden rounded-3xl border border-border bg-card p-2 shadow-sm sm:p-3">
               <img
@@ -878,7 +916,9 @@ function FunnelPage() {
             </span>
           </div>
           <form
-            className="mt-6 space-y-4 border-t border-border pt-5"
+            id="yj-order-form"
+            ref={orderFormRef}
+            className="mt-6 scroll-mt-6 space-y-4 border-t border-border pt-5"
             onSubmit={handleFirstPageCheckout}
           >
             <div>
@@ -978,7 +1018,7 @@ function FunnelPage() {
               {outOfStock
                 ? "Currently unavailable"
                 : hasSelection
-                  ? "Continue to secure checkout"
+                  ? "Order Now"
                   : "Choose a colour to get started"}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
