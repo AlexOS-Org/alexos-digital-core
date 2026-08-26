@@ -200,7 +200,7 @@ function ProductsPage() {
       {!isLoading && filtered.length > 0 && (
         <Card className="overflow-hidden rounded-2xl">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="min-w-[760px] w-full text-sm">
               <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">Product</th>

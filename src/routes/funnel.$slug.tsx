@@ -564,7 +564,14 @@ function FunnelPage() {
 
           <section className="mt-8 space-y-6" aria-label="Product benefits and images">
             {visibleBenefits.map((benefit, index) => {
-              const benefitImageUrls = isYjBag ? YJ_BENEFIT_IMAGES : galleryImages;
+              const benefitImageUrls = isYjBag
+                ? [
+                    "/assets/yj-baby-feature-compartments.webp",
+                    "/assets/yj-baby-feature-comfort-straps.webp",
+                    "/assets/yj-baby-feature-water-resistant.webp",
+                    "/assets/yj-baby-feature-one-piece.webp",
+                  ]
+                : galleryImages;
               const image = benefitImageUrls[index % Math.max(benefitImageUrls.length, 1)];
               return (
                 <article
