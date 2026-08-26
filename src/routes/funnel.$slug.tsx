@@ -566,9 +566,9 @@ function FunnelPage() {
             {visibleBenefits.map((benefit, index) => {
               const benefitImageUrls = isYjBag
                 ? [
-                    "/assets/yj-baby-feature-compartments.webp",
-                    "/assets/yj-baby-feature-comfort-straps.webp",
-                    "/assets/yj-baby-feature-water-resistant.webp",
+                    "/assets/yj-baby-card-child-storage-pink-trim.webp",
+                    "/assets/yj-baby-card-child-comfort-green.webp",
+                    "/assets/yj-baby-card-child-rain-red.webp",
                     "/assets/yj-baby-feature-one-piece.webp",
                   ]
                 : galleryImages;
@@ -761,26 +761,60 @@ function FunnelPage() {
                 before continuing.
               </p>
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-border bg-card p-4">
-                  <p className="font-semibold">Will it hold the essentials?</p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    The spacious interior, zipped compartments, organiser pockets, and side pockets
-                    help give books, stationery, bottles, and personal items a clear place.
-                  </p>
+                <div className="overflow-hidden rounded-2xl border border-border bg-card">
+                  <img
+                    src="/assets/yj-baby-card-child-storage-pink-trim.webp"
+                    alt="Child organising books in the navy YJ Baby backpack with pink trim"
+                    width={1664}
+                    height={2080}
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-[4/3] w-full object-cover"
+                  />
+                  <div className="p-4">
+                    <p className="font-semibold">Will it hold the essentials?</p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      The spacious interior, zipped compartments, organiser pockets, and side
+                      pockets help give books, stationery, bottles, and personal items a clear
+                      place.
+                    </p>
+                  </div>
                 </div>
-                <div className="rounded-2xl border border-border bg-card p-4">
-                  <p className="font-semibold">What if the weather changes?</p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Waterproof Oxford fabric helps protect school supplies from unexpected rain,
-                    dampness, and spills.
-                  </p>
+                <div className="overflow-hidden rounded-2xl border border-border bg-card">
+                  <img
+                    src="/assets/yj-baby-card-child-rain-red.webp"
+                    alt="Child carrying the red YJ Baby backpack beside a parent in light rain"
+                    width={1664}
+                    height={2080}
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-[4/3] w-full object-cover"
+                  />
+                  <div className="p-4">
+                    <p className="font-semibold">What if the weather changes?</p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      Waterproof Oxford fabric helps protect school supplies from unexpected rain,
+                      dampness, and spills.
+                    </p>
+                  </div>
                 </div>
-                <div className="rounded-2xl border border-border bg-card p-4">
-                  <p className="font-semibold">What happens after I order?</p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Review your delivery details and payment method at checkout. Payment is not
-                    treated as settled until confirmed by DailyGear.
-                  </p>
+                <div className="overflow-hidden rounded-2xl border border-border bg-card">
+                  <img
+                    src="/assets/yj-baby-card-child-comfort-green.webp"
+                    alt="Child comfortably carrying the green YJ Baby backpack on the way to school"
+                    width={1664}
+                    height={2080}
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-[4/3] w-full object-cover"
+                  />
+                  <div className="p-4">
+                    <p className="font-semibold">What happens after I order?</p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      Review your delivery details and payment method at checkout. Payment is not
+                      treated as settled until confirmed by DailyGear.
+                    </p>
+                  </div>
                 </div>
                 <div className="rounded-2xl border border-border bg-card p-4">
                   <p className="font-semibold">What if I need support?</p>
