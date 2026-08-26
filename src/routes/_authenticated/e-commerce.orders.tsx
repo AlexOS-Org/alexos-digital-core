@@ -254,7 +254,7 @@ function OrdersPage() {
       {!showTrash && !isLoading && filtered.length > 0 && (
         <Card className="rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="min-w-[1120px] w-full text-sm">
               <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">Order #</th>
@@ -409,7 +409,7 @@ function OrdersPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="min-w-[1120px] w-full text-sm">
                 <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
                   <tr>
                     <th className="px-4 py-3 font-medium">Order #</th>
