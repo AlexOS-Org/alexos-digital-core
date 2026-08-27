@@ -27,23 +27,26 @@ import {
   yjColourImage,
 } from "@/lib/storefront/yj-colours";
 
-const YJ_HERO_IMAGE = "/assets/yj-baby-three-colour-card.webp";
+const YJ_HERO_IMAGE = "/assets/yj-baby-three-colour-card-tinified.webp";
 const YJ_BENEFIT_IMAGES = [
-  "/assets/yj-feature-card-01-top-repaired.webp",
-  "/assets/yj-feature-card-02-top-repaired.webp",
-  "/assets/yj-baby-waterproof-card.webp",
-  "/assets/yj-baby-three-colour-card.webp",
+  "/assets/yj-feature-card-01-top-repaired-tinified.webp",
+  "/assets/yj-feature-card-02-top-repaired-tinified.webp",
+  "/assets/yj-baby-waterproof-card-tinified.webp",
+  "/assets/yj-baby-three-colour-card-tinified.webp",
 ] as const;
 const YJ_DETAIL_IMAGES = [
-  ["/assets/yj-baby-waterproof-fabric-detail.webp", "Water droplets on YJ Baby Oxford fabric"],
-  ["/assets/yj-baby-zipper-detail.webp", "Close-up of YJ Baby backpack zipper pulls"],
   [
-    "/assets/yj-baby-adjustable-straps-detail.webp",
+    "/assets/yj-baby-waterproof-fabric-detail-tinified.webp",
+    "Water droplets on YJ Baby Oxford fabric",
+  ],
+  ["/assets/yj-baby-zipper-detail-tinified.webp", "Close-up of YJ Baby backpack zipper pulls"],
+  [
+    "/assets/yj-baby-adjustable-straps-detail-tinified.webp",
     "Close-up of YJ Baby adjustable shoulder strap",
   ],
-  ["/assets/yj-baby-cushioned-back-detail.webp", "YJ Baby backpack cushioned back panel"],
+  ["/assets/yj-baby-cushioned-back-detail-tinified.webp", "YJ Baby backpack cushioned back panel"],
   [
-    "/assets/yj-baby-reinforced-bottom-detail.webp",
+    "/assets/yj-baby-reinforced-bottom-detail-tinified.webp",
     "YJ Baby backpack reinforced protective bottom",
   ],
 ] as const;
@@ -447,7 +450,7 @@ function FunnelPage() {
             <>
               <div className="mt-8 w-full max-w-5xl overflow-hidden rounded-3xl border border-border bg-card p-2 shadow-sm sm:p-3">
                 <img
-                  src="/assets/yj-baby-hero-classroom.webp"
+                  src="/assets/yj-baby-hero-classroom-tinified.webp"
                   alt="YJ Baby school bags in navy blue with pink trim, red, and teal-green"
                   width={2560}
                   height={1440}
@@ -513,10 +516,10 @@ function FunnelPage() {
               {visibleBenefits.map((benefit, index) => {
                 const benefitSummaryImages = isYjBag
                   ? [
-                      "/assets/yj-feature-card-01-top-repaired.webp",
-                      "/assets/yj-feature-card-02-top-repaired.webp",
-                      "/assets/yj-feature-card-03-clean.webp",
-                      "/assets/yj-feature-card-04-clean.webp",
+                      "/assets/yj-feature-card-01-top-repaired-tinified.webp",
+                      "/assets/yj-feature-card-02-top-repaired-tinified.webp",
+                      "/assets/yj-feature-card-03-clean-tinified.webp",
+                      "/assets/yj-feature-card-04-clean-tinified.webp",
                     ]
                   : galleryImages;
                 const image =
@@ -548,7 +551,7 @@ function FunnelPage() {
                     {isYjBag && index === 0 ? (
                       <div className="sm:col-span-2 rounded-2xl border border-border bg-background p-2">
                         <img
-                          src="/assets/yj-baby-interior-one-piece-combined.webp"
+                          src="/assets/yj-baby-interior-one-piece-combined-tinified.webp"
                           alt="YJ Baby backpack interior compartments and one-piece open design"
                           width={2560}
                           height={1440}
@@ -561,7 +564,7 @@ function FunnelPage() {
                     {isYjBag && index === 1 ? (
                       <div className="sm:col-span-2 rounded-2xl border border-border bg-background p-2">
                         <img
-                          src="/assets/yj-baby-rain-red-pink-lifestyle.webp"
+                          src="/assets/yj-baby-rain-red-pink-lifestyle-tinified.webp"
                           alt="Child carrying a red YJ Baby backpack and a woman carrying the navy backpack with pink trim in light rain"
                           width={2560}
                           height={1440}
@@ -581,10 +584,10 @@ function FunnelPage() {
             {visibleBenefits.map((benefit, index) => {
               const benefitImageUrls = isYjBag
                 ? [
-                    "/assets/yj-baby-card-child-storage-pink-trim.webp",
-                    "/assets/yj-baby-card-child-comfort-green.webp",
-                    "/assets/yj-baby-card-child-rain-red.webp",
-                    "/assets/yj-baby-feature-one-piece.webp",
+                    "/assets/yj-baby-card-child-storage-pink-trim-tinified.png",
+                    "/assets/yj-baby-card-child-comfort-green-tinified.png",
+                    "/assets/yj-baby-card-child-rain-red-tinified.png",
+                    "/assets/yj-baby-feature-one-piece-tinified.webp",
                   ]
                 : galleryImages;
               const image = benefitImageUrls[index % Math.max(benefitImageUrls.length, 1)];
@@ -649,7 +652,7 @@ function FunnelPage() {
                 Stop the morning scramble. Give your child’s school essentials one reliable place.
               </h2>
               <img
-                src="/assets/yj-baby-offer-colours.webp"
+                src="/assets/yj-baby-offer-colours-tinified.webp"
                 alt="YJ Baby school bags in red, teal-green, and navy blue with pink trim"
                 width={1400}
                 height={1050}
@@ -778,7 +781,7 @@ function FunnelPage() {
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 <div className="overflow-hidden rounded-2xl border border-border bg-card">
                   <img
-                    src="/assets/yj-baby-card-child-storage-pink-trim.webp"
+                    src="/assets/yj-baby-card-child-storage-pink-trim-tinified.png"
                     alt="Child organising books in the navy YJ Baby backpack with pink trim"
                     width={1664}
                     height={2080}
@@ -797,7 +800,7 @@ function FunnelPage() {
                 </div>
                 <div className="overflow-hidden rounded-2xl border border-border bg-card">
                   <img
-                    src="/assets/yj-baby-card-child-rain-red.webp"
+                    src="/assets/yj-baby-card-child-rain-red-tinified.png"
                     alt="Child carrying the red YJ Baby backpack beside a parent in light rain"
                     width={1664}
                     height={2080}
@@ -815,7 +818,7 @@ function FunnelPage() {
                 </div>
                 <div className="overflow-hidden rounded-2xl border border-border bg-card">
                   <img
-                    src="/assets/yj-baby-card-child-comfort-green.webp"
+                    src="/assets/yj-baby-card-child-comfort-green-tinified.png"
                     alt="Child comfortably carrying the green YJ Baby backpack on the way to school"
                     width={1664}
                     height={2080}
@@ -851,7 +854,7 @@ function FunnelPage() {
                   See the details before ordering
                 </p>
                 <img
-                  src="/assets/yj-baby-trust-schoolday.webp"
+                  src="/assets/yj-baby-trust-schoolday-tinified.webp"
                   alt="Child carrying a navy YJ Baby school bag with red and teal-green bags nearby"
                   width={1400}
                   height={1050}
