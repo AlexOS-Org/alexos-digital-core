@@ -43,7 +43,14 @@ export type BankingProspect = {
   email: string | null;
   job_title: string | null;
   estimated_salary: number | null;
-  stage: "identified" | "contacted" | "account_opened" | "salary_active" | "product_opportunity" | "converted" | "lost";
+  stage:
+    | "identified"
+    | "contacted"
+    | "account_opened"
+    | "salary_active"
+    | "product_opportunity"
+    | "converted"
+    | "lost";
   account_status: "not_started" | "application" | "opened" | "active";
   consent_status: "unknown" | "pending" | "granted" | "declined";
   next_action_at: string | null;
@@ -52,8 +59,9 @@ export type BankingProspect = {
   updated_at: string;
 };
 
-// The generated Supabase Database type is intentionally not modified in this first isolated slice.
-// The cast keeps this module self-contained until the next type-generation pass.
+// Banking tables are delivered by a migration newer than the checked-in generated types.
+// Keep the cast local until the next type-generation pass adds those tables.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
 export const bankingEmployersKey = ["banking", "employers"] as const;
@@ -108,10 +116,29 @@ export function useBankingProspects() {
 export function useCreateBankingEmployer() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: Pick<BankingEmployer, "company_name" | "industry" | "location" | "employee_count" | "recruitment_frequency" | "hiring_momentum_score" | "priority" | "hr_contact_name" | "hr_contact_phone" | "hr_contact_email" | "notes">) => {
+    mutationFn: async (
+      input: Pick<
+        BankingEmployer,
+        | "company_name"
+        | "industry"
+        | "location"
+        | "employee_count"
+        | "recruitment_frequency"
+        | "hiring_momentum_score"
+        | "priority"
+        | "hr_contact_name"
+        | "hr_contact_phone"
+        | "hr_contact_email"
+        | "notes"
+      >,
+    ) => {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("Not authenticated");
-      const { data, error } = await db.from("banking_employers").insert({ ...input, user_id: auth.user.id }).select().single();
+      const { data, error } = await db
+        .from("banking_employers")
+        .insert({ ...input, user_id: auth.user.id })
+        .select()
+        .single();
       if (error) throw error;
       return data as BankingEmployer;
     },
@@ -122,10 +149,16 @@ export function useCreateBankingEmployer() {
 export function useCreateBankingProspect() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: Omit<BankingProspect, "id" | "user_id" | "created_at" | "updated_at">) => {
+    mutationFn: async (
+      input: Omit<BankingProspect, "id" | "user_id" | "created_at" | "updated_at">,
+    ) => {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("Not authenticated");
-      const { data, error } = await db.from("banking_employee_prospects").insert({ ...input, user_id: auth.user.id }).select().single();
+      const { data, error } = await db
+        .from("banking_employee_prospects")
+        .insert({ ...input, user_id: auth.user.id })
+        .select()
+        .single();
       if (error) throw error;
       return data as BankingProspect;
     },
@@ -136,20 +169,24 @@ export function useCreateBankingProspect() {
 export async function createCrmContactFromBankingProspect(prospect: BankingProspect) {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("Not authenticated");
-  const { data, error } = await db.from("contacts").insert({
-    user_id: auth.user.id,
-    first_name: prospect.first_name.trim(),
-    last_name: prospect.last_name?.trim() || null,
-    display_name: [prospect.first_name, prospect.last_name].filter(Boolean).join(" "),
-    email: prospect.email?.trim() || null,
-    phone: prospect.phone?.trim() || null,
-    company: null,
-    job_title: prospect.job_title?.trim() || null,
-    source: "banking-acquisition",
-    status: "lead",
-    notes: prospect.notes?.trim() || "Banking acquisition prospect",
-    tags: ["banking", "salary-acquisition"],
-  }).select().single();
+  const { data, error } = await db
+    .from("contacts")
+    .insert({
+      user_id: auth.user.id,
+      first_name: prospect.first_name.trim(),
+      last_name: prospect.last_name?.trim() || null,
+      display_name: [prospect.first_name, prospect.last_name].filter(Boolean).join(" "),
+      email: prospect.email?.trim() || null,
+      phone: prospect.phone?.trim() || null,
+      company: null,
+      job_title: prospect.job_title?.trim() || null,
+      source: "banking-acquisition",
+      status: "lead",
+      notes: prospect.notes?.trim() || "Banking acquisition prospect",
+      tags: ["banking", "salary-acquisition"],
+    })
+    .select()
+    .single();
   if (error) throw error;
   const { error: linkError } = await db
     .from("banking_employee_prospects")

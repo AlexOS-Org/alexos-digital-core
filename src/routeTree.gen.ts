@@ -43,6 +43,7 @@ import { Route as ShopFaqRouteImport } from './routes/shop.faq'
 import { Route as ShopProductsRouteImport } from './routes/shop.products'
 import { Route as ShopThankYouRouteImport } from './routes/shop.thank-you'
 import { Route as ShopTrackRouteImport } from './routes/shop.track'
+import { Route as AuthenticatedBankingAcquisitionRouteImport } from './routes/_authenticated/banking.acquisition'
 import { Route as AuthenticatedBusinessesNoveraRouteImport } from './routes/_authenticated/businesses.novera'
 import { Route as AuthenticatedECommerceIndexRouteImport } from './routes/_authenticated/e-commerce.index'
 import { Route as AuthenticatedECommerceAdsRouteImport } from './routes/_authenticated/e-commerce.ads'
@@ -255,6 +256,12 @@ const ShopTrackRoute = ShopTrackRouteImport.update({
   path: '/track',
   getParentRoute: () => ShopRoute,
 } as any)
+const AuthenticatedBankingAcquisitionRoute =
+  AuthenticatedBankingAcquisitionRouteImport.update({
+    id: '/acquisition',
+    path: '/acquisition',
+    getParentRoute: () => AuthenticatedBankingRoute,
+  } as any)
 const AuthenticatedBusinessesNoveraRoute =
   AuthenticatedBusinessesNoveraRouteImport.update({
     id: '/novera',
@@ -485,7 +492,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/shop': typeof ShopRouteWithChildren
   '/auren': typeof AuthenticatedAurenRoute
-  '/banking': typeof AuthenticatedBankingRoute
+  '/banking': typeof AuthenticatedBankingRouteWithChildren
   '/businesses': typeof AuthenticatedBusinessesRouteWithChildren
   '/calendar': typeof AuthenticatedCalendarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -514,6 +521,7 @@ export interface FileRoutesByFullPath {
   '/shop/thank-you': typeof ShopThankYouRoute
   '/shop/track': typeof ShopTrackRoute
   '/shop/': typeof ShopIndexRoute
+  '/banking/acquisition': typeof AuthenticatedBankingAcquisitionRoute
   '/businesses/novera': typeof AuthenticatedBusinessesNoveraRoute
   '/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
   '/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
@@ -557,7 +565,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/auren': typeof AuthenticatedAurenRoute
-  '/banking': typeof AuthenticatedBankingRoute
+  '/banking': typeof AuthenticatedBankingRouteWithChildren
   '/businesses': typeof AuthenticatedBusinessesRouteWithChildren
   '/calendar': typeof AuthenticatedCalendarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -583,6 +591,7 @@ export interface FileRoutesByTo {
   '/shop/thank-you': typeof ShopThankYouRoute
   '/shop/track': typeof ShopTrackRoute
   '/shop': typeof ShopIndexRoute
+  '/banking/acquisition': typeof AuthenticatedBankingAcquisitionRoute
   '/businesses/novera': typeof AuthenticatedBusinessesNoveraRoute
   '/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
   '/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
@@ -629,7 +638,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/shop': typeof ShopRouteWithChildren
   '/_authenticated/auren': typeof AuthenticatedAurenRoute
-  '/_authenticated/banking': typeof AuthenticatedBankingRoute
+  '/_authenticated/banking': typeof AuthenticatedBankingRouteWithChildren
   '/_authenticated/businesses': typeof AuthenticatedBusinessesRouteWithChildren
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -658,6 +667,7 @@ export interface FileRoutesById {
   '/shop/thank-you': typeof ShopThankYouRoute
   '/shop/track': typeof ShopTrackRoute
   '/shop/': typeof ShopIndexRoute
+  '/_authenticated/banking/acquisition': typeof AuthenticatedBankingAcquisitionRoute
   '/_authenticated/businesses/novera': typeof AuthenticatedBusinessesNoveraRoute
   '/_authenticated/e-commerce/ads': typeof AuthenticatedECommerceAdsRoute
   '/_authenticated/e-commerce/checkout': typeof AuthenticatedECommerceCheckoutRoute
@@ -733,6 +743,7 @@ export interface FileRouteTypes {
     | '/shop/thank-you'
     | '/shop/track'
     | '/shop/'
+    | '/banking/acquisition'
     | '/businesses/novera'
     | '/e-commerce/ads'
     | '/e-commerce/checkout'
@@ -802,6 +813,7 @@ export interface FileRouteTypes {
     | '/shop/thank-you'
     | '/shop/track'
     | '/shop'
+    | '/banking/acquisition'
     | '/businesses/novera'
     | '/e-commerce/ads'
     | '/e-commerce/checkout'
@@ -876,6 +888,7 @@ export interface FileRouteTypes {
     | '/shop/thank-you'
     | '/shop/track'
     | '/shop/'
+    | '/_authenticated/banking/acquisition'
     | '/_authenticated/businesses/novera'
     | '/_authenticated/e-commerce/ads'
     | '/_authenticated/e-commerce/checkout'
@@ -1166,6 +1179,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopTrackRouteImport
       parentRoute: typeof ShopRoute
     }
+    '/_authenticated/banking/acquisition': {
+      id: '/_authenticated/banking/acquisition'
+      path: '/acquisition'
+      fullPath: '/banking/acquisition'
+      preLoaderRoute: typeof AuthenticatedBankingAcquisitionRouteImport
+      parentRoute: typeof AuthenticatedBankingRoute
+    }
     '/_authenticated/businesses/novera': {
       id: '/_authenticated/businesses/novera'
       path: '/novera'
@@ -1435,6 +1455,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedBankingRouteChildren {
+  AuthenticatedBankingAcquisitionRoute: typeof AuthenticatedBankingAcquisitionRoute
+}
+
+const AuthenticatedBankingRouteChildren: AuthenticatedBankingRouteChildren = {
+  AuthenticatedBankingAcquisitionRoute: AuthenticatedBankingAcquisitionRoute,
+}
+
+const AuthenticatedBankingRouteWithChildren =
+  AuthenticatedBankingRoute._addFileChildren(AuthenticatedBankingRouteChildren)
+
 interface AuthenticatedBusinessesRouteChildren {
   AuthenticatedBusinessesNoveraRoute: typeof AuthenticatedBusinessesNoveraRoute
 }
@@ -1566,7 +1597,7 @@ const AuthenticatedPeopleRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAurenRoute: typeof AuthenticatedAurenRoute
-  AuthenticatedBankingRoute: typeof AuthenticatedBankingRoute
+  AuthenticatedBankingRoute: typeof AuthenticatedBankingRouteWithChildren
   AuthenticatedBusinessesRoute: typeof AuthenticatedBusinessesRouteWithChildren
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -1589,7 +1620,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAurenRoute: AuthenticatedAurenRoute,
-  AuthenticatedBankingRoute: AuthenticatedBankingRoute,
+  AuthenticatedBankingRoute: AuthenticatedBankingRouteWithChildren,
   AuthenticatedBusinessesRoute: AuthenticatedBusinessesRouteWithChildren,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
