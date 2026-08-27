@@ -847,7 +847,7 @@ function FunnelPage() {
           ) : null}
         </div>
 
-        <aside className="order-first h-fit rounded-3xl border border-border bg-card p-5 shadow-xl lg:order-none lg:sticky lg:top-6 sm:p-6">
+        <aside className="order-last h-fit rounded-3xl border border-border bg-card p-5 shadow-xl lg:order-none lg:sticky lg:top-6 sm:p-6">
           {galleryImages.length > 0 ? (
             <section
               className="-m-1 mb-5 rounded-3xl border border-border bg-background p-4 sm:p-5"
