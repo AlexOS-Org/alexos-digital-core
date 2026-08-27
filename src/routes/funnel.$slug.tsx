@@ -444,17 +444,44 @@ function FunnelPage() {
             {effectiveLandingCopy?.headline ?? product.name}
           </h1>
           {isYjBag ? (
-            <div className="mt-8 w-full max-w-5xl overflow-hidden rounded-3xl border border-border bg-card p-2 shadow-sm sm:p-3">
-              <img
-                src="/assets/yj-baby-hero-classroom.webp"
-                alt="YJ Baby school bags in navy blue with pink trim, red, and teal-green"
-                width={2560}
-                height={1440}
-                fetchPriority="high"
-                decoding="async"
-                className="aspect-video w-full rounded-2xl object-cover"
-              />
-            </div>
+            <>
+              <div className="mt-8 w-full max-w-5xl overflow-hidden rounded-3xl border border-border bg-card p-2 shadow-sm sm:p-3">
+                <img
+                  src="/assets/yj-baby-hero-classroom.webp"
+                  alt="YJ Baby school bags in navy blue with pink trim, red, and teal-green"
+                  width={2560}
+                  height={1440}
+                  fetchPriority="high"
+                  decoding="async"
+                  className="aspect-video w-full rounded-2xl object-cover"
+                />
+              </div>
+              <div className="mt-6 w-full max-w-3xl rounded-3xl border border-primary/20 bg-card p-5 text-left shadow-sm sm:p-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-primary">
+                      Ready for a more organised school day?
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-muted-foreground">
+                      Keep books, stationery, water bottles, and everyday essentials together in one
+                      water-resistant backpack designed for the school routine.
+                    </p>
+                    <p className="mt-3 text-lg font-black text-foreground">KES 2,750 per bag</p>
+                    <p className="mt-1 text-xs font-semibold text-muted-foreground">
+                      Available colours: {availableColoursLabel}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={focusOrderForm}
+                    className="w-full shrink-0 rounded-xl bg-foreground px-7 text-background hover:bg-foreground/90 sm:w-auto"
+                    aria-controls="yj-order-form"
+                  >
+                    Order Now <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </>
           ) : null}
         </div>
       </section>
@@ -468,18 +495,6 @@ function FunnelPage() {
                 <p className="mt-2 text-sm font-semibold">{item}</p>
               </div>
             ))}
-          </div>
-          <div className="mt-5 flex justify-center">
-            {isYjBag ? (
-              <Button
-                type="button"
-                onClick={focusOrderForm}
-                className="rounded-xl bg-foreground px-7 text-background hover:bg-foreground/90"
-                aria-controls="yj-order-form"
-              >
-                Order Now <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            ) : null}
           </div>
           <div className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7">
             <p className="text-center text-xs font-bold uppercase tracking-[0.18em] text-primary">
@@ -832,7 +847,7 @@ function FunnelPage() {
           ) : null}
         </div>
 
-        <aside className="h-fit rounded-3xl border border-border bg-card p-5 shadow-xl lg:sticky lg:top-6 sm:p-6">
+        <aside className="order-first h-fit rounded-3xl border border-border bg-card p-5 shadow-xl lg:order-none lg:sticky lg:top-6 sm:p-6">
           {galleryImages.length > 0 ? (
             <section
               className="-m-1 mb-5 rounded-3xl border border-border bg-background p-4 sm:p-5"
@@ -936,7 +951,7 @@ function FunnelPage() {
               aria-label="Customer reviews"
             >
               <p className="text-center text-xs font-bold uppercase tracking-[0.16em] text-primary">
-                What customers say
+                See the details before ordering
               </p>
               <img
                 src="/assets/yj-baby-trust-schoolday.webp"
@@ -948,16 +963,15 @@ function FunnelPage() {
                 className="mt-4 aspect-[4/3] w-full rounded-2xl object-contain"
               />
               <h2 className="mt-4 text-center text-xl font-black tracking-tight">
-                Real feedback belongs to real deliveries.
+                A closer look at the everyday details.
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                We are collecting verified feedback from YJ Baby customers after their orders are
-                delivered. Once customers share their experience, this section will feature genuine
-                comments about storage, material, carrying design, and everyday use. We do not copy
-                testimonials from another store or create customer quotes.
+                Review the visible storage, fabric, colour options, and carrying design before you
+                order. We use product evidence here rather than copied testimonials or invented
+                customer quotes.
               </p>
               <p className="mt-3 text-xs font-semibold text-muted-foreground">
-                Review status: awaiting verified YJ Baby customer submissions.
+                Product information shown from the current DailyGear offer.
               </p>
             </section>
           ) : null}
