@@ -1,0 +1,18 @@
+:root {
+  --alexos-ds-accent: var(--primary);
+  --alexos-ds-accent-soft: color-mix(in oklch, var(--primary) 16%, transparent);
+  --alexos-ds-accent-faint: color-mix(in oklch, var(--primary) 7%, transparent);
+  --alexos-ds-purple: var(--alexos-purple, #7c3aed);
+  --alexos-ds-blue: var(--alexos-blue, #2563eb);
+  --alexos-ds-surface: color-mix(in oklch, var(--card) 96%, var(--primary) 4%);
+  --alexos-ds-border: color-mix(in oklch, var(--border) 76%, var(--primary) 24%);
+  --alexos-ds-glow: 0 24px 80px -48px color-mix(in oklch, var(--primary) 62%, transparent);
+}
+
+/* Token usage is intentionally presentation-only. Keep public commerce themes separate. */
+.alexos-ds-internal-surface {
+  color: var(--foreground);
+  background: var(--alexos-ds-surface);
+  border: 1px solid var(--alexos-ds-border);
+  box-shadow: var(--alexos-ds-glow);
+}
