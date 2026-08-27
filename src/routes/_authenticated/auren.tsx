@@ -367,6 +367,51 @@ function AurenPage() {
             </Card>
           ) : null}
 
+          {advisory.decisions.length > 0 ? (
+            <Card className="rounded-3xl border-amber-500/20 bg-amber-500/[0.025] soft-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Target className="h-4 w-4 text-amber-600 dark:text-amber-300" /> Decision
+                  guardrails
+                  <Badge variant="outline" className="ml-auto text-xs">
+                    Approval required before action
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-3 md:grid-cols-2">
+                {advisory.decisions.map((decision) => (
+                  <div
+                    key={decision.id}
+                    className="min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4"
+                  >
+                    <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold">{decision.title}</p>
+                        <p className="mt-1 text-xs capitalize text-muted-foreground">
+                          {decision.area} · {decision.priority} priority
+                        </p>
+                      </div>
+                      <Badge variant={decision.approvalRequired ? "outline" : "secondary"}>
+                        {decision.approvalRequired ? "Review" : "Informational"}
+                      </Badge>
+                    </div>
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                      {decision.evidence}
+                    </p>
+                    <p className="mt-3 text-sm leading-6">
+                      <span className="font-semibold">Next move:</span> {decision.recommendation}
+                    </p>
+                    {decision.missingData.length > 0 ? (
+                      <p className="mt-3 break-words text-xs leading-5 text-amber-700 dark:text-amber-300">
+                        Missing or unavailable: {decision.missingData.join(", ")}
+                      </p>
+                    ) : null}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          ) : null}
+
           {advisory.liveEvidence.length > 0 ? (
             <Card className="rounded-3xl border-primary/20 bg-primary/[0.025] soft-shadow">
               <CardHeader>

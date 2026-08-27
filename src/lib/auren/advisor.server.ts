@@ -5,6 +5,12 @@ import type { DashboardSnapshot } from "@/lib/dashboard/types";
 import { computeDashboardMetrics } from "@/lib/dashboard/calculations";
 import { generateSignals } from "@/lib/intelligence/signals";
 import { getAurenPublicContext, type AurenPublicContextRecord } from "./public-context";
+import {
+  buildAurenDecisions,
+  normalizeEvidenceMeta,
+  type AurenDecision,
+  type AurenEvidenceMeta,
+} from "./decision-system";
 
 const AI_MODEL = "@cf/meta/llama-3.2-3b-instruct";
 const MAX_ROWS = 5000;
@@ -143,6 +149,8 @@ export interface AurenAdvisorySnapshot {
   recommendations: AurenRecommendation[];
   externalContext: AurenPublicContextRecord[];
   liveEvidence: AurenLiveEvidenceRecord[];
+  evidenceMeta: AurenEvidenceMeta[];
+  decisions: AurenDecision[];
   dataQuality: {
     warnings: string[];
     sourceRows: Record<string, number>;
@@ -577,6 +585,8 @@ export function buildAurenAdvisory(input: AurenAdvisoryInput): AurenAdvisorySnap
     ),
     externalContext: getAurenPublicContext(input.request.scope),
     liveEvidence: [],
+    evidenceMeta: [],
+    decisions: [],
     dataQuality: {
       warnings,
       sourceRows: {
@@ -753,6 +763,37 @@ export async function getAurenAdvisoryForUser(
     dashboardSnapshot,
   });
   advisory.liveEvidence = liveEvidence;
+  advisory.evidenceMeta = liveEvidence.map((row) =>
+    normalizeEvidenceMeta(
+      {
+        source_type: row.sourceType,
+        source_key: row.sourceKey,
+        source_url: row.sourceUrl,
+        source_scope: "portfolio",
+        observed_at: row.observedAt,
+        window_start: null,
+        window_end: null,
+        status: row.status,
+        confidence: row.confidence,
+        payload: row.payload,
+      },
+      new Date(),
+    ),
+  );
+  advisory.decisions = buildAurenDecisions({
+    now: new Date(),
+    evidence: advisory.evidenceMeta,
+    funnelEvents: {
+      pageView: null,
+      viewContent: null,
+      addToCart: null,
+      initiateCheckout: null,
+      purchase: null,
+    },
+    inventoryWarnings: advisory.verified.dailyGearLowStock,
+    cashAvailable: advisory.verified.cashAvailable,
+    netCashFlow: advisory.verified.netCashFlow,
+  });
   if (noData(advisory)) return { status: "no_data", advisory, summary: null, model: null };
   const ai = workerEnv.AI;
   if (!ai) return { status: "ai_unavailable", advisory, summary: null, model: null };
