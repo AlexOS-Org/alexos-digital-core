@@ -843,6 +843,34 @@ function FunnelPage() {
                 Your order is not treated as paid until payment is confirmed by DailyGear. No
                 reminder-email option is shown on this funnel.
               </p>
+              <section
+                className="mt-8 rounded-3xl border border-border bg-background p-5 sm:p-7"
+                aria-label="Product details"
+              >
+                <p className="text-center text-xs font-bold uppercase tracking-[0.16em] text-primary">
+                  See the details before ordering
+                </p>
+                <img
+                  src="/assets/yj-baby-trust-schoolday.webp"
+                  alt="Child carrying a navy YJ Baby school bag with red and teal-green bags nearby"
+                  width={1400}
+                  height={1050}
+                  loading="lazy"
+                  decoding="async"
+                  className="mx-auto mt-4 aspect-[4/3] w-full max-w-3xl rounded-2xl object-contain"
+                />
+                <h2 className="mt-5 text-center text-xl font-black tracking-tight sm:text-2xl">
+                  A closer look at the everyday details.
+                </h2>
+                <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-center">
+                  Review the visible storage, fabric, colour options, and carrying design before you
+                  order. We use product evidence here rather than copied testimonials or invented
+                  customer quotes.
+                </p>
+                <p className="mt-3 text-center text-xs font-semibold text-muted-foreground">
+                  Product information shown from the current DailyGear offer.
+                </p>
+              </section>
             </section>
           ) : null}
         </div>
@@ -1097,36 +1125,6 @@ function FunnelPage() {
           </Button>
         </aside>
       </section>
-      {isYjBag ? (
-        <section
-          className="mt-8 rounded-3xl border border-border bg-background p-5 sm:p-7"
-          aria-label="Product details"
-        >
-          <p className="text-center text-xs font-bold uppercase tracking-[0.16em] text-primary">
-            See the details before ordering
-          </p>
-          <img
-            src="/assets/yj-baby-trust-schoolday.webp"
-            alt="Child carrying a navy YJ Baby school bag with red and teal-green bags nearby"
-            width={1400}
-            height={1050}
-            loading="lazy"
-            decoding="async"
-            className="mx-auto mt-4 aspect-[4/3] w-full max-w-3xl rounded-2xl object-contain"
-          />
-          <h2 className="mt-5 text-center text-xl font-black tracking-tight sm:text-2xl">
-            A closer look at the everyday details.
-          </h2>
-          <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-center">
-            Review the visible storage, fabric, colour options, and carrying design before you
-            order. We use product evidence here rather than copied testimonials or invented customer
-            quotes.
-          </p>
-          <p className="mt-3 text-center text-xs font-semibold text-muted-foreground">
-            Product information shown from the current DailyGear offer.
-          </p>
-        </section>
-      ) : null}
     </main>
   );
 }
