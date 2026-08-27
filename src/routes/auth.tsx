@@ -106,9 +106,9 @@ function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2 bg-background">
+    <div className="alexos-auth-shell relative grid min-h-screen overflow-hidden bg-background lg:grid-cols-2">
       <SupabaseConfigBanner />
-      <div className="hidden lg:flex flex-col justify-between bg-sidebar text-sidebar-foreground p-12">
+      <div className="alexos-auth-brand-panel relative hidden flex-col justify-between overflow-hidden bg-sidebar p-12 text-sidebar-foreground lg:flex">
         <Link to="/" className="w-fit">
           <AlexOSLogo showWordmark />
         </Link>
@@ -136,13 +136,15 @@ function AuthPage() {
         </p>
       </div>
 
-      <div className="flex items-center justify-center p-6 sm:p-12">
-        <Card className="w-full max-w-md border-border/60 shadow-sm">
+      <div className="alexos-auth-form-panel flex items-center justify-center p-5 sm:p-10 lg:p-14">
+        <Card className="alexos-auth-card w-full max-w-md border-border/60 shadow-2xl shadow-primary/10">
           <CardHeader className="space-y-2">
             <div className="lg:hidden mb-2">
               <AlexOSLogo showWordmark />
             </div>
-            <CardTitle className="text-2xl">Welcome</CardTitle>
+            <CardTitle className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              Welcome back
+            </CardTitle>
             <CardDescription>Sign in to your AlexOS workspace.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -154,7 +156,7 @@ function AuthPage() {
                 {accessMessage}
               </div>
             ) : null}
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               <Button
                 type="button"
                 variant="outline"
@@ -222,7 +224,11 @@ function AuthPage() {
                       placeholder="••••••••"
                     />
                   </div>
-                  <Button type="submit" disabled={loading} className="w-full">
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full shadow-lg shadow-primary/20 transition-shadow hover:shadow-xl hover:shadow-primary/25"
+                  >
                     {loading ? "Signing in…" : "Sign in"}
                   </Button>
                 </form>
@@ -250,7 +256,11 @@ function AuthPage() {
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
-                  <Button type="submit" disabled={loading} className="w-full">
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full shadow-lg shadow-primary/20 transition-shadow hover:shadow-xl hover:shadow-primary/25"
+                  >
                     {loading ? "Creating…" : "Create account"}
                   </Button>
                 </form>
