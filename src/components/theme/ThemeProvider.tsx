@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import "../../styles/alexos-4k-visual-system.css";
 import "../../styles/alexos-module-overrides.css";
 import {
@@ -82,6 +83,9 @@ function getStoredGreetingTrigger(): GreetingTriggerId {
     : DEFAULT_GREETING_TRIGGER;
 }
 export function ThemeProvider({ children }: { children: ReactNode }) {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isPublicStorefront =
+    pathname.startsWith("/funnel/") || pathname === "/shop" || pathname.startsWith("/shop/");
   const [theme, setThemeState] = useState<Theme>(getStoredTheme);
   const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(getSystemTheme);
   const [visualTheme, setVisualThemeState] = useState<VisualThemeId>(getStoredVisualTheme);
@@ -93,6 +97,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [greetingTrigger, setGreetingTriggerState] =
     useState<GreetingTriggerId>(getStoredGreetingTrigger);
   const resolvedTheme: ResolvedTheme = theme === "system" ? systemTheme : theme;
+  const appliedTheme: ResolvedTheme = isPublicStorefront ? "light" : resolvedTheme;
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     const update = () => setSystemTheme(media.matches ? "dark" : "light");
@@ -101,13 +106,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => media.removeEventListener("change", update);
   }, []);
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", resolvedTheme === "dark");
-    document.documentElement.style.colorScheme = resolvedTheme;
+    document.documentElement.classList.toggle("dark", appliedTheme === "dark");
+    document.documentElement.style.colorScheme = appliedTheme;
     document.documentElement.dataset.visualTheme = visualTheme;
+    document.documentElement.dataset.publicStorefront = isPublicStorefront ? "true" : "false";
     document.documentElement.style.setProperty("--alexos-custom-accent", customAccent);
     document.documentElement.style.setProperty("--alexos-custom-surface", customSurface);
     document.documentElement.style.setProperty("--alexos-custom-sidebar", customSidebar);
-  }, [customAccent, customSidebar, customSurface, resolvedTheme, visualTheme]);
+  }, [appliedTheme, customAccent, customSidebar, customSurface, isPublicStorefront, visualTheme]);
   const setTheme = (next: Theme) => {
     setThemeState(next);
     window.localStorage.setItem(STORAGE_KEY, next);
