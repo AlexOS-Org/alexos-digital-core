@@ -379,27 +379,48 @@ function CheckoutPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <h1 className="text-2xl font-black tracking-tight">Checkout</h1>
-      <div className="mt-3 rounded-2xl border bg-muted/40 p-4">
-        <p className="text-sm font-semibold">Review before placing your order</p>
-        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+      <div className="mt-3 min-w-0 rounded-2xl border bg-muted/40 p-4 sm:p-5">
+        <p className="text-[15px] font-semibold leading-6 sm:text-sm">
+          Review before placing your order
+        </p>
+        <p className="mt-2 text-[13px] leading-6 text-muted-foreground sm:text-xs sm:leading-relaxed">
           DailyGear rechecks the current product or variant price and availability when you place
           the order. Payment instructions or status depend on the method you choose and are not
           treated as settled until confirmed.
         </p>
-        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold text-primary">
-          <Link to="/shop/policies/$slug" params={{ slug: "shipping" }} className="hover:underline">
+        <nav
+          aria-label="Checkout policies"
+          className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t pt-3 text-[13px] font-semibold text-primary sm:flex sm:flex-wrap sm:gap-x-4 sm:gap-y-2 sm:border-t-0 sm:pt-0 sm:text-xs"
+        >
+          <Link
+            to="/shop/policies/$slug"
+            params={{ slug: "shipping" }}
+            className="min-w-0 hover:underline"
+          >
             Shipping
           </Link>
-          <Link to="/shop/policies/$slug" params={{ slug: "returns" }} className="hover:underline">
+          <Link
+            to="/shop/policies/$slug"
+            params={{ slug: "returns" }}
+            className="min-w-0 hover:underline"
+          >
             Returns & refunds
           </Link>
-          <Link to="/shop/policies/$slug" params={{ slug: "privacy" }} className="hover:underline">
+          <Link
+            to="/shop/policies/$slug"
+            params={{ slug: "privacy" }}
+            className="min-w-0 hover:underline"
+          >
             Privacy
           </Link>
-          <Link to="/shop/policies/$slug" params={{ slug: "terms" }} className="hover:underline">
+          <Link
+            to="/shop/policies/$slug"
+            params={{ slug: "terms" }}
+            className="min-w-0 hover:underline"
+          >
             Terms
           </Link>
-        </div>
+        </nav>
       </div>
 
       <form
