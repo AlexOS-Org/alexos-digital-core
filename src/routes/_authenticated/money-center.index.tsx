@@ -29,8 +29,13 @@ export const Route = createFileRoute("/_authenticated/money-center/")({
 
 function MoneyDashboard() {
   const { maskBalance } = useBalanceVisibility();
-  const displayMoney = (value: number | string | null | undefined, currency = "KES") =>
-    maskBalance(formatMoney(value, currency));
+  const displayMoney = (
+    value: number | string | null | undefined,
+    currency: string | null = "KES",
+  ) => {
+    if (value === null || value === undefined || currency === null) return "Multiple currencies";
+    return maskBalance(formatMoney(value, currency));
+  };
   const { data: accounts = [], isLoading: accLoading } = useAccounts();
   const { data: balances = [] } = useAccountBalances();
   const { data: txs = [] } = useTransactions({ limit: 8 });
@@ -40,21 +45,27 @@ function MoneyDashboard() {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   const { data: monthTx = [] } = useTransactions({ from: monthStart });
 
-  const total = balances.reduce((s, b) => s + Number(b.balance), 0);
-  const incomeMonth = monthTx
-    .filter((t) => t.type === "income")
-    .reduce((s, t) => s + Number(t.amount), 0);
-  const expenseMonth = monthTx
-    .filter((t) => t.type === "expense")
-    .reduce((s, t) => s + Number(t.amount), 0);
-  const cashFlow = incomeMonth - expenseMonth;
-  const expectedTotal = pendingExpected.reduce(
-    (s, e) => s + (Number(e.amount) * e.probability) / 100,
-    0,
-  );
+  const accountCurrencies = [
+    ...new Set(accounts.map((account) => account.currency).filter(Boolean)),
+  ];
+  const aggregateCurrency = accountCurrencies.length === 1 ? accountCurrencies[0] : null;
+  const total = aggregateCurrency ? balances.reduce((s, b) => s + Number(b.balance), 0) : null;
+  const incomeMonth = aggregateCurrency
+    ? monthTx.filter((t) => t.type === "income").reduce((s, t) => s + Number(t.amount), 0)
+    : null;
+  const expenseMonth = aggregateCurrency
+    ? monthTx.filter((t) => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0)
+    : null;
+  const cashFlow =
+    incomeMonth !== null && expenseMonth !== null ? incomeMonth - expenseMonth : null;
+  const expectedTotal = aggregateCurrency
+    ? pendingExpected.reduce((s, e) => s + (Number(e.amount) * e.probability) / 100, 0)
+    : null;
   const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   const unpaidBills = bills.filter((b) => b.status === "pending");
-  const unpaidTotal = unpaidBills.reduce((s, b) => s + Number(b.amount), 0);
+  const unpaidTotal = aggregateCurrency
+    ? unpaidBills.reduce((s, b) => s + Number(b.amount), 0)
+    : null;
   const upcomingBills = unpaidBills.filter((b) => {
     const d = new Date(b.due_date + "T00:00:00");
     const diff = Math.round((d.getTime() - new Date(now.toDateString()).getTime()) / 86_400_000);
@@ -62,7 +73,9 @@ function MoneyDashboard() {
   });
   const billsThisMonth = unpaidBills.filter((b) => b.due_date?.startsWith(monthKey));
   const savingsRate =
-    incomeMonth > 0 ? Math.max(0, Math.min(100, (cashFlow / incomeMonth) * 100)) : 0;
+    incomeMonth !== null && cashFlow !== null && incomeMonth > 0
+      ? Math.max(0, Math.min(100, (cashFlow / incomeMonth) * 100))
+      : 0;
 
   const getAccountState = (a: (typeof accounts)[number]) => {
     const balance = Number(balances.find((b) => b.account_id === a.id)?.balance ?? 0);
@@ -95,8 +108,13 @@ function MoneyDashboard() {
       label: "Cash Flow",
       value: cashFlow,
       icon: PiggyBank,
-      tone: cashFlow >= 0 ? "teal" : "rose",
-      hint: cashFlow >= 0 ? "Moving forward" : "Needs attention",
+      tone: cashFlow !== null && cashFlow >= 0 ? "teal" : "rose",
+      hint:
+        cashFlow === null
+          ? "Multiple currencies"
+          : cashFlow >= 0
+            ? "Moving forward"
+            : "Needs attention",
     },
     {
       label: "Expected",
@@ -130,7 +148,7 @@ function MoneyDashboard() {
               </div>
               <p className="mt-4 text-sm text-white/65">Your financial picture right now</p>
               <div className="mt-1 text-4xl font-semibold tracking-tight sm:text-5xl">
-                {displayMoney(total)}
+                {displayMoney(total, aggregateCurrency)}
               </div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-black/10 px-4 py-3 backdrop-blur-md">
@@ -138,25 +156,33 @@ function MoneyDashboard() {
               <div
                 className={cn(
                   "mt-1 text-lg font-semibold",
-                  cashFlow >= 0 ? "text-emerald-200" : "text-rose-200",
+                  cashFlow !== null && cashFlow >= 0 ? "text-emerald-200" : "text-rose-200",
                 )}
               >
-                {cashFlow >= 0 ? "+" : ""}
-                {displayMoney(cashFlow)}
+                {cashFlow !== null && cashFlow >= 0 ? "+" : ""}
+                {displayMoney(cashFlow, aggregateCurrency)}
               </div>
               <div className="mt-1 text-xs text-white/50">
-                {cashFlow >= 0 ? "You are ahead of expenses" : "Expenses are ahead of income"}
+                {cashFlow === null
+                  ? "Choose one currency to view combined totals"
+                  : cashFlow >= 0
+                    ? "You are ahead of expenses"
+                    : "Expenses are ahead of income"}
               </div>
             </div>
           </div>
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-sm">
               <div className="text-xs text-white/55">Income</div>
-              <div className="mt-1 text-lg font-semibold">{displayMoney(incomeMonth)}</div>
+              <div className="mt-1 text-lg font-semibold">
+                {displayMoney(incomeMonth, aggregateCurrency)}
+              </div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-sm">
               <div className="text-xs text-white/55">Expenses</div>
-              <div className="mt-1 text-lg font-semibold">{displayMoney(expenseMonth)}</div>
+              <div className="mt-1 text-lg font-semibold">
+                {displayMoney(expenseMonth, aggregateCurrency)}
+              </div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-sm">
               <div className="text-xs text-white/55">Savings rate</div>
@@ -193,7 +219,7 @@ function MoneyDashboard() {
                       {k.label}
                     </p>
                     <p className="mt-3 text-2xl font-semibold tracking-tight">
-                      {displayMoney(k.value)}
+                      {displayMoney(k.value, aggregateCurrency)}
                     </p>
                   </div>
                   <div className="money-kpi-icon grid h-11 w-11 place-items-center rounded-2xl">
@@ -322,7 +348,7 @@ function MoneyDashboard() {
                       </div>
                       <div className={cn("whitespace-nowrap text-sm font-semibold", tone)}>
                         {sign}
-                        {displayMoney(t.amount)}
+                        {displayMoney(t.amount, a?.currency ?? null)}
                       </div>
                     </li>
                   );
@@ -339,7 +365,12 @@ function MoneyDashboard() {
             <div className="rounded-2xl bg-amber-500/8 p-4">
               <div className="text-xs font-semibold text-amber-700 dark:text-amber-400">Bills</div>
               <div className="mt-1 text-xl font-semibold">
-                {displayMoney(upcomingBills.reduce((s, b) => s + Number(b.amount), 0))}
+                {displayMoney(
+                  aggregateCurrency
+                    ? upcomingBills.reduce((s, b) => s + Number(b.amount), 0)
+                    : null,
+                  aggregateCurrency,
+                )}
               </div>
               <div className="mt-1 text-xs text-muted-foreground">
                 {upcomingBills.length} due in the next 7 days
@@ -349,7 +380,9 @@ function MoneyDashboard() {
               <div className="text-xs font-semibold text-violet-700 dark:text-violet-400">
                 Expected money
               </div>
-              <div className="mt-1 text-xl font-semibold">{displayMoney(expectedTotal)}</div>
+              <div className="mt-1 text-xl font-semibold">
+                {displayMoney(expectedTotal, aggregateCurrency)}
+              </div>
               <div className="mt-1 text-xs text-muted-foreground">Weighted incoming value</div>
             </div>
             <div className="rounded-2xl bg-emerald-500/8 p-4">
@@ -357,7 +390,12 @@ function MoneyDashboard() {
                 This month
               </div>
               <div className="mt-1 text-xl font-semibold">
-                {displayMoney(billsThisMonth.reduce((s, b) => s + Number(b.amount), 0))}
+                {displayMoney(
+                  aggregateCurrency
+                    ? billsThisMonth.reduce((s, b) => s + Number(b.amount), 0)
+                    : null,
+                  aggregateCurrency,
+                )}
               </div>
               <div className="mt-1 text-xs text-muted-foreground">Bills due this month</div>
             </div>
