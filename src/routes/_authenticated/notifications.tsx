@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo } from "react";
 import {
   AlertTriangle,
   ArrowUpRight,
@@ -97,7 +98,9 @@ function NotificationsPage() {
       ) : (
         <>
           <section className="rounded-[2rem] border border-primary/15 bg-gradient-to-br from-primary/[0.09] via-card to-card p-5 shadow-[0_24px_70px_-48px_var(--alexos-glow)] sm:p-7">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <SignalCalendarCard signalCount={isLoading ? null : signals.length} />
+
+            <div className="mt-7 flex flex-col gap-4 border-t border-border/60 pt-6 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">
                   <Target className="h-3.5 w-3.5" /> Today&apos;s priorities
@@ -237,6 +240,72 @@ function NotificationsPage() {
         </>
       )}
     </main>
+  );
+}
+
+function SignalCalendarCard({ signalCount }: { signalCount: number | null }) {
+  const days = useMemo(() => {
+    const today = new Date();
+    const mondayOffset = (today.getDay() + 6) % 7;
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - mondayOffset);
+    return Array.from({ length: 7 }, (_, index) => {
+      const date = new Date(monday);
+      date.setDate(monday.getDate() + index);
+      return {
+        date,
+        number: date.getDate(),
+        name: date.toLocaleDateString(undefined, { weekday: "short" }).slice(0, 3),
+        active: date.toDateString() === today.toDateString(),
+      };
+    });
+  }, []);
+
+  return (
+    <div className="min-w-0 rounded-[1.6rem] border border-border/70 bg-background/65 p-4 sm:p-5">
+      <div className="flex flex-col gap-3 min-[380px]:flex-row min-[380px]:items-start min-[380px]:justify-between">
+        <div className="min-w-0">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            Signal review
+          </p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
+            Today&apos;s view
+          </h2>
+        </div>
+        <span className="w-fit shrink-0 rounded-full border border-border/70 bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+          {signalCount == null ? "Analysing" : `${signalCount} live signals`}
+        </span>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-border/60 bg-card p-2.5 sm:p-3">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2" aria-label="Current week">
+          {days.map((day) => (
+            <div
+              key={day.date.toISOString()}
+              className={`flex min-w-0 flex-col items-center rounded-xl px-1 py-2 text-center ${
+                day.active
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground"
+              }`}
+            >
+              <span className="text-[10px] font-semibold uppercase tracking-wide">{day.name}</span>
+              <span className="mt-1 text-base font-bold leading-5 sm:text-lg">{day.number}</span>
+              <span
+                className={`mt-2 h-1.5 w-1.5 rounded-full ${
+                  day.active ? "bg-primary-foreground" : "bg-border"
+                }`}
+                aria-hidden="true"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <p className="mt-3 text-xs leading-5 text-muted-foreground">
+        Review the live signals below. Historical date filtering will appear when archived signal
+        data is available.
+      </p>
+    </div>
   );
 }
 
