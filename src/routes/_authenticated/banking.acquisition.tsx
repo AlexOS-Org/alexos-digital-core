@@ -314,30 +314,6 @@ function BankingAcquisitionPage() {
   );
 }
 
-function parseRecruitmentFrequency(
-  value: FormDataEntryValue | null,
-): BankingEmployer["recruitment_frequency"] {
-  const allowed: BankingEmployer["recruitment_frequency"][] = [
-    "unknown",
-    "occasional",
-    "regular",
-    "frequent",
-    "mass",
-  ];
-  const normalized = String(value ?? "regular");
-  return allowed.includes(normalized as BankingEmployer["recruitment_frequency"])
-    ? (normalized as BankingEmployer["recruitment_frequency"])
-    : "regular";
-}
-
-function parseEmployerPriority(value: FormDataEntryValue | null): BankingEmployer["priority"] {
-  const allowed: BankingEmployer["priority"][] = ["low", "medium", "high", "hot"];
-  const normalized = String(value ?? "medium");
-  return allowed.includes(normalized as BankingEmployer["priority"])
-    ? (normalized as BankingEmployer["priority"])
-    : "medium";
-}
-
 function Metric({
   icon: Icon,
   label,
