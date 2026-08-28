@@ -638,53 +638,35 @@ type FunnelEventName = "pageView" | "viewContent" | "addToCart" | "initiateCheck
 
 type FunnelEventCounts = Record<FunnelEventName, number | null>;
 
-const FUNNEL_EVENT_NAMES: Record<string, FunnelEventName> = {
-  pageview: "pageView",
-  page_view: "pageView",
-  viewcontent: "viewContent",
-  view_content: "viewContent",
-  addtocart: "addToCart",
-  add_to_cart: "addToCart",
-  initiatecheckout: "initiateCheckout",
-  initiate_checkout: "initiateCheckout",
-  purchase: "purchase",
-};
-
-function aggregateFirstPartyFunnelEvents(
-  rows: Array<Record<string, unknown>>,
-  allowedBusinessIds: Set<string>,
-): { counts: FunnelEventCounts; observedAt: string | null; rowCount: number } {
-  const totals: Partial<Record<FunnelEventName, number>> = {};
-  let observedAt: string | null = null;
-  let rowCount = 0;
-  for (const row of rows) {
-    const businessId = typeof row.business_id === "string" ? row.business_id : null;
-    const event =
-      typeof row.event_name === "string" ? FUNNEL_EVENT_NAMES[row.event_name.toLowerCase()] : null;
-    const count = Number(row.event_count);
-    if (
-      !businessId ||
-      !allowedBusinessIds.has(businessId) ||
-      !event ||
-      !Number.isInteger(count) ||
-      count < 0
-    )
-      continue;
-    totals[event] = (totals[event] ?? 0) + count;
-    rowCount += 1;
-    const syncedAt = typeof row.synced_at === "string" ? row.synced_at : null;
-    if (syncedAt && (!observedAt || syncedAt > observedAt)) observedAt = syncedAt;
-  }
+function funnelEventsFromEvidence(evidence: AurenLiveEvidenceRecord[]): {
+  counts: FunnelEventCounts;
+  observedAt: string | null;
+  rowCount: number;
+} {
+  const source = evidence.find((row) => row.sourceType === "first_party_funnel");
+  const payload = source?.payload;
+  const value = (name: FunnelEventName) => {
+    const count =
+      payload && typeof payload === "object"
+        ? Number((payload as Record<string, unknown>)[name])
+        : NaN;
+    return Number.isInteger(count) && count >= 0 ? count : null;
+  };
+  const counts = {
+    pageView: value("pageView"),
+    viewContent: value("viewContent"),
+    addToCart: value("addToCart"),
+    initiateCheckout: value("initiateCheckout"),
+    purchase: value("purchase"),
+  };
+  const rowCount =
+    payload && typeof payload === "object"
+      ? Number((payload as Record<string, unknown>).rowCount)
+      : 0;
   return {
-    counts: {
-      pageView: totals.pageView ?? null,
-      viewContent: totals.viewContent ?? null,
-      addToCart: totals.addToCart ?? null,
-      initiateCheckout: totals.initiateCheckout ?? null,
-      purchase: totals.purchase ?? null,
-    },
-    observedAt,
-    rowCount,
+    counts,
+    observedAt: source?.observedAt ?? null,
+    rowCount: Number.isInteger(rowCount) && rowCount > 0 ? rowCount : 0,
   };
 }
 
@@ -720,7 +702,6 @@ export async function getAurenAdvisoryForUser(
     productsResult,
     ordersResult,
     liveEvidenceResult,
-    funnelEventsResult,
   ] = await Promise.all([
     context.supabase
       .from("businesses")
@@ -745,12 +726,6 @@ export async function getAurenAdvisoryForUser(
       .eq("user_id", userId)
       .order("observed_at", { ascending: false })
       .limit(60),
-    context.supabase
-      .from("meta_pixel_event_daily" as never)
-      .select("business_id,date,event_name,event_count,synced_at")
-      .eq("user_id", userId)
-      .gte("date", dateOnly(shiftDate(new Date(), -(request.period === "last_90d" ? 89 : 29))))
-      .limit(MAX_ROWS),
   ]);
   const results = [
     businessesResult,
@@ -767,7 +742,6 @@ export async function getAurenAdvisoryForUser(
     productsResult,
     ordersResult,
     liveEvidenceResult,
-    funnelEventsResult,
   ];
   const failed = results.find((result) => result.error);
   if (failed?.error) throw failed.error;
@@ -785,14 +759,6 @@ export async function getAurenAdvisoryForUser(
   );
   const businesses = (businessesResult.data ?? []) as AurenBusinessRecord[];
   const selectedBusinessId = request.businessId ?? null;
-  const dailyGearBusinessIds = new Set(
-    businesses
-      .filter((business) => `${business.slug} ${business.name}`.toLowerCase().includes("dailygear"))
-      .map((business) => business.id),
-  );
-  const funnelBusinessIds = selectedBusinessId
-    ? new Set([selectedBusinessId])
-    : dailyGearBusinessIds;
   const selectedBusiness = selectedBusinessId
     ? businesses.find((business) => business.id === selectedBusinessId)
     : null;
@@ -811,10 +777,19 @@ export async function getAurenAdvisoryForUser(
   const isDailyGear = selectedBusiness
     ? `${selectedBusiness.slug} ${selectedBusiness.name}`.toLowerCase().includes("dailygear")
     : true;
-  const firstPartyFunnel = aggregateFirstPartyFunnelEvents(
-    (funnelEventsResult.data ?? []) as Array<Record<string, unknown>>,
-    isDailyGear ? funnelBusinessIds : new Set(),
-  );
+  const firstPartyFunnel = isDailyGear
+    ? funnelEventsFromEvidence(liveEvidence)
+    : {
+        counts: {
+          pageView: null,
+          viewContent: null,
+          addToCart: null,
+          initiateCheckout: null,
+          purchase: null,
+        },
+        observedAt: null,
+        rowCount: 0,
+      };
   const dailyGear: AurenDailyGearRecord = {
     products: isDailyGear ? ((productsResult.data ?? []) as AurenDailyGearRecord["products"]) : [],
     orders: isDailyGear ? ((ordersResult.data ?? []) as AurenDailyGearRecord["orders"]) : [],
