@@ -49,3 +49,124 @@
     max-width: 3200px;
   }
 }
+
+/* Authenticated entry surface: intentionally scoped to /auth and never shared with commerce. */
+.alexos-auth-shell {
+  isolation: isolate;
+  background:
+    radial-gradient(
+      circle at 12% 8%,
+      color-mix(in oklch, var(--primary) 9%, transparent),
+      transparent 30rem
+    ),
+    radial-gradient(
+      circle at 88% 82%,
+      color-mix(in oklch, var(--alexos-purple) 8%, transparent),
+      transparent 32rem
+    ),
+    var(--background);
+}
+
+.alexos-auth-shell::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(color-mix(in oklch, var(--foreground) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in oklch, var(--foreground) 4%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+  content: "";
+}
+
+.alexos-auth-brand-panel {
+  isolation: isolate;
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklch, var(--sidebar) 92%, var(--alexos-purple) 8%),
+    var(--sidebar)
+  );
+}
+
+.alexos-auth-brand-panel::before,
+.alexos-auth-brand-panel::after {
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  content: "";
+}
+
+.alexos-auth-brand-panel::before {
+  top: 12%;
+  right: -12rem;
+  width: 30rem;
+  height: 30rem;
+  background: color-mix(in oklch, var(--alexos-blue) 18%, transparent);
+  filter: blur(10px);
+  opacity: 0.8;
+}
+
+.alexos-auth-brand-panel::after {
+  bottom: -16rem;
+  left: -8rem;
+  width: 32rem;
+  height: 32rem;
+  border: 1px solid color-mix(in oklch, var(--sidebar-foreground) 12%, transparent);
+  box-shadow:
+    0 0 0 4rem color-mix(in oklch, var(--sidebar-foreground) 3%, transparent),
+    0 0 0 8rem color-mix(in oklch, var(--sidebar-foreground) 2%, transparent);
+}
+
+.alexos-auth-brand-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.alexos-auth-form-panel {
+  position: relative;
+  z-index: 1;
+}
+
+.alexos-auth-card {
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklch, var(--card) 96%, var(--primary) 4%),
+    var(--card)
+  );
+  backdrop-filter: blur(20px);
+}
+
+.alexos-auth-card input,
+.alexos-auth-card button,
+.alexos-auth-card [role="tab"] {
+  min-height: 2.75rem;
+}
+
+.alexos-auth-card input:focus-visible,
+.alexos-auth-card button:focus-visible,
+.alexos-auth-card [role="tab"]:focus-visible {
+  outline: 2px solid color-mix(in oklch, var(--ring) 82%, transparent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 639px) {
+  .alexos-auth-form-panel {
+    align-items: flex-start;
+    padding-top: 2.5rem;
+  }
+
+  .alexos-auth-card {
+    border-radius: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alexos-auth-card,
+  .alexos-auth-card button {
+    transition: none;
+  }
+}

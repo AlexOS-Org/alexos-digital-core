@@ -16,6 +16,32 @@ export const Route = createFileRoute("/_authenticated/banking/acquisition")({
   component: BankingAcquisitionPage,
 });
 
+type RecruitmentFrequency = "unknown" | "occasional" | "regular" | "frequent" | "mass";
+type EmployerPriority = "low" | "medium" | "high" | "hot";
+
+const recruitmentFrequencies: readonly RecruitmentFrequency[] = [
+  "unknown",
+  "occasional",
+  "regular",
+  "frequent",
+  "mass",
+];
+const employerPriorities: readonly EmployerPriority[] = ["low", "medium", "high", "hot"];
+
+function parseRecruitmentFrequency(value: FormDataEntryValue | null): RecruitmentFrequency {
+  const candidate = String(value ?? "regular");
+  return recruitmentFrequencies.includes(candidate as RecruitmentFrequency)
+    ? (candidate as RecruitmentFrequency)
+    : "regular";
+}
+
+function parseEmployerPriority(value: FormDataEntryValue | null): EmployerPriority {
+  const candidate = String(value ?? "medium");
+  return employerPriorities.includes(candidate as EmployerPriority)
+    ? (candidate as EmployerPriority)
+    : "medium";
+}
+
 function BankingAcquisitionPage() {
   const employers = useBankingEmployers();
   const signals = useBankingSignals();

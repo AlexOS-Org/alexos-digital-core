@@ -1,0 +1,11 @@
+{
+  "name": "@alexos/dashboard-design-system",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Presentation tokens and scoped components for authenticated AlexOS dashboard surfaces.",
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./components.css": "./components.css",
+    "./usage": "./usage.md"
+  }
+}
