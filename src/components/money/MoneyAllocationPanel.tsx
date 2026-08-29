@@ -20,19 +20,14 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatMoney } from "@/lib/money/format";
-import {
-  isGiftIncome,
-  isSavingsEligibleIncome,
-  isTitheEligibleIncome,
-} from "@/lib/money/constants";
+import { isSavingsEligibleIncome } from "@/lib/money/constants";
+import { calculateTithe } from "@/lib/money/tithe-calculations";
 import {
   useAccountBalances,
   useAccounts,
   useSaveTransaction,
   useTransactions,
 } from "@/lib/money/api";
-import { getDailyGearProfitCashFlow } from "@/lib/dailygear/profit-cash-flow.functions";
-import type { DailyGearProfitCashFlowResponse } from "@/lib/dailygear/profit-cash-flow.server";
 
 const ALLOCATION_RATE = 0.1;
 
@@ -53,26 +48,6 @@ export function MoneyAllocationPanel() {
   const [savingsAccountId, setSavingsAccountId] = useState("");
   const [approvedTitheKeys, setApprovedTitheKeys] = useState<string[]>([]);
   const [approvedSavingsKeys, setApprovedSavingsKeys] = useState<string[]>([]);
-  const [profitResponse, setProfitResponse] = useState<DailyGearProfitCashFlowResponse | null>(
-    null,
-  );
-
-  useEffect(() => {
-    let active = true;
-    getDailyGearProfitCashFlow({
-      data: { datePreset: "today", includeInsights: true, maxPages: 10 },
-    })
-      .then((response) => {
-        if (active) setProfitResponse(response);
-      })
-      .catch(() => {
-        if (active) setProfitResponse(null);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
   const emergencyAccount = accounts.find(
     (account) =>
       /emergency fund/i.test(account.name) &&
@@ -84,26 +59,12 @@ export function MoneyAllocationPanel() {
 
   const metrics = useMemo(() => {
     const posted = transactions.filter((transaction) => transaction.status === "posted");
-    const ledgerBusinessProfit = posted.reduce((total, transaction) => {
-      if (transaction.financial_scope !== "business") return total;
-      if (transaction.type === "income") {
-        if (isGiftIncome(transaction)) return total;
-        return total + Number(transaction.amount);
-      }
-      if (transaction.type === "expense") {
-        if (transaction.category === "Tithe") return total;
-        return total - Number(transaction.amount);
-      }
-      return total;
-    }, 0);
-    const eligiblePersonalIncome = posted
-      .filter(
-        (transaction) =>
-          transaction.type === "income" &&
-          transaction.financial_scope !== "business" &&
-          isTitheEligibleIncome(transaction),
-      )
-      .reduce((total, transaction) => total + Number(transaction.amount), 0);
+    const titheCalculation = calculateTithe(
+      posted.map((transaction) => ({
+        ...transaction,
+        currency: accounts.find((account) => account.id === transaction.account_id)?.currency,
+      })),
+    );
     const eligiblePersonalReceipts = posted
       .filter(
         (transaction) =>
@@ -112,16 +73,11 @@ export function MoneyAllocationPanel() {
           isSavingsEligibleIncome(transaction),
       )
       .reduce((total, transaction) => total + Number(transaction.amount), 0);
-    const canonicalBusinessProfit = profitResponse?.financials.operatingProfit;
-    const businessProfit = canonicalBusinessProfit ?? ledgerBusinessProfit;
     return {
-      businessProfit: canonicalBusinessProfit ?? ledgerBusinessProfit,
-      eligiblePersonalIncome,
-      businessTithe: Math.max(0, businessProfit) * ALLOCATION_RATE,
-      personalIncomeTithe: eligiblePersonalIncome * ALLOCATION_RATE,
+      titheCalculation,
       savingsSuggestion: eligiblePersonalReceipts * ALLOCATION_RATE,
     };
-  }, [transactions, profitResponse]);
+  }, [transactions, accounts]);
 
   const availableAccounts = accounts.filter((account) => account.id !== emergencyAccount?.id);
   const personalSavingsAccounts = availableAccounts.filter(
@@ -133,7 +89,10 @@ export function MoneyAllocationPanel() {
   const selectedTitheAccount = availableAccounts.find((account) => account.id === titheAccountId);
   const balanceFor = (id: string) =>
     Number(balances.find((balance) => balance.account_id === id)?.balance ?? 0);
-  const titheTotal = metrics.businessTithe + metrics.personalIncomeTithe;
+  const titheTotal = metrics.titheCalculation.total ?? 0;
+  const titheUnavailable =
+    metrics.titheCalculation.unavailableReason !== null &&
+    metrics.titheCalculation.currencies.length > 0;
   const titheKey = `${window.from}:tithe:${titheTotal.toFixed(2)}`;
   const savingsKey = `${window.from}:savings:${metrics.savingsSuggestion.toFixed(2)}`;
 
@@ -155,7 +114,7 @@ export function MoneyAllocationPanel() {
       financial_scope: selectedTitheAccount.financial_scope ?? "personal",
       business_id: selectedTitheAccount.business_id ?? null,
       source: "Approved tithe suggestion",
-      description: `Approved 10% tithe: business profit ${formatMoney(metrics.businessTithe)} + eligible personal income excluding gifts ${formatMoney(metrics.personalIncomeTithe)}`,
+      description: `Approved 10% tithe on posted non-gift receipts: ${formatMoney(titheTotal, metrics.titheCalculation.currency ?? undefined)}`,
       reference: titheReference,
     });
     setApprovedTitheKeys((keys) => [...keys, titheKey]);
@@ -215,22 +174,28 @@ export function MoneyAllocationPanel() {
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 Tithe due
               </p>
-              <p className="mt-1 text-2xl font-semibold">{formatMoney(titheTotal)}</p>
+              <p className="mt-1 text-2xl font-semibold">
+                {titheUnavailable
+                  ? "Unavailable"
+                  : formatMoney(titheTotal, metrics.titheCalculation.currency ?? undefined)}
+              </p>
             </div>
             <HeartHandshake className="h-6 w-6 text-rose-500" />
           </div>
           <p className="text-xs text-muted-foreground">
-            10% of today’s net business profit ({formatMoney(metrics.businessTithe)}) plus 10% of
-            eligible personal income excluding gifts ({formatMoney(metrics.personalIncomeTithe)}).
-            Net business profit includes recognized revenue, COGS, order costs, business expenses,
-            and available read-only Meta spend.
+            10% of today’s posted non-gift income receipts. Gifts, loans, and transfers are
+            excluded; nothing moves until you approve it.
           </p>
-          {profitResponse?.financials.dataQuality.warnings.length ? (
+          {titheUnavailable ? (
             <p className="text-xs text-amber-700 dark:text-amber-300">
-              Profit data warning: {profitResponse.financials.dataQuality.warnings[0]}
+              Tithe is unavailable because eligible receipts have{" "}
+              {metrics.titheCalculation.unavailableReason === "mixed_currency"
+                ? "multiple currencies"
+                : "an unknown currency"}
+              .
             </p>
           ) : null}
-          {titheTotal > 0 && !titheApproved ? (
+          {titheTotal > 0 && !titheUnavailable && !titheApproved ? (
             <>
               <div className="space-y-1.5">
                 <Label>Pay tithe from</Label>
