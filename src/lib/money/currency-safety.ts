@@ -19,3 +19,10 @@ export function summarizeCurrencySafety(accounts: CurrencyAccountLike[]): Curren
   if (currencies.size > 1) return { currency: null, isMixed: true };
   return { currency: currencies.values().next().value ?? null, isMixed: false };
 }
+
+export function guardAggregateMoneyValue(
+  value: number,
+  summary: CurrencySafetySummary,
+): number | null {
+  return summary.isMixed || !summary.currency ? null : value;
+}

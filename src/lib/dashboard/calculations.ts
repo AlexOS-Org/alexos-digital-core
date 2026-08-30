@@ -17,6 +17,7 @@ import type {
 } from "./types";
 import type { Account, AccountBalance, Transaction } from "@/lib/money/api";
 import type { Lead } from "@/lib/crm/types";
+import { summarizeCurrencySafety } from "@/lib/money/currency-safety";
 
 const num = (value: unknown) => {
   const n = typeof value === "string" ? parseFloat(value) : Number(value ?? 0);
@@ -97,6 +98,7 @@ export function computeMoneyMetrics(snapshot: DashboardSnapshot, now = new Date(
   const pendingExpected = expected.filter((e) => e.status === "pending");
 
   return {
+    currencySafety: summarizeCurrencySafety(accounts),
     cashAvailable,
     lowBalanceAccounts,
     incomeThisMonth,

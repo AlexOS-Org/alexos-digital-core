@@ -3,6 +3,7 @@ import type { Bill } from "@/lib/money/bills";
 import type { Debt } from "@/lib/debts/api";
 import type { Goal, GoalProgress } from "@/lib/goals/api";
 import type { Contact, Lead } from "@/lib/crm/types";
+import type { CurrencySafetySummary } from "@/lib/money/currency-safety";
 
 export interface DashboardSnapshot {
   accounts: Account[];
@@ -18,6 +19,7 @@ export interface DashboardSnapshot {
 }
 
 export interface MoneyMetrics {
+  currencySafety: CurrencySafetySummary;
   cashAvailable: number;
   lowBalanceAccounts: { name: string; balance: number; threshold: number }[];
   incomeThisMonth: number;

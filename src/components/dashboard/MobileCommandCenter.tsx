@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboardData } from "@/lib/dashboard/api";
 import { formatMoney } from "@/lib/money/format";
+import { guardAggregateMoneyValue } from "@/lib/money/currency-safety";
 import { useIntelligenceSignals } from "@/lib/intelligence/api";
 import { cn } from "@/lib/utils";
 
@@ -109,6 +110,12 @@ export function MobileAurenBriefing() {
 export function MobileMetricTiles() {
   const { metrics, isLoading } = useDashboardData();
   const { data: signals = [] } = useIntelligenceSignals(3);
+  const moneyValue = (value: number) => {
+    const guarded = guardAggregateMoneyValue(value, metrics.money.currencySafety);
+    return guarded === null
+      ? "Data not available"
+      : formatMoney(guarded, metrics.money.currencySafety.currency ?? undefined);
+  };
   const alertCount =
     signals.length +
     metrics.money.lowBalanceAccounts.length +
@@ -117,7 +124,7 @@ export function MobileMetricTiles() {
   const tiles = [
     {
       label: "Money",
-      value: formatMoney(metrics.money.cashAvailable),
+      value: moneyValue(metrics.money.cashAvailable),
       detail: "Cash available",
       icon: WalletCards,
       tone: "text-emerald-600 dark:text-emerald-300 bg-emerald-500/10 ring-emerald-500/15",
@@ -199,13 +206,21 @@ export function MobileRevenueToday() {
     return buckets;
   }, [snapshot.transactions]);
   const max = Math.max(...values, 1);
-  const hasRevenue = metrics.money.revenueToday > 0;
+  const guardedRevenueToday = guardAggregateMoneyValue(
+    metrics.money.revenueToday,
+    metrics.money.currencySafety,
+  );
+  const hasRevenue = guardedRevenueToday !== null && guardedRevenueToday > 0;
   return (
     <section className="relative overflow-hidden rounded-[1.75rem] border border-border/60 bg-card/75 p-4 shadow-[0_18px_50px_-35px_var(--alexos-glow)] sm:p-5">
       <div className="alexos-visual-strip absolute inset-x-0 top-0 h-1 opacity-80" />
       <MobileSectionHeader
         eyebrow="Revenue today"
-        title={formatMoney(metrics.money.revenueToday)}
+        title={
+          guardedRevenueToday === null
+            ? "Data not available"
+            : formatMoney(guardedRevenueToday, metrics.money.currencySafety.currency ?? undefined)
+        }
         description={
           hasRevenue
             ? "Posted income recorded since midnight."

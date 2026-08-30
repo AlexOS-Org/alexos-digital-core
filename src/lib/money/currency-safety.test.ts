@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { summarizeCurrencySafety } from "./currency-safety";
+import { guardAggregateMoneyValue, summarizeCurrencySafety } from "./currency-safety";
 
 describe("Money Center currency safety", () => {
   it("allows aggregate display when all active accounts share one currency", () => {
@@ -30,4 +30,13 @@ describe("Money Center currency safety", () => {
       ]),
     ).toEqual({ currency: "KES", isMixed: false });
   });
+});
+
+it("withholds a numeric aggregate value when the summary is mixed", () => {
+  const summary = summarizeCurrencySafety([
+    { currency: "KES", status: "active" },
+    { currency: "USD", status: "active" },
+  ]);
+
+  expect(guardAggregateMoneyValue(12500, summary)).toBeNull();
 });

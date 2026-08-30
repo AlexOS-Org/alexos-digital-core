@@ -10,6 +10,7 @@ import { Link } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { useDashboardData } from "@/lib/dashboard/api";
 import { formatMoney } from "@/lib/money/format";
+import { guardAggregateMoneyValue } from "@/lib/money/currency-safety";
 import { cn } from "@/lib/utils";
 
 type KpiTone = "blue" | "green" | "purple" | "amber";
@@ -47,10 +48,16 @@ export function DashboardKpiStrip() {
   const { metrics, isLoading } = useDashboardData();
   const { money, business } = metrics;
   const netWorth = money.cashAvailable - money.outstandingDebt;
+  const moneyValue = (value: number) => {
+    const guarded = guardAggregateMoneyValue(value, money.currencySafety);
+    return guarded === null
+      ? "Data not available"
+      : formatMoney(guarded, money.currencySafety.currency ?? undefined);
+  };
   const kpis: Kpi[] = [
     {
       label: "Total net worth",
-      value: formatMoney(netWorth),
+      value: moneyValue(netWorth),
       detail: "Cash available less outstanding debt",
       to: "/money-center",
       tone: "blue",
@@ -58,7 +65,7 @@ export function DashboardKpiStrip() {
     },
     {
       label: "Cash available",
-      value: formatMoney(money.cashAvailable),
+      value: moneyValue(money.cashAvailable),
       detail: "Across your connected accounts",
       to: "/money-center/accounts",
       tone: "green",
@@ -66,7 +73,7 @@ export function DashboardKpiStrip() {
     },
     {
       label: "Operating income",
-      value: formatMoney(money.incomeThisMonth),
+      value: moneyValue(money.incomeThisMonth),
       detail: "Posted income this month",
       to: "/money-center/income",
       tone: "purple",

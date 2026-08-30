@@ -13,6 +13,7 @@ import {
 import { useAccountBalances, useAccounts, useTransactions } from "@/lib/money/api";
 import { useDebts, debtRemaining } from "@/lib/debts/api";
 import { formatMoney } from "@/lib/money/format";
+import { guardAggregateMoneyValue, summarizeCurrencySafety } from "@/lib/money/currency-safety";
 
 export default function MoneySnapshot() {
   const { data: balances = [] } = useAccountBalances();
@@ -32,6 +33,13 @@ export default function MoneySnapshot() {
 
   const scopedAccounts = accounts as AccountWithScope[];
   const scopedTransactions = transactions as TxWithFlow[];
+  const currencySafety = summarizeCurrencySafety(scopedAccounts);
+  const moneyValue = (value: number) => {
+    const guarded = guardAggregateMoneyValue(value, currencySafety);
+    return guarded === null
+      ? "Data not available"
+      : formatMoney(guarded, currencySafety.currency ?? undefined);
+  };
 
   const getBalance = (accountId: string) =>
     Number(balances.find((b) => b.account_id === accountId)?.balance ?? 0);
@@ -91,49 +99,49 @@ export default function MoneySnapshot() {
   const cards = [
     {
       title: "Cash Available",
-      value: formatMoney(cashAvailable),
+      value: moneyValue(cashAvailable),
       icon: Wallet,
       subtitle: "All accounts",
       tone: "green",
     },
     {
       title: "Personal Cash",
-      value: formatMoney(personalCash),
+      value: moneyValue(personalCash),
       icon: UserRound,
-      subtitle: `Debt ${formatMoney(personalDebt)}`,
+      subtitle: `Debt ${moneyValue(personalDebt)}`,
       tone: "blue",
     },
     {
       title: "Business Cash",
-      value: formatMoney(businessCash),
+      value: moneyValue(businessCash),
       icon: Briefcase,
-      subtitle: `Debt ${formatMoney(businessDebt)}`,
+      subtitle: `Debt ${moneyValue(businessDebt)}`,
       tone: "purple",
     },
     {
       title: "Net Worth",
-      value: formatMoney(netWorth),
+      value: moneyValue(netWorth),
       icon: Landmark,
       subtitle: "Cash less outstanding debt",
       tone: netWorth >= 0 ? "purple" : "danger",
     },
     {
       title: "Operating Income",
-      value: formatMoney(operatingIncome),
+      value: moneyValue(operatingIncome),
       icon: TrendingUp,
       subtitle: "This month · loans excluded",
       tone: "green",
     },
     {
       title: "Expenses",
-      value: formatMoney(expenses),
+      value: moneyValue(expenses),
       icon: TrendingDown,
       subtitle: "This month",
       tone: "amber",
     },
     {
       title: "Loan Proceeds",
-      value: formatMoney(loanProceeds),
+      value: moneyValue(loanProceeds),
       icon: ArrowDownCircle,
       subtitle: "Cash received · not income",
       tone: "amber",

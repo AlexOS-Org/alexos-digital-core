@@ -4,10 +4,17 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Coins, Percent, TrendingUp, Users, Wallet } from "lucide-react";
 import { useDashboardData } from "@/lib/dashboard/api";
 import { formatMoney } from "@/lib/money/format";
+import { guardAggregateMoneyValue } from "@/lib/money/currency-safety";
 
 export default function BusinessSnapshot() {
   const { metrics, isLoading, isError } = useDashboardData();
   const { business, money } = metrics;
+  const moneyValue = (value: number) => {
+    const guarded = guardAggregateMoneyValue(value, money.currencySafety);
+    return guarded === null
+      ? "Data not available"
+      : formatMoney(guarded, money.currencySafety.currency ?? undefined);
+  };
 
   if (isError) {
     return (
@@ -22,7 +29,7 @@ export default function BusinessSnapshot() {
   const items = [
     {
       title: "Revenue",
-      value: formatMoney(money.incomeThisMonth),
+      value: moneyValue(money.incomeThisMonth),
       description:
         money.incomeChangePct === null
           ? "This month"
@@ -33,7 +40,7 @@ export default function BusinessSnapshot() {
     },
     {
       title: "Expenses",
-      value: formatMoney(money.expensesThisMonth),
+      value: moneyValue(money.expensesThisMonth),
       description:
         money.expenseChangePct === null
           ? "This month"
