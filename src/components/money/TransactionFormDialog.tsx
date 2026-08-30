@@ -17,7 +17,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAccounts, useBusinesses, useSaveTransaction, type Transaction } from "@/lib/money/api";
+import {
+  useAccounts,
+  useBusinesses,
+  useSaveBusiness,
+  useSaveTransaction,
+  type Transaction,
+} from "@/lib/money/api";
 import { toast } from "sonner";
 import {
   EXPENSE_CATEGORIES,
@@ -39,6 +45,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
   const { data: accounts = [] } = useAccounts();
   const { data: businesses = [] } = useBusinesses();
   const save = useSaveTransaction();
+  const saveBusiness = useSaveBusiness();
 
   const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 16));
   const [amount, setAmount] = useState("");
@@ -50,6 +57,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
   const [reference, setReference] = useState("");
   const [scope, setScope] = useState<"personal" | "business">("personal");
   const [businessId, setBusinessId] = useState("");
+  const [newBusinessName, setNewBusinessName] = useState("");
 
   const eligibleAccounts =
     mode !== "expense"
@@ -62,6 +70,11 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       setAccountId(eligibleAccounts[0]?.id ?? "");
     }
   }, [open, mode, scope, accountId, eligibleAccounts]);
+
+  useEffect(() => {
+    if (scope !== "business" || businessId || !businesses[0]) return;
+    setBusinessId(businesses[0].id);
+  }, [scope, businessId, businesses]);
 
   useEffect(() => {
     if (!open) return;
@@ -89,8 +102,24 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       setReference("");
       setScope("personal");
       setBusinessId(businesses[0]?.id ?? "");
+      setNewBusinessName("");
     }
   }, [open, editing, accounts, businesses]);
+
+  const createBusiness = async () => {
+    const name = newBusinessName.trim();
+    if (!name) {
+      toast.error("Enter a business name.");
+      return;
+    }
+    try {
+      const created = await saveBusiness.mutateAsync({ name });
+      setBusinessId(created.id);
+      setNewBusinessName("");
+    } catch {
+      // The mutation's onError handler presents the provider error to the user.
+    }
+  };
 
   const selectedAccount = accounts.find((account) => account.id === accountId);
 
@@ -253,7 +282,11 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
               {scope === "business" && (
                 <div className="space-y-1.5">
                   <Label>Business</Label>
-                  <Select value={businessId} onValueChange={setBusinessId}>
+                  <Select
+                    value={businessId}
+                    onValueChange={setBusinessId}
+                    disabled={businesses.length === 0}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select business" />
                     </SelectTrigger>
@@ -265,6 +298,29 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
                       ))}
                     </SelectContent>
                   </Select>
+                  {businesses.length === 0 && (
+                    <div className="space-y-2 rounded-xl border border-dashed border-primary/30 bg-primary/[0.04] p-3">
+                      <p className="text-xs text-muted-foreground">
+                        No active businesses are available yet. Add one to assign this expense.
+                      </p>
+                      <div className="flex gap-2">
+                        <Input
+                          aria-label="New business name"
+                          value={newBusinessName}
+                          onChange={(event) => setNewBusinessName(event.target.value)}
+                          placeholder="e.g. DailyGear"
+                        />
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={createBusiness}
+                          disabled={saveBusiness.isPending}
+                        >
+                          {saveBusiness.isPending ? "Adding..." : "Add"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
               <div className="space-y-1.5">

@@ -90,6 +90,18 @@ async function uid() {
 }
 
 /* ---------------- Accounts ---------------- */
+export function businessSlugFromName(name: string): string {
+  return (
+    name
+      .trim()
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "business"
+  );
+}
+
 export function useBusinesses() {
   return useQuery({
     queryKey: ["businesses", "finance"],
@@ -103,6 +115,36 @@ export function useBusinesses() {
       if (error) throw error;
       return (data ?? []) as Business[];
     },
+  });
+}
+
+export function useSaveBusiness() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { name: string; currency?: string; business_type?: string }) => {
+      const name = input.name.trim();
+      if (!name) throw new Error("Enter a business name.");
+      const user_id = await uid();
+      const { data, error } = await supabase
+        .from("businesses")
+        .insert({
+          user_id,
+          name,
+          slug: businessSlugFromName(name),
+          status: "active",
+          currency: input.currency ?? "KES",
+          business_type: input.business_type ?? null,
+        } as never)
+        .select("id,name,status,currency,business_type")
+        .single();
+      if (error) throw error;
+      return data as Business;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["businesses", "finance"] });
+      toast.success("Business added");
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
