@@ -10,6 +10,7 @@ import {
 } from "@/lib/money/api";
 import { formatMoney, monthKey } from "@/lib/money/format";
 import { normalizeExpenseCategory } from "@/lib/money/constants";
+import { summarizeCurrencySafety } from "@/lib/money/currency-safety";
 
 const MoneyCenterCharts = lazy(() =>
   import("@/components/money/MoneyCenterCharts").then((module) => ({
@@ -27,6 +28,7 @@ function AnalyticsPage() {
   const { data: balances = [] } = useAccountBalances();
   const { data: budgets = [] } = useBudgets(monthKey());
   const { data: expected = [] } = useExpected();
+  const currencySafety = useMemo(() => summarizeCurrencySafety(accounts), [accounts]);
 
   const monthly = useMemo(() => {
     const map = new Map<string, { month: string; income: number; expense: number }>();
@@ -134,19 +136,29 @@ function AnalyticsPage() {
         <h1 className="text-2xl font-semibold tracking-tight">Analytics</h1>
         <p className="text-sm text-muted-foreground">Visual insights across your money.</p>
       </header>
-      <Suspense fallback={<ChartsLoadingState />}>
-        <MoneyCenterCharts
-          monthly={monthly}
-          byCategory={byCategory}
-          bySource={bySource}
-          budgetActual={budgetActual}
-          accountBalanceData={accountBalanceData}
-          netWorthTrend={netWorthTrend}
-          expectedVsReceived={expectedVsReceived}
-          expectedCount={expected.length}
-          money={money}
-        />
-      </Suspense>
+      {currencySafety.isMixed ? (
+        <div
+          role="alert"
+          className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-900 dark:text-amber-100"
+        >
+          Analytics totals are unavailable because active accounts use multiple currencies. Review
+          each account separately rather than combining values as KES.
+        </div>
+      ) : (
+        <Suspense fallback={<ChartsLoadingState />}>
+          <MoneyCenterCharts
+            monthly={monthly}
+            byCategory={byCategory}
+            bySource={bySource}
+            budgetActual={budgetActual}
+            accountBalanceData={accountBalanceData}
+            netWorthTrend={netWorthTrend}
+            expectedVsReceived={expectedVsReceived}
+            expectedCount={expected.length}
+            money={money}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
