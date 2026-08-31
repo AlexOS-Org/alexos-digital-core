@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { carryForwardBudgets } from "./budget-calculations";
 import type { ExpenseScope } from "./constants";
+import { buildReceivedExpectedTransaction } from "./expected-money";
 
 export interface Account {
   id: string;
@@ -81,6 +82,9 @@ export interface Expected {
   account_id: string | null;
   received_transaction_id: string | null;
   deleted_at: string | null;
+  financial_scope: "personal" | "business" | null;
+  business_id: string | null;
+  business_name: string | null;
 }
 
 async function uid() {
@@ -420,15 +424,9 @@ export function useMarkExpectedReceived() {
       const user_id = await uid();
       const { data: tx, error: txErr } = await supabase
         .from("transactions")
-        .insert({
-          user_id,
-          type: "income",
-          account_id: accountId,
-          amount: expected.amount,
-          source: expected.source,
-          description: expected.description ?? `Expected: ${expected.source}`,
-          occurred_at: new Date().toISOString(),
-        })
+        .insert(
+          buildReceivedExpectedTransaction(expected, user_id, accountId, new Date().toISOString()),
+        )
         .select("id")
         .single();
       if (txErr) throw txErr;
