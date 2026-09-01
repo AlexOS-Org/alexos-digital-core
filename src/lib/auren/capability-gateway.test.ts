@@ -68,24 +68,49 @@ describe("Auren capability gateway", () => {
     expect(result.reason).toBe("mutation_not_approved");
   });
 
-  it("marks requested skills as contract-only until an adapter is wired", () => {
-    const ids = new Set(
-      readOnlyCapabilityRegistry
-        .filter((capability) => capability.availability === "contract_only")
-        .map((capability) => capability.id),
-    );
+  it("keeps external analysis skills contract-only until a provider adapter is wired", () => {
+    const externalSkillIds = [
+      "analytics:read",
+      "content-gap:read",
+      "debugging:read",
+      "financial-analysis:read",
+      "seo-competitor:read",
+      "similarweb:read",
+    ] as const;
 
-    expect(ids).toEqual(
-      new Set([
-        "analytics:read",
-        "content-gap:read",
-        "daily-briefing:read",
-        "debugging:read",
-        "financial-analysis:read",
-        "seo-competitor:read",
-        "similarweb:read",
-      ]),
-    );
+    for (const capabilityId of externalSkillIds) {
+      const capability = readOnlyCapabilityRegistry.find((item) => item.id === capabilityId);
+      expect(capability?.availability).toBe("contract_only");
+      expect(capability?.authorization).toBe("read_only");
+      expect(
+        authorizeCapability({
+          capabilityId,
+          userId: "user-1",
+          requestedUserId: "user-2",
+          requestedBusinessId: null,
+        }),
+      ).toEqual({ allowed: false, reason: "workspace_scope_mismatch" });
+    }
+  });
+
+  it("marks the daily briefing as connected and still read-only", () => {
+    const capability = readOnlyCapabilityRegistry.find((item) => item.id === "daily-briefing:read");
+
+    expect(capability).toMatchObject({
+      availability: "connected",
+      authorization: "read_only",
+      mutationApprovalRequired: true,
+      freshnessLabel: "live owner-scoped CRM and task data",
+      skillId: "daily-briefing",
+    });
+    expect(
+      authorizeCapability({
+        capabilityId: "daily-briefing:read",
+        userId: "user-1",
+        requestedUserId: "user-1",
+        requestedBusinessId: null,
+      }),
+    ).toEqual({ allowed: true, reason: null });
   });
 
   it("never registers a mutation capability in the read-only registry", () => {

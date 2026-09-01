@@ -90,8 +90,8 @@ export const readOnlyCapabilityRegistry: readonly AurenCapability[] = [
     source: "knowledge",
     authorization: "read_only",
     mutationApprovalRequired: true,
-    freshnessLabel: "source-dated workspace context",
-    availability: "contract_only",
+    freshnessLabel: "live owner-scoped CRM and task data",
+    availability: "connected",
     skillId: "daily-briefing",
   },
   {
