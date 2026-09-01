@@ -8,12 +8,15 @@ const untracked = execFileSync("git", ["ls-files", "--others", "--exclude-standa
 });
 const changed = [...new Set(`${tracked}\n${untracked}`.split(/\r?\n/).filter(Boolean))];
 
+// This guard protects the *public-facing DailyGear storefront*. The
+// authenticated admin commerce layer (src/lib/dailygear/*) is deliberately
+// excluded so the owner can manage products, pricing, variants, stock and
+// readiness without putting the customer-facing surface at risk.
 const protectedPatterns = [
   /^src\/routes\/shop\./,
   /^src\/routes\/funnel\.\$slug\.tsx$/,
   /^src\/components\/storefront\//,
   /^src\/styles\.css$/,
-  /^src\/lib\/dailygear\//,
   /^public\/storefront\//,
 ];
 
