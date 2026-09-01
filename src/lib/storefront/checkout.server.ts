@@ -1,6 +1,33 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, Json } from "@/integrations/supabase/types";
 import type { FunnelAttribution, FunnelOfferRole } from "@/lib/dailygear/types";
 import { markCartSessionConvertedImpl } from "./cart-session.server";
+
+type AdminClient = SupabaseClient<Database>;
+
+/**
+ * Reject any guest order line whose authoritative selling price is not a
+ * positive number. This is the application-level zero-price safety guard.
+ *
+ * The RPC is the final authority, but this guard runs *before* the order is
+ * placed so a KES 0 / unset catalogue product can never silently become a
+ * free customer order. The RPC receives only product/variant identity; any
+ * unresolved line fails closed here.
+ */
+export function assertNoZeroPricedLines(
+  lines: Array<{ productId: string; variantId?: string | null; quantity: number }>,
+  prices: Record<string, number | null | undefined>,
+): void {
+  for (const line of lines) {
+    const key = line.variantId ?? line.productId;
+    const price = prices[key];
+    if (!Number.isFinite(Number(price)) || Number(price) <= 0) {
+      throw new Error(
+        `One of the items in your cart is not priced for sale. Please remove it and try again.`,
+      );
+    }
+  }
+}
 
 /**
  * Guest checkout — server-only implementation.
@@ -150,9 +177,74 @@ export function buildGuestOrderRpcItems(items: GuestOrderLineInput[]) {
   }));
 }
 
+type PricedRow = { price: number | string | null; sale_price: number | string | null };
+
+function effectivePrice(row: PricedRow) {
+  const base = Number(row.price);
+  const sale = row.sale_price == null ? null : Number(row.sale_price);
+  return sale != null && Number.isFinite(sale) && sale > 0 && sale < base ? sale : base;
+}
+
+async function assertZeroPriceGuard(
+  supabaseAdmin: AdminClient,
+  storeSlug: string,
+  items: GuestOrderLineInput[],
+) {
+  if (items.length === 0) return;
+
+  const productIds = [...new Set(items.map((item) => item.productId))];
+  const variantIds = [...new Set(items.map((item) => item.variantId).filter(Boolean))] as string[];
+
+  const { data: storefront } = await supabaseAdmin
+    .from("dg_storefronts")
+    .select("user_id")
+    .eq("slug", storeSlug)
+    .maybeSingle();
+  if (!storefront) return;
+
+  const [{ data: products }, { data: variants }] = await Promise.all([
+    supabaseAdmin
+      .from("dg_products")
+      .select("id,price,sale_price")
+      .eq("user_id", storefront.user_id)
+      .in("id", productIds)
+      .is("deleted_at", null),
+    variantIds.length
+      ? supabaseAdmin
+          .from("dg_product_variants")
+          .select("id,product_id,price,sale_price")
+          .in("id", variantIds)
+          .is("deleted_at", null)
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  const productMap = new Map<string, PricedRow>((products ?? []).map((row) => [row.id, row]));
+  const variantMap = new Map<string, PricedRow>((variants ?? []).map((row) => [row.id, row]));
+
+  const pricesByLine: Record<string, number | null> = {};
+  for (const item of items) {
+    const product = productMap.get(item.productId);
+    if (!product) {
+      pricesByLine[item.variantId ?? item.productId] = null;
+      continue;
+    }
+    const variant = item.variantId ? variantMap.get(item.variantId) : undefined;
+    pricesByLine[item.variantId ?? item.productId] = effectivePrice({
+      price: variant ? variant.price : product.price,
+      sale_price: variant ? variant.sale_price : product.sale_price,
+    });
+  }
+
+  assertNoZeroPricedLines(items, pricesByLine);
+}
+
 export async function placeGuestOrderImpl(input: GuestOrderInput) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   type GuestOrderRpcArgs = Database["public"]["Functions"]["dg_create_guest_order"]["Args"];
+
+  // Fail closed on any line whose authoritative price is not a positive number.
+  await assertZeroPriceGuard(supabaseAdmin, input.storeSlug, input.items);
+
   const rpcArgs = {
     p_store_slug: input.storeSlug,
     p_first_name: input.firstName,
