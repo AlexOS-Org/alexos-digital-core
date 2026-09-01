@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +27,17 @@ import {
   useSuppliers,
   useVariants,
 } from "@/lib/dailygear/api";
+import {
+  canPublishToCatalogue,
+  cataloguePublicationBlockers,
+  normalizeCurrencyCode,
+} from "@/lib/dailygear/catalogue-publish";
+import {
+  buildPremiumAttributes,
+  premiumContentFromAttributes,
+  premiumEnabledFromAttributes,
+  type PremiumContentDraft,
+} from "@/lib/dailygear/premium-content";
 import { canActivateForSale } from "@/lib/dailygear/product-readiness";
 import { buildVariantCommercialPayload } from "@/lib/dailygear/variant-commercial";
 import type { Product, ProductStatus } from "@/lib/dailygear/types";
@@ -46,6 +57,7 @@ const EMPTY = {
   price: "",
   sale_price: "",
   cost_price: "",
+  currency: "KES",
   stock_quantity: "",
   low_stock_threshold: "5",
   category_id: "",
@@ -53,6 +65,26 @@ const EMPTY = {
   supplier_id: "",
   images: "",
   premium: "false",
+  premiumHero: "",
+  premiumImages: "",
+  premiumFeatureImages: "",
+  premiumLifestyleImages: "",
+  premiumBenefits: "",
+  premiumFeatures: "",
+  premiumSpecs: "",
+  premiumFaq: "",
+};
+
+const EMPTY_PREMIUM_CONTENT: PremiumContentDraft = {
+  enabled: false,
+  hero: "",
+  images: "",
+  featureImages: "",
+  lifestyleImages: "",
+  benefits: "",
+  features: "",
+  specs: "",
+  faq: "",
 };
 
 function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> }) {
@@ -292,6 +324,13 @@ export function ProductFormDialog({
   const { data: suppliers = [] } = useSuppliers();
   const { data: variants = [] } = useVariants(product?.id ? { product_id: product.id } : undefined);
 
+  const premiumContent = useMemo(() => {
+    if (!product) return EMPTY_PREMIUM_CONTENT;
+    const existing = premiumContentFromAttributes(product.attributes);
+    const enabled = premiumEnabledFromAttributes(product.attributes);
+    return { ...existing, enabled };
+  }, [product]);
+
   useEffect(() => {
     if (!open) return;
     setForm(
@@ -311,26 +350,26 @@ export function ProductFormDialog({
             price: String(product.price ?? ""),
             sale_price: product.sale_price != null ? String(product.sale_price) : "",
             cost_price: String(product.cost_price ?? ""),
+            currency: normalizeCurrencyCode(product.currency),
             stock_quantity: String(product.stock_quantity ?? ""),
             low_stock_threshold: String(product.low_stock_threshold ?? 5),
             category_id: product.category_id ?? "",
             brand_id: product.brand_id ?? "",
             supplier_id: product.supplier_id ?? "",
             images: ((product.images ?? []) as string[]).join("\n"),
-            premium:
-              product.attributes &&
-              typeof product.attributes === "object" &&
-              !Array.isArray(product.attributes) &&
-              (product.attributes as Record<string, unknown>).premium &&
-              typeof (product.attributes as Record<string, unknown>).premium === "object" &&
-              ((product.attributes as Record<string, unknown>).premium as Record<string, unknown>)
-                .enabled === true
-                ? "true"
-                : "false",
+            premium: premiumEnabledFromAttributes(product.attributes) ? "true" : "false",
+            premiumHero: premiumContent.hero,
+            premiumImages: premiumContent.images,
+            premiumFeatureImages: premiumContent.featureImages,
+            premiumLifestyleImages: premiumContent.lifestyleImages,
+            premiumBenefits: premiumContent.benefits,
+            premiumFeatures: premiumContent.features,
+            premiumSpecs: premiumContent.specs,
+            premiumFaq: premiumContent.faq,
           }
         : EMPTY,
     );
-  }, [open, product]);
+  }, [open, product, premiumContent]);
 
   const set = (key: keyof typeof EMPTY) => (value: string) =>
     setForm((current) => ({ ...current, [key]: value }));
@@ -354,21 +393,23 @@ export function ProductFormDialog({
   const incompleteVariants = variants.filter((variant) => !variant.availability_confirmed);
   const hasVariantReadiness = incompleteVariants.length === 0;
   const priceMissing = !canActivateForSale({ price: Number(form.price), sale_price: null });
-  const missingPublicationRequirements = [
-    !hasConfirmedAvailability ? "confirmed availability" : null,
-    !hasCategory ? "a primary category" : null,
-    !hasEvidence ? "source evidence" : null,
-    !hasVariantReadiness ? "every colour/SKU variant must have confirmed availability" : null,
-    invalidImageUrls.length > 0 ? "valid HTTPS image URLs" : null,
-    priceMissing ? "a positive selling price" : null,
-  ].filter((requirement): requirement is string => Boolean(requirement));
-  const publicationBlocked = form.status === "active" && missingPublicationRequirements.length > 0;
+  const catalogueInput = {
+    hasName: Boolean(form.name.trim()),
+    hasCategory,
+    hasConfirmedAvailability,
+    hasEvidence,
+    hasVariantReadiness,
+    hasValidImageUrls: invalidImageUrls.length === 0,
+    hasSellablePrice: !priceMissing,
+  };
+  const publicationBlockers = cataloguePublicationBlockers(catalogueInput);
+  const publicationBlocked = form.status === "active" && !canPublishToCatalogue(catalogueInput);
   const invalid = !form.name.trim() || publicationBlocked;
 
   async function submit(statusOverride?: ProductStatus) {
     const nextStatus = statusOverride ?? form.status;
     if (!form.name.trim()) return;
-    if (nextStatus === "active" && missingPublicationRequirements.length > 0) return;
+    if (nextStatus === "active" && !canPublishToCatalogue(catalogueInput)) return;
     await save.mutateAsync({
       ...(product ? { id: product.id } : {}),
       name: form.name.trim(),
@@ -388,20 +429,31 @@ export function ProductFormDialog({
       price: Number(form.price) || 0,
       sale_price: form.sale_price ? Number(form.sale_price) : null,
       cost_price: Number(form.cost_price) || 0,
+      currency: normalizeCurrencyCode(form.currency),
       stock_quantity: Number(form.stock_quantity) || 0,
       low_stock_threshold: Number(form.low_stock_threshold) || 0,
       category_id: form.category_id || null,
       brand_id: form.brand_id || null,
       supplier_id: form.supplier_id || null,
       images: imageUrls,
-      attributes: {
-        ...(product?.attributes &&
-        typeof product.attributes === "object" &&
-        !Array.isArray(product.attributes)
+      attributes: buildPremiumAttributes(
+        product?.attributes &&
+          typeof product.attributes === "object" &&
+          !Array.isArray(product.attributes)
           ? (product.attributes as Record<string, unknown>)
-          : {}),
-        premium: { enabled: form.premium === "true" },
-      },
+          : null,
+        {
+          enabled: form.premium === "true",
+          hero: form.premiumHero,
+          images: form.premiumImages,
+          featureImages: form.premiumFeatureImages,
+          lifestyleImages: form.premiumLifestyleImages,
+          benefits: form.premiumBenefits,
+          features: form.premiumFeatures,
+          specs: form.premiumSpecs,
+          faq: form.premiumFaq,
+        },
+      ),
     });
     onOpenChange(false);
   }
@@ -490,6 +542,102 @@ export function ProductFormDialog({
             </p>
           </div>
 
+          {form.premium === "true" ? (
+            <div className="space-y-3 sm:col-span-2">
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-semibold">Premium page content</h3>
+                <p className="text-xs text-muted-foreground">
+                  Optional presentation content. Each line is stored as one record; use
+                  <span className="font-mono"> | </span>
+                  to separate the title from the description. Leave blank to fall back to the
+                  standard product page.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Hero image URL</Label>
+                <Input
+                  value={form.premiumHero}
+                  onChange={(e) => set("premiumHero")(e.target.value)}
+                  placeholder="https://example.com/hero.webp"
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>Gallery images (one URL per line)</Label>
+                  <textarea
+                    value={form.premiumImages}
+                    onChange={(e) => set("premiumImages")(e.target.value)}
+                    rows={4}
+                    className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Feature images (one URL per line)</Label>
+                  <textarea
+                    value={form.premiumFeatureImages}
+                    onChange={(e) => set("premiumFeatureImages")(e.target.value)}
+                    rows={4}
+                    className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Lifestyle images (one URL per line)</Label>
+                  <textarea
+                    value={form.premiumLifestyleImages}
+                    onChange={(e) => set("premiumLifestyleImages")(e.target.value)}
+                    rows={4}
+                    className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Benefits</Label>
+                  <textarea
+                    value={form.premiumBenefits}
+                    onChange={(e) => set("premiumBenefits")(e.target.value)}
+                    rows={4}
+                    placeholder="Padded support|Cushioned back panel"
+                    className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Features</Label>
+                  <textarea
+                    value={form.premiumFeatures}
+                    onChange={(e) => set("premiumFeatures")(e.target.value)}
+                    rows={4}
+                    placeholder="Organised compartments|Three safe carry sections"
+                    className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Specifications</Label>
+                  <textarea
+                    value={form.premiumSpecs}
+                    onChange={(e) => set("premiumSpecs")(e.target.value)}
+                    rows={4}
+                    placeholder="Material|Oxford fabric"
+                    className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>FAQ</Label>
+                  <textarea
+                    value={form.premiumFaq}
+                    onChange={(e) => set("premiumFaq")(e.target.value)}
+                    rows={4}
+                    placeholder="Is it machine washable?|Hand wash recommended"
+                    className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+          ) : null}
+
           <div className="space-y-2">
             <Label>Selling price</Label>
             <Input
@@ -501,10 +649,23 @@ export function ProductFormDialog({
             />
             {priceMissing ? (
               <p className="text-xs font-medium text-destructive">
-                Price required before sale. A KES 0 product stays a catalogue draft and cannot be
-                activated for checkout until you enter a positive selling price.
+                Price required before sale. A KES 0 product can be published as a catalogue preview,
+                but checkout stays blocked until you enter a positive selling price.
               </p>
             ) : null}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Currency</Label>
+            <Input
+              maxLength={3}
+              value={form.currency}
+              onChange={(e) => set("currency")(e.target.value)}
+              placeholder="KES"
+            />
+            <p className="text-xs text-muted-foreground">
+              ISO currency code for this product. Falls back to KES when empty.
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -717,9 +878,9 @@ export function ProductFormDialog({
                   Publication is blocked until the catalogue is ready.
                 </p>
                 <p className="mt-1 text-muted-foreground">
-                  An active product needs {missingPublicationRequirements.join(", ")}. Keep it as a
-                  draft until the source, category and variant availability are verified. Quantity
-                  is informational; choose Out of stock when you want to stop accepting orders.
+                  An active product needs {publicationBlockers.join(", ")}. Keep it as a draft until
+                  the source, category and variant availability are verified. Quantity is
+                  informational; choose Out of stock when you want to stop accepting orders.
                   {incompleteVariants.length > 0
                     ? ` ${incompleteVariants.length} child variant${incompleteVariants.length === 1 ? "" : "s"} still need attention.`
                     : ""}
