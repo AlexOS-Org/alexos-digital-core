@@ -1,9 +1,10 @@
-import { ChevronDown, ChevronUp, Plus, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { parsePremiumUrlLines, serializePremiumUrlLines } from "@/lib/dailygear/premium-content";
 
-export type PremiumListKind = "content" | "spec" | "faq";
+export type PremiumListKind = "content" | "spec" | "faq" | "url";
 
 interface PremiumListEditorProps {
   label: string;
@@ -21,20 +22,25 @@ interface Row {
   second: string;
 }
 
-function parseRows(value: string): Row[] {
+function parseRows(value: string, url: boolean): Row[] {
   return (value ?? "")
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line) => {
+      if (url) return { first: line, second: "" };
       const [first, ...rest] = line.split("|").map((part) => part.trim());
       return { first: first ?? "", second: rest.join("|").trim() };
     });
 }
 
-function serializeRows(rows: Row[]): string {
+function serializeRows(rows: Row[], url: boolean): string {
   return rows
     .map((row) => {
+      if (url) {
+        const value = row.first.trim();
+        return value ? value : "";
+      }
       const first = row.first.trim();
       const second = row.second.trim();
       if (!first && !second) return "";
@@ -54,10 +60,15 @@ export function PremiumListEditor({
   addLabel,
   hint,
 }: PremiumListEditorProps) {
-  const rows = parseRows(value);
+  const isUrl = kind === "url";
+  const rows: Row[] = isUrl
+    ? parsePremiumUrlLines(value).map((first) => ({ first, second: "" }))
+    : parseRows(value, false);
 
   function update(next: Row[]) {
-    onChange(serializeRows(next));
+    onChange(
+      isUrl ? serializePremiumUrlLines(next.map((row) => row.first)) : serializeRows(next, false),
+    );
   }
 
   function setRow(index: number, patch: Partial<Row>) {
@@ -80,9 +91,26 @@ export function PremiumListEditor({
     update([...rows, { first: "", second: "" }]);
   }
 
-  const ariaFirst = `${label} ${kind === "spec" ? "label" : kind === "faq" ? "question" : "title"}`;
-  const ariaSecond = `${label} ${kind === "spec" ? "value" : kind === "faq" ? "answer" : "description"}`;
-  const editingLabel = kind === "spec" ? "Specification" : kind === "faq" ? "FAQ" : "Record";
+  function setPrimary(index: number) {
+    if (index === 0) return;
+    const next = [...rows];
+    const [item] = next.splice(index, 1);
+    next.unshift(item);
+    update(next);
+  }
+
+  const ariaFirst =
+    kind === "url"
+      ? `${label} URL`
+      : `${label} ${kind === "spec" ? "label" : kind === "faq" ? "question" : "title"}`;
+  const ariaSecond =
+    kind === "spec"
+      ? `${label} value`
+      : kind === "faq"
+        ? `${label} answer`
+        : `${label} description`;
+  const editingLabel =
+    kind === "spec" ? "Specification" : kind === "faq" ? "FAQ" : isUrl ? "Image" : "Record";
 
   return (
     <div className="space-y-2">
@@ -112,14 +140,21 @@ export function PremiumListEditor({
                   placeholder={firstPlaceholder}
                   aria-label={`${ariaFirst} ${index + 1}`}
                 />
-                <Input
-                  value={row.second}
-                  onChange={(event) => setRow(index, { second: event.target.value })}
-                  placeholder={secondPlaceholder}
-                  aria-label={`${ariaSecond} ${index + 1}`}
-                />
+                {!isUrl ? (
+                  <Input
+                    value={row.second}
+                    onChange={(event) => setRow(index, { second: event.target.value })}
+                    placeholder={secondPlaceholder}
+                    aria-label={`${ariaSecond} ${index + 1}`}
+                  />
+                ) : null}
               </div>
               <div className="flex shrink-0 items-center gap-0.5">
+                {isUrl && index === 0 ? (
+                  <span className="px-1 text-[10px] font-medium uppercase text-primary">
+                    Primary
+                  </span>
+                ) : null}
                 <Button
                   type="button"
                   variant="ghost"
@@ -142,6 +177,19 @@ export function PremiumListEditor({
                 >
                   <ChevronDown className="h-4 w-4" />
                 </Button>
+                {isUrl ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setPrimary(index)}
+                    disabled={index === 0}
+                    aria-label={`Set as primary ${editingLabel.toLowerCase()}`}
+                  >
+                    <Star className="h-4 w-4" />
+                  </Button>
+                ) : null}
                 <Button
                   type="button"
                   variant="ghost"

@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   buildPremiumAttributes,
   parsePremiumContentLines,
+  parsePremiumUrlLines,
+  serializePremiumUrlLines,
   type PremiumContentDraft,
 } from "./premium-content";
 
@@ -16,6 +18,19 @@ const draft: PremiumContentDraft = {
   specs: "Material|Oxford fabric\nSize|Large",
   faq: "Is it machine washable?|Hand wash recommended",
 };
+
+describe("premium URL lines", () => {
+  it("round-trips newline-separated image urls", () => {
+    const urls = ["https://example.com/hero.webp", "https://example.com/gallery-2.webp"];
+    expect(parsePremiumUrlLines(serializePremiumUrlLines(urls))).toEqual(urls);
+  });
+
+  it("ignores blank lines without inventing urls", () => {
+    expect(parsePremiumUrlLines("\n  \nhttps://example.com/a.webp\n")).toEqual([
+      "https://example.com/a.webp",
+    ]);
+  });
+});
 
 describe("parsePremiumContentLines", () => {
   it("parses pipe-delimited content rows into structured entries", () => {

@@ -565,33 +565,36 @@ export function ProductFormDialog({
               </div>
 
               <div className="grid gap-4 sm:grid-cols-3">
-                <div className="space-y-2">
-                  <Label>Gallery images (one URL per line)</Label>
-                  <textarea
-                    value={form.premiumImages}
-                    onChange={(e) => set("premiumImages")(e.target.value)}
-                    rows={4}
-                    className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Feature images (one URL per line)</Label>
-                  <textarea
-                    value={form.premiumFeatureImages}
-                    onChange={(e) => set("premiumFeatureImages")(e.target.value)}
-                    rows={4}
-                    className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Lifestyle images (one URL per line)</Label>
-                  <textarea
-                    value={form.premiumLifestyleImages}
-                    onChange={(e) => set("premiumLifestyleImages")(e.target.value)}
-                    rows={4}
-                    className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
-                </div>
+                <PremiumListEditor
+                  label="Gallery images"
+                  kind="url"
+                  value={form.premiumImages}
+                  onChange={set("premiumImages")}
+                  firstPlaceholder="https://example.com/gallery.webp"
+                  secondPlaceholder=""
+                  addLabel="Add image"
+                  hint="Reorder and mark the primary gallery image."
+                />
+                <PremiumListEditor
+                  label="Feature images"
+                  kind="url"
+                  value={form.premiumFeatureImages}
+                  onChange={set("premiumFeatureImages")}
+                  firstPlaceholder="https://example.com/feature.webp"
+                  secondPlaceholder=""
+                  addLabel="Add image"
+                  hint="Visuals for the benefit/feature sections."
+                />
+                <PremiumListEditor
+                  label="Lifestyle images"
+                  kind="url"
+                  value={form.premiumLifestyleImages}
+                  onChange={set("premiumLifestyleImages")}
+                  firstPlaceholder="https://example.com/lifestyle.webp"
+                  secondPlaceholder=""
+                  addLabel="Add image"
+                  hint="Context visuals; only use verified imagery."
+                />
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">

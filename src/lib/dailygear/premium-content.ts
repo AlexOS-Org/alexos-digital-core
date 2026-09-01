@@ -49,6 +49,19 @@ function splitUrls(value: string | null | undefined): string[] {
     .filter(Boolean);
 }
 
+export function parsePremiumUrlLines(value: string | null | undefined): string[] {
+  return splitLines(value)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+export function serializePremiumUrlLines(urls: string[]): string {
+  return urls
+    .map((url) => url.trim())
+    .filter(Boolean)
+    .join("\n");
+}
+
 export function parsePremiumContentLines(value: string | null | undefined): PremiumContentEntry[] {
   return splitLines(value).flatMap((line) => {
     const [title, ...rest] = line.split("|").map((part) => part.trim());
