@@ -119,10 +119,10 @@ export default function MoneySnapshot() {
       tone: "purple",
     },
     {
-      title: "Net Worth",
+      title: "Liquid Net Position",
       value: moneyValue(netWorth),
       icon: Landmark,
-      subtitle: "Cash less outstanding debt",
+      subtitle: "Cash less tracked outstanding debt",
       tone: netWorth >= 0 ? "purple" : "danger",
     },
     {

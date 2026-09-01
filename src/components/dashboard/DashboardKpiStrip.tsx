@@ -56,9 +56,9 @@ export function DashboardKpiStrip() {
   };
   const kpis: Kpi[] = [
     {
-      label: "Total net worth",
+      label: "Liquid net position",
       value: moneyValue(netWorth),
-      detail: "Cash available less outstanding debt",
+      detail: "Cash available less tracked outstanding debt",
       to: "/money-center",
       tone: "blue",
       icon: Landmark,

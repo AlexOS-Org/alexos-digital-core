@@ -15,6 +15,8 @@ describe("AlexOS product language", () => {
       source("src/routes/_authenticated/businesses.tsx"),
       source("src/routes/_authenticated/route.tsx"),
       source("src/routes/auth.tsx"),
+      source("src/components/dashboard/DashboardKpiStrip.tsx"),
+      source("src/components/dashboard/MoneySnapshot.tsx"),
     ].join("\n");
 
     expect(sources).toContain("Nuvora");
@@ -24,6 +26,8 @@ describe("AlexOS product language", () => {
     expect(sources).not.toContain("Car-Bar Motion.ke");
     expect(sources).not.toContain("AI assistant");
     expect(sources).not.toContain("Alex OS");
+    expect(sources).not.toContain('label: "Total net worth"');
+    expect(sources).not.toContain('title: "Net Worth"');
   });
 });
 
