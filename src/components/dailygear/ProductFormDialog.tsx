@@ -27,6 +27,8 @@ import {
   useSuppliers,
   useVariants,
 } from "@/lib/dailygear/api";
+import { canActivateForSale } from "@/lib/dailygear/product-readiness";
+import { buildVariantCommercialPayload } from "@/lib/dailygear/variant-commercial";
 import type { Product, ProductStatus } from "@/lib/dailygear/types";
 
 const EMPTY = {
@@ -63,6 +65,9 @@ function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> 
         imageUrl: string;
         sku: string;
         stock: string;
+        price: string;
+        salePrice: string;
+        costPrice: string;
         available: boolean;
       }
     >
@@ -80,6 +85,9 @@ function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> 
         imageUrl: String(variant.image_url ?? ""),
         sku: String(variant.sku ?? ""),
         stock: String(variant.stock_quantity ?? "0"),
+        price: variant.price != null ? String(variant.price) : "",
+        salePrice: variant.sale_price != null ? String(variant.sale_price) : "",
+        costPrice: variant.cost_price != null ? String(variant.cost_price) : "",
         available: variant.availability_confirmed === true,
       }
     );
@@ -95,22 +103,11 @@ function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> 
   async function saveOne(variant: Record<string, unknown>) {
     const id = String(variant.id ?? "");
     const draft = draftFor(variant);
-    let existingOptions: Record<string, unknown> = {};
-    if (variant.options && typeof variant.options === "object")
-      existingOptions = variant.options as Record<string, unknown>;
-    await saveVariant.mutateAsync({
-      id,
-      color: draft.color.trim() || null,
-      image_url: draft.imageUrl.trim() || null,
-      sku: draft.sku.trim() || null,
-      stock_quantity: Number(draft.stock) || 0,
-      availability_confirmed: draft.available,
-      options: {
-        ...existingOptions,
-        color: draft.color.trim() || undefined,
-        sex: draft.sex || "Unisex",
-      },
-    });
+    const existingOptions =
+      variant.options && typeof variant.options === "object"
+        ? (variant.options as Record<string, unknown>)
+        : {};
+    await saveVariant.mutateAsync(buildVariantCommercialPayload(id, draft, existingOptions));
   }
 
   if (!variants.length) return null;
@@ -120,9 +117,9 @@ function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> 
         <div>
           <p className="text-sm font-semibold">Colour and audience variants</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Edit each variant’s colour, sex/gender audience, external image, SKU, quantity, and
-            customer visibility. Unavailable variants remain visible here but are hidden from the
-            storefront.
+            Edit each variant’s colour, sex/gender audience, external image, SKU, quantity, price,
+            sale price, cost and customer visibility. Unavailable variants remain visible here but
+            are hidden from the storefront.
           </p>
         </div>
         <span className="rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary">
@@ -236,6 +233,38 @@ function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> 
                   Save variant
                 </Button>
               </div>
+              <div className="grid gap-3 rounded-xl border border-border/50 bg-muted/20 p-3 md:col-span-7 md:grid-cols-3">
+                <div>
+                  <Label className="text-xs">Variant price</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={draft.price}
+                    onChange={(event) => update(id, { price: event.target.value })}
+                    placeholder="Use product price"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Variant sale price (optional)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={draft.salePrice}
+                    onChange={(event) => update(id, { salePrice: event.target.value })}
+                    placeholder="Optional"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Variant cost / COGS</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={draft.costPrice}
+                    onChange={(event) => update(id, { costPrice: event.target.value })}
+                    placeholder="Use product cost"
+                  />
+                </div>
+              </div>
             </div>
           );
         })}
@@ -313,19 +342,21 @@ export function ProductFormDialog({
   const hasEvidence = evidenceCount > 0;
   const incompleteVariants = variants.filter((variant) => !variant.availability_confirmed);
   const hasVariantReadiness = incompleteVariants.length === 0;
+  const priceMissing = !canActivateForSale({ price: Number(form.price), sale_price: null });
   const missingPublicationRequirements = [
     !hasConfirmedAvailability ? "confirmed availability" : null,
     !hasCategory ? "a primary category" : null,
     !hasEvidence ? "source evidence" : null,
     !hasVariantReadiness ? "every colour/SKU variant must have confirmed availability" : null,
     invalidImageUrls.length > 0 ? "valid HTTPS image URLs" : null,
+    priceMissing ? "a positive selling price" : null,
   ].filter((requirement): requirement is string => Boolean(requirement));
   const publicationBlocked = form.status === "active" && missingPublicationRequirements.length > 0;
-  const invalid = !form.name.trim() || Number(form.price) <= 0 || publicationBlocked;
+  const invalid = !form.name.trim() || publicationBlocked;
 
   async function submit(statusOverride?: ProductStatus) {
     const nextStatus = statusOverride ?? form.status;
-    if (!form.name.trim() || Number(form.price) <= 0) return;
+    if (!form.name.trim()) return;
     if (nextStatus === "active" && missingPublicationRequirements.length > 0) return;
     await save.mutateAsync({
       ...(product ? { id: product.id } : {}),
@@ -432,6 +463,12 @@ export function ProductFormDialog({
               onChange={(e) => set("price")(e.target.value)}
               placeholder="0"
             />
+            {priceMissing ? (
+              <p className="text-xs font-medium text-destructive">
+                Price required before sale. A KES 0 product stays a catalogue draft and cannot be
+                activated for checkout until you enter a positive selling price.
+              </p>
+            ) : null}
           </div>
 
           <div className="space-y-2">
