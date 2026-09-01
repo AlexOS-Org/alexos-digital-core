@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { PremiumListEditor } from "@/components/dailygear/PremiumListEditor";
 import {
   Select,
   SelectContent,
@@ -594,46 +595,46 @@ export function ProductFormDialog({
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Benefits</Label>
-                  <textarea
-                    value={form.premiumBenefits}
-                    onChange={(e) => set("premiumBenefits")(e.target.value)}
-                    rows={4}
-                    placeholder="Padded support|Cushioned back panel"
-                    className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Features</Label>
-                  <textarea
-                    value={form.premiumFeatures}
-                    onChange={(e) => set("premiumFeatures")(e.target.value)}
-                    rows={4}
-                    placeholder="Organised compartments|Three safe carry sections"
-                    className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Specifications</Label>
-                  <textarea
-                    value={form.premiumSpecs}
-                    onChange={(e) => set("premiumSpecs")(e.target.value)}
-                    rows={4}
-                    placeholder="Material|Oxford fabric"
-                    className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>FAQ</Label>
-                  <textarea
-                    value={form.premiumFaq}
-                    onChange={(e) => set("premiumFaq")(e.target.value)}
-                    rows={4}
-                    placeholder="Is it machine washable?|Hand wash recommended"
-                    className="min-h-[96px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
-                </div>
+                <PremiumListEditor
+                  label="Benefits"
+                  kind="content"
+                  value={form.premiumBenefits}
+                  onChange={set("premiumBenefits")}
+                  firstPlaceholder="Benefit title"
+                  secondPlaceholder="Why it matters"
+                  addLabel="Add benefit"
+                  hint="Structured owner-entered benefits, saved into attributes.premium."
+                />
+                <PremiumListEditor
+                  label="Features"
+                  kind="content"
+                  value={form.premiumFeatures}
+                  onChange={set("premiumFeatures")}
+                  firstPlaceholder="Feature title"
+                  secondPlaceholder="Feature detail"
+                  addLabel="Add feature"
+                  hint="Add, edit, reorder or remove feature records."
+                />
+                <PremiumListEditor
+                  label="Specifications"
+                  kind="spec"
+                  value={form.premiumSpecs}
+                  onChange={set("premiumSpecs")}
+                  firstPlaceholder="Label (e.g. Material)"
+                  secondPlaceholder="Value (e.g. Oxford fabric)"
+                  addLabel="Add specification"
+                  hint="Factual specs only; leave unknown values blank."
+                />
+                <PremiumListEditor
+                  label="FAQ"
+                  kind="faq"
+                  value={form.premiumFaq}
+                  onChange={set("premiumFaq")}
+                  firstPlaceholder="Question"
+                  secondPlaceholder="Answer"
+                  addLabel="Add FAQ"
+                  hint="Product-specific questions and truthful answers."
+                />
               </div>
             </div>
           ) : null}
