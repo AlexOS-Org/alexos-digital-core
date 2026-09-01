@@ -26,6 +26,7 @@ import {
   useProducts,
 } from "@/lib/dailygear/api";
 import { DG_CURRENCY, PRODUCT_STATUS_META } from "@/lib/dailygear/constants";
+import { assessProductReadiness } from "@/lib/dailygear/product-readiness";
 import { getProductReadiness } from "@/lib/dailygear/types";
 import { productImage } from "@/lib/storefront/api";
 import type { Product } from "@/lib/dailygear/types";
@@ -216,6 +217,10 @@ function ProductsPage() {
                 {filtered.map((p) => {
                   const low = Number(p.stock_quantity) <= Number(p.low_stock_threshold);
                   const readiness = getProductReadiness(p, evidenceCounts.get(p.id) ?? 0);
+                  const commerceReadiness = assessProductReadiness(p);
+                  const priceMissing = commerceReadiness.reasons.includes("missing_price");
+                  const cannotSell =
+                    !commerceReadiness.salesReady || !readiness.readyToPublish || priceMissing;
                   return (
                     <tr key={p.id} className="border-t border-border/70">
                       <td className="px-4 py-3">
@@ -250,18 +255,27 @@ function ProductsPage() {
                       <td className="px-4 py-3">
                         <span
                           className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-medium ${
-                            readiness.readyToPublish
+                            !cannotSell
                               ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
                               : "bg-amber-500/10 text-amber-700 dark:text-amber-300"
                           }`}
                         >
-                          {readiness.readyToPublish ? (
+                          {!cannotSell ? (
                             <CheckCircle2 className="h-3 w-3" />
                           ) : (
                             <AlertTriangle className="h-3 w-3" />
                           )}
-                          {readiness.readyToPublish ? "Ready" : "Needs verification"}
+                          {!cannotSell
+                            ? "READY FOR SALE"
+                            : commerceReadiness.catalogueReady
+                              ? "CATALOGUE READY"
+                              : "NOT READY"}
                         </span>
+                        {priceMissing ? (
+                          <p className="mt-1 text-[11px] font-medium text-destructive">
+                            Price required before sale
+                          </p>
+                        ) : null}
                         <p className="mt-1 text-[11px] text-muted-foreground">
                           {evidenceCounts.get(p.id) ?? 0} verified source record
                           {evidenceCounts.get(p.id) === 1 ? "" : "s"}
