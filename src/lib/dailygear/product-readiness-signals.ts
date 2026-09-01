@@ -53,6 +53,36 @@ export function productReadinessSignals(ctx: IntelligenceContext): IntelligenceI
       });
     }
 
+    const premiumConfig =
+      product.attributes &&
+      typeof product.attributes === "object" &&
+      !Array.isArray(product.attributes) &&
+      (product.attributes as Record<string, unknown>).premium &&
+      typeof (product.attributes as Record<string, unknown>).premium === "object"
+        ? ((product.attributes as Record<string, unknown>).premium as Record<string, unknown>)
+        : null;
+
+    if (premium && premiumConfig) {
+      const hasBenefits =
+        Array.isArray(premiumConfig.benefits) && premiumConfig.benefits.length > 0;
+      const hasFeatures =
+        Array.isArray(premiumConfig.features) && premiumConfig.features.length > 0;
+      const hasSectionContent = hasBenefits || hasFeatures;
+      if (!hasSectionContent) {
+        signals.push({
+          id: `readiness-premium-content-${product.id}`,
+          kind: "market",
+          title: `${product.name} is premium but has no benefit or feature copy`,
+          summary:
+            "The premium presentation is enabled without structured benefits or features, so the page has a strong hero but no owned conversion message.",
+          tone: "neutral",
+          recommendation: "Add benefit and feature content so the premium page can convert.",
+          source: "Internal premium conversion readiness",
+          evidenceLevel: "inference",
+        });
+      }
+    }
+
     if (!product.sku?.trim()) {
       signals.push({
         id: `readiness-sku-missing-${product.id}`,

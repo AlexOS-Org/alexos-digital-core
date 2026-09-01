@@ -101,6 +101,41 @@ describe("productReadinessSignals", () => {
     );
   });
 
+  it("flags premium products missing conversion content without inventing claims", () => {
+    const signals = productReadinessSignals({
+      ...ctx,
+      products: [
+        product({
+          attributes: { premium: { enabled: true } },
+        }),
+      ],
+    });
+
+    const signal = signals.find((s) => s.id === "readiness-premium-content-p1");
+    expect(signal).toBeDefined();
+    expect(signal?.evidenceLevel).toBe("inference");
+    expect(signal?.recommendation).toMatch(/benefit and feature/i);
+  });
+
+  it("does not flag premium conversion when benefit and feature content exist", () => {
+    const signals = productReadinessSignals({
+      ...ctx,
+      products: [
+        product({
+          attributes: {
+            premium: {
+              enabled: true,
+              benefits: [{ title: "Padded support", description: "Cushioned back panel" }],
+              features: [{ title: "Compartments", description: "Three sections" }],
+            },
+          },
+        }),
+      ],
+    });
+
+    expect(signals.find((s) => s.id === "readiness-premium-content-p1")).toBeUndefined();
+  });
+
   it("marks a ready product recommendation explicitly", () => {
     const signals = productReadinessSignals(ctx);
     expect(signals.find((s) => s.id === "readiness-ok-p1")?.evidenceLevel).toBe("recommendation");
