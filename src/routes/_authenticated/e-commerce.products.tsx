@@ -22,6 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   useCategories,
   useDeleteProduct,
+  useFunnels,
   useProductEvidence,
   useProducts,
 } from "@/lib/dailygear/api";
@@ -86,6 +87,7 @@ function ProductsPage() {
   const { data: products = [], isLoading } = useProducts();
   const { data: evidence = [] } = useProductEvidence();
   const { data: categories = [] } = useCategories();
+  const { data: funnels = [] } = useFunnels();
   const remove = useDeleteProduct();
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<Product | null>(null);
@@ -110,6 +112,17 @@ function ProductsPage() {
       ]),
     );
   }, [categories]);
+
+  const funnelsByProduct = useMemo(() => {
+    const byProduct = new Map<string, typeof funnels>();
+    for (const funnel of funnels) {
+      if (!funnel.product_id) continue;
+      const list = byProduct.get(funnel.product_id) ?? [];
+      list.push(funnel);
+      byProduct.set(funnel.product_id, list);
+    }
+    return byProduct;
+  }, [funnels]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -276,6 +289,21 @@ function ProductsPage() {
                         <p className="mt-1 text-xs text-muted-foreground">
                           {categoryNames.get(p.category_id ?? "") ?? "Uncategorised"}
                         </p>
+                        {(funnelsByProduct.get(p.id) ?? []).length > 0 ? (
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            {(funnelsByProduct.get(p.id) ?? []).map((funnel) => (
+                              <Link
+                                key={funnel.id}
+                                to="/funnel/$slug"
+                                params={{ slug: funnel.slug }}
+                                className="inline-flex items-center gap-1 text-[11px] font-medium text-primary hover:underline"
+                              >
+                                <ArrowRight className="h-3 w-3" />
+                                {funnel.name || funnel.slug}
+                              </Link>
+                            ))}
+                          </div>
+                        ) : null}
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge meta={PRODUCT_STATUS_META[p.status ?? "draft"]} />
