@@ -33,6 +33,7 @@ describe("CI quality gates", () => {
 
     expect(workflow).toContain("npm ci");
     expect(workflow).toContain("npm run verify");
+    expect(workflow).toContain("fetch-depth: 0");
   });
 
   it("the PR and production verification workflows run the full verify gate", () => {
