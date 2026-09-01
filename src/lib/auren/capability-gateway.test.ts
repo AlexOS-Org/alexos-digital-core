@@ -11,7 +11,17 @@ describe("Auren capability gateway", () => {
     const capabilities = listReadOnlyCapabilities();
 
     expect(capabilities.map((capability) => capability.id)).toEqual(
-      expect.arrayContaining(["supabase:read", "dailygear:read", "analytics:read"]),
+      expect.arrayContaining([
+        "supabase:read",
+        "dailygear:read",
+        "analytics:read",
+        "financial-analysis:read",
+        "similarweb:read",
+        "content-gap:read",
+        "seo-competitor:read",
+        "daily-briefing:read",
+        "debugging:read",
+      ]),
     );
     expect(capabilities.every((capability) => capability.authorization === "read_only")).toBe(true);
   });
@@ -56,6 +66,26 @@ describe("Auren capability gateway", () => {
 
     expect(result.allowed).toBe(false);
     expect(result.reason).toBe("mutation_not_approved");
+  });
+
+  it("marks requested skills as contract-only until an adapter is wired", () => {
+    const ids = new Set(
+      readOnlyCapabilityRegistry
+        .filter((capability) => capability.availability === "contract_only")
+        .map((capability) => capability.id),
+    );
+
+    expect(ids).toEqual(
+      new Set([
+        "analytics:read",
+        "content-gap:read",
+        "daily-briefing:read",
+        "debugging:read",
+        "financial-analysis:read",
+        "seo-competitor:read",
+        "similarweb:read",
+      ]),
+    );
   });
 
   it("never registers a mutation capability in the read-only registry", () => {
