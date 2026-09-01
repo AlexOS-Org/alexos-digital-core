@@ -27,6 +27,7 @@ import {
   useStorefront,
 } from "@/lib/storefront/api";
 import { isPremiumProduct } from "@/lib/storefront/premium";
+import { buildProductJsonLd } from "@/lib/storefront/product-json-ld";
 
 export const Route = createFileRoute("/shop/product/$id")({
   head: () => ({
@@ -232,8 +233,16 @@ function ProductDetail() {
     );
   }
 
+  const productJsonLd = product ? buildProductJsonLd(product, store ?? null) : null;
+
   return (
     <div className="store-product-detail mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-10">
+      {productJsonLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+        />
+      ) : null}
       <nav className="mb-6 flex flex-wrap items-center text-xs text-muted-foreground">
         <Link to="/shop" className="hover:text-foreground">
           Home
