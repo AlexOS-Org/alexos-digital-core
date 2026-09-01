@@ -91,6 +91,7 @@ export function assessProductReadiness(product: ProductReadinessShape): ProductR
     ...catalogueBlockers,
     "missing_price",
     "missing_currency",
+    "missing_stock_configuration",
     "not_confirmed_available",
     "not_active",
   ];

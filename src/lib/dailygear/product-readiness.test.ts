@@ -61,6 +61,19 @@ describe("assessProductReadiness", () => {
     );
   });
 
+  it("blocks sales readiness when stock is not configured", () => {
+    const result = assessProductReadiness({ ...base, stock_quantity: null });
+
+    expect(result.reasons).toContain("missing_stock_configuration");
+    expect(result.salesReady).toBe(false);
+  });
+
+  it("still allows catalogue publication while stock is not configured", () => {
+    const result = assessProductReadiness({ ...base, stock_quantity: null });
+
+    expect(result.catalogueReady).toBe(true);
+  });
+
   it("checks the commercial and SEO minimums", () => {
     const missing = assessProductReadiness({
       ...base,

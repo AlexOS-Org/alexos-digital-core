@@ -26,7 +26,10 @@ import {
   useProducts,
 } from "@/lib/dailygear/api";
 import { DG_CURRENCY, PRODUCT_STATUS_META } from "@/lib/dailygear/constants";
-import { assessProductReadiness } from "@/lib/dailygear/product-readiness";
+import {
+  assessProductReadiness,
+  type ProductReadinessReason,
+} from "@/lib/dailygear/product-readiness";
 import { getProductReadiness } from "@/lib/dailygear/types";
 import { productImage } from "@/lib/storefront/api";
 import type { Product } from "@/lib/dailygear/types";
@@ -53,6 +56,31 @@ export const Route = createFileRoute("/_authenticated/e-commerce/products")({
 
 const money = (v: number) =>
   `${DG_CURRENCY} ${Number(v ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+
+const READINESS_REASON_LABELS: Record<ProductReadinessReason, string> = {
+  missing_name: "Name required",
+  missing_category: "Category required",
+  missing_description: "Description required",
+  missing_primary_image: "Primary image required",
+  missing_seo_title: "SEO title required",
+  missing_seo_description: "SEO description required",
+  missing_price: "Price required before sale",
+  missing_currency: "Currency required",
+  missing_stock_configuration: "Stock configuration required",
+  not_confirmed_available: "Availability evidence required",
+  not_active: "Product must be active",
+};
+
+function ReadinessReasons({ reasons }: { reasons: ProductReadinessReason[] }) {
+  if (reasons.length === 0) return null;
+  return (
+    <ul className="mt-1 space-y-0.5 text-[11px] text-muted-foreground">
+      {reasons.map((reason) => (
+        <li key={reason}>• {READINESS_REASON_LABELS[reason]}</li>
+      ))}
+    </ul>
+  );
+}
 
 function ProductsPage() {
   const { data: products = [], isLoading } = useProducts();
@@ -271,15 +299,13 @@ function ProductsPage() {
                               ? "CATALOGUE READY"
                               : "NOT READY"}
                         </span>
-                        {priceMissing ? (
-                          <p className="mt-1 text-[11px] font-medium text-destructive">
-                            Price required before sale
-                          </p>
-                        ) : null}
                         <p className="mt-1 text-[11px] text-muted-foreground">
                           {evidenceCounts.get(p.id) ?? 0} verified source record
                           {evidenceCounts.get(p.id) === 1 ? "" : "s"}
                         </p>
+                        {!commerceReadiness.salesReady ? (
+                          <ReadinessReasons reasons={commerceReadiness.reasons} />
+                        ) : null}
                       </td>
                       <td className="px-4 py-3 text-right">{money(Number(p.price))}</td>
                       <td className="px-4 py-3 text-right text-muted-foreground">
