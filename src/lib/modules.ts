@@ -54,7 +54,7 @@ export const modules: ModuleDef[] = [
 
   // ── Businesses ───────────────────────────────────────
   {
-    title: "Car-Bar Motion.ke",
+    title: "CarBar Motion",
     url: "/vehicle-sales",
     icon: Car,
     description: "Vehicle inventory, financing and sales pipeline.",
@@ -68,10 +68,10 @@ export const modules: ModuleDef[] = [
     group: "Businesses",
   },
   {
-    title: "Novera",
+    title: "Nuvora",
     url: "/businesses/novera",
     icon: Gem,
-    description: "Business operations and growth for Novera.",
+    description: "Business operations and growth for Nuvora.",
     group: "Businesses",
   },
   {

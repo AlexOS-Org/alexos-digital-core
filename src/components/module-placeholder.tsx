@@ -63,7 +63,7 @@ export function ModulePlaceholder({ title, description, icon: Icon }: Props) {
             <Card>
               <CardContent className="p-5 space-y-3">
                 <Clock className="h-6 w-6 text-primary" />
-                <h3 className="font-semibold">Coming Soon</h3>
+                <h3 className="font-semibold">Roadmap preview</h3>
                 <p className="text-sm text-muted-foreground">
                   This module is scheduled in the AlexOS roadmap.
                 </p>
@@ -71,10 +71,10 @@ export function ModulePlaceholder({ title, description, icon: Icon }: Props) {
             </Card>
           </div>
 
-          <Button size="lg" className="rounded-xl">
+          <div className="inline-flex items-center rounded-xl border border-dashed px-4 py-2 text-sm text-muted-foreground">
             <Sparkles className="mr-2 h-4 w-4" />
-            Build in Progress
-          </Button>
+            Connection pending
+          </div>
         </CardContent>
       </Card>
     </div>

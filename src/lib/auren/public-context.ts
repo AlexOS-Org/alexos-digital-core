@@ -2,7 +2,7 @@ export type AurenPublicContextScope = "portfolio" | "businesses" | "personal";
 export type AurenPublicContextStatus = "verified_brand_context" | "source_missing";
 
 export interface AurenPublicContextRecord {
-  business: "DailyGear" | "Car-Bar Motion.ke" | "Novera";
+  business: "DailyGear" | "CarBar Motion" | "Nuvora";
   status: AurenPublicContextStatus;
   sourceUrl: string | null;
   sourceTitle: string;
@@ -37,7 +37,7 @@ export const AUREN_PUBLIC_CONTEXT: readonly AurenPublicContextRecord[] = [
     ],
   },
   {
-    business: "Car-Bar Motion.ke",
+    business: "CarBar Motion",
     status: "source_missing",
     sourceUrl: null,
     sourceTitle: "No entity-verified first-party public source found",
@@ -50,7 +50,7 @@ export const AUREN_PUBLIC_CONTEXT: readonly AurenPublicContextRecord[] = [
     ],
   },
   {
-    business: "Novera",
+    business: "Nuvora",
     status: "source_missing",
     sourceUrl: null,
     sourceTitle: "No entity-verified first-party public source found",
@@ -58,8 +58,8 @@ export const AUREN_PUBLIC_CONTEXT: readonly AurenPublicContextRecord[] = [
     confidence: "insufficient",
     facts: [],
     limitations: [
-      "Firecrawl returned an unrelated Serbian consulting company and other unrelated Novera results.",
-      "Auren must not attribute those pages, services, locations or claims to the AlexOS Novera business.",
+      "Firecrawl returned an unrelated Serbian consulting company and other unrelated Nuvora results.",
+      "Auren must not attribute those pages, services, locations or claims to the AlexOS Nuvora business.",
     ],
   },
 ];

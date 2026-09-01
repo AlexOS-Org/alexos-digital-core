@@ -161,13 +161,13 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
                 <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
                   {config.title}
                 </h1>
-                <Badge variant="outline">V1 workspace</Badge>
+                <Badge variant="outline">Local Draft</Badge>
               </div>
               <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{config.subtitle}</p>
             </div>
           </div>
           <div className="rounded-xl border bg-background/70 px-3 py-2 text-xs text-muted-foreground">
-            Ready for Phase 3 validation
+            Device-only preview
           </div>
         </div>
       </div>
@@ -203,8 +203,8 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
                 <Icon className="mx-auto h-9 w-9 text-muted-foreground/60" />
                 <p className="mt-3 font-medium">Nothing here yet</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Add your first item on the right. This workspace is intentionally simple for the
-                  Phase 3 validation cycle.
+                  Add your first item on the right. This Local Draft is intentionally limited to
+                  device-only planning.
                 </p>
               </div>
             ) : (
@@ -279,8 +279,8 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
               </Button>
             </form>
             <p className="mt-4 text-xs leading-5 text-muted-foreground">
-              Entries are kept on this device during the validation cycle. Core financial data
-              remains in Supabase; this V1 workspace does not alter Money Center data.
+              Entries are kept on this device only. This Local Draft is not synchronized, backed up,
+              or treated as operational data; core financial records remain in Supabase.
             </p>
           </CardContent>
         </Card>

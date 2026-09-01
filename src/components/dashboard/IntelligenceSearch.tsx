@@ -16,14 +16,14 @@ export default function IntelligenceSearch() {
           type="text"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Ask Auren about cash position, overdue bills, pipeline value…"
+          placeholder="Search verified business signals when this capability is connected…"
           className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-          aria-label="Ask Auren"
+          aria-label="Search verified business signals"
         />
       </div>
       <p className="mt-2 flex items-center gap-1.5 pl-8 text-[11px] text-muted-foreground">
         <Sparkles className="h-3 w-3 text-[var(--alexos-purple)]" />
-        Natural-language querying arrives in a later release.
+        Natural-language querying is not connected in this preview.
       </p>
     </div>
   );

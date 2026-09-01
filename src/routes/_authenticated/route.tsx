@@ -41,7 +41,7 @@ function MobileWorkspaceHeader({
 }) {
   const isAurenRoute = !isDailyGearRoute && currentTitle === "Auren";
   const title = isAurenRoute ? "Auren" : "AlexOS";
-  const subtitle = isAurenRoute ? "AI assistant" : "Business OS";
+  const subtitle = isAurenRoute ? "Auren Intelligence" : "Business OS";
 
   return (
     <header
@@ -100,9 +100,9 @@ function AuthenticatedLayout() {
   const businessContext = pathname.startsWith("/e-commerce")
     ? "DailyGear"
     : pathname.startsWith("/vehicle-sales")
-      ? "Car-Bar Motion.ke"
+      ? "CarBar Motion"
       : pathname.startsWith("/businesses")
-        ? "Novera"
+        ? "Nuvora"
         : null;
   const breadcrumb = ["AlexOS", businessContext, current?.title].filter(
     (label, index, labels): label is string => Boolean(label) && labels.indexOf(label) === index,

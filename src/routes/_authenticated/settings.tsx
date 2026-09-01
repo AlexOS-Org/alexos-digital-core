@@ -1,18 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Bell, Lock, Database, Globe, Save, Check } from "lucide-react";
+import { ArrowLeft, Bell, Lock, Database, Globe, Check } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/settings")({ component: Settings });
 
 function Settings() {
-  const [saved, setSaved] = useState(false);
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
-
   return (
     <div className="mx-auto max-w-2xl space-y-6 animate-in fade-in duration-500">
       <div className="flex items-center gap-4">
@@ -23,7 +17,9 @@ function Settings() {
         </Button>
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-          <p className="text-sm text-muted-foreground">Customize your AlexOS experience</p>
+          <p className="text-sm text-muted-foreground">
+            Customize your AlexOS experience · read-only preview
+          </p>
         </div>
       </div>
 
@@ -118,9 +114,9 @@ function Settings() {
               <p className="text-sm font-medium">Two-Factor Authentication</p>
               <p className="text-xs text-muted-foreground">Secure your account with 2FA</p>
             </div>
-            <Button variant="outline" size="sm">
-              Enable
-            </Button>
+            <span className="text-xs font-medium text-muted-foreground">
+              Unavailable until persistence is connected
+            </span>
           </div>
           <div className="flex items-center justify-between rounded-lg bg-muted p-3">
             <div>
@@ -136,9 +132,9 @@ function Settings() {
               <p className="text-sm font-medium">Session Timeout</p>
               <p className="text-xs text-muted-foreground">Auto logout after 30 minutes</p>
             </div>
-            <Button variant="outline" size="sm">
-              Configure
-            </Button>
+            <span className="text-xs font-medium text-muted-foreground">
+              Unavailable until persistence is connected
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -151,26 +147,23 @@ function Settings() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <Button variant="outline" className="w-full justify-start gap-2">
-            📊 Export All Data
+          <Button disabled variant="outline" className="w-full justify-start gap-2">
+            Export All Data · unavailable
           </Button>
-          <Button variant="outline" className="w-full justify-start gap-2">
-            🗑️ Clear Cache
+          <Button disabled variant="outline" className="w-full justify-start gap-2">
+            Clear Cache · unavailable
           </Button>
-          <Button variant="outline" className="w-full justify-start gap-2">
-            🔄 Sync Now
+          <Button disabled variant="outline" className="w-full justify-start gap-2">
+            Sync Now · unavailable
           </Button>
         </CardContent>
       </Card>
 
-      <div className="sticky bottom-4 flex gap-2">
+      <div className="sticky bottom-4 flex items-center gap-3">
         <Button asChild variant="outline">
-          <Link to="/dashboard">Cancel</Link>
+          <Link to="/dashboard">Back to dashboard</Link>
         </Button>
-        <Button className="flex-1 gap-2" onClick={handleSave}>
-          <Save className="h-4 w-4" />
-          {saved ? "Settings Saved!" : "Save Settings"}
-        </Button>
+        <p className="text-xs text-muted-foreground">Persistence not connected</p>
       </div>
     </div>
   );

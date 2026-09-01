@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/businesses")({
 
 const businessWorkspaces = [
   {
-    name: "Novera",
+    name: "Nuvora",
     description: "Business operations and growth workspace.",
     detail: "Open the workspace when its live operating data is connected.",
     href: "/businesses/novera",
@@ -25,7 +25,7 @@ const businessWorkspaces = [
     accent: "from-violet-500/15 to-fuchsia-500/10 text-violet-600 dark:text-violet-300",
   },
   {
-    name: "Car-Bar Motion.ke",
+    name: "CarBar Motion",
     description: "Vehicle sales, financing and inventory workspace.",
     detail: "Manage the vehicle operating workflow from one place.",
     href: "/vehicle-sales",
@@ -44,9 +44,9 @@ const businessWorkspaces = [
 
 function BusinessesPage() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const isNoveraWorkspace = pathname.startsWith("/businesses/novera");
+  const isNuvoraWorkspace = pathname.startsWith("/businesses/novera");
 
-  if (isNoveraWorkspace) {
+  if (isNuvoraWorkspace) {
     return (
       <div className="mx-auto w-full max-w-6xl pb-10">
         <Outlet />
