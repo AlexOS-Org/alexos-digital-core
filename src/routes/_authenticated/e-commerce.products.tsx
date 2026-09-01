@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { useMemo, useState } from "react";
 import {
   AlertTriangle,
@@ -17,7 +18,15 @@ import { StatusBadge } from "@/components/dailygear/StatusBadge";
 import { ProductFormDialog } from "@/components/dailygear/ProductFormDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   useCategories,
@@ -25,7 +34,15 @@ import {
   useFunnels,
   useProductEvidence,
   useProducts,
+  useSaveProduct,
+  useVariants,
 } from "@/lib/dailygear/api";
+import { planBulkPublish } from "@/lib/dailygear/bulk-actions";
+import {
+  CATALOGUE_FILTER_OPTIONS,
+  matchesCatalogueFilter,
+  type CatalogueFilterKey,
+} from "@/lib/dailygear/catalogue-filters";
 import { DG_CURRENCY, PRODUCT_STATUS_META } from "@/lib/dailygear/constants";
 import {
   assessProductReadiness,
@@ -33,6 +50,7 @@ import {
 } from "@/lib/dailygear/product-readiness";
 import { getProductReadiness } from "@/lib/dailygear/types";
 import { productImage } from "@/lib/storefront/api";
+import { isPremiumProduct } from "@/lib/storefront/premium";
 import type { Product } from "@/lib/dailygear/types";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/products")({
@@ -88,8 +106,12 @@ function ProductsPage() {
   const { data: evidence = [] } = useProductEvidence();
   const { data: categories = [] } = useCategories();
   const { data: funnels = [] } = useFunnels();
+  const { data: allVariants = [] } = useVariants();
   const remove = useDeleteProduct();
+  const save = useSaveProduct();
   const [query, setQuery] = useState("");
+  const [filterKey, setFilterKey] = useState<CatalogueFilterKey>("all");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [editing, setEditing] = useState<Product | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -124,13 +146,102 @@ function ProductsPage() {
     return byProduct;
   }, [funnels]);
 
+  const variantsByProduct = useMemo(() => {
+    const byProduct = new Map<string, typeof allVariants>();
+    for (const variant of allVariants) {
+      const list = byProduct.get(variant.product_id) ?? [];
+      list.push(variant);
+      byProduct.set(variant.product_id, list);
+    }
+    return byProduct;
+  }, [allVariants]);
+
+  const bulkPlan = useMemo(() => {
+    return planBulkPublish(
+      products
+        .filter((product) => selected.has(product.id))
+        .map((product) => {
+          const variants = variantsByProduct.get(product.id) ?? [];
+          const validImages = (product.images ?? []).every(
+            (url) => typeof url === "string" && /^https:\/\//.test(url.trim()),
+          );
+          return {
+            id: product.id,
+            input: {
+              hasName: Boolean(product.name.trim()),
+              hasCategory: Boolean(product.category_id),
+              hasConfirmedAvailability: product.availability_confirmed === true,
+              hasEvidence: (evidenceCounts.get(product.id) ?? 0) > 0,
+              hasVariantReadiness: variants.every((variant) => variant.availability_confirmed),
+              hasValidImageUrls: validImages,
+              hasSellablePrice: Number(product.price) > 0,
+            },
+          };
+        }),
+    );
+  }, [products, selected, variantsByProduct, evidenceCounts]);
+
+  function toggleSelected(id: string) {
+    setSelected((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  async function publishSelectedEligible() {
+    const eligible = bulkPlan.eligible;
+    if (eligible.length === 0) {
+      toast.info("No selected product met the catalogue readiness rules. Nothing published.");
+      return;
+    }
+    let published = 0;
+    for (const item of eligible) {
+      try {
+        await save.mutateAsync({ id: item.id, status: "active" });
+        published += 1;
+      } catch {
+        // Leave untouched; the row's readiness reason will still show on reload.
+      }
+    }
+    if (bulkPlan.skipped.length > 0) {
+      toast.info(
+        `${bulkPlan.skipped.length} product(s) skipped because they are not catalogue-ready.`,
+      );
+    }
+    toast.success(`${published} product(s) published to the catalogue.`);
+    setSelected(new Set());
+  }
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return products;
-    return products.filter(
-      (p) => p.name.toLowerCase().includes(q) || (p.sku ?? "").toLowerCase().includes(q),
-    );
-  }, [products, query]);
+    return products.filter((p) => {
+      if (q && !p.name.toLowerCase().includes(q) && !(p.sku ?? "").toLowerCase().includes(q)) {
+        return false;
+      }
+      if (filterKey === "all") return true;
+      const readiness = assessProductReadiness(p);
+      const price = Number(p.price);
+      const stock = Number(p.stock_quantity);
+      const lowStock = stock > 0 && stock <= Number(p.low_stock_threshold);
+      const premium = isPremiumProduct(p);
+      return matchesCatalogueFilter(
+        {
+          status: p.status,
+          price,
+          stock,
+          lowStock,
+          premium,
+          hasFunnel: Boolean(funnelsByProduct.get(p.id)?.length),
+          catalogueReady: readiness.catalogueReady,
+          salesReady: readiness.salesReady,
+          missingPrice: readiness.reasons.includes("missing_price"),
+        },
+        filterKey,
+      );
+    });
+  }, [products, query, filterKey, funnelsByProduct]);
 
   return (
     <div className="space-y-6">
@@ -150,15 +261,59 @@ function ProductsPage() {
         }
       />
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          className="pl-9"
-          placeholder="Search by name or SKU"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="pl-9"
+            placeholder="Search by name or SKU"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+        <div className="w-full sm:max-w-[200px]">
+          <Select
+            value={filterKey}
+            onValueChange={(value) => setFilterKey(value as CatalogueFilterKey)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Filter products" />
+            </SelectTrigger>
+            <SelectContent>
+              {CATALOGUE_FILTER_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
+
+      {selected.size > 0 ? (
+        <div className="flex flex-col gap-3 rounded-xl border border-primary/20 bg-primary/[0.06] p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-sm">
+            <span className="font-medium">{selected.size} selected</span>
+            <span className="text-muted-foreground">
+              {" "}
+              · {bulkPlan.eligible.length} eligible · {bulkPlan.skipped.length} skipped
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              onClick={publishSelectedEligible}
+              disabled={bulkPlan.eligible.length === 0 || save.isPending}
+            >
+              <CheckCircle2 className="mr-1 h-4 w-4" />
+              Publish eligible
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setSelected(new Set())}>
+              Clear selection
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       {isLoading && <Skeleton className="h-64 w-full rounded-2xl" />}
 
@@ -245,6 +400,17 @@ function ProductsPage() {
             <table className="min-w-[760px] w-full text-sm">
               <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
                 <tr>
+                  <th className="px-4 py-3">
+                    <Checkbox
+                      checked={filtered.length > 0 && filtered.every((p) => selected.has(p.id))}
+                      onCheckedChange={(checked) => {
+                        setSelected(
+                          checked ? new Set(filtered.map((p) => p.id)) : new Set<string>(),
+                        );
+                      }}
+                      aria-label="Select all visible products"
+                    />
+                  </th>
                   <th className="px-4 py-3 font-medium">Product</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium">Readiness</th>
@@ -264,6 +430,13 @@ function ProductsPage() {
                     !commerceReadiness.salesReady || !readiness.readyToPublish || priceMissing;
                   return (
                     <tr key={p.id} className="border-t border-border/70">
+                      <td className="px-4 py-3">
+                        <Checkbox
+                          checked={selected.has(p.id)}
+                          onCheckedChange={() => toggleSelected(p.id)}
+                          aria-label={`Select ${p.name}`}
+                        />
+                      </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {productImage(p) ? (
