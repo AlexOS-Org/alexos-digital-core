@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { computeProductPerformance, effectivePrice, isDeadStock } from "./calculations";
+import { productReadinessSignals } from "./product-readiness-signals";
 import type {
   IntelligenceContext,
   IntelligenceInsight,
@@ -36,7 +37,7 @@ const firstPartyProvider: IntelligenceProvider = {
 
 function marketSignals(ctx: IntelligenceContext): IntelligenceInsight[] {
   const perf = computeProductPerformance(ctx.products, ctx.orders, ctx.orderItems);
-  const out: IntelligenceInsight[] = [];
+  const out: IntelligenceInsight[] = [...productReadinessSignals(ctx)];
 
   const top = perf.filter((p) => p.unitsSold > 0).slice(0, 3);
   for (const p of top) {
