@@ -52,6 +52,7 @@ const EMPTY = {
   brand_id: "",
   supplier_id: "",
   images: "",
+  premium: "false",
 };
 
 function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> }) {
@@ -316,6 +317,16 @@ export function ProductFormDialog({
             brand_id: product.brand_id ?? "",
             supplier_id: product.supplier_id ?? "",
             images: ((product.images ?? []) as string[]).join("\n"),
+            premium:
+              product.attributes &&
+              typeof product.attributes === "object" &&
+              !Array.isArray(product.attributes) &&
+              (product.attributes as Record<string, unknown>).premium &&
+              typeof (product.attributes as Record<string, unknown>).premium === "object" &&
+              ((product.attributes as Record<string, unknown>).premium as Record<string, unknown>)
+                .enabled === true
+                ? "true"
+                : "false",
           }
         : EMPTY,
     );
@@ -383,6 +394,14 @@ export function ProductFormDialog({
       brand_id: form.brand_id || null,
       supplier_id: form.supplier_id || null,
       images: imageUrls,
+      attributes: {
+        ...(product?.attributes &&
+        typeof product.attributes === "object" &&
+        !Array.isArray(product.attributes)
+          ? (product.attributes as Record<string, unknown>)
+          : {}),
+        premium: { enabled: form.premium === "true" },
+      },
     });
     onOpenChange(false);
   }
@@ -452,6 +471,23 @@ export function ProductFormDialog({
                 <SelectItem value="true">Confirmed from source</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Premium product</Label>
+            <Select value={form.premium} onValueChange={(value) => set("premium")(value)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="false">Off — standard product page</SelectItem>
+                <SelectItem value="true">On — premium product experience</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Premium only changes presentation on the public product page. It does not change
+              price, stock or checkout rules.
+            </p>
           </div>
 
           <div className="space-y-2">

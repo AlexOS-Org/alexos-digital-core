@@ -16,6 +16,8 @@ const PUBLIC_PATTERNS = [
   "/^public\\/storefront\\//",
 ];
 
+const APPROVED_PUBLIC_PATH = "/^src\\/routes\\/shop\\.product\\.\\$id\\.tsx$/";
+
 describe("public storefront immutability guard scope", () => {
   it("must still protect every public-facing DailyGear surface", () => {
     const guard = read("scripts/assert-public-storefront-untouched.mjs");
@@ -32,5 +34,15 @@ describe("public storefront immutability guard scope", () => {
     // commerce layer (src/lib/dailygear/*) must be allowed to change so the
     // owner can manage products, pricing, variants, stock and readiness.
     expect(guard).not.toContain("/^src\\/lib\\/dailygear\\//");
+  });
+
+  it("only allows the explicitly approved premium product page among public files", () => {
+    const guard = read("scripts/assert-public-storefront-untouched.mjs");
+
+    expect(guard).toContain("approvedPublicPaths");
+    expect(guard).toContain(APPROVED_PUBLIC_PATH);
+    // Any other protected public route/component must remain blocked.
+    expect(guard).toContain("/^src\\/components\\/storefront\\//");
+    expect(guard).toContain("/^src\\/routes\\/funnel\\.\\$slug\\.tsx$/");
   });
 });
