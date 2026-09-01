@@ -69,4 +69,40 @@ describe("productReadinessSignals", () => {
     expect(signal?.tone).toBe("warning");
     expect(signal?.recommendation).toMatch(/re-order/i);
   });
+
+  it("surfaces a FACT when a SKU is absent", () => {
+    const signals = productReadinessSignals({
+      ...ctx,
+      products: [product({ sku: null })],
+    });
+
+    const signal = signals.find((s) => s.id === "readiness-sku-missing-p1");
+    expect(signal).toBeDefined();
+    expect(signal?.evidenceLevel).toBe("fact");
+    expect(signal?.summary).toContain("SKU");
+  });
+
+  it("distinguishes gallery fact from premium inference", () => {
+    const signals = productReadinessSignals({
+      ...ctx,
+      products: [
+        product({
+          images: ["/assets/yj-baby-hero-classroom.webp"],
+          attributes: { premium: { enabled: true } },
+        }),
+      ],
+    });
+
+    expect(signals.find((s) => s.id === "readiness-gallery-thin-p1")?.evidenceLevel).toBe(
+      "inference",
+    );
+    expect(signals.find((s) => s.id === "readiness-premium-visuals-p1")?.evidenceLevel).toBe(
+      "inference",
+    );
+  });
+
+  it("marks a ready product recommendation explicitly", () => {
+    const signals = productReadinessSignals(ctx);
+    expect(signals.find((s) => s.id === "readiness-ok-p1")?.evidenceLevel).toBe("recommendation");
+  });
 });
