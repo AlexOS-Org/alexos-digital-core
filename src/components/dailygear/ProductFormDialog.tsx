@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { PremiumListEditor } from "@/components/dailygear/PremiumListEditor";
 import {
   Select,
   SelectContent,
@@ -27,6 +28,19 @@ import {
   useSuppliers,
   useVariants,
 } from "@/lib/dailygear/api";
+import {
+  canPublishToCatalogue,
+  cataloguePublicationBlockers,
+  normalizeCurrencyCode,
+} from "@/lib/dailygear/catalogue-publish";
+import {
+  buildPremiumAttributes,
+  premiumContentFromAttributes,
+  premiumEnabledFromAttributes,
+  type PremiumContentDraft,
+} from "@/lib/dailygear/premium-content";
+import { canActivateForSale } from "@/lib/dailygear/product-readiness";
+import { buildVariantCommercialPayload } from "@/lib/dailygear/variant-commercial";
 import type { Product, ProductStatus } from "@/lib/dailygear/types";
 
 const EMPTY = {
@@ -44,12 +58,34 @@ const EMPTY = {
   price: "",
   sale_price: "",
   cost_price: "",
+  currency: "KES",
   stock_quantity: "",
   low_stock_threshold: "5",
   category_id: "",
   brand_id: "",
   supplier_id: "",
   images: "",
+  premium: "false",
+  premiumHero: "",
+  premiumImages: "",
+  premiumFeatureImages: "",
+  premiumLifestyleImages: "",
+  premiumBenefits: "",
+  premiumFeatures: "",
+  premiumSpecs: "",
+  premiumFaq: "",
+};
+
+const EMPTY_PREMIUM_CONTENT: PremiumContentDraft = {
+  enabled: false,
+  hero: "",
+  images: "",
+  featureImages: "",
+  lifestyleImages: "",
+  benefits: "",
+  features: "",
+  specs: "",
+  faq: "",
 };
 
 function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> }) {
@@ -63,6 +99,9 @@ function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> 
         imageUrl: string;
         sku: string;
         stock: string;
+        price: string;
+        salePrice: string;
+        costPrice: string;
         available: boolean;
       }
     >
@@ -80,6 +119,9 @@ function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> 
         imageUrl: String(variant.image_url ?? ""),
         sku: String(variant.sku ?? ""),
         stock: String(variant.stock_quantity ?? "0"),
+        price: variant.price != null ? String(variant.price) : "",
+        salePrice: variant.sale_price != null ? String(variant.sale_price) : "",
+        costPrice: variant.cost_price != null ? String(variant.cost_price) : "",
         available: variant.availability_confirmed === true,
       }
     );
@@ -95,22 +137,11 @@ function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> 
   async function saveOne(variant: Record<string, unknown>) {
     const id = String(variant.id ?? "");
     const draft = draftFor(variant);
-    let existingOptions: Record<string, unknown> = {};
-    if (variant.options && typeof variant.options === "object")
-      existingOptions = variant.options as Record<string, unknown>;
-    await saveVariant.mutateAsync({
-      id,
-      color: draft.color.trim() || null,
-      image_url: draft.imageUrl.trim() || null,
-      sku: draft.sku.trim() || null,
-      stock_quantity: Number(draft.stock) || 0,
-      availability_confirmed: draft.available,
-      options: {
-        ...existingOptions,
-        color: draft.color.trim() || undefined,
-        sex: draft.sex || "Unisex",
-      },
-    });
+    const existingOptions =
+      variant.options && typeof variant.options === "object"
+        ? (variant.options as Record<string, unknown>)
+        : {};
+    await saveVariant.mutateAsync(buildVariantCommercialPayload(id, draft, existingOptions));
   }
 
   if (!variants.length) return null;
@@ -120,9 +151,9 @@ function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> 
         <div>
           <p className="text-sm font-semibold">Colour and audience variants</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Edit each variant’s colour, sex/gender audience, external image, SKU, quantity, and
-            customer visibility. Unavailable variants remain visible here but are hidden from the
-            storefront.
+            Edit each variant’s colour, sex/gender audience, external image, SKU, quantity, price,
+            sale price, cost and customer visibility. Unavailable variants remain visible here but
+            are hidden from the storefront.
           </p>
         </div>
         <span className="rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary">
@@ -236,6 +267,38 @@ function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> 
                   Save variant
                 </Button>
               </div>
+              <div className="grid gap-3 rounded-xl border border-border/50 bg-muted/20 p-3 md:col-span-7 md:grid-cols-3">
+                <div>
+                  <Label className="text-xs">Variant price</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={draft.price}
+                    onChange={(event) => update(id, { price: event.target.value })}
+                    placeholder="Use product price"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Variant sale price (optional)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={draft.salePrice}
+                    onChange={(event) => update(id, { salePrice: event.target.value })}
+                    placeholder="Optional"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Variant cost / COGS</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={draft.costPrice}
+                    onChange={(event) => update(id, { costPrice: event.target.value })}
+                    placeholder="Use product cost"
+                  />
+                </div>
+              </div>
             </div>
           );
         })}
@@ -262,6 +325,13 @@ export function ProductFormDialog({
   const { data: suppliers = [] } = useSuppliers();
   const { data: variants = [] } = useVariants(product?.id ? { product_id: product.id } : undefined);
 
+  const premiumContent = useMemo(() => {
+    if (!product) return EMPTY_PREMIUM_CONTENT;
+    const existing = premiumContentFromAttributes(product.attributes);
+    const enabled = premiumEnabledFromAttributes(product.attributes);
+    return { ...existing, enabled };
+  }, [product]);
+
   useEffect(() => {
     if (!open) return;
     setForm(
@@ -281,16 +351,26 @@ export function ProductFormDialog({
             price: String(product.price ?? ""),
             sale_price: product.sale_price != null ? String(product.sale_price) : "",
             cost_price: String(product.cost_price ?? ""),
+            currency: normalizeCurrencyCode(product.currency),
             stock_quantity: String(product.stock_quantity ?? ""),
             low_stock_threshold: String(product.low_stock_threshold ?? 5),
             category_id: product.category_id ?? "",
             brand_id: product.brand_id ?? "",
             supplier_id: product.supplier_id ?? "",
             images: ((product.images ?? []) as string[]).join("\n"),
+            premium: premiumEnabledFromAttributes(product.attributes) ? "true" : "false",
+            premiumHero: premiumContent.hero,
+            premiumImages: premiumContent.images,
+            premiumFeatureImages: premiumContent.featureImages,
+            premiumLifestyleImages: premiumContent.lifestyleImages,
+            premiumBenefits: premiumContent.benefits,
+            premiumFeatures: premiumContent.features,
+            premiumSpecs: premiumContent.specs,
+            premiumFaq: premiumContent.faq,
           }
         : EMPTY,
     );
-  }, [open, product]);
+  }, [open, product, premiumContent]);
 
   const set = (key: keyof typeof EMPTY) => (value: string) =>
     setForm((current) => ({ ...current, [key]: value }));
@@ -313,20 +393,24 @@ export function ProductFormDialog({
   const hasEvidence = evidenceCount > 0;
   const incompleteVariants = variants.filter((variant) => !variant.availability_confirmed);
   const hasVariantReadiness = incompleteVariants.length === 0;
-  const missingPublicationRequirements = [
-    !hasConfirmedAvailability ? "confirmed availability" : null,
-    !hasCategory ? "a primary category" : null,
-    !hasEvidence ? "source evidence" : null,
-    !hasVariantReadiness ? "every colour/SKU variant must have confirmed availability" : null,
-    invalidImageUrls.length > 0 ? "valid HTTPS image URLs" : null,
-  ].filter((requirement): requirement is string => Boolean(requirement));
-  const publicationBlocked = form.status === "active" && missingPublicationRequirements.length > 0;
-  const invalid = !form.name.trim() || Number(form.price) <= 0 || publicationBlocked;
+  const priceMissing = !canActivateForSale({ price: Number(form.price), sale_price: null });
+  const catalogueInput = {
+    hasName: Boolean(form.name.trim()),
+    hasCategory,
+    hasConfirmedAvailability,
+    hasEvidence,
+    hasVariantReadiness,
+    hasValidImageUrls: invalidImageUrls.length === 0,
+    hasSellablePrice: !priceMissing,
+  };
+  const publicationBlockers = cataloguePublicationBlockers(catalogueInput);
+  const publicationBlocked = form.status === "active" && !canPublishToCatalogue(catalogueInput);
+  const invalid = !form.name.trim() || publicationBlocked;
 
   async function submit(statusOverride?: ProductStatus) {
     const nextStatus = statusOverride ?? form.status;
-    if (!form.name.trim() || Number(form.price) <= 0) return;
-    if (nextStatus === "active" && missingPublicationRequirements.length > 0) return;
+    if (!form.name.trim()) return;
+    if (nextStatus === "active" && !canPublishToCatalogue(catalogueInput)) return;
     await save.mutateAsync({
       ...(product ? { id: product.id } : {}),
       name: form.name.trim(),
@@ -346,12 +430,31 @@ export function ProductFormDialog({
       price: Number(form.price) || 0,
       sale_price: form.sale_price ? Number(form.sale_price) : null,
       cost_price: Number(form.cost_price) || 0,
+      currency: normalizeCurrencyCode(form.currency),
       stock_quantity: Number(form.stock_quantity) || 0,
       low_stock_threshold: Number(form.low_stock_threshold) || 0,
       category_id: form.category_id || null,
       brand_id: form.brand_id || null,
       supplier_id: form.supplier_id || null,
       images: imageUrls,
+      attributes: buildPremiumAttributes(
+        product?.attributes &&
+          typeof product.attributes === "object" &&
+          !Array.isArray(product.attributes)
+          ? (product.attributes as Record<string, unknown>)
+          : null,
+        {
+          enabled: form.premium === "true",
+          hero: form.premiumHero,
+          images: form.premiumImages,
+          featureImages: form.premiumFeatureImages,
+          lifestyleImages: form.premiumLifestyleImages,
+          benefits: form.premiumBenefits,
+          features: form.premiumFeatures,
+          specs: form.premiumSpecs,
+          faq: form.premiumFaq,
+        },
+      ),
     });
     onOpenChange(false);
   }
@@ -424,6 +527,122 @@ export function ProductFormDialog({
           </div>
 
           <div className="space-y-2">
+            <Label>Premium product</Label>
+            <Select value={form.premium} onValueChange={(value) => set("premium")(value)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="false">Off — standard product page</SelectItem>
+                <SelectItem value="true">On — premium product experience</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Premium only changes presentation on the public product page. It does not change
+              price, stock or checkout rules.
+            </p>
+          </div>
+
+          {form.premium === "true" ? (
+            <div className="space-y-3 sm:col-span-2">
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-semibold">Premium page content</h3>
+                <p className="text-xs text-muted-foreground">
+                  Optional presentation content. Each line is stored as one record; use
+                  <span className="font-mono"> | </span>
+                  to separate the title from the description. Leave blank to fall back to the
+                  standard product page.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Hero image URL</Label>
+                <Input
+                  value={form.premiumHero}
+                  onChange={(e) => set("premiumHero")(e.target.value)}
+                  placeholder="https://example.com/hero.webp"
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                <PremiumListEditor
+                  label="Gallery images"
+                  kind="url"
+                  value={form.premiumImages}
+                  onChange={set("premiumImages")}
+                  firstPlaceholder="https://example.com/gallery.webp"
+                  secondPlaceholder=""
+                  addLabel="Add image"
+                  hint="Reorder and mark the primary gallery image."
+                />
+                <PremiumListEditor
+                  label="Feature images"
+                  kind="url"
+                  value={form.premiumFeatureImages}
+                  onChange={set("premiumFeatureImages")}
+                  firstPlaceholder="https://example.com/feature.webp"
+                  secondPlaceholder=""
+                  addLabel="Add image"
+                  hint="Visuals for the benefit/feature sections."
+                />
+                <PremiumListEditor
+                  label="Lifestyle images"
+                  kind="url"
+                  value={form.premiumLifestyleImages}
+                  onChange={set("premiumLifestyleImages")}
+                  firstPlaceholder="https://example.com/lifestyle.webp"
+                  secondPlaceholder=""
+                  addLabel="Add image"
+                  hint="Context visuals; only use verified imagery."
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <PremiumListEditor
+                  label="Benefits"
+                  kind="content"
+                  value={form.premiumBenefits}
+                  onChange={set("premiumBenefits")}
+                  firstPlaceholder="Benefit title"
+                  secondPlaceholder="Why it matters"
+                  addLabel="Add benefit"
+                  hint="Structured owner-entered benefits, saved into attributes.premium."
+                />
+                <PremiumListEditor
+                  label="Features"
+                  kind="content"
+                  value={form.premiumFeatures}
+                  onChange={set("premiumFeatures")}
+                  firstPlaceholder="Feature title"
+                  secondPlaceholder="Feature detail"
+                  addLabel="Add feature"
+                  hint="Add, edit, reorder or remove feature records."
+                />
+                <PremiumListEditor
+                  label="Specifications"
+                  kind="spec"
+                  value={form.premiumSpecs}
+                  onChange={set("premiumSpecs")}
+                  firstPlaceholder="Label (e.g. Material)"
+                  secondPlaceholder="Value (e.g. Oxford fabric)"
+                  addLabel="Add specification"
+                  hint="Factual specs only; leave unknown values blank."
+                />
+                <PremiumListEditor
+                  label="FAQ"
+                  kind="faq"
+                  value={form.premiumFaq}
+                  onChange={set("premiumFaq")}
+                  firstPlaceholder="Question"
+                  secondPlaceholder="Answer"
+                  addLabel="Add FAQ"
+                  hint="Product-specific questions and truthful answers."
+                />
+              </div>
+            </div>
+          ) : null}
+
+          <div className="space-y-2">
             <Label>Selling price</Label>
             <Input
               type="number"
@@ -432,6 +651,25 @@ export function ProductFormDialog({
               onChange={(e) => set("price")(e.target.value)}
               placeholder="0"
             />
+            {priceMissing ? (
+              <p className="text-xs font-medium text-destructive">
+                Price required before sale. A KES 0 product can be published as a catalogue preview,
+                but checkout stays blocked until you enter a positive selling price.
+              </p>
+            ) : null}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Currency</Label>
+            <Input
+              maxLength={3}
+              value={form.currency}
+              onChange={(e) => set("currency")(e.target.value)}
+              placeholder="KES"
+            />
+            <p className="text-xs text-muted-foreground">
+              ISO currency code for this product. Falls back to KES when empty.
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -644,9 +882,9 @@ export function ProductFormDialog({
                   Publication is blocked until the catalogue is ready.
                 </p>
                 <p className="mt-1 text-muted-foreground">
-                  An active product needs {missingPublicationRequirements.join(", ")}. Keep it as a
-                  draft until the source, category and variant availability are verified. Quantity
-                  is informational; choose Out of stock when you want to stop accepting orders.
+                  An active product needs {publicationBlockers.join(", ")}. Keep it as a draft until
+                  the source, category and variant availability are verified. Quantity is
+                  informational; choose Out of stock when you want to stop accepting orders.
                   {incompleteVariants.length > 0
                     ? ` ${incompleteVariants.length} child variant${incompleteVariants.length === 1 ? "" : "s"} still need attention.`
                     : ""}

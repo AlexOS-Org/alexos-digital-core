@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Boxes, Minus, Package, Plus, Search, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/dailygear/PageHeader";
@@ -23,8 +24,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 import { useCommerceData } from "@/lib/dailygear/useCommerceData";
-import { useSaveStockMovement } from "@/lib/dailygear/api";
+import { recordStockMovement } from "@/lib/dailygear/inventory.functions";
 import {
   DEAD_STOCK_DAYS,
   DG_CURRENCY,
@@ -78,7 +80,8 @@ interface AdjustDialogProps {
 }
 
 function StockAdjustDialog({ product, open, onOpenChange }: AdjustDialogProps) {
-  const save = useSaveStockMovement();
+  const queryClient = useQueryClient();
+  const [saving, setSaving] = useState(false);
   const [movementType, setMovementType] = useState<StockMovementType>("purchase");
   const [qty, setQty] = useState("");
   const [ref, setRef] = useState("");
@@ -98,14 +101,26 @@ function StockAdjustDialog({ product, open, onOpenChange }: AdjustDialogProps) {
 
   async function submit() {
     if (invalid || !product) return;
-    await save.mutateAsync({
-      product_id: product.id,
-      type: movementType,
-      quantity: direction === "in" ? parsed : -parsed,
-      unit_cost: num(product.cost_price),
-      reference: ref.trim() || null,
-    });
-    onOpenChange(false);
+    setSaving(true);
+    try {
+      await recordStockMovement({
+        data: {
+          productId: product.id,
+          type: movementType,
+          quantity: direction === "in" ? parsed : -parsed,
+          unitCost: num(product.cost_price),
+          reference: ref.trim() || null,
+        },
+      });
+      toast.success("Stock movement recorded");
+      queryClient.invalidateQueries({ queryKey: ["dailygear"] });
+      onOpenChange(false);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Stock adjustment failed.";
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -181,8 +196,8 @@ function StockAdjustDialog({ product, open, onOpenChange }: AdjustDialogProps) {
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={submit} disabled={invalid || save.isPending}>
-            {save.isPending ? "Saving…" : "Record movement"}
+          <Button onClick={submit} disabled={invalid || saving}>
+            {saving ? "Saving…" : "Record movement"}
           </Button>
         </DialogFooter>
       </DialogContent>

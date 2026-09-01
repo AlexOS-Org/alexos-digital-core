@@ -4,6 +4,7 @@ import type { Database, Json } from "@/integrations/supabase/types";
 import type { DashboardSnapshot } from "@/lib/dashboard/types";
 import { computeDashboardMetrics } from "@/lib/dashboard/calculations";
 import { generateSignals } from "@/lib/intelligence/signals";
+import { listReadOnlyCapabilities, type AurenCapability } from "./capability-gateway";
 import { getAurenPublicContext, type AurenPublicContextRecord } from "./public-context";
 import {
   buildAurenDecisions,
@@ -155,6 +156,7 @@ export interface AurenAdvisorySnapshot {
   liveEvidence: AurenLiveEvidenceRecord[];
   evidenceMeta: AurenEvidenceMeta[];
   decisions: AurenDecision[];
+  capabilities: AurenCapability[];
   dataQuality: {
     warnings: string[];
     sourceRows: Record<string, number>;
@@ -591,6 +593,7 @@ export function buildAurenAdvisory(input: AurenAdvisoryInput): AurenAdvisorySnap
     liveEvidence: [],
     evidenceMeta: [],
     decisions: [],
+    capabilities: listReadOnlyCapabilities(),
     dataQuality: {
       warnings,
       sourceRows: {

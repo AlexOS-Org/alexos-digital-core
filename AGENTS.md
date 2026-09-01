@@ -1,5 +1,11 @@
 # AlexOS repository guidance
 
+## Governing protocol
+Read `docs/GOVERNED_BUILD_PROTOCOL.md` before making any code change. It is the
+audit-first, evidence-based change protocol: feature-branch/PR only, full
+validation gate before commit, public-storefront immutability check, and no
+production/hosted mutations without explicit approval.
+
 ## Source of truth
 GitHub is the source of truth for the application code. Production infrastructure must not depend on a third-party editor or hosted development environment.
 

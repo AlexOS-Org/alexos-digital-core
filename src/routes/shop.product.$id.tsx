@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/accordion";
 import { ProductCard } from "@/components/storefront/ProductCard";
 import { ResponsiveProductImage } from "@/components/storefront/ResponsiveProductImage";
+import { PremiumProductDetail } from "@/components/premium/PremiumProductDetail";
 import { cartStore, useRecentlyViewed } from "@/lib/storefront/cart";
 import { trackMetaPixel } from "@/lib/storefront/meta-pixel";
 import {
@@ -25,6 +26,8 @@ import {
   useStoreVariants,
   useStorefront,
 } from "@/lib/storefront/api";
+import { isPremiumProduct } from "@/lib/storefront/premium";
+import { buildProductJsonLd } from "@/lib/storefront/product-json-ld";
 
 export const Route = createFileRoute("/shop/product/$id")({
   head: () => ({
@@ -152,8 +155,11 @@ function ProductDetail() {
   const selectedVariant = variants.find((variant) => variant.id === selectedVariantId) ?? null;
   const sellingItem = selectedVariant ?? product;
   const price = effectivePrice(sellingItem);
+  const priceComingSoon = !(Number.isFinite(price) && price > 0);
   const soldOut =
     product.status === "out_of_stock" || selectedVariant?.availability_confirmed === false;
+  const canAdd = !soldOut && !priceComingSoon;
+  const premium = isPremiumProduct(product);
 
   function chooseOption(key: VariantOptionKey, value: string) {
     const nextOptions = { ...selectedOptions, [key]: value };
@@ -182,7 +188,7 @@ function ProductDetail() {
   }
 
   function add() {
-    if (!product) return;
+    if (!product || priceComingSoon) return;
     cartStore.add(
       {
         productId: product.id,
@@ -206,8 +212,37 @@ function ProductDetail() {
     toast.success(`${product.name} added to bag`);
   }
 
+  if (premium) {
+    return (
+      <>
+        <PremiumProductDetail product={product} variants={variants} currency={currency} />
+        {related.data?.length ? (
+          <section className="mx-auto mt-16 max-w-7xl space-y-4 px-4">
+            <h2 className="text-xl font-bold tracking-tight">You may also like</h2>
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {related.data
+                .filter((p) => p.id !== product.id)
+                .slice(0, 4)
+                .map((p) => (
+                  <ProductCard key={p.id} product={p} currency={currency} />
+                ))}
+            </div>
+          </section>
+        ) : null}
+      </>
+    );
+  }
+
+  const productJsonLd = product ? buildProductJsonLd(product, store ?? null) : null;
+
   return (
     <div className="store-product-detail mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-10">
+      {productJsonLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+        />
+      ) : null}
       <nav className="mb-6 flex flex-wrap items-center text-xs text-muted-foreground">
         <Link to="/shop" className="hover:text-foreground">
           Home
@@ -271,14 +306,24 @@ function ProductDetail() {
               </Badge>
             </div>
             <h1 className="text-3xl font-black tracking-tight">{product.name}</h1>
-            <div className="flex items-baseline gap-3">
-              <span className="text-2xl font-bold">{formatMoney(price, currency)}</span>
-              {isOnSale(sellingItem) ? (
-                <span className="text-sm text-muted-foreground line-through">
-                  {formatMoney(Number(sellingItem.price), currency)}
-                </span>
-              ) : null}
-            </div>
+            {priceComingSoon ? (
+              <div>
+                <p className="text-2xl font-bold text-muted-foreground">Price coming soon</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  This product is in catalogue preparation. A positive selling price is required
+                  before checkout is enabled.
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-baseline gap-3">
+                <span className="text-2xl font-bold">{formatMoney(price, currency)}</span>
+                {isOnSale(sellingItem) ? (
+                  <span className="text-sm text-muted-foreground line-through">
+                    {formatMoney(Number(sellingItem.price), currency)}
+                  </span>
+                ) : null}
+              </div>
+            )}
             {variants.length ? (
               <div className="space-y-4 rounded-2xl border border-border/60 bg-muted/20 p-4">
                 <div>
@@ -470,8 +515,8 @@ function ProductDetail() {
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-            <Button size="lg" className="flex-1 rounded-xl" disabled={soldOut} onClick={add}>
-              {soldOut ? "Sold out" : "Order now"}
+            <Button size="lg" className="flex-1 rounded-xl" disabled={!canAdd} onClick={add}>
+              {soldOut ? "Sold out" : priceComingSoon ? "Price coming soon" : "Order now"}
             </Button>
           </div>
 

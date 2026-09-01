@@ -136,6 +136,8 @@ export interface IntelligenceInsight {
   tone: SignalTone;
   recommendation?: string;
   source: string;
+  /** Epistemic status: fact, inference or recommendation. */
+  evidenceLevel?: "fact" | "inference" | "recommendation";
 }
 
 /**

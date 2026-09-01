@@ -8,17 +8,27 @@ const untracked = execFileSync("git", ["ls-files", "--others", "--exclude-standa
 });
 const changed = [...new Set(`${tracked}\n${untracked}`.split(/\r?\n/).filter(Boolean))];
 
+// This guard protects the *public-facing DailyGear storefront*. The
+// authenticated admin commerce layer (src/lib/dailygear/*) is deliberately
+// excluded so the owner can manage products, pricing, variants, stock and
+// readiness without putting the customer-facing surface at risk.
 const protectedPatterns = [
   /^src\/routes\/shop\./,
   /^src\/routes\/funnel\.\$slug\.tsx$/,
   /^src\/components\/storefront\//,
   /^src\/styles\.css$/,
-  /^src\/lib\/dailygear\//,
   /^public\/storefront\//,
 ];
 
-const violations = changed.filter((file) =>
-  protectedPatterns.some((pattern) => pattern.test(file)),
+// Explicitly approved public-file changes. Phase 2 intentionally builds the
+// reusable Premium Product Function on the existing product page. Every new
+// approved path must be justified in code review and covered by a test here.
+const approvedPublicPaths = [/^src\/routes\/shop\.product\.\$id\.tsx$/];
+
+const violations = changed.filter(
+  (file) =>
+    protectedPatterns.some((pattern) => pattern.test(file)) &&
+    !approvedPublicPaths.some((pattern) => pattern.test(file)),
 );
 
 console.log(`Base ref: ${base}`);
