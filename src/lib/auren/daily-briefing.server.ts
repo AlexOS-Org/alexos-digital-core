@@ -10,6 +10,14 @@ import {
 
 type ServerSupabaseClient = SupabaseClient<Database>;
 
+export const DAILY_BRIEFING_PROJECTIONS = {
+  leads:
+    "id, title, company, value, estimated_value, probability, stage, status, expected_close_date, contact_id",
+  tasks: "id, title, due_date, status, lead_id, contact_id",
+  activities: "id, subject, type, occurred_at, lead_id, contact_id",
+  contacts: "id, display_name",
+} as const;
+
 export interface AurenDailyBriefingResponse {
   status: "ready" | "no_data";
   briefing: DailyBriefing;
@@ -31,25 +39,23 @@ export async function getAurenDailyBriefingForUser(context: {
   const [leadsResult, tasksResult, activitiesResult, contactsResult] = await Promise.all([
     context.supabase
       .from("leads")
-      .select(
-        "id, title, company, value, estimated_value, probability, stage, status, expected_close_date, contact_id, user_id, deleted_at",
-      )
+      .select(DAILY_BRIEFING_PROJECTIONS.leads)
       .eq("user_id", context.userId)
       .is("deleted_at", null)
       .limit(500),
     context.supabase
       .from("crm_tasks")
-      .select("id, title, due_date, status, lead_id, contact_id, user_id")
+      .select(DAILY_BRIEFING_PROJECTIONS.tasks)
       .eq("user_id", context.userId)
       .limit(500),
     context.supabase
       .from("crm_activities")
-      .select("id, subject, type, occurred_at, lead_id, contact_id, user_id")
+      .select(DAILY_BRIEFING_PROJECTIONS.activities)
       .eq("user_id", context.userId)
       .limit(500),
     context.supabase
       .from("contacts")
-      .select("id, display_name, user_id")
+      .select(DAILY_BRIEFING_PROJECTIONS.contacts)
       .eq("user_id", context.userId)
       .is("deleted_at", null)
       .limit(500),
