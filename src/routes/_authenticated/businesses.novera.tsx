@@ -3,17 +3,17 @@ import { Gem } from "lucide-react";
 import { AlexOSEmptyState } from "@/components/alexos-empty-state";
 
 export const Route = createFileRoute("/_authenticated/businesses/novera")({
-  component: NoveraPage,
+  component: NuvoraPage,
   head: () => ({
-    meta: [{ title: "Novera · AlexOS" }],
+    meta: [{ title: "Nuvora · AlexOS" }],
   }),
 });
 
-function NoveraPage() {
+function NuvoraPage() {
   return (
     <AlexOSEmptyState
-      title="Novera"
-      description="Business operations and growth for Novera. Connect live workspace data to bring this view online."
+      title="Nuvora"
+      description="Business operations and growth for Nuvora. Connect live workspace data to bring this view online."
       icon={Gem}
       statusLabel="Workspace preparing"
     />

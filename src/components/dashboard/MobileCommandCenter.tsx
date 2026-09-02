@@ -7,6 +7,7 @@ import { useDashboardData } from "@/lib/dashboard/api";
 import { formatMoney } from "@/lib/money/format";
 import { guardAggregateMoneyValue } from "@/lib/money/currency-safety";
 import { useIntelligenceSignals } from "@/lib/intelligence/api";
+import { useAurenDailyBriefing } from "@/lib/auren/daily-briefing.api";
 import { cn } from "@/lib/utils";
 
 function MobileSectionHeader({
@@ -45,7 +46,9 @@ function MobileSectionHeader({
 }
 
 export function MobileAurenBriefing() {
-  const { data: signals, isLoading, isError, isEmpty } = useIntelligenceSignals(3);
+  const { data, isLoading, isError } = useAurenDailyBriefing();
+  const briefing = data?.briefing;
+  const topPriority = briefing?.topPriority;
   return (
     <section className="alexos-mesh relative overflow-hidden rounded-[1.75rem] border border-[var(--alexos-purple)]/20 p-4 shadow-[0_18px_52px_-34px_var(--alexos-glow)] sm:p-5">
       <div className="pointer-events-none absolute -right-12 -top-16 h-36 w-36 rounded-full bg-[var(--alexos-purple)]/12 blur-3xl" />
@@ -53,53 +56,54 @@ export function MobileAurenBriefing() {
         <MobileSectionHeader
           eyebrow="Auren briefing"
           title="What matters today."
-          description="Signals from your live money, pipeline and goals."
+          description="Priorities from your owner-scoped CRM data."
           action={{ label: "View all", to: "/auren" }}
         />
         <div className="mt-4 space-y-2">
           {isLoading ? (
-            Array.from({ length: 3 }).map((_, index) => (
+            Array.from({ length: 2 }).map((_, index) => (
               <Skeleton key={index} className="h-[68px] rounded-2xl" />
             ))
-          ) : isError ? (
+          ) : isError || !data || !briefing ? (
             <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-3 text-xs text-muted-foreground">
-              Auren signals are unavailable right now. Your data is safe; refresh to retry.
+              Auren briefing is unavailable right now. Your data is safe; refresh to retry.
             </div>
-          ) : isEmpty ? (
+          ) : briefing.status === "no_data" ? (
             <div className="flex items-start gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-3">
               <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-300" />
               <div>
-                <p className="text-sm font-semibold">No signals right now</p>
+                <p className="text-sm font-semibold">No CRM priorities yet</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  Add a transaction, bill or lead and Auren will surface the next useful action.
+                  Record a lead, task, or activity and Auren will surface the next useful action.
                 </p>
               </div>
             </div>
           ) : (
-            signals.map((signal) => {
-              const Icon = signal.icon;
-              return (
+            <>
+              {topPriority ? (
                 <Link
-                  key={signal.id}
-                  to={signal.action?.to ?? "/auren"}
-                  className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card/75 p-3 transition-all hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-sm"
+                  to="/auren"
+                  className="group flex items-center gap-3 rounded-2xl border border-primary/20 bg-card/75 p-3"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--alexos-purple)]/10 text-[var(--alexos-purple)] ring-1 ring-inset ring-[var(--alexos-purple)]/15">
-                    <Icon className="h-4 w-4" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--alexos-purple)]/10 text-[var(--alexos-purple)]">
+                    <ArrowUpRight className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                      {signal.categoryLabel}
+                      {topPriority.priority} priority · {topPriority.type}
                     </p>
-                    <p className="mt-1 truncate text-sm font-semibold">{signal.title}</p>
+                    <p className="mt-1 truncate text-sm font-semibold">{topPriority.title}</p>
                     <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                      {signal.description}
+                      {topPriority.detail}
                     </p>
                   </div>
-                  <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </Link>
-              );
-            })
+              ) : null}
+              <p className="px-1 text-[10px] text-muted-foreground">
+                {briefing.metrics.meetingsToday} meetings · {briefing.metrics.actionItems} open
+                actions · read-only
+              </p>
+            </>
           )}
         </div>
       </div>

@@ -6,6 +6,30 @@ export type BillFrequency = Database["public"]["Enums"]["bill_frequency"];
 export type BillStatus = Database["public"]["Enums"]["bill_status"];
 export type Bill = Database["public"]["Tables"]["bills"]["Row"];
 
+/**
+ * Convert a bill amount into its recurring monthly planning equivalent.
+ * One-time bills are excluded because they are obligations for a specific due date,
+ * not recurring monthly commitments.
+ */
+export function billMonthlyEquivalent(amount: number, frequency: BillFrequency): number {
+  const normalizedAmount = Number.isFinite(amount) ? Math.max(0, amount) : 0;
+
+  switch (frequency) {
+    case "weekly":
+      return (normalizedAmount * 52) / 12;
+    case "quarterly":
+      return normalizedAmount / 3;
+    case "yearly":
+      return normalizedAmount / 12;
+    case "monthly":
+      return normalizedAmount;
+    case "one_time":
+      return 0;
+    default:
+      return 0;
+  }
+}
+
 export interface BillInput {
   id?: string;
   name: string;
@@ -38,13 +62,24 @@ export function useBills() {
   });
 }
 
-function advanceDueDate(dueDate: string, frequency: BillFrequency): string {
+export function nextBillDueDate(dueDate: string, frequency: BillFrequency): string {
   const d = new Date(dueDate + "T00:00:00");
 
-  if (frequency === "weekly") {
-    d.setDate(d.getDate() + 7);
-  } else if (frequency === "monthly") {
-    d.setMonth(d.getMonth() + 1);
+  switch (frequency) {
+    case "weekly":
+      d.setDate(d.getDate() + 7);
+      break;
+    case "monthly":
+      d.setMonth(d.getMonth() + 1);
+      break;
+    case "quarterly":
+      d.setMonth(d.getMonth() + 3);
+      break;
+    case "yearly":
+      d.setFullYear(d.getFullYear() + 1);
+      break;
+    case "one_time":
+      break;
   }
 
   return d.toISOString().slice(0, 10);
@@ -149,13 +184,13 @@ export function useMarkBillPaid() {
         }
       }
 
-      if (bill.frequency === "weekly" || bill.frequency === "monthly") {
+      if (bill.frequency !== "one_time") {
         const { error } = await supabase
           .from("bills")
           .update({
             status: "pending",
             last_paid_at: now,
-            due_date: bill.due_date ? advanceDueDate(bill.due_date, bill.frequency) : null,
+            due_date: bill.due_date ? nextBillDueDate(bill.due_date, bill.frequency) : null,
           })
           .eq("id", bill.id);
 

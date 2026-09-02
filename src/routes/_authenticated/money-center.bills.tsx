@@ -6,6 +6,7 @@ import {
   Bill,
   BillFrequency,
   BillInput,
+  billMonthlyEquivalent,
   useBills,
   useDeleteBill,
   useMarkBillPaid,
@@ -29,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/money-center/bills")({
   component: BillsPage,
 });
 
-const frequencies: BillFrequency[] = ["one_time", "weekly", "monthly"];
+const frequencies: BillFrequency[] = ["one_time", "weekly", "monthly", "quarterly", "yearly"];
 
 function currency(value: number) {
   return new Intl.NumberFormat("en-KE", {
@@ -51,7 +52,11 @@ function BillsPage() {
   const activeBills = useMemo(() => bills.filter((b) => b.status === "pending"), [bills]);
 
   const totalMonthly = useMemo(
-    () => activeBills.reduce((sum, bill) => sum + Number(bill.amount ?? 0), 0),
+    () =>
+      activeBills.reduce(
+        (sum, bill) => sum + billMonthlyEquivalent(Number(bill.amount ?? 0), bill.frequency),
+        0,
+      ),
     [activeBills],
   );
 

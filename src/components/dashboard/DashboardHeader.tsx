@@ -263,7 +263,7 @@ export function MobileDashboardHeader() {
             >
               <Link to="/auren">
                 <Sparkles className="mr-2 h-4 w-4 text-[var(--alexos-purple)]" />
-                Ask Auren
+                Open Auren Intelligence
               </Link>
             </Button>
           </div>

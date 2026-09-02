@@ -7,15 +7,26 @@
  *
  * 1. declares the capabilities Auren is allowed to use;
  * 2. enforces per-workspace scope for read-only access;
- * 3. refuses any mutation until an explicit approval gate is wired in.
+ * 3. refuses any mutation until an explicit approval gate is wired in;
+ * 4. records whether a capability is connected or only a contract.
  *
  * Connector adapters can be registered here later, but each one must still
  * pass through `authorizeCapability` before it is allowed to run.
  */
 
-export type CapabilityId = "supabase:read" | "dailygear:read" | "analytics:read";
+export type CapabilityId =
+  | "analytics:read"
+  | "content-gap:read"
+  | "daily-briefing:read"
+  | "dailygear:read"
+  | "debugging:read"
+  | "financial-analysis:read"
+  | "seo-competitor:read"
+  | "similarweb:read"
+  | "supabase:read";
 
 export type CapabilityAuthorization = "read_only";
+export type CapabilityAvailability = "connected" | "contract_only";
 
 export interface AurenCapability {
   id: CapabilityId;
@@ -28,6 +39,10 @@ export interface AurenCapability {
   mutationApprovalRequired: boolean;
   /** Human-visible capability name so the UI can label the connector honestly. */
   freshnessLabel: string;
+  /** Whether a server-side adapter is connected or only its safe contract exists. */
+  availability: CapabilityAvailability;
+  /** Optional skill identifier that maps to the corresponding analysis workflow. */
+  skillId: string | null;
 }
 
 export interface CapabilityAccessRequest {
@@ -52,6 +67,32 @@ export const readOnlyCapabilityRegistry: readonly AurenCapability[] = [
     authorization: "read_only",
     mutationApprovalRequired: true,
     freshnessLabel: "external context",
+    availability: "contract_only",
+    skillId: null,
+  },
+  {
+    id: "content-gap:read",
+    label: "Content gap analysis",
+    description:
+      "Compare verified search-demand and competitor coverage data without publishing content.",
+    source: "external_analytics",
+    authorization: "read_only",
+    mutationApprovalRequired: true,
+    freshnessLabel: "source-dated SEO evidence",
+    availability: "contract_only",
+    skillId: "content-gap-analysis",
+  },
+  {
+    id: "daily-briefing:read",
+    label: "Daily briefing",
+    description:
+      "Prioritize verified meetings, pipeline, tasks, and account signals when connected.",
+    source: "knowledge",
+    authorization: "read_only",
+    mutationApprovalRequired: true,
+    freshnessLabel: "live owner-scoped CRM and task data",
+    availability: "connected",
+    skillId: "daily-briefing",
   },
   {
     id: "dailygear:read",
@@ -61,6 +102,56 @@ export const readOnlyCapabilityRegistry: readonly AurenCapability[] = [
     authorization: "read_only",
     mutationApprovalRequired: true,
     freshnessLabel: "synchronized storefront data",
+    availability: "connected",
+    skillId: null,
+  },
+  {
+    id: "debugging:read",
+    label: "Debugging and error recovery",
+    description:
+      "Classify reproducible application failures and preserve evidence without changing production systems.",
+    source: "knowledge",
+    authorization: "read_only",
+    mutationApprovalRequired: true,
+    freshnessLabel: "diagnostic evidence",
+    availability: "contract_only",
+    skillId: "debugging-and-error-recovery",
+  },
+  {
+    id: "financial-analysis:read",
+    label: "Structured financial analysis",
+    description:
+      "Analyze approved market and company-financial data through structured, source-attributed providers.",
+    source: "external_analytics",
+    authorization: "read_only",
+    mutationApprovalRequired: true,
+    freshnessLabel: "provider-dated financial data",
+    availability: "contract_only",
+    skillId: "financial-analysis",
+  },
+  {
+    id: "seo-competitor:read",
+    label: "SEO competitor analysis",
+    description:
+      "Analyze organic visibility, page types, countries, and backlink evidence without changing the target site.",
+    source: "external_analytics",
+    authorization: "read_only",
+    mutationApprovalRequired: true,
+    freshnessLabel: "source-dated competitor evidence",
+    availability: "contract_only",
+    skillId: "seo-competitor-analysis",
+  },
+  {
+    id: "similarweb:read",
+    label: "SimilarWeb analytics",
+    description:
+      "Read traffic, engagement, source, ranking, and geography signals from an approved SimilarWeb provider.",
+    source: "external_analytics",
+    authorization: "read_only",
+    mutationApprovalRequired: true,
+    freshnessLabel: "monthly provider snapshot",
+    availability: "contract_only",
+    skillId: "similarweb-analytics",
   },
   {
     id: "supabase:read",
@@ -70,6 +161,8 @@ export const readOnlyCapabilityRegistry: readonly AurenCapability[] = [
     authorization: "read_only",
     mutationApprovalRequired: true,
     freshnessLabel: "live first-party data",
+    availability: "connected",
+    skillId: null,
   },
 ];
 
@@ -111,3 +204,16 @@ export function authorizeCapability(request: CapabilityAccessRequest): Capabilit
 
   return { allowed: true, reason: null };
 }
+
+// Keep the registry deterministic so UIs and audit snapshots remain stable.
+if (
+  readOnlyCapabilityRegistry.some(
+    (capability, index, all) => index > 0 && all[index - 1].id > capability.id,
+  )
+) {
+  throw new Error("Auren read-only capability registry must remain sorted by id.");
+}
+
+// `requestedBusinessId` is intentionally carried by the request contract even
+// though user-to-business membership is enforced by the caller's data layer.
+// The gateway must not infer membership from an untrusted business id alone.

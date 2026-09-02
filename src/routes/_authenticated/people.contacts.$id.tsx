@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/people/contacts/$id")({
   component: ContactDetailPage,
   head: () => ({
     meta: [
-      { title: "Contact · Alex OS" },
+      { title: "Contact · AlexOS" },
       {
         name: "description",
         content: "Full contact profile with leads, activities, tasks, notes and attachments.",

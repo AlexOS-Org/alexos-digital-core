@@ -11,7 +11,17 @@ describe("Auren capability gateway", () => {
     const capabilities = listReadOnlyCapabilities();
 
     expect(capabilities.map((capability) => capability.id)).toEqual(
-      expect.arrayContaining(["supabase:read", "dailygear:read", "analytics:read"]),
+      expect.arrayContaining([
+        "supabase:read",
+        "dailygear:read",
+        "analytics:read",
+        "financial-analysis:read",
+        "similarweb:read",
+        "content-gap:read",
+        "seo-competitor:read",
+        "daily-briefing:read",
+        "debugging:read",
+      ]),
     );
     expect(capabilities.every((capability) => capability.authorization === "read_only")).toBe(true);
   });
@@ -56,6 +66,51 @@ describe("Auren capability gateway", () => {
 
     expect(result.allowed).toBe(false);
     expect(result.reason).toBe("mutation_not_approved");
+  });
+
+  it("keeps external analysis skills contract-only until a provider adapter is wired", () => {
+    const externalSkillIds = [
+      "analytics:read",
+      "content-gap:read",
+      "debugging:read",
+      "financial-analysis:read",
+      "seo-competitor:read",
+      "similarweb:read",
+    ] as const;
+
+    for (const capabilityId of externalSkillIds) {
+      const capability = readOnlyCapabilityRegistry.find((item) => item.id === capabilityId);
+      expect(capability?.availability).toBe("contract_only");
+      expect(capability?.authorization).toBe("read_only");
+      expect(
+        authorizeCapability({
+          capabilityId,
+          userId: "user-1",
+          requestedUserId: "user-2",
+          requestedBusinessId: null,
+        }),
+      ).toEqual({ allowed: false, reason: "workspace_scope_mismatch" });
+    }
+  });
+
+  it("marks the daily briefing as connected and still read-only", () => {
+    const capability = readOnlyCapabilityRegistry.find((item) => item.id === "daily-briefing:read");
+
+    expect(capability).toMatchObject({
+      availability: "connected",
+      authorization: "read_only",
+      mutationApprovalRequired: true,
+      freshnessLabel: "live owner-scoped CRM and task data",
+      skillId: "daily-briefing",
+    });
+    expect(
+      authorizeCapability({
+        capabilityId: "daily-briefing:read",
+        userId: "user-1",
+        requestedUserId: "user-1",
+        requestedBusinessId: null,
+      }),
+    ).toEqual({ allowed: true, reason: null });
   });
 
   it("never registers a mutation capability in the read-only registry", () => {

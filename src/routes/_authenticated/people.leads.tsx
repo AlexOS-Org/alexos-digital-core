@@ -41,7 +41,7 @@ export const Route = createFileRoute("/_authenticated/people/leads")({
   component: LeadsPipelinePage,
   head: () => ({
     meta: [
-      { title: "Revenue Pipeline · Alex OS" },
+      { title: "Revenue Pipeline · AlexOS" },
       {
         name: "description",
         content:

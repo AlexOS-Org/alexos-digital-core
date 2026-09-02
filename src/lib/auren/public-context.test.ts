@@ -11,7 +11,7 @@ describe("Auren public context", () => {
       status: "verified_brand_context",
       confidence: "high",
     });
-    expect(missingSources.map((item) => item.business)).toEqual(["Car-Bar Motion.ke", "Novera"]);
+    expect(missingSources.map((item) => item.business)).toEqual(["CarBar Motion", "Nuvora"]);
   });
 
   it("keeps external context separate from operational metrics", () => {
