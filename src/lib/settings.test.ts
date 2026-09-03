@@ -11,6 +11,8 @@ describe("Settings truthfulness", () => {
   it("identifies the screen as a read-only preview until persistence exists", () => {
     expect(source).toContain("read-only preview");
     expect(source).toContain("Persistence not connected");
+    expect(source).toContain("disabled");
+    expect(source).toContain("preference preview");
     expect(source).not.toContain("Settings Saved!");
     expect(source).not.toContain(">Enable</Button>");
     expect(source).not.toContain(">Configure</Button>");
