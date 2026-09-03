@@ -41,6 +41,8 @@ describe("truthful roadmap labels", () => {
     expect(workbench).not.toContain("V1 workspace");
     expect(workbench).not.toContain("Ready for Phase 3 validation");
     expect(placeholder).toContain("Roadmap preview");
+    expect(placeholder).toContain("No persistent records");
+    expect(placeholder).toContain("Persistence and integrations pending");
     expect(placeholder).not.toContain("Coming Soon");
     expect(placeholder).not.toContain("Build in Progress");
     expect(modules.match(/description: "Roadmap preview/g)?.length).toBeGreaterThanOrEqual(10);

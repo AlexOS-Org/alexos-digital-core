@@ -34,9 +34,8 @@ export function ModulePlaceholder({ title, description, icon: Icon }: Props) {
 
         <CardContent className="space-y-6">
           <p className="text-muted-foreground leading-7">
-            This module is currently under active development. When completed, the intelligence
-            layer will help you make smarter business decisions, automate repetitive work and
-            generate more revenue from this area of your business.
+            This is a roadmap preview. No persistent records, live integrations or automated actions
+            are connected to this module yet.
           </p>
 
           <div className="grid gap-4 md:grid-cols-3">
@@ -55,7 +54,8 @@ export function ModulePlaceholder({ title, description, icon: Icon }: Props) {
                 <Brain className="h-6 w-6 text-primary" />
                 <h3 className="font-semibold">AI Intelligence</h3>
                 <p className="text-sm text-muted-foreground">
-                  Receive intelligent recommendations from the intelligence layer.
+                  Auren Intelligence will be connected here after the underlying data workflow is
+                  implemented and verified.
                 </p>
               </CardContent>
             </Card>
@@ -73,7 +73,7 @@ export function ModulePlaceholder({ title, description, icon: Icon }: Props) {
 
           <div className="inline-flex items-center rounded-xl border border-dashed px-4 py-2 text-sm text-muted-foreground">
             <Sparkles className="mr-2 h-4 w-4" />
-            Connection pending
+            Persistence and integrations pending
           </div>
         </CardContent>
       </Card>
