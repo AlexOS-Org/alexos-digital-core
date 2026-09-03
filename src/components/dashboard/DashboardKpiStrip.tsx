@@ -1,17 +1,10 @@
-import {
-  ArrowDownRight,
-  ArrowUpRight,
-  BriefcaseBusiness,
-  Landmark,
-  TrendingUp,
-  WalletCards,
-} from "lucide-react";
+import { ArrowUpRight, BriefcaseBusiness, Landmark, TrendingUp, WalletCards } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { useDashboardData } from "@/lib/dashboard/api";
 import { formatMoney } from "@/lib/money/format";
 import { guardAggregateMoneyValue } from "@/lib/money/currency-safety";
-import { cn } from "@/lib/utils";
+import { DashboardTrendRail } from "@/components/dashboard/DashboardTrendRail";
 
 type KpiTone = "blue" | "green" | "purple" | "amber";
 
@@ -24,25 +17,6 @@ type Kpi = {
   icon: typeof Landmark;
   change?: number | null;
 };
-
-function ChangePill({ change }: { change: number | null | undefined }) {
-  if (change === null || change === undefined) {
-    return <span className="text-[10px] text-muted-foreground">No prior baseline</span>;
-  }
-  const positive = change >= 0;
-  const Icon = positive ? ArrowUpRight : ArrowDownRight;
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-0.5 text-[10px] font-semibold",
-        positive ? "text-success" : "text-destructive",
-      )}
-    >
-      <Icon className="h-3 w-3" />
-      {Math.abs(change).toFixed(1)}% vs last month
-    </span>
-  );
-}
 
 export function DashboardKpiStrip() {
   const { metrics, isLoading } = useDashboardData();
@@ -133,7 +107,7 @@ export function DashboardKpiStrip() {
                   </div>
                   <div className="mt-5 flex min-h-8 flex-col justify-end gap-1">
                     <p className="truncate text-[11px] text-muted-foreground">{kpi.detail}</p>
-                    <ChangePill change={kpi.change} />
+                    <DashboardTrendRail change={kpi.change} tone={kpi.tone} />
                   </div>
                 </CardContent>
               </Card>
