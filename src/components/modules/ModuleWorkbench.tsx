@@ -100,6 +100,15 @@ function read(mode: Mode): WorkItem[] {
   }
 }
 
+function write(mode: Mode, items: WorkItem[]) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(KEY(mode), JSON.stringify(items));
+  } catch {
+    // Device-only previews remain usable when storage is blocked or full.
+  }
+}
+
 export function ModuleWorkbench({ mode }: { mode: Mode }) {
   const config = CONFIG[mode];
   const Icon = config.icon;
@@ -109,7 +118,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    window.localStorage.setItem(KEY(mode), JSON.stringify(items));
+    write(mode, items);
   }, [mode, items]);
 
   const visible = useMemo(() => {
