@@ -35,12 +35,20 @@ describe("truthful roadmap labels", () => {
   it("does not present local workbenches as validated or ready", () => {
     const workbench = source("src/components/modules/ModuleWorkbench.tsx");
     const placeholder = source("src/components/module-placeholder.tsx");
+    const modules = source("src/lib/modules.ts");
 
     expect(workbench).toContain("Local Draft");
+    expect(workbench).toContain("function isWorkItem");
+    expect(workbench).toContain("parsed.filter(isWorkItem)");
+    expect(workbench).toContain("function write");
+    expect(workbench).toContain("Device-only previews remain usable");
     expect(workbench).not.toContain("V1 workspace");
     expect(workbench).not.toContain("Ready for Phase 3 validation");
     expect(placeholder).toContain("Roadmap preview");
+    expect(placeholder).toContain("No persistent records");
+    expect(placeholder).toContain("Persistence and integrations pending");
     expect(placeholder).not.toContain("Coming Soon");
     expect(placeholder).not.toContain("Build in Progress");
+    expect(modules.match(/description: "Roadmap preview/g)?.length).toBeGreaterThanOrEqual(10);
   });
 });

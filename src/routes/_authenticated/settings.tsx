@@ -180,7 +180,7 @@ function SettingsToggle({
 }) {
   const [checked, setChecked] = useState(defaultChecked);
   return (
-    <div className="flex items-center justify-between rounded-lg bg-muted p-3">
+    <div className="flex items-center justify-between rounded-lg bg-muted p-3 opacity-80">
       <div>
         <p className="text-sm font-medium">{title}</p>
         <p className="text-xs text-muted-foreground">{description}</p>
@@ -189,7 +189,9 @@ function SettingsToggle({
         type="checkbox"
         checked={checked}
         onChange={(e) => setChecked(e.target.checked)}
-        className="h-4 w-4 cursor-pointer rounded accent-primary"
+        disabled
+        aria-label={`${title} preference preview`}
+        className="h-4 w-4 cursor-not-allowed rounded accent-primary"
       />
     </div>
   );
