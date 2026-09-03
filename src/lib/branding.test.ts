@@ -38,6 +38,8 @@ describe("truthful roadmap labels", () => {
     const modules = source("src/lib/modules.ts");
 
     expect(workbench).toContain("Local Draft");
+    expect(workbench).toContain("function isWorkItem");
+    expect(workbench).toContain("parsed.filter(isWorkItem)");
     expect(workbench).toContain("function write");
     expect(workbench).toContain("Device-only previews remain usable");
     expect(workbench).not.toContain("V1 workspace");

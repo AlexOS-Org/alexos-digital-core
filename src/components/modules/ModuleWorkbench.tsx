@@ -91,10 +91,23 @@ const CONFIG: Record<Mode, Config> = {
 
 const KEY = (mode: Mode) => `alexos-workbench-${mode}-v1`;
 
+function isWorkItem(value: unknown): value is WorkItem {
+  if (!value || typeof value !== "object") return false;
+  const item = value as Partial<WorkItem>;
+  return (
+    typeof item.id === "string" &&
+    typeof item.title === "string" &&
+    typeof item.detail === "string" &&
+    (item.status === "Open" || item.status === "Done") &&
+    typeof item.createdAt === "string"
+  );
+}
+
 function read(mode: Mode): WorkItem[] {
   if (typeof window === "undefined") return [];
   try {
-    return JSON.parse(window.localStorage.getItem(KEY(mode)) || "[]") as WorkItem[];
+    const parsed: unknown = JSON.parse(window.localStorage.getItem(KEY(mode)) || "[]");
+    return Array.isArray(parsed) ? parsed.filter(isWorkItem) : [];
   } catch {
     return [];
   }
