@@ -1,5 +1,6 @@
 import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { dashboardTrendRailMagnitudeClass } from "./DashboardTrendRail.utils";
 
 type DashboardTrendRailProps = {
   change: number | null | undefined;
@@ -12,15 +13,6 @@ const toneClasses = {
   purple: "bg-violet-500",
   amber: "bg-amber-500",
 } as const;
-
-function magnitudeClass(change: number) {
-  const magnitude = Math.abs(change);
-  if (magnitude >= 75) return "w-full";
-  if (magnitude >= 50) return "w-3/4";
-  if (magnitude >= 25) return "w-1/2";
-  if (magnitude >= 10) return "w-1/4";
-  return "w-1/12";
-}
 
 export function DashboardTrendRail({ change, tone = "blue" }: DashboardTrendRailProps) {
   if (change === null || change === undefined) {
@@ -48,7 +40,7 @@ export function DashboardTrendRail({ change, tone = "blue" }: DashboardTrendRail
         <span
           className={cn(
             "absolute inset-y-0 left-0 rounded-full opacity-80",
-            magnitudeClass(change),
+            dashboardTrendRailMagnitudeClass(change),
             toneClasses[tone],
           )}
         />
