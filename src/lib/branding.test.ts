@@ -35,6 +35,7 @@ describe("truthful roadmap labels", () => {
   it("does not present local workbenches as validated or ready", () => {
     const workbench = source("src/components/modules/ModuleWorkbench.tsx");
     const placeholder = source("src/components/module-placeholder.tsx");
+    const modules = source("src/lib/modules.ts");
 
     expect(workbench).toContain("Local Draft");
     expect(workbench).not.toContain("V1 workspace");
@@ -42,5 +43,6 @@ describe("truthful roadmap labels", () => {
     expect(placeholder).toContain("Roadmap preview");
     expect(placeholder).not.toContain("Coming Soon");
     expect(placeholder).not.toContain("Build in Progress");
+    expect(modules.match(/description: "Roadmap preview/g)?.length).toBeGreaterThanOrEqual(10);
   });
 });
