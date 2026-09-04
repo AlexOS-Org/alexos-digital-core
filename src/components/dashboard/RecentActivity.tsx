@@ -13,7 +13,7 @@ export default function RecentActivity() {
     <Card className="h-full rounded-[1.8rem] border-border/60 bg-card/80 shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl dashboard-tone-blue dashboard-tone-icon">
             <Activity className="h-5 w-5" />
           </div>
           <div>
@@ -38,7 +38,7 @@ export default function RecentActivity() {
             >
               <div className="flex min-w-0 items-center gap-3">
                 <div
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${item.type === "income" ? "bg-emerald-500/10 text-emerald-600" : item.type === "expense" ? "bg-red-500/10 text-red-600" : "bg-blue-500/10 text-blue-600"}`}
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${item.type === "income" ? "dashboard-tone-green dashboard-tone-icon" : item.type === "expense" ? "dashboard-tone-danger dashboard-tone-icon" : "dashboard-tone-blue dashboard-tone-icon"}`}
                 >
                   {item.type === "income" ? (
                     <ArrowDownLeft className="h-4 w-4" />

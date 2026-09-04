@@ -111,8 +111,8 @@ export function DashboardHeader() {
         <div className="relative flex min-h-[360px] flex-col justify-between p-5 sm:min-h-[330px] sm:p-8 lg:p-10">
           <div className="flex items-start justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-xs font-medium text-emerald-50 backdrop-blur-md">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.9)]" />
+              <span className="dashboard-hero-control inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium backdrop-blur-md">
+                <span className="dashboard-status-dot h-1.5 w-1.5 rounded-full" />
                 Auren active
               </span>
               <span className="rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-xs font-medium text-white/80 backdrop-blur-md">
@@ -237,7 +237,7 @@ export function MobileDashboardHeader() {
         <div className="relative flex min-h-[210px] flex-col justify-between">
           <div className="flex items-center justify-between gap-2">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-[10px] font-semibold backdrop-blur-md">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,0.9)]" />
+              <span className="dashboard-status-dot h-1.5 w-1.5 rounded-full" />
               Auren active
             </span>
             <span className="rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-[10px] font-medium text-white/85 backdrop-blur-md">

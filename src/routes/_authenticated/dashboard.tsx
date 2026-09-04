@@ -36,7 +36,7 @@ class DashboardPanelBoundary extends Component<{ children: ReactNode }, { hasErr
   render() {
     if (this.state.hasError)
       return (
-        <Card className="rounded-3xl border-amber-500/20 bg-amber-500/5">
+        <Card className="rounded-3xl dashboard-tone-warning dashboard-tone-panel border">
           <CardContent className="p-5">
             <p className="text-sm font-semibold">This panel is still loading.</p>
             <p className="mt-1 text-xs text-muted-foreground">
@@ -185,7 +185,7 @@ function Dashboard() {
                   </p>
                   <div className="mt-5 space-y-3 text-xs text-muted-foreground">
                     <div className="flex items-start gap-3">
-                      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-emerald-500/12 text-emerald-600 dark:text-emerald-300">
+                      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full dashboard-tone-green dashboard-tone-icon">
                         1
                       </span>
                       <span>
@@ -193,7 +193,7 @@ function Dashboard() {
                       </span>
                     </div>
                     <div className="flex items-start gap-3">
-                      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-amber-500/12 text-amber-600 dark:text-amber-300">
+                      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full dashboard-tone-amber dashboard-tone-icon">
                         2
                       </span>
                       <span>
@@ -201,7 +201,7 @@ function Dashboard() {
                       </span>
                     </div>
                     <div className="flex items-start gap-3">
-                      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-violet-500/12 text-violet-600 dark:text-violet-300">
+                      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full dashboard-tone-purple dashboard-tone-icon">
                         3
                       </span>
                       <span>
@@ -223,10 +223,10 @@ function Dashboard() {
             <section id="dashboard-auren" className="scroll-mt-24">
               <SafePanel>
                 <section className="dashboard-feature-surface relative h-full overflow-hidden rounded-[1.75rem] p-4 sm:p-5 lg:p-6">
-                  <div className="pointer-events-none absolute -right-14 -top-16 h-40 w-40 rounded-full bg-[var(--alexos-purple)]/15 blur-3xl" />
+                  <div className="pointer-events-none absolute -right-14 -top-16 h-40 w-40 rounded-full dashboard-tone-purple dashboard-tone-panel blur-3xl" />
                   <div className="relative mb-3 flex items-center justify-between gap-3 sm:mb-4">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-600 dark:text-violet-300">
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] dashboard-tone-purple dashboard-tone-text">
                         Auren
                       </p>
                       <h2 className="mt-1 text-lg font-semibold tracking-tight sm:text-xl">

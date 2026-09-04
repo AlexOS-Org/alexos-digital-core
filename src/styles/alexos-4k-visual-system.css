@@ -309,3 +309,135 @@ body::after {
     transition: none;
   }
 }
+
+/* Semantic admin dashboard tones. These classes intentionally live outside the
+   protected global storefront stylesheet so theme changes stay backend-only. */
+.dashboard-tone-blue {
+  --dashboard-tone: var(--alexos-blue);
+}
+
+.dashboard-tone-green,
+.dashboard-tone-success {
+  --dashboard-tone: var(--alexos-green);
+}
+
+.dashboard-tone-purple {
+  --dashboard-tone: var(--alexos-purple);
+}
+
+.dashboard-tone-amber,
+.dashboard-tone-warning {
+  --dashboard-tone: var(--alexos-amber);
+}
+
+.dashboard-tone-coral {
+  --dashboard-tone: var(--alexos-coral);
+}
+
+.dashboard-tone-neutral {
+  --dashboard-tone: var(--muted-foreground);
+}
+
+.dashboard-tone-danger {
+  --dashboard-tone: var(--destructive);
+}
+
+.dashboard-tone-fill {
+  background: var(--dashboard-tone, var(--primary));
+}
+
+.dashboard-tone-text {
+  color: var(--dashboard-tone, var(--primary));
+}
+
+.dashboard-tone-panel {
+  color: color-mix(in oklch, var(--dashboard-tone, var(--primary)) 82%, var(--foreground));
+  background: color-mix(in oklch, var(--dashboard-tone, var(--primary)) 9%, var(--card));
+  box-shadow: inset 0 0 0 1px
+    color-mix(in oklch, var(--dashboard-tone, var(--primary)) 14%, transparent);
+}
+
+.dashboard-tone-icon {
+  color: var(--dashboard-tone, var(--primary));
+  background: color-mix(in oklch, var(--dashboard-tone, var(--primary)) 14%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in oklch, var(--dashboard-tone, var(--primary)) 18%, transparent);
+}
+
+.dashboard-chart-bars {
+  background: linear-gradient(
+    to top,
+    color-mix(in oklch, var(--chart-5) 70%, transparent),
+    color-mix(in oklch, var(--chart-2) 35%, transparent)
+  );
+}
+
+.dashboard-priority-card {
+  --dashboard-priority-foreground: var(--primary-foreground);
+  --dashboard-priority-muted: color-mix(
+    in oklch,
+    var(--dashboard-priority-foreground) 68%,
+    transparent
+  );
+  color: var(--dashboard-priority-foreground);
+}
+
+.dashboard-priority-surface {
+  border-color: color-mix(in oklch, var(--dashboard-priority-foreground) 12%, transparent);
+  background: color-mix(in oklch, var(--dashboard-priority-foreground) 5%, transparent);
+}
+
+.dashboard-priority-muted {
+  color: var(--dashboard-priority-muted);
+}
+
+.dashboard-intelligence-shell {
+  --dashboard-intelligence-foreground: var(--primary-foreground);
+  --dashboard-intelligence-muted: color-mix(
+    in oklch,
+    var(--dashboard-intelligence-foreground) 66%,
+    transparent
+  );
+  color: var(--dashboard-intelligence-foreground);
+  background:
+    radial-gradient(
+      circle at 85% 0%,
+      color-mix(in oklch, var(--alexos-purple) 18%, transparent),
+      transparent 24rem
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--alexos-blue-dark) 78%, var(--background)),
+      color-mix(in oklch, var(--alexos-purple-dark) 62%, var(--alexos-blue-dark))
+    );
+  border-color: color-mix(in oklch, var(--alexos-purple) 20%, var(--border));
+  box-shadow: 0 22px 60px -35px color-mix(in oklch, var(--primary) 55%, transparent);
+}
+
+.dashboard-intelligence-muted {
+  color: var(--dashboard-intelligence-muted);
+}
+
+.dashboard-intelligence-item,
+.dashboard-intelligence-badge {
+  border-color: color-mix(in oklch, var(--dashboard-intelligence-foreground) 12%, transparent);
+  background: color-mix(in oklch, var(--dashboard-intelligence-foreground) 5%, transparent);
+}
+
+.dashboard-hero-control {
+  color: var(--primary-foreground);
+  border-color: color-mix(in oklch, var(--primary-foreground) 15%, transparent);
+  background: color-mix(in oklch, var(--background) 28%, transparent);
+}
+
+.dashboard-status-dot {
+  background: var(--alexos-green);
+  box-shadow: 0 0 12px color-mix(in oklch, var(--alexos-green) 80%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-chart-bars,
+  .dashboard-tone-fill {
+    transition: none;
+  }
+}

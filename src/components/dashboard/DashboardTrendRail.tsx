@@ -8,10 +8,10 @@ type DashboardTrendRailProps = {
 };
 
 const toneClasses = {
-  blue: "bg-blue-500",
-  green: "bg-emerald-500",
-  purple: "bg-violet-500",
-  amber: "bg-amber-500",
+  blue: "dashboard-tone-blue",
+  green: "dashboard-tone-green",
+  purple: "dashboard-tone-purple",
+  amber: "dashboard-tone-amber",
 } as const;
 
 export function DashboardTrendRail({ change, tone = "blue" }: DashboardTrendRailProps) {
@@ -42,6 +42,7 @@ export function DashboardTrendRail({ change, tone = "blue" }: DashboardTrendRail
             "absolute inset-y-0 left-0 rounded-full opacity-80",
             dashboardTrendRailMagnitudeClass(change),
             toneClasses[tone],
+            "dashboard-tone-fill",
           )}
         />
       </span>

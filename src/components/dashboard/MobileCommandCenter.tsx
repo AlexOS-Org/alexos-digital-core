@@ -50,8 +50,8 @@ export function MobileAurenBriefing() {
   const briefing = data?.briefing;
   const topPriority = briefing?.topPriority;
   return (
-    <section className="alexos-mesh relative overflow-hidden rounded-[1.75rem] border border-[var(--alexos-purple)]/20 p-4 shadow-[0_18px_52px_-34px_var(--alexos-glow)] sm:p-5">
-      <div className="pointer-events-none absolute -right-12 -top-16 h-36 w-36 rounded-full bg-[var(--alexos-purple)]/12 blur-3xl" />
+    <section className="alexos-mesh relative overflow-hidden rounded-[1.75rem] dashboard-tone-purple border p-4 shadow-[0_18px_52px_-34px_var(--alexos-glow)] sm:p-5">
+      <div className="pointer-events-none absolute -right-12 -top-16 h-36 w-36 rounded-full dashboard-tone-purple dashboard-tone-panel blur-3xl" />
       <div className="relative">
         <MobileSectionHeader
           eyebrow="Auren briefing"
@@ -65,12 +65,12 @@ export function MobileAurenBriefing() {
               <Skeleton key={index} className="h-[68px] rounded-2xl" />
             ))
           ) : isError || !data || !briefing ? (
-            <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-3 text-xs text-muted-foreground">
+            <div className="rounded-2xl border dashboard-tone-danger dashboard-tone-panel p-3 text-xs text-muted-foreground">
               Auren briefing is unavailable right now. Your data is safe; refresh to retry.
             </div>
           ) : briefing.status === "no_data" ? (
-            <div className="flex items-start gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-3">
-              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-300" />
+            <div className="flex items-start gap-3 rounded-2xl border dashboard-tone-green dashboard-tone-panel p-3">
+              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 dashboard-tone-green dashboard-tone-text" />
               <div>
                 <p className="text-sm font-semibold">No CRM priorities yet</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
@@ -85,7 +85,7 @@ export function MobileAurenBriefing() {
                   to="/auren"
                   className="group flex items-center gap-3 rounded-2xl border border-primary/20 bg-card/75 p-3"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--alexos-purple)]/10 text-[var(--alexos-purple)]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl dashboard-tone-purple dashboard-tone-icon">
                     <ArrowUpRight className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -131,7 +131,7 @@ export function MobileMetricTiles() {
       value: moneyValue(metrics.money.cashAvailable),
       detail: "Cash available",
       icon: WalletCards,
-      tone: "text-emerald-600 dark:text-emerald-300 bg-emerald-500/10 ring-emerald-500/15",
+      tone: "dashboard-tone-green dashboard-tone-icon",
       to: "/money-center",
     },
     {
@@ -139,7 +139,7 @@ export function MobileMetricTiles() {
       value: formatMoney(metrics.business.pipelineValue),
       detail: `${metrics.business.openLeads} open leads`,
       icon: TrendingUp,
-      tone: "text-violet-600 dark:text-violet-300 bg-violet-500/10 ring-violet-500/15",
+      tone: "dashboard-tone-purple dashboard-tone-icon",
       to: "/people/leads",
     },
     {
@@ -147,7 +147,7 @@ export function MobileMetricTiles() {
       value: String(alertCount),
       detail: alertCount === 0 ? "No attention needed" : "Need attention",
       icon: CircleAlert,
-      tone: "text-amber-600 dark:text-amber-300 bg-amber-500/10 ring-amber-500/15",
+      tone: "dashboard-tone-amber dashboard-tone-icon",
       to: "/notifications",
     },
   ];
@@ -237,7 +237,7 @@ export function MobileRevenueToday() {
           <div key={index} className="flex h-full flex-1 items-end" aria-hidden="true">
             <div
               className={cn(
-                "w-full rounded-t-md bg-gradient-to-t from-[var(--alexos-purple)]/70 to-[var(--alexos-blue)]/35 transition-[height] duration-500",
+                "w-full rounded-t-md dashboard-chart-bars transition-[height] duration-500",
                 !hasRevenue && "h-1.5 opacity-40",
               )}
               style={hasRevenue ? { height: `${Math.max(8, (value / max) * 100)}%` } : undefined}

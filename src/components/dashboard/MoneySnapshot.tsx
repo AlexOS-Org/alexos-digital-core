@@ -179,7 +179,7 @@ export default function MoneySnapshot() {
         })}
       </div>
       {lowBalanceCount > 0 && (
-        <div className="inline-flex items-center gap-2 rounded-full border border-red-200/70 bg-red-50/70 px-3 py-1.5 text-xs text-red-700/80 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-300/80">
+        <div className="inline-flex items-center gap-2 rounded-full dashboard-tone-danger dashboard-tone-panel inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs">
           <CircleAlert className="h-3.5 w-3.5" />
           {lowBalanceCount} account{lowBalanceCount === 1 ? "" : "s"} below your comfort level
         </div>

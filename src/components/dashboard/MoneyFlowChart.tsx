@@ -114,8 +114,8 @@ export default function MoneyFlowChart() {
           </div>
         )}
         <div className="mt-3 grid grid-cols-2 gap-3">
-          <div className="flex items-center gap-2 rounded-2xl bg-emerald-500/8 p-3">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-300">
+          <div className="flex items-center gap-2 rounded-2xl dashboard-tone-green dashboard-tone-panel p-3">
+            <span className="grid h-8 w-8 place-items-center rounded-full dashboard-tone-green dashboard-tone-icon">
               <ArrowUpRight className="h-4 w-4" />
             </span>
             <div>
@@ -123,8 +123,8 @@ export default function MoneyFlowChart() {
               <p className="text-sm font-bold">{formatMoney(income)}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-2xl bg-amber-500/8 p-3">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-300">
+          <div className="flex items-center gap-2 rounded-2xl dashboard-tone-amber dashboard-tone-panel p-3">
+            <span className="grid h-8 w-8 place-items-center rounded-full dashboard-tone-amber dashboard-tone-icon">
               <ArrowDownRight className="h-4 w-4" />
             </span>
             <div>
