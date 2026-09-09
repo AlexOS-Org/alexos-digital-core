@@ -182,8 +182,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
   const todayCount = items.filter((x) => isCreatedToday(x.createdAt)).length;
   // For non-task modes the first KPI label is domain-specific (Products, Campaigns, …)
   // and still maps to total inventory; "Today" modes use true today-filtered count.
-  const firstStat =
-    config.labels[0] === "Today" ? todayCount : items.length;
+  const firstStat = config.labels[0] === "Today" ? todayCount : items.length;
   const stats = [firstStat, openCount, doneCount, items.length];
 
   return (
