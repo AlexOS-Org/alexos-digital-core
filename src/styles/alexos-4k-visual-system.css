@@ -98,6 +98,62 @@ body::after {
   background-attachment: fixed;
 }
 
+/*
+ * Admin command-center stage. Stronger ambient is scoped to .dashboard-canvas
+ * so public storefront/funnel routes are not restyled by this block.
+ */
+.dashboard-canvas {
+  position: relative;
+  isolation: isolate;
+}
+
+.dashboard-canvas::before {
+  position: absolute;
+  inset: -2rem;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  background:
+    radial-gradient(
+      circle at 12% 6%,
+      color-mix(in oklch, var(--alexos-visual-accent) 14%, transparent),
+      transparent 30rem
+    ),
+    radial-gradient(
+      circle at 88% 18%,
+      color-mix(in oklch, var(--alexos-purple) 12%, transparent),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 48% 100%,
+      color-mix(in oklch, var(--alexos-blue) 10%, transparent),
+      transparent 34rem
+    );
+  opacity: 0.95;
+}
+
+.dashboard-canvas::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  background-image:
+    linear-gradient(var(--alexos-visual-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--alexos-visual-line) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse at center, black 35%, transparent 78%);
+  opacity: 0.18;
+}
+
+.dashboard-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--primary) 88%, var(--muted-foreground));
+}
+
 .dashboard-surface,
 .dashboard-surface-muted,
 .dashboard-feature-surface,
@@ -231,6 +287,14 @@ body::after {
   .alexos-module-shell {
     box-shadow: 0 28px 90px -58px color-mix(in oklch, var(--alexos-visual-accent) 58%, transparent);
   }
+
+  .dashboard-canvas {
+    padding-block: 0.25rem;
+  }
+
+  .alexos-data-metric {
+    min-height: 136px;
+  }
 }
 
 @media (min-width: 2560px) {
@@ -261,7 +325,12 @@ body::after {
   }
 
   .alexos-data-metric {
-    min-height: 148px;
+    min-height: 156px;
+  }
+
+  .dashboard-canvas::after {
+    background-size: 56px 56px;
+    opacity: 0.14;
   }
 
   body::after {
@@ -278,6 +347,10 @@ body::after {
   .dashboard-canvas,
   .dailygear-storefront-canvas {
     max-width: 3000px;
+  }
+
+  .alexos-data-metric {
+    min-height: 168px;
   }
 }
 
