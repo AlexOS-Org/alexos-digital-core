@@ -69,7 +69,10 @@ export function DashboardKpiStrip() {
       <div className="flex items-end justify-between gap-3">
         <div>
           <p className="dashboard-eyebrow">Command snapshot</p>
-          <h2 id="dashboard-kpi-title" className="mt-1 text-xl font-semibold tracking-tight 3xl:text-2xl">
+          <h2
+            id="dashboard-kpi-title"
+            className="mt-1 text-xl font-semibold tracking-tight 3xl:text-2xl"
+          >
             The four signals to check first.
           </h2>
         </div>
