@@ -1,4 +1,5 @@
 import type { Contact } from "./types";
+import { ALEXOS_LOCALE } from "@/lib/locale";
 
 export function contactDisplayName(
   c: Pick<Contact, "first_name" | "last_name"> | null | undefined,
@@ -17,7 +18,7 @@ export function contactInitials(
 }
 
 export function formatCurrency(value: number, currency = "KES"): string {
-  return new Intl.NumberFormat("en-KE", {
+  return new Intl.NumberFormat(ALEXOS_LOCALE, {
     style: "currency",
     currency,
     maximumFractionDigits: 0,
