@@ -69,39 +69,42 @@ export function DashboardKpiStrip() {
       <div className="flex items-end justify-between gap-3">
         <div>
           <p className="dashboard-eyebrow">Command snapshot</p>
-          <h2 id="dashboard-kpi-title" className="mt-1 text-xl font-semibold tracking-tight">
+          <h2
+            id="dashboard-kpi-title"
+            className="mt-1 text-xl font-semibold tracking-tight 3xl:text-2xl"
+          >
             The four signals to check first.
           </h2>
         </div>
         <Link
           to="/money-center"
-          className="hidden text-xs font-semibold text-primary transition-colors hover:text-primary/80 sm:inline-flex"
+          className="hidden text-xs font-semibold text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:inline-flex"
         >
           Open Money Center <ArrowUpRight className="ml-1 h-3.5 w-3.5" />
         </Link>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4 3xl:gap-4">
         {kpis.map((kpi) => {
           const Icon = kpi.icon;
           return (
             <Link key={kpi.label} to={kpi.to} className="group min-w-0">
               <Card
                 data-tone={kpi.tone}
-                className="dashboard-kpi-card h-full overflow-hidden rounded-[1.35rem] transition duration-300 group-hover:-translate-y-1 group-hover:shadow-xl"
+                className="dashboard-kpi-card alexos-data-metric h-full overflow-hidden rounded-[1.35rem] transition duration-300 group-hover:-translate-y-1 group-hover:shadow-xl focus-within:ring-2 focus-within:ring-ring"
               >
-                <CardContent className="p-4 sm:p-5">
+                <CardContent className="relative z-[1] p-4 sm:p-5 3xl:p-6">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="dashboard-kpi-label truncate">{kpi.label}</p>
                       {isLoading ? (
                         <div className="mt-3 h-8 w-28 animate-pulse rounded-lg bg-muted" />
                       ) : (
-                        <p className="mt-3 truncate text-2xl font-bold tracking-tight">
+                        <p className="mt-3 truncate text-2xl font-bold tracking-tight 3xl:text-3xl">
                           {kpi.value}
                         </p>
                       )}
                     </div>
-                    <span className="dashboard-kpi-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ring-1 ring-inset">
+                    <span className="dashboard-kpi-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ring-1 ring-inset 3xl:h-11 3xl:w-11">
                       <Icon className="h-5 w-5" />
                     </span>
                   </div>
