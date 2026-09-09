@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Calendar, CheckCircle2, Clock3, DollarSign, Edit, Plus, Trash2 } from "lucide-react";
 
 import {
@@ -13,7 +13,7 @@ import {
   useSaveBill,
 } from "@/lib/money/bills";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -25,12 +25,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/money-center/bills")({
   component: BillsPage,
 });
 
 const frequencies: BillFrequency[] = ["one_time", "weekly", "monthly", "quarterly", "yearly"];
+
+const frequencyLabel: Record<BillFrequency, string> = {
+  one_time: "One-time",
+  weekly: "Weekly",
+  monthly: "Monthly",
+  quarterly: "Quarterly",
+  yearly: "Yearly",
+};
 
 function currency(value: number) {
   return new Intl.NumberFormat("en-KE", {
@@ -51,6 +60,7 @@ function BillsPage() {
 
   const activeBills = useMemo(() => bills.filter((b) => b.status === "pending"), [bills]);
 
+  /** Recurring obligations only — frequency-normalized; one-time bills are excluded. */
   const totalMonthly = useMemo(
     () =>
       activeBills.reduce(
@@ -100,8 +110,11 @@ function BillsPage() {
       </div>
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Total Bills</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle>Est. monthly</CardTitle>
+            <CardDescription className="text-xs font-normal">
+              Frequency-normalized planning total. One-time bills are not included.
+            </CardDescription>
           </CardHeader>
 
           <CardContent className="flex items-center justify-between">
@@ -155,49 +168,68 @@ function BillsPage() {
             <p className="text-muted-foreground">No bills found.</p>
           ) : (
             <div className="space-y-3">
-              {bills.map((bill) => (
-                <div
-                  key={bill.id}
-                  className="flex items-center justify-between rounded-xl border p-4"
-                >
-                  <div>
-                    <h3 className="font-semibold">{bill.name}</h3>
+              {bills.map((bill) => {
+                const amount = Number(bill.amount ?? 0);
+                const monthly = billMonthlyEquivalent(amount, bill.frequency);
+                return (
+                  <div
+                    key={bill.id}
+                    className="flex items-center justify-between rounded-xl border p-4"
+                  >
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-semibold">{bill.name}</h3>
+                        <Badge variant="outline" className="text-xs font-normal">
+                          {frequencyLabel[bill.frequency] ?? bill.frequency}
+                        </Badge>
+                        {bill.status !== "pending" && (
+                          <Badge variant="secondary" className="text-xs font-normal">
+                            {bill.status}
+                          </Badge>
+                        )}
+                      </div>
 
-                    <p className="text-sm text-muted-foreground">{bill.due_date}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Due {bill.due_date ?? "—"}
+                        {bill.frequency !== "one_time" && bill.frequency !== "monthly"
+                          ? ` · ~${currency(monthly)}/mo planning`
+                          : null}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold">{currency(amount)}</span>
+
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => {
+                          setEditing(bill);
+                          setOpen(true);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+
+                      <Button size="icon" variant="outline" onClick={() => markPaid.mutate(bill)}>
+                        <CheckCircle2 className="h-4 w-4" />
+                      </Button>
+
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        onClick={() => deleteBill.mutate(bill.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold">{currency(Number(bill.amount))}</span>
-
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => {
-                        setEditing(bill);
-                        setOpen(true);
-                      }}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-
-                    <Button size="icon" variant="outline" onClick={() => markPaid.mutate(bill)}>
-                      <CheckCircle2 className="h-4 w-4" />
-                    </Button>
-
-                    <Button
-                      size="icon"
-                      variant="destructive"
-                      onClick={() => deleteBill.mutate(bill.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
-      </Card>{" "}
+      </Card>
       <BillDialog open={open} onOpenChange={setOpen} bill={editing} />
     </div>
   );
@@ -223,6 +255,20 @@ function BillDialog({ open, onOpenChange, bill }: BillDialogProps) {
     auto_create_transaction: bill?.auto_create_transaction ?? false,
     status: bill?.status ?? "pending",
   });
+
+  useEffect(() => {
+    setForm({
+      name: bill?.name ?? "",
+      amount: Number(bill?.amount ?? 0),
+      due_date: bill?.due_date ?? "",
+      frequency: bill?.frequency ?? "monthly",
+      category: bill?.category ?? "",
+      account_id: bill?.account_id ?? null,
+      notes: bill?.notes ?? "",
+      auto_create_transaction: bill?.auto_create_transaction ?? false,
+      status: bill?.status ?? "pending",
+    });
+  }, [bill, open]);
 
   function update<K extends keyof BillInput>(key: K, value: BillInput[K]) {
     setForm((prev) => ({
@@ -285,11 +331,37 @@ function BillDialog({ open, onOpenChange, bill }: BillDialogProps) {
               <SelectContent>
                 {frequencies.map((f) => (
                   <SelectItem key={f} value={f}>
-                    {f}
+                    {frequencyLabel[f]}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {form.frequency !== "one_time" &&
+            form.frequency !== "monthly" &&
+            Number(form.amount) > 0 ? (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Planning equivalent:{" "}
+                {currency(billMonthlyEquivalent(Number(form.amount), form.frequency))}/mo
+              </p>
+            ) : null}
+          </div>
+
+          <div>
+            <Label>Category</Label>
+            <Input
+              value={form.category ?? ""}
+              onChange={(e) => update("category", e.target.value)}
+              placeholder="Optional (e.g. utilities)"
+            />
+          </div>
+
+          <div>
+            <Label>Notes</Label>
+            <Input
+              value={form.notes ?? ""}
+              onChange={(e) => update("notes", e.target.value)}
+              placeholder="Optional"
+            />
           </div>
 
           <Button className="w-full" onClick={submit}>
