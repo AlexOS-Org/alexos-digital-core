@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { ALEXOS_LOCALE } from "@/lib/locale";
 
 type WorkItem = {
   id: string;
@@ -122,6 +123,17 @@ function write(mode: Mode, items: WorkItem[]) {
   }
 }
 
+function isCreatedToday(iso: string) {
+  const created = new Date(iso);
+  if (Number.isNaN(created.getTime())) return false;
+  const now = new Date();
+  return (
+    created.getFullYear() === now.getFullYear() &&
+    created.getMonth() === now.getMonth() &&
+    created.getDate() === now.getDate()
+  );
+}
+
 export function ModuleWorkbench({ mode }: { mode: Mode }) {
   const config = CONFIG[mode];
   const Icon = config.icon;
@@ -167,18 +179,24 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
 
   const openCount = items.filter((x) => x.status === "Open").length;
   const doneCount = items.filter((x) => x.status === "Done").length;
-  const stats = [items.length, openCount, doneCount, items.length];
+  const todayCount = items.filter((x) => isCreatedToday(x.createdAt)).length;
+  // For non-task modes the first KPI label is domain-specific (Products, Campaigns, …)
+  // and still maps to total inventory; "Today" modes use true today-filtered count.
+  const firstStat =
+    config.labels[0] === "Today" ? todayCount : items.length;
+  const stats = [firstStat, openCount, doneCount, items.length];
 
   return (
-    <div className="space-y-6">
-      <div className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-gradient-to-br from-background via-background to-muted/70 p-6 shadow-sm sm:p-8">
+    <div className="alexos-module-shell space-y-6 rounded-[2rem] p-1 sm:p-2">
+      <div className="dashboard-feature-surface relative overflow-hidden rounded-[1.85rem] p-6 sm:p-8">
         <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
         <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border bg-background shadow-sm">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-primary/15 bg-background/80 text-primary shadow-sm">
               <Icon className="h-6 w-6" />
             </div>
             <div>
+              <p className="dashboard-eyebrow mb-1">Local draft workspace</p>
               <div className="mb-1 flex flex-wrap items-center gap-2">
                 <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
                   {config.title}
@@ -188,7 +206,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
               <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{config.subtitle}</p>
             </div>
           </div>
-          <div className="rounded-xl border bg-background/70 px-3 py-2 text-xs text-muted-foreground">
+          <div className="rounded-xl border border-border/60 bg-background/70 px-3 py-2 text-xs text-muted-foreground">
             Device-only preview
           </div>
         </div>
@@ -196,17 +214,17 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {config.labels.map((label, i) => (
-          <Card key={label} className="border-border/60">
-            <CardContent className="p-4">
-              <p className="text-xs font-medium text-muted-foreground">{label}</p>
-              <p className="mt-2 text-2xl font-semibold">{stats[i]}</p>
+          <Card key={label} className="alexos-data-metric alexos-module-card rounded-[1.35rem]">
+            <CardContent className="relative z-[1] p-4">
+              <p className="dashboard-eyebrow text-[10px]">{label}</p>
+              <p className="mt-2 text-2xl font-semibold tracking-tight">{stats[i]}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <Card className="border-border/60">
+        <Card className="dashboard-surface alexos-module-card rounded-[1.75rem]">
           <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle className="text-base">Workspace activity</CardTitle>
             <div className="relative w-full sm:w-48">
@@ -221,7 +239,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
           </CardHeader>
           <CardContent>
             {visible.length === 0 ? (
-              <div className="rounded-2xl border border-dashed p-10 text-center">
+              <div className="rounded-2xl border border-dashed border-border/60 p-10 text-center">
                 <Icon className="mx-auto h-9 w-9 text-muted-foreground/60" />
                 <p className="mt-3 font-medium">Nothing here yet</p>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -234,12 +252,12 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
                 {visible.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-3 rounded-2xl border p-3 transition-colors hover:bg-muted/40"
+                    className="flex items-center gap-3 rounded-2xl border border-border/60 p-3 transition-colors hover:bg-muted/40"
                   >
                     <button
                       type="button"
                       onClick={() => complete(item.id)}
-                      className="shrink-0"
+                      className="shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       aria-label="Toggle complete"
                     >
                       {item.status === "Done" ? (
@@ -259,7 +277,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
                       )}
                     </div>
                     <span className="hidden text-xs text-muted-foreground sm:block">
-                      {new Date(item.createdAt).toLocaleDateString("en-KE", {
+                      {new Date(item.createdAt).toLocaleDateString(ALEXOS_LOCALE, {
                         day: "numeric",
                         month: "short",
                       })}
@@ -279,7 +297,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
           </CardContent>
         </Card>
 
-        <Card className="border-border/60">
+        <Card className="dashboard-surface alexos-module-card rounded-[1.75rem]">
           <CardHeader>
             <CardTitle className="text-base">Quick add</CardTitle>
           </CardHeader>
