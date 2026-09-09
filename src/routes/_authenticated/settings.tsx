@@ -2,11 +2,70 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Bell, Lock, Database, Globe, Check } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/settings")({ component: Settings });
 
+const NOTIFICATION_PREFS_KEY = "alexos-settings-notification-prefs-v1";
+
+type NotificationPrefs = {
+  paymentReminders: boolean;
+  goalMilestones: boolean;
+  transactionAlerts: boolean;
+  weeklySummary: boolean;
+  debtDueDates: boolean;
+};
+
+const DEFAULT_NOTIFICATION_PREFS: NotificationPrefs = {
+  paymentReminders: true,
+  goalMilestones: true,
+  transactionAlerts: true,
+  weeklySummary: true,
+  debtDueDates: true,
+};
+
+function readNotificationPrefs(): NotificationPrefs {
+  if (typeof window === "undefined") return DEFAULT_NOTIFICATION_PREFS;
+  try {
+    const raw = window.localStorage.getItem(NOTIFICATION_PREFS_KEY);
+    if (!raw) return DEFAULT_NOTIFICATION_PREFS;
+    const parsed = JSON.parse(raw) as Partial<NotificationPrefs>;
+    return {
+      paymentReminders: parsed.paymentReminders ?? DEFAULT_NOTIFICATION_PREFS.paymentReminders,
+      goalMilestones: parsed.goalMilestones ?? DEFAULT_NOTIFICATION_PREFS.goalMilestones,
+      transactionAlerts: parsed.transactionAlerts ?? DEFAULT_NOTIFICATION_PREFS.transactionAlerts,
+      weeklySummary: parsed.weeklySummary ?? DEFAULT_NOTIFICATION_PREFS.weeklySummary,
+      debtDueDates: parsed.debtDueDates ?? DEFAULT_NOTIFICATION_PREFS.debtDueDates,
+    };
+  } catch {
+    return DEFAULT_NOTIFICATION_PREFS;
+  }
+}
+
+function writeNotificationPrefs(prefs: NotificationPrefs) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(NOTIFICATION_PREFS_KEY, JSON.stringify(prefs));
+}
+
 function Settings() {
+  const [notificationPrefs, setNotificationPrefs] = useState<NotificationPrefs>(
+    DEFAULT_NOTIFICATION_PREFS,
+  );
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setNotificationPrefs(readNotificationPrefs());
+    setHydrated(true);
+  }, []);
+
+  const updatePref = <K extends keyof NotificationPrefs>(key: K, value: NotificationPrefs[K]) => {
+    setNotificationPrefs((prev) => {
+      const next = { ...prev, [key]: value };
+      writeNotificationPrefs(next);
+      return next;
+    });
+  };
+
   return (
     <div className="mx-auto max-w-2xl space-y-6 animate-in fade-in duration-500">
       <div className="flex items-center gap-4">
@@ -18,7 +77,8 @@ function Settings() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
           <p className="text-sm text-muted-foreground">
-            Customize your AlexOS experience · read-only preview
+            Notification preferences are saved on this device. Other controls remain read-only until
+            workspace persistence is connected.
           </p>
         </div>
       </div>
@@ -76,28 +136,42 @@ function Settings() {
           <SettingsToggle
             title="Payment Reminders"
             description="Get notified about upcoming payments"
-            defaultChecked
+            checked={notificationPrefs.paymentReminders}
+            onChange={(value) => updatePref("paymentReminders", value)}
+            enabled={hydrated}
           />
           <SettingsToggle
             title="Goal Milestones"
             description="Celebrate goal achievements"
-            defaultChecked
+            checked={notificationPrefs.goalMilestones}
+            onChange={(value) => updatePref("goalMilestones", value)}
+            enabled={hydrated}
           />
           <SettingsToggle
             title="Transaction Alerts"
             description="Notify on large transactions"
-            defaultChecked
+            checked={notificationPrefs.transactionAlerts}
+            onChange={(value) => updatePref("transactionAlerts", value)}
+            enabled={hydrated}
           />
           <SettingsToggle
             title="Weekly Summary"
             description="Get your weekly financial summary"
-            defaultChecked
+            checked={notificationPrefs.weeklySummary}
+            onChange={(value) => updatePref("weeklySummary", value)}
+            enabled={hydrated}
           />
           <SettingsToggle
             title="Debt Due Dates"
             description="Reminder for debt payment due dates"
-            defaultChecked
+            checked={notificationPrefs.debtDueDates}
+            onChange={(value) => updatePref("debtDueDates", value)}
+            enabled={hydrated}
           />
+          <p className="text-xs text-muted-foreground">
+            Preferences are stored on this device only. Push, email, and WhatsApp delivery are not
+            connected yet.
+          </p>
         </CardContent>
       </Card>
 
@@ -163,7 +237,9 @@ function Settings() {
         <Button asChild variant="outline">
           <Link to="/dashboard">Back to dashboard</Link>
         </Button>
-        <p className="text-xs text-muted-foreground">Persistence not connected</p>
+        <p className="text-xs text-muted-foreground">
+          Notification prefs saved on this device
+        </p>
       </div>
     </div>
   );
@@ -172,15 +248,18 @@ function Settings() {
 function SettingsToggle({
   title,
   description,
-  defaultChecked = false,
+  checked,
+  onChange,
+  enabled,
 }: {
   title: string;
   description: string;
-  defaultChecked?: boolean;
+  checked: boolean;
+  onChange: (value: boolean) => void;
+  enabled: boolean;
 }) {
-  const [checked, setChecked] = useState(defaultChecked);
   return (
-    <div className="flex items-center justify-between rounded-lg bg-muted p-3 opacity-80">
+    <div className="flex items-center justify-between rounded-lg bg-muted p-3">
       <div>
         <p className="text-sm font-medium">{title}</p>
         <p className="text-xs text-muted-foreground">{description}</p>
@@ -188,10 +267,10 @@ function SettingsToggle({
       <input
         type="checkbox"
         checked={checked}
-        onChange={(e) => setChecked(e.target.checked)}
-        disabled
-        aria-label={`${title} preference preview`}
-        className="h-4 w-4 cursor-not-allowed rounded accent-primary"
+        onChange={(e) => onChange(e.target.checked)}
+        disabled={!enabled}
+        aria-label={`${title} preference`}
+        className="h-4 w-4 rounded accent-primary disabled:cursor-not-allowed"
       />
     </div>
   );
