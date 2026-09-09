@@ -26,6 +26,13 @@ export default function BusinessSnapshot() {
     );
   }
 
+  const closed = business.wonLeads + business.lostLeads;
+  const winShare = closed > 0 ? Math.min(100, (business.wonLeads / closed) * 100) : 0;
+  const weightedShare =
+    business.pipelineValue > 0
+      ? Math.min(100, (business.weightedPipelineValue / business.pipelineValue) * 100)
+      : 0;
+
   const items = [
     {
       title: "Revenue",
@@ -72,6 +79,8 @@ export default function BusinessSnapshot() {
       icon: ArrowUpRight,
       url: "/people/leads",
       accent: "from-indigo-500 to-blue-400",
+      density: weightedShare,
+      densityLabel: "Weighted share of open pipeline",
     },
     {
       title: "Win rate",
@@ -80,6 +89,8 @@ export default function BusinessSnapshot() {
       icon: Percent,
       url: "/people/leads",
       accent: "from-emerald-500 to-lime-400",
+      density: winShare,
+      densityLabel: "Wins among closed leads",
     },
   ];
 
@@ -94,14 +105,14 @@ export default function BusinessSnapshot() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3 3xl:gap-5">
       {items.map((item) => {
         const Icon = item.icon;
         return (
           <Link key={item.title} to={item.url} className="group">
-            <Card className="relative h-full overflow-hidden rounded-[1.6rem] border-border/60 bg-card/80 transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-xl">
+            <Card className="alexos-data-metric relative h-full overflow-hidden rounded-[1.6rem] border-border/60 transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-xl focus-within:ring-2 focus-within:ring-ring">
               <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${item.accent}`} />
-              <CardContent className="relative p-5">
+              <CardContent className="relative z-[1] p-5 3xl:p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/[0.07] text-primary ring-1 ring-inset ring-primary/10">
                     <Icon className="h-5 w-5" />
@@ -112,10 +123,19 @@ export default function BusinessSnapshot() {
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                     {item.title}
                   </p>
-                  <p className="mt-2 text-2xl font-bold tracking-tight">{item.value}</p>
-                  <p className="mt-1.5 text-xs leading-5 text-muted-foreground">
-                    {item.description}
-                  </p>
+                  <p className="mt-2 text-2xl font-bold tracking-tight 3xl:text-3xl">{item.value}</p>
+                  <p className="mt-1.5 text-xs leading-5 text-muted-foreground">{item.description}</p>
+                  {"density" in item && typeof item.density === "number" ? (
+                    <div className="mt-3" aria-label={item.densityLabel}>
+                      <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full bg-primary/80 transition-[width] duration-500"
+                          style={{ width: `${item.density}%` }}
+                        />
+                      </div>
+                      <p className="mt-1 text-[10px] text-muted-foreground">{item.densityLabel}</p>
+                    </div>
+                  ) : null}
                 </div>
               </CardContent>
             </Card>
