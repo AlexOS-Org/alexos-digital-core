@@ -1,7 +1,9 @@
+import { ALEXOS_LOCALE } from "@/lib/locale";
+
 export function formatMoney(amount: number | string | null | undefined, currency = "KES") {
   const n = typeof amount === "string" ? parseFloat(amount) : (amount ?? 0);
   if (!isFinite(n)) return `${currency} 0.00`;
-  return `${currency} ${n.toLocaleString(undefined, {
+  return `${currency} ${n.toLocaleString(ALEXOS_LOCALE, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
@@ -9,7 +11,7 @@ export function formatMoney(amount: number | string | null | undefined, currency
 
 export function formatDate(d: string | Date) {
   const date = typeof d === "string" ? new Date(d) : d;
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(ALEXOS_LOCALE, {
     year: "numeric",
     month: "short",
     day: "2-digit",
@@ -22,7 +24,7 @@ export function formatTime(d: string | Date) {
     typeof window !== "undefined"
       ? window.localStorage.getItem("alexos-dashboard-time-format")
       : null;
-  return date.toLocaleTimeString("en-KE", {
+  return date.toLocaleTimeString(ALEXOS_LOCALE, {
     hour: "2-digit",
     minute: "2-digit",
     hour12: preference === "12h" ? true : false,
@@ -35,5 +37,5 @@ export function monthKey(d = new Date()) {
 
 export function monthLabel(d: string | Date) {
   const date = typeof d === "string" ? new Date(d) : d;
-  return date.toLocaleDateString(undefined, { year: "numeric", month: "long" });
+  return date.toLocaleDateString(ALEXOS_LOCALE, { year: "numeric", month: "long" });
 }

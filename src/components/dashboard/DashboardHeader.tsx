@@ -11,6 +11,7 @@ import { getDashboardSceneLabel, getGreetingScene } from "@/components/theme/vis
 import { getDashboardSceneAsset } from "@/components/theme/dashboard-scene-assets";
 import alexosCommandCenterWide from "@/assets/visuals/alexos-command-center-wide.webp";
 import alexosCommandCenterMobile from "@/assets/visuals/alexos-command-center-mobile.webp";
+import { ALEXOS_LOCALE } from "@/lib/locale";
 
 type TimeFormat = "12h" | "24h";
 const TIME_FORMAT_KEY = "alexos-dashboard-time-format";
@@ -26,7 +27,7 @@ function getGreeting(hour: number) {
   return "Good evening";
 }
 function formatTime(date: Date, timeFormat: TimeFormat) {
-  return date.toLocaleTimeString("en-KE", {
+  return date.toLocaleTimeString(ALEXOS_LOCALE, {
     hour: "2-digit",
     minute: "2-digit",
     hour12: timeFormat === "12h",
@@ -59,7 +60,7 @@ export function DashboardHeader() {
     return () => window.clearInterval(timer);
   }, []);
   const greeting = getGreeting(now.getHours());
-  const today = now.toLocaleDateString("en-KE", {
+  const today = now.toLocaleDateString(ALEXOS_LOCALE, {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -192,7 +193,7 @@ export function MobileDashboardHeader() {
     return () => window.clearInterval(timer);
   }, []);
 
-  const today = now.toLocaleDateString("en-KE", {
+  const today = now.toLocaleDateString(ALEXOS_LOCALE, {
     weekday: "long",
     day: "numeric",
     month: "long",

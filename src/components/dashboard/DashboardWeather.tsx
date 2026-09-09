@@ -1,5 +1,6 @@
 import { Cloud, CloudSun, Droplets, Moon, Sun, Sunrise, Sunset, Wind } from "lucide-react";
 import type { LocalWeatherSnapshot } from "@/components/dashboard/greeting-context";
+import { ALEXOS_LOCALE } from "@/lib/locale";
 
 function weatherLabel(code: number) {
   if (code === 0) return "Clear sky";
@@ -21,7 +22,7 @@ function WeatherIcon({ code, night }: { code: number; night: boolean }) {
 }
 
 function formatClock(value: string) {
-  return new Date(value).toLocaleTimeString("en-KE", {
+  return new Date(value).toLocaleTimeString(ALEXOS_LOCALE, {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
