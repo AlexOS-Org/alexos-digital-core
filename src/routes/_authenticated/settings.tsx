@@ -237,9 +237,7 @@ function Settings() {
         <Button asChild variant="outline">
           <Link to="/dashboard">Back to dashboard</Link>
         </Button>
-        <p className="text-xs text-muted-foreground">
-          Notification prefs saved on this device
-        </p>
+        <p className="text-xs text-muted-foreground">Notification prefs saved on this device</p>
       </div>
     </div>
   );
