@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { ALEXOS_LOCALE } from "@/lib/locale";
 
 export const Route = createFileRoute("/_authenticated/money-center/bills")({
   component: BillsPage,
@@ -42,7 +43,7 @@ const frequencyLabel: Record<BillFrequency, string> = {
 };
 
 function currency(value: number) {
-  return new Intl.NumberFormat("en-KE", {
+  return new Intl.NumberFormat(ALEXOS_LOCALE, {
     style: "currency",
     currency: "KES",
     maximumFractionDigits: 0,
