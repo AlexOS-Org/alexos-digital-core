@@ -123,8 +123,12 @@ export default function BusinessSnapshot() {
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                     {item.title}
                   </p>
-                  <p className="mt-2 text-2xl font-bold tracking-tight 3xl:text-3xl">{item.value}</p>
-                  <p className="mt-1.5 text-xs leading-5 text-muted-foreground">{item.description}</p>
+                  <p className="mt-2 text-2xl font-bold tracking-tight 3xl:text-3xl">
+                    {item.value}
+                  </p>
+                  <p className="mt-1.5 text-xs leading-5 text-muted-foreground">
+                    {item.description}
+                  </p>
                   {"density" in item && typeof item.density === "number" ? (
                     <div className="mt-3" aria-label={item.densityLabel}>
                       <div className="h-1.5 overflow-hidden rounded-full bg-muted">
