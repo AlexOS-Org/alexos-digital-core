@@ -15,7 +15,7 @@ function LibraryPage() {
       title="Library"
       description="Documents, contracts, files and your business knowledge base — organised and always accessible."
       icon={BookOpen}
-      statusLabel="Module foundation ready"
+      statusLabel="Roadmap module"
     />
   );
 }

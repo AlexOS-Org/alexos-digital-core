@@ -15,7 +15,7 @@ function MissionsPage() {
       title="Missions"
       description="Strategic priorities, milestones and mission execution — connecting your goals to daily action."
       icon={Rocket}
-      statusLabel="Workspace preparing"
+      statusLabel="Roadmap module"
     />
   );
 }

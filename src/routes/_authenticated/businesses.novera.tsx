@@ -15,7 +15,7 @@ function NuvoraPage() {
       title="Nuvora"
       description="Business operations and growth for Nuvora. Connect live workspace data to bring this view online."
       icon={Gem}
-      statusLabel="Workspace preparing"
+      statusLabel="Roadmap module"
     />
   );
 }
