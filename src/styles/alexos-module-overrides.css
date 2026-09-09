@@ -20,16 +20,19 @@
   width: 100%;
 }
 
-.alexos-module-card {
-  border-color: color-mix(in oklch, var(--border) 72%, var(--alexos-visual-accent) 28%) !important;
+/* Prefer cascade specificity over !important so modules can express state. */
+.alexos-route-canvas .alexos-module-card,
+.alexos-module-shell .alexos-module-card {
+  border-color: color-mix(in oklch, var(--border) 72%, var(--alexos-visual-accent) 28%);
   background:
     radial-gradient(circle at 100% 0%, var(--alexos-visual-accent-faint), transparent 18rem),
     color-mix(in oklch, var(--card) 96%, var(--alexos-visual-accent) 4%);
   box-shadow: 0 22px 68px -48px color-mix(in oklch, var(--alexos-visual-accent) 66%, transparent);
 }
 
-.alexos-module-card:hover {
-  border-color: color-mix(in oklch, var(--border) 54%, var(--alexos-visual-accent) 46%) !important;
+.alexos-route-canvas .alexos-module-card:hover,
+.alexos-module-shell .alexos-module-card:hover {
+  border-color: color-mix(in oklch, var(--border) 54%, var(--alexos-visual-accent) 46%);
   box-shadow: 0 28px 82px -52px color-mix(in oklch, var(--alexos-visual-accent) 74%, transparent);
 }
 
