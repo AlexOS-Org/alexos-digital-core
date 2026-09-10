@@ -1,7 +1,20 @@
 import { describe, expect, it } from "vitest";
 import { buildAurenDataReadiness, summarizeReadiness } from "./data-readiness";
-import type { AurenAdvisorySnapshot } from "./advisor.server";
+import type { AurenAdvisorySnapshot, AurenForecast } from "./advisor.server";
 import { listReadOnlyCapabilities } from "./capability-gateway";
+
+function insufficientForecast(): AurenForecast {
+  return {
+    horizonDays: 30,
+    lower: null,
+    base: null,
+    upper: null,
+    currency: null,
+    method: "insufficient_data",
+    confidence: "insufficient",
+    assumptions: ["Need more activity"],
+  };
+}
 
 function emptyAdvisory(): AurenAdvisorySnapshot {
   return {
@@ -28,42 +41,10 @@ function emptyAdvisory(): AurenAdvisorySnapshot {
       dailyGearLowStock: 0,
     },
     forecasts: {
-      income: {
-        horizonDays: 30,
-        lower: null,
-        base: null,
-        upper: null,
-        currency: null,
-        confidence: "insufficient",
-        assumptions: ["Need more activity"],
-      },
-      expenses: {
-        horizonDays: 30,
-        lower: null,
-        base: null,
-        upper: null,
-        currency: null,
-        confidence: "insufficient",
-        assumptions: ["Need more activity"],
-      },
-      netCashFlow: {
-        horizonDays: 30,
-        lower: null,
-        base: null,
-        upper: null,
-        currency: null,
-        confidence: "insufficient",
-        assumptions: ["Need more activity"],
-      },
-      dailyGearRevenue: {
-        horizonDays: 30,
-        lower: null,
-        base: null,
-        upper: null,
-        currency: null,
-        confidence: "insufficient",
-        assumptions: ["Need more activity"],
-      },
+      income: insufficientForecast(),
+      expenses: insufficientForecast(),
+      netCashFlow: insufficientForecast(),
+      dailyGearRevenue: insufficientForecast(),
     },
     businesses: [],
     recommendations: [],
