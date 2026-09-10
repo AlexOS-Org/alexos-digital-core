@@ -33,6 +33,7 @@ import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedVehicleSalesRouteImport } from './routes/_authenticated/vehicle-sales'
+import { Route as ApiRuntimeConfigRouteImport } from './routes/api/runtime-config'
 import { Route as FunnelSlugRouteImport } from './routes/funnel.$slug'
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as ShopAboutRouteImport } from './routes/shop.about'
@@ -206,6 +207,11 @@ const AuthenticatedVehicleSalesRoute =
     path: '/vehicle-sales',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiRuntimeConfigRoute = ApiRuntimeConfigRouteImport.update({
+  id: '/api/runtime-config',
+  path: '/api/runtime-config',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FunnelSlugRoute = FunnelSlugRouteImport.update({
   id: '/funnel/$slug',
   path: '/funnel/$slug',
@@ -511,6 +517,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/api/runtime-config': typeof ApiRuntimeConfigRoute
   '/funnel/$slug': typeof FunnelSlugRoute
   '/shop/about': typeof ShopAboutRoute
   '/shop/cart': typeof ShopCartRoute
@@ -581,6 +588,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/api/runtime-config': typeof ApiRuntimeConfigRoute
   '/funnel/$slug': typeof FunnelSlugRoute
   '/shop/about': typeof ShopAboutRoute
   '/shop/cart': typeof ShopCartRoute
@@ -657,6 +665,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/vehicle-sales': typeof AuthenticatedVehicleSalesRoute
+  '/api/runtime-config': typeof ApiRuntimeConfigRoute
   '/funnel/$slug': typeof FunnelSlugRoute
   '/shop/about': typeof ShopAboutRoute
   '/shop/cart': typeof ShopCartRoute
@@ -733,6 +742,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/vehicle-sales'
+    | '/api/runtime-config'
     | '/funnel/$slug'
     | '/shop/about'
     | '/shop/cart'
@@ -803,6 +813,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/vehicle-sales'
+    | '/api/runtime-config'
     | '/funnel/$slug'
     | '/shop/about'
     | '/shop/cart'
@@ -878,6 +889,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/tasks'
     | '/_authenticated/vehicle-sales'
+    | '/api/runtime-config'
     | '/funnel/$slug'
     | '/shop/about'
     | '/shop/cart'
@@ -934,6 +946,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ShopRoute: typeof ShopRouteWithChildren
+  ApiRuntimeConfigRoute: typeof ApiRuntimeConfigRoute
   FunnelSlugRoute: typeof FunnelSlugRoute
   ApiMetaAdsWebhookRoute: typeof ApiMetaAdsWebhookRoute
   ApiScheduledAbandonedCartRoute: typeof ApiScheduledAbandonedCartRoute
@@ -1108,6 +1121,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/vehicle-sales'
       preLoaderRoute: typeof AuthenticatedVehicleSalesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/runtime-config': {
+      id: '/api/runtime-config'
+      path: '/api/runtime-config'
+      fullPath: '/api/runtime-config'
+      preLoaderRoute: typeof ApiRuntimeConfigRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/funnel/$slug': {
       id: '/funnel/$slug'
@@ -1692,6 +1712,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ShopRoute: ShopRouteWithChildren,
+  ApiRuntimeConfigRoute: ApiRuntimeConfigRoute,
   FunnelSlugRoute: FunnelSlugRoute,
   ApiMetaAdsWebhookRoute: ApiMetaAdsWebhookRoute,
   ApiScheduledAbandonedCartRoute: ApiScheduledAbandonedCartRoute,

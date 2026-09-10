@@ -28,18 +28,59 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
   };
 }
 
-export function isSupabaseConfigured(): boolean {
+type RuntimeSupabaseConfig = {
+  supabaseUrl: string;
+  supabasePublishableKey: string;
+};
+
+let runtimeConfig: RuntimeSupabaseConfig | undefined;
+
+export function applyRuntimeSupabaseConfig(config: RuntimeSupabaseConfig): void {
+  if (!config.supabaseUrl || !config.supabasePublishableKey) return;
+  runtimeConfig = config;
+  _supabase = undefined;
+}
+
+export async function loadRuntimeSupabaseConfig(): Promise<boolean> {
+  if (typeof window === "undefined" || isSupabaseConfigured()) return isSupabaseConfigured();
+
+  try {
+    const response = await fetch("/api/runtime-config", {
+      cache: "no-store",
+      headers: { Accept: "application/json" },
+    });
+    if (!response.ok) return false;
+
+    const payload = (await response.json()) as Partial<RuntimeSupabaseConfig> & { ok?: boolean };
+    if (!payload.ok || !payload.supabaseUrl || !payload.supabasePublishableKey) return false;
+
+    applyRuntimeSupabaseConfig({
+      supabaseUrl: payload.supabaseUrl,
+      supabasePublishableKey: payload.supabasePublishableKey,
+    });
+    return true;
+  } catch (error) {
+    console.error("[Supabase] Failed to load runtime configuration", error);
+    return false;
+  }
+}
+
+function getSupabaseConfig(): RuntimeSupabaseConfig | undefined {
   const url = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
   const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
-  return Boolean(url && key);
+  if (url && key) return { supabaseUrl: url, supabasePublishableKey: key };
+  return runtimeConfig;
+}
+
+export function isSupabaseConfigured(): boolean {
+  return Boolean(getSupabaseConfig());
 }
 
 export function getMissingSupabaseEnvVars(): string[] {
-  const url = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+  const config = getSupabaseConfig();
   const missing: string[] = [];
-  if (!url) missing.push("SUPABASE_URL");
-  if (!key) missing.push("SUPABASE_PUBLISHABLE_KEY");
+  if (!config?.supabaseUrl) missing.push("SUPABASE_URL");
+  if (!config?.supabasePublishableKey) missing.push("SUPABASE_PUBLISHABLE_KEY");
   return missing;
 }
 
@@ -71,9 +112,9 @@ function createSupabaseClient() {
     return createPlaceholderClient();
   }
 
-  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL!;
-  const SUPABASE_PUBLISHABLE_KEY = (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.SUPABASE_PUBLISHABLE_KEY)!;
+  const config = getSupabaseConfig()!;
+  const SUPABASE_URL = config.supabaseUrl;
+  const SUPABASE_PUBLISHABLE_KEY = config.supabasePublishableKey;
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     global: {

@@ -10,7 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportRuntimeError } from "../lib/error-reporting";
-import { supabase } from "../integrations/supabase/client";
+import { loadRuntimeSupabaseConfig, supabase } from "../integrations/supabase/client";
 import { Toaster } from "../components/ui/sonner";
 import { ThemeProvider } from "../components/theme/ThemeProvider";
 
@@ -74,6 +74,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  beforeLoad: async () => {
+    await loadRuntimeSupabaseConfig();
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
