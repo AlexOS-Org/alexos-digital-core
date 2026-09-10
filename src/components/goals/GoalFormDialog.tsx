@@ -211,11 +211,7 @@ export function GoalFormDialog({ open, onOpenChange, goal }: Props) {
                   {accounts.map((a) => (
                     <SelectItem key={a.id} value={a.id}>
                       {a.name}
-                      {a.type === "bank"
-                        ? " · Bank"
-                        : a.type === "mobile_money"
-                          ? " · M-Pesa"
-                          : ""}
+                      {a.type === "bank" ? " · Bank" : a.type === "mobile_money" ? " · M-Pesa" : ""}
                     </SelectItem>
                   ))}
                   <SelectItem value={CREATE_NEW}>+ Open / create new account…</SelectItem>
@@ -251,8 +247,7 @@ export function GoalFormDialog({ open, onOpenChange, goal }: Props) {
             const list = result.data ?? accounts;
             if (accountId === NONE && list.length > 0) {
               const newest = [...list].sort(
-                (a, b) =>
-                  new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+                (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
               )[0];
               if (newest) setAccountId(newest.id);
             }
