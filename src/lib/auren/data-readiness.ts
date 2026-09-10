@@ -49,8 +49,7 @@ export function buildAurenDataReadiness(
       tx > 0
         ? "Receiving posted income, expense and transfer records."
         : "I am waiting to receive information from Money Center transactions (income, expenses, transfers).",
-    benefit:
-      "Lets you judge cash direction, spend spikes, and whether new commitments are safe.",
+    benefit: "Lets you judge cash direction, spend spikes, and whether new commitments are safe.",
     actionLabel: "Open Money Center",
     actionTo: "/money-center",
     detail: tx > 0 ? `${tx.toLocaleString()} rows in scope` : undefined,
