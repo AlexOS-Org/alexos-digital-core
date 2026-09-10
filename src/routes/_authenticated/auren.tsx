@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   AlertTriangle,
   ArrowRight,
@@ -10,7 +10,6 @@ import {
   PackageSearch,
   RefreshCw,
   ShieldCheck,
-  ShoppingBag,
   Target,
   TrendingDown,
   TrendingUp,
@@ -21,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAurenAdvisory } from "@/lib/auren/advisor.functions";
 import type {
-  AurenAdvisorySnapshot,
   AurenAdvisorPeriod,
   AurenAdvisorScope,
   AurenConfidence,
@@ -29,6 +27,7 @@ import type {
   AurenForecastHorizon,
 } from "@/lib/auren/advisor.server";
 import type { AurenAdvisoryResponse } from "@/lib/auren/advisor.server";
+import { buildAurenDataReadiness, summarizeReadiness } from "@/lib/auren/data-readiness";
 
 export const Route = createFileRoute("/_authenticated/auren")({
   component: AurenPage,
@@ -60,24 +59,6 @@ function percentage(value: number | null): string {
 
 function confidenceLabel(confidence: AurenConfidence): string {
   return confidence === "insufficient" ? "Insufficient data" : `${confidence} confidence`;
-}
-
-function outlookLabel(value: AurenAdvisorySnapshot["outlook"]): string {
-  return value === "under_pressure"
-    ? "Under pressure"
-    : value === "improving"
-      ? "Improving"
-      : value === "stable"
-        ? "Stable"
-        : "Insufficient data";
-}
-
-function outlookClass(value: AurenAdvisorySnapshot["outlook"]): string {
-  return value === "under_pressure"
-    ? "border-rose-300/60 bg-rose-50 text-rose-800 dark:border-rose-500/30 dark:bg-rose-950/20 dark:text-rose-200"
-    : value === "improving"
-      ? "border-emerald-300/60 bg-emerald-50 text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-950/20 dark:text-emerald-200"
-      : "border-border/60 bg-card text-foreground";
 }
 
 function Metric({
@@ -127,13 +108,11 @@ function ForecastCard({ label, forecast }: { label: string; forecast: AurenForec
           </p>
         </>
       ) : (
-        <p className="mt-3 min-w-0 break-words text-sm leading-6 text-muted-foreground">
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">
           A forecast will appear after Auren has enough comparable activity.
         </p>
       )}
-      <p className="mt-3 min-w-0 break-words text-[11px] leading-5 text-muted-foreground">
-        {forecast.assumptions[0]}
-      </p>
+      <p className="mt-3 text-[11px] leading-5 text-muted-foreground">{forecast.assumptions[0]}</p>
     </div>
   );
 }
@@ -172,6 +151,10 @@ function AurenPage() {
   }, [businessId, period, scope, horizonDays, refreshNonce]);
 
   const advisory = response?.advisory;
+  const readinessFeeds = advisory
+    ? buildAurenDataReadiness(advisory, response?.status ?? null)
+    : [];
+  const readinessSummary = summarizeReadiness(readinessFeeds);
   const statusLabel =
     response?.status === "ready"
       ? "Grounded advisory ready"
@@ -312,6 +295,57 @@ function AurenPage() {
         </Card>
       ) : null}
 
+      {advisory && readinessFeeds.length > 0 ? (
+        <Card className="rounded-3xl border-violet-500/25 bg-violet-500/[0.04] soft-shadow">
+          <CardHeader>
+            <CardTitle className="flex flex-wrap items-center gap-2 text-base">
+              What Auren is receiving — and what it is still waiting for
+              <Badge variant="outline" className="ml-auto text-xs">
+                {response?.status === "no_data" ? "No live data yet" : "Decision inputs"}
+              </Badge>
+            </CardTitle>
+            <p className="text-sm leading-6 text-muted-foreground">{readinessSummary.headline}</p>
+            <p className="text-xs text-muted-foreground">
+              Ready {readinessSummary.ready} · Partial {readinessSummary.partial} · Waiting{" "}
+              {readinessSummary.waiting}
+            </p>
+          </CardHeader>
+          <CardContent className="grid gap-3 md:grid-cols-2">
+            {readinessFeeds.map((feed) => (
+              <div
+                key={feed.id}
+                className="min-w-0 rounded-2xl border border-border/60 bg-card/80 p-4"
+              >
+                <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
+                  <p className="text-sm font-semibold">{feed.source}</p>
+                  <Badge variant={feed.status === "ready" ? "secondary" : "outline"}>
+                    {feed.status === "ready"
+                      ? "Receiving data"
+                      : feed.status === "partial"
+                        ? "Partial"
+                        : "Waiting"}
+                  </Badge>
+                </div>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">{feed.waitingFor}</p>
+                <p className="mt-2 text-sm leading-6">
+                  <span className="font-semibold">Decision benefit:</span> {feed.benefit}
+                </p>
+                {feed.detail ? (
+                  <p className="mt-2 text-xs text-muted-foreground">{feed.detail}</p>
+                ) : null}
+                {feed.actionTo && feed.actionLabel ? (
+                  <Button asChild variant="link" className="mt-2 h-auto px-0 text-xs">
+                    <a href={feed.actionTo}>
+                      {feed.actionLabel} <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                    </a>
+                  </Button>
+                ) : null}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      ) : null}
+
       {loading && !advisory ? (
         <Card className="rounded-3xl border-border/60">
           <CardContent className="flex min-h-44 items-center justify-center gap-2 p-6 text-sm text-muted-foreground">
@@ -388,22 +422,17 @@ function AurenPage() {
                       <div>
                         <p className="text-sm font-semibold">{decision.title}</p>
                         <p className="mt-1 text-xs capitalize text-muted-foreground">
-                          {decision.area} · {decision.priority} priority
+                          {decision.severity} · {decision.category.replace(/_/g, " ")}
                         </p>
                       </div>
-                      <Badge variant={decision.approvalRequired ? "outline" : "secondary"}>
-                        {decision.approvalRequired ? "Review" : "Informational"}
+                      <Badge variant="outline" className="text-[10px]">
+                        {confidenceLabel(decision.confidence)}
                       </Badge>
                     </div>
-                    <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                      {decision.evidence}
-                    </p>
-                    <p className="mt-3 text-sm leading-6">
-                      <span className="font-semibold">Next move:</span> {decision.recommendation}
-                    </p>
-                    {decision.missingData.length > 0 ? (
-                      <p className="mt-3 break-words text-xs leading-5 text-amber-700 dark:text-amber-300">
-                        Missing or unavailable: {decision.missingData.join(", ")}
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground">{decision.rationale}</p>
+                    {decision.evidence.length > 0 ? (
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        Evidence: {decision.evidence.join(" · ")}
                       </p>
                     ) : null}
                   </div>
@@ -412,62 +441,24 @@ function AurenPage() {
             </Card>
           ) : null}
 
-          {advisory.liveEvidence.length > 0 ? (
-            <Card className="rounded-3xl border-primary/20 bg-primary/[0.025] soft-shadow">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <RefreshCw className="h-4 w-4 text-primary" /> Live evidence refresh
-                  <Badge variant="outline" className="ml-auto text-xs">
-                    Read-only · 30 min
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-3 md:grid-cols-3">
-                {advisory.liveEvidence.slice(0, 9).map((evidence) => (
-                  <div
-                    key={`${evidence.sourceType}-${evidence.sourceKey}-${evidence.observedAt}`}
-                    className="auren-evidence-card min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4"
-                  >
-                    <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold">
-                          {evidence.sourceType.replaceAll("_", " ")}
-                        </p>
-                        <p className="mt-1 text-xs text-muted-foreground">{evidence.sourceKey}</p>
-                      </div>
-                      <Badge variant={evidence.status === "ok" ? "secondary" : "outline"}>
-                        {evidence.status === "ok" ? "Fresh" : evidence.status}
-                      </Badge>
-                    </div>
-                    <p className="mt-3 min-w-0 break-words text-sm leading-6 text-muted-foreground">
-                      {evidence.summary ?? "No source summary was returned."}
-                    </p>
-                    <p className="mt-3 min-w-0 break-words text-[11px] leading-5 text-muted-foreground">
-                      Observed {new Date(evidence.observedAt).toLocaleString()} ·{" "}
-                      {confidenceLabel(evidence.confidence)}
-                    </p>
-                    {evidence.sourceUrl ? (
-                      <a
-                        href={evidence.sourceUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-2 inline-flex max-w-full min-w-0 items-center gap-1 break-all text-xs font-semibold text-primary hover:underline"
-                      >
-                        View source <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
-                    ) : null}
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+          {advisory.forecasts.length > 0 ? (
+            <div className="grid gap-3 md:grid-cols-2">
+              {advisory.forecasts.map((forecast) => (
+                <ForecastCard
+                  key={`${forecast.horizonDays}-${forecast.metric}`}
+                  label={`${forecast.horizonDays}-day ${forecast.metric.replace(/_/g, " ")}`}
+                  forecast={forecast}
+                />
+              ))}
+            </div>
           ) : null}
 
           {advisory.externalContext.length > 0 ? (
             <Card className="rounded-3xl border-border/60 soft-shadow">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <ShieldCheck className="h-4 w-4 text-primary" /> Public context and source
-                  coverage
+                  <ShieldCheck className="h-4 w-4 text-primary" />{" "}
+                  Public context and source coverage
                   <Badge variant="outline" className="ml-auto text-xs">
                     Background only
                   </Badge>
@@ -489,210 +480,51 @@ function AurenPage() {
                           context.status === "verified_brand_context" ? "secondary" : "outline"
                         }
                       >
-                        {context.status === "verified_brand_context" ? "Reviewed" : "Source needed"}
+                        {context.status === "verified_brand_context"
+                          ? "Verified"
+                          : "Source missing"}
                       </Badge>
                     </div>
-                    {context.facts.length > 0 ? (
-                      <ul className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
-                        {context.facts.map((fact) => (
-                          <li key={fact}>• {fact}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="mt-3 min-w-0 break-words text-sm leading-6 text-muted-foreground">
-                        No entity-verified public facts were added. Auren will rely on internal
-                        records for this business.
-                      </p>
-                    )}
-                    {context.sourceUrl ? (
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground">{context.summary}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          ) : null}
+
+          {advisory.liveEvidence && advisory.liveEvidence.items.length > 0 ? (
+            <Card className="rounded-3xl border-border/60 soft-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <PackageSearch className="h-4 w-4 text-primary" /> Live evidence
+                  <Badge variant="outline" className="ml-auto text-xs">
+                    Refreshable
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-3 md:grid-cols-2">
+                {advisory.liveEvidence.items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4"
+                  >
+                    <p className="text-sm font-semibold">{item.title}</p>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.snippet}</p>
+                    {item.url ? (
                       <a
-                        href={context.sourceUrl}
+                        href={item.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="mt-3 inline-flex max-w-full min-w-0 items-center gap-1 break-all text-xs font-semibold text-primary hover:underline"
+                        className="mt-2 inline-flex items-center gap-1 text-xs text-primary"
                       >
-                        View public source <ExternalLink className="h-3.5 w-3.5" />
+                        Open source <ExternalLink className="h-3.5 w-3.5" />
                       </a>
                     ) : null}
-                    <p className="mt-3 min-w-0 break-words text-[11px] leading-5 text-muted-foreground">
-                      Retrieved {context.retrievedAt.slice(0, 10)} · {context.confidence} confidence
-                    </p>
-                    <p className="mt-2 min-w-0 break-words text-[11px] leading-5 text-muted-foreground">
-                      Limitation: {context.limitations[0]}
-                    </p>
                   </div>
                 ))}
               </CardContent>
             </Card>
           ) : null}
-
-          <div className="grid gap-6 lg:grid-cols-[1.05fr_1.95fr]">
-            <Card className={`rounded-3xl ${outlookClass(advisory.outlook)}`}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Target className="h-4 w-4 text-primary" /> Performance outlook
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-2xl font-black">{outlookLabel(advisory.outlook)}</p>
-                  <Badge variant="outline">
-                    {advisory.dataQuality.coverageDays.current}/
-                    {advisory.dataQuality.coverageDays.previous} active days
-                  </Badge>
-                </div>
-                <p className="mt-3 min-w-0 break-words text-sm leading-6 text-muted-foreground">
-                  This is a directional assessment from recorded income and expense movement. It is
-                  not a guarantee or an investment recommendation.
-                </p>
-                <div className="mt-5 space-y-3 text-sm">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-muted-foreground">Expected income, weighted</span>
-                    <strong>{money(advisory.verified.weightedExpected, advisory.currency)}</strong>
-                  </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-muted-foreground">Open pipeline</span>
-                    <strong>
-                      {money(advisory.verified.weightedPipelineValue, advisory.currency)}
-                    </strong>
-                  </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-muted-foreground">DailyGear orders</span>
-                    <strong>{advisory.verified.dailyGearOrders.toLocaleString()}</strong>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <ForecastCard label="Income outlook" forecast={advisory.forecasts.income} />
-              <ForecastCard label="Expense outlook" forecast={advisory.forecasts.expenses} />
-              <ForecastCard
-                label="Net cash-flow outlook"
-                forecast={advisory.forecasts.netCashFlow}
-              />
-              <ForecastCard
-                label="DailyGear revenue outlook"
-                forecast={advisory.forecasts.dailyGearRevenue}
-              />
-            </div>
-          </div>
-
-          <Card className="rounded-3xl border-border/60 soft-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <ShieldCheck className="h-4 w-4 text-primary" /> What deserves attention
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-3 lg:grid-cols-2">
-              {advisory.recommendations.map((recommendation) => (
-                <div
-                  key={recommendation.id}
-                  className="auren-evidence-card min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4"
-                >
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge
-                      variant={recommendation.priority === "critical" ? "destructive" : "outline"}
-                    >
-                      {recommendation.priority}
-                    </Badge>
-                    <Badge variant="outline">{confidenceLabel(recommendation.confidence)}</Badge>
-                    <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      {recommendation.area}
-                    </span>
-                  </div>
-                  <h3 className="mt-3 font-semibold">{recommendation.title}</h3>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Evidence: {recommendation.evidence}
-                  </p>
-                  <p className="mt-2 text-sm leading-6">{recommendation.recommendation}</p>
-                  {recommendation.action ? (
-                    <Link
-                      to={recommendation.action.to}
-                      className="mt-3 inline-flex max-w-full min-w-0 items-center gap-1 break-all text-xs font-semibold text-primary hover:underline"
-                    >
-                      {recommendation.action.label}
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
-                  ) : null}
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          {advisory.businesses.length > 0 ? (
-            <Card className="rounded-3xl border-border/60">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <ShoppingBag className="h-4 w-4 text-primary" /> Business performance view
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {advisory.businesses.map((business) => (
-                  <div
-                    key={`${business.id ?? "unassigned"}-${business.name}`}
-                    className="auren-evidence-card min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <h3 className="font-semibold">{business.name}</h3>
-                      <Badge variant="outline">{outlookLabel(business.outlook)}</Badge>
-                    </div>
-                    <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                      <div>
-                        <p className="text-xs text-muted-foreground">Income</p>
-                        <p className="mt-1 font-semibold">
-                          {money(business.currentIncome, advisory.currency)}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">Expenses</p>
-                        <p className="mt-1 font-semibold">
-                          {money(business.currentExpenses, advisory.currency)}
-                        </p>
-                      </div>
-                    </div>
-                    <p className="mt-3 text-xs text-muted-foreground">
-                      Income {percentage(business.incomeChangePct)} · Expenses{" "}
-                      {percentage(business.expenseChangePct)}
-                    </p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          ) : null}
-
-          <Card className="rounded-3xl border-dashed border-border/70">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <PackageSearch className="h-4 w-4 text-primary" /> Data quality and assumptions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                {Object.entries(advisory.dataQuality.sourceRows).map(([label, count]) => (
-                  <div key={label} className="rounded-2xl bg-muted/50 p-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      {label.replace(/([A-Z])/g, " $1")}
-                    </p>
-                    <p className="mt-1 text-lg font-bold tabular-nums">{count.toLocaleString()}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 space-y-1 text-xs leading-5 text-muted-foreground">
-                {advisory.dataQuality.warnings.length > 0 ? (
-                  advisory.dataQuality.warnings.map((warning) => (
-                    <p key={warning}>Data note: {warning}</p>
-                  ))
-                ) : (
-                  <p>No data-quality warnings were triggered for this view.</p>
-                )}
-                <p>
-                  Forecast method: current recorded active-day run-rate with a ±25%
-                  operating-variance range. Auren does not treat this range as a statistical
-                  confidence interval.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
         </>
       ) : null}
     </div>
