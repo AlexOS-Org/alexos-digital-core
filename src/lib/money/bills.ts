@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { expenseTypeForCategory } from "./constants";
 
 export type BillFrequency = Database["public"]["Enums"]["bill_frequency"];
 export type BillStatus = Database["public"]["Enums"]["bill_status"];
@@ -41,6 +42,67 @@ export interface BillInput {
   account_id?: string | null;
   notes?: string | null;
   auto_create_transaction?: boolean;
+}
+
+export type BillDueKind = "no_date" | "due_today" | "upcoming" | "overdue" | "paid";
+
+export type BillDueState = {
+  kind: BillDueKind;
+  /** Calendar days until due (negative = overdue). Null when no due date. */
+  days: number | null;
+  label: string;
+};
+
+function calendarDayUtc(isoDate: string): number | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(isoDate);
+  if (!m) return null;
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const d = Number(m[3]);
+  if (!y || !mo || !d) return null;
+  return Date.UTC(y, mo - 1, d);
+}
+
+/**
+ * Relative due state for bill cards.
+ * Uses UTC calendar days so local timezone does not shift the due boundary.
+ */
+export function getBillDueState(
+  dueDate: string | null | undefined,
+  status: BillStatus,
+  today = new Date(),
+): BillDueState {
+  if (status === "paid") {
+    return { kind: "paid", days: null, label: "Paid" };
+  }
+  if (!dueDate) {
+    return { kind: "no_date", days: null, label: "No due date" };
+  }
+
+  const dueMs = calendarDayUtc(dueDate);
+  if (dueMs === null) {
+    return { kind: "no_date", days: null, label: "No due date" };
+  }
+
+  const todayMs = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const days = Math.round((dueMs - todayMs) / 86_400_000);
+
+  if (days === 0) {
+    return { kind: "due_today", days: 0, label: "Due today" };
+  }
+  if (days > 0) {
+    return {
+      kind: "upcoming",
+      days,
+      label: days === 1 ? "Due in 1 day" : `Due in ${days} days`,
+    };
+  }
+  const overdue = Math.abs(days);
+  return {
+    kind: "overdue",
+    days,
+    label: overdue === 1 ? "Overdue by 1 day" : `Overdue by ${overdue} days`,
+  };
 }
 
 const BILLS_KEY = ["bills"] as const;
@@ -109,7 +171,7 @@ export function useSaveBill() {
         status: (input.status ?? "pending") as BillStatus,
         account_id: input.account_id ?? null,
         notes: input.notes ?? null,
-        auto_create_transaction: input.auto_create_transaction ?? false,
+        auto_create_transaction: input.auto_create_transaction ?? true,
       };
 
       if (input.id) {
@@ -159,30 +221,58 @@ export function useDeleteBill() {
   });
 }
 
+export type MarkBillPaidInput = {
+  bill: Bill;
+  /** Required: cash leaves this account. */
+  accountId: string;
+  /** personal | business — defaults to personal when omitted. */
+  expenseScope?: "personal" | "business";
+  businessId?: string | null;
+};
+
+/**
+ * Mark a bill paid:
+ * 1) Post one expense on the selected account (ledger).
+ * 2) Record last_paid_at + account_id on the bill.
+ * 3) Recurring → advance due_date, keep pending; one-time → status paid.
+ */
 export function useMarkBillPaid() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async (bill: Bill) => {
-      const now = new Date().toISOString();
-
-      if (bill.auto_create_transaction && bill.account_id) {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (user) {
-          await supabase.from("transactions").insert({
-            user_id: user.id,
-            type: "expense",
-            account_id: bill.account_id,
-            amount: bill.amount,
-            category: bill.category,
-            description: `Bill: ${bill.name}`,
-            occurred_at: now,
-          });
-        }
+    mutationFn: async ({ bill, accountId, expenseScope = "personal", businessId }: MarkBillPaidInput) => {
+      if (!accountId) {
+        throw new Error("Choose the account this bill was paid from.");
       }
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        throw new Error("Not authenticated");
+      }
+
+      const now = new Date().toISOString();
+      const category = bill.category ?? "Other";
+
+      const { error: txError } = await supabase.from("transactions").insert({
+        user_id: user.id,
+        type: "expense",
+        status: "posted",
+        account_id: accountId,
+        amount: Number(bill.amount ?? 0),
+        category,
+        expense_type: expenseTypeForCategory(category),
+        expense_scope: expenseScope,
+        business_id: expenseScope === "business" ? (businessId ?? null) : null,
+        description: `Bill: ${bill.name}`,
+        reference: `bill:${bill.id}`,
+        occurred_at: now,
+      });
+
+      if (txError) throw txError;
 
       if (bill.frequency !== "one_time") {
         const { error } = await supabase
@@ -190,6 +280,8 @@ export function useMarkBillPaid() {
           .update({
             status: "pending",
             last_paid_at: now,
+            account_id: accountId,
+            auto_create_transaction: true,
             due_date: bill.due_date ? nextBillDueDate(bill.due_date, bill.frequency) : null,
           })
           .eq("id", bill.id);
@@ -201,6 +293,8 @@ export function useMarkBillPaid() {
           .update({
             status: "paid",
             last_paid_at: now,
+            account_id: accountId,
+            auto_create_transaction: true,
           })
           .eq("id", bill.id);
 
@@ -211,6 +305,7 @@ export function useMarkBillPaid() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: BILLS_KEY });
       qc.invalidateQueries({ queryKey: ["transactions"] });
+      qc.invalidateQueries({ queryKey: ["account_balances"] });
       qc.invalidateQueries({ queryKey: ["balances"] });
     },
   });
