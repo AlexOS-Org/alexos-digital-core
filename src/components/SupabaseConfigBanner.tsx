@@ -1,12 +1,29 @@
-import { isSupabaseConfigured, getMissingSupabaseEnvVars } from "@/integrations/supabase/client";
+import {
+  getMissingSupabaseEnvVars,
+  isSupabaseConfigured,
+  loadRuntimeSupabaseConfig,
+} from "@/integrations/supabase/client";
 import { AlertTriangle } from "lucide-react";
+import { useEffect, useState } from "react";
 
 /**
  * Small banner rendered at the top of authenticated pages when the Supabase
  * environment variables are missing in the current deployment.
  */
 export function SupabaseConfigBanner() {
-  if (isSupabaseConfigured()) return null;
+  const [configured, setConfigured] = useState(isSupabaseConfigured);
+
+  useEffect(() => {
+    let active = true;
+    void loadRuntimeSupabaseConfig().then((loaded) => {
+      if (active) setConfigured(loaded || isSupabaseConfigured());
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (configured || isSupabaseConfigured()) return null;
 
   const missing = getMissingSupabaseEnvVars();
 
