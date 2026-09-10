@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   AlertTriangle,
   ArrowRight,
@@ -10,7 +10,6 @@ import {
   PackageSearch,
   RefreshCw,
   ShieldCheck,
-  ShoppingBag,
   Target,
   TrendingDown,
   TrendingUp,
@@ -21,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAurenAdvisory } from "@/lib/auren/advisor.functions";
 import type {
-  AurenAdvisorySnapshot,
   AurenAdvisorPeriod,
   AurenAdvisorScope,
   AurenConfidence,
@@ -101,7 +99,8 @@ function ForecastCard({ label, forecast }: { label: string; forecast: AurenForec
         <>
           <p className="mt-3 text-xl font-black tabular-nums">{money(forecast.base, forecast.currency)}</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Scenario range: {money(forecast.lower, forecast.currency)} – {money(forecast.upper, forecast.currency)}
+            Scenario range: {money(forecast.lower, forecast.currency)} –{" "}
+            {money(forecast.upper, forecast.currency)}
           </p>
         </>
       ) : (
@@ -135,7 +134,9 @@ function AurenPage() {
       .catch((cause: unknown) => {
         if (!active) return;
         setResponse(null);
-        setError(cause instanceof Error ? cause.message : "Auren could not load the advisory data.");
+        setError(
+          cause instanceof Error ? cause.message : "Auren could not load the advisory data.",
+        );
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -146,7 +147,9 @@ function AurenPage() {
   }, [businessId, period, scope, horizonDays, refreshNonce]);
 
   const advisory = response?.advisory;
-  const readinessFeeds = advisory ? buildAurenDataReadiness(advisory, response?.status ?? null) : [];
+  const readinessFeeds = advisory
+    ? buildAurenDataReadiness(advisory, response?.status ?? null)
+    : [];
   const readinessSummary = summarizeReadiness(readinessFeeds);
   const statusLabel =
     response?.status === "ready"
@@ -168,14 +171,17 @@ function AurenPage() {
                 <Brain className="h-3.5 w-3.5 text-violet-200" />
                 Auren Intelligence
               </span>
-              <Badge className="border-white/15 bg-white/10 text-white hover:bg-white/10">{statusLabel}</Badge>
+              <Badge className="border-white/15 bg-white/10 text-white hover:bg-white/10">
+                {statusLabel}
+              </Badge>
             </div>
             <h1 className="mt-5 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
               Know what is happening, what may happen next and what deserves your attention.
             </h1>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-200 sm:text-base">
-              Auren combines the records already in AlexOS across Money Center, CRM, goals and DailyGear.
-              It separates verified facts from run-rate scenarios and labels recommendations with their evidence.
+              Auren combines the records already in AlexOS across Money Center, CRM, goals and
+              DailyGear. It separates verified facts from run-rate scenarios and labels
+              recommendations with their evidence.
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-2 text-xs text-slate-300">
               <span className="inline-flex items-center gap-1.5">
@@ -189,7 +195,9 @@ function AurenPage() {
           <div className="flex items-end justify-start lg:justify-end">
             <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-md">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">Decision lens</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
+                  Decision lens
+                </p>
                 <Button
                   type="button"
                   size="icon"
@@ -220,7 +228,9 @@ function AurenPage() {
               {scope === "businesses" && advisory?.businesses.length ? (
                 <select
                   value={businessId ?? "all"}
-                  onChange={(event) => setBusinessId(event.target.value === "all" ? null : event.target.value)}
+                  onChange={(event) =>
+                    setBusinessId(event.target.value === "all" ? null : event.target.value)
+                  }
                   className="mt-2 w-full rounded-xl border border-white/15 bg-[#0d1b3c] px-3 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-300/40"
                   aria-label="Auren business"
                 >
@@ -249,7 +259,9 @@ function AurenPage() {
                 </select>
                 <select
                   value={horizonDays}
-                  onChange={(event) => setHorizonDays(Number(event.target.value) as AurenForecastHorizon)}
+                  onChange={(event) =>
+                    setHorizonDays(Number(event.target.value) as AurenForecastHorizon)
+                  }
                   className="w-full rounded-xl border border-white/15 bg-[#0d1b3c] px-3 py-2.5 text-xs text-white outline-none focus:ring-2 focus:ring-violet-300/40"
                   aria-label="Auren forecast horizon"
                 >
@@ -290,28 +302,38 @@ function AurenPage() {
             </CardTitle>
             <p className="text-sm leading-6 text-muted-foreground">{readinessSummary.headline}</p>
             <p className="text-xs text-muted-foreground">
-              Ready {readinessSummary.ready} · Partial {readinessSummary.partial} · Waiting {readinessSummary.waiting}
+              Ready {readinessSummary.ready} · Partial {readinessSummary.partial} · Waiting{" "}
+              {readinessSummary.waiting}
             </p>
           </CardHeader>
           <CardContent className="grid gap-3 md:grid-cols-2">
             {readinessFeeds.map((feed) => (
-              <div key={feed.id} className="min-w-0 rounded-2xl border border-border/60 bg-card/80 p-4">
+              <div
+                key={feed.id}
+                className="min-w-0 rounded-2xl border border-border/60 bg-card/80 p-4"
+              >
                 <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
                   <p className="text-sm font-semibold">{feed.source}</p>
                   <Badge variant={feed.status === "ready" ? "secondary" : "outline"}>
-                    {feed.status === "ready" ? "Receiving data" : feed.status === "partial" ? "Partial" : "Waiting"}
+                    {feed.status === "ready"
+                      ? "Receiving data"
+                      : feed.status === "partial"
+                        ? "Partial"
+                        : "Waiting"}
                   </Badge>
                 </div>
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">{feed.waitingFor}</p>
                 <p className="mt-2 text-sm leading-6">
                   <span className="font-semibold">Decision benefit:</span> {feed.benefit}
                 </p>
-                {feed.detail ? <p className="mt-2 text-xs text-muted-foreground">{feed.detail}</p> : null}
+                {feed.detail ? (
+                  <p className="mt-2 text-xs text-muted-foreground">{feed.detail}</p>
+                ) : null}
                 {feed.actionTo && feed.actionLabel ? (
                   <Button asChild variant="link" className="mt-2 h-auto px-0 text-xs">
-                    <Link to={feed.actionTo}>
+                    <a href={feed.actionTo}>
                       {feed.actionLabel} <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                    </Link>
+                    </a>
                   </Button>
                 ) : null}
               </div>
@@ -330,22 +352,47 @@ function AurenPage() {
       ) : advisory ? (
         <>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <Metric label="Net cash flow" value={money(advisory.verified.netCashFlow, advisory.currency)} detail={`${percentage(advisory.verified.incomeChangePct)} income direction`} icon={CircleDollarSign} />
-            <Metric label="Recorded income" value={money(advisory.verified.income, advisory.currency)} detail={`${advisory.dataQuality.coverageDays.current} active days`} icon={TrendingUp} />
-            <Metric label="Recorded expenses" value={money(advisory.verified.expenses, advisory.currency)} detail={`${percentage(advisory.verified.expenseChangePct)} expense direction`} icon={TrendingDown} />
-            <Metric label="Cash available" value={money(advisory.verified.cashAvailable, advisory.currency)} detail={`${advisory.verified.pendingExpectedCount} expected item(s) pending`} icon={Wallet} />
+            <Metric
+              label="Net cash flow"
+              value={money(advisory.verified.netCashFlow, advisory.currency)}
+              detail={`${percentage(advisory.verified.incomeChangePct)} income direction`}
+              icon={CircleDollarSign}
+            />
+            <Metric
+              label="Recorded income"
+              value={money(advisory.verified.income, advisory.currency)}
+              detail={`${advisory.dataQuality.coverageDays.current} active days`}
+              icon={TrendingUp}
+            />
+            <Metric
+              label="Recorded expenses"
+              value={money(advisory.verified.expenses, advisory.currency)}
+              detail={`${percentage(advisory.verified.expenseChangePct)} expense direction`}
+              icon={TrendingDown}
+            />
+            <Metric
+              label="Cash available"
+              value={money(advisory.verified.cashAvailable, advisory.currency)}
+              detail={`${advisory.verified.pendingExpectedCount} expected item(s) pending`}
+              icon={Wallet}
+            />
           </div>
 
           {response?.summary ? (
             <Card className="rounded-3xl border-violet-500/20 bg-violet-500/[0.04] soft-shadow">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <Brain className="h-4 w-4 text-violet-600 dark:text-violet-300" /> Auren decision brief{" "}
-                  <Badge variant="outline" className="ml-auto text-xs">{response.model ? "Workers AI + verified data" : "Verified data"}</Badge>
+                  <Brain className="h-4 w-4 text-violet-600 dark:text-violet-300" /> Auren decision
+                  brief{" "}
+                  <Badge variant="outline" className="ml-auto text-xs">
+                    {response.model ? "Workers AI + verified data" : "Verified data"}
+                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="rounded-2xl border border-violet-500/15 bg-background/60 p-5 text-sm leading-7 whitespace-pre-line">{response.summary}</div>
+                <div className="rounded-2xl border border-violet-500/15 bg-background/60 p-5 text-sm leading-7 whitespace-pre-line">
+                  {response.summary}
+                </div>
               </CardContent>
             </Card>
           ) : null}
@@ -354,24 +401,40 @@ function AurenPage() {
             <Card className="rounded-3xl border-amber-500/20 bg-amber-500/[0.025] soft-shadow">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <Target className="h-4 w-4 text-amber-600 dark:text-amber-300" /> Decision guardrails
-                  <Badge variant="outline" className="ml-auto text-xs">Approval required before action</Badge>
+                  <Target className="h-4 w-4 text-amber-600 dark:text-amber-300" /> Decision
+                  guardrails
+                  <Badge variant="outline" className="ml-auto text-xs">
+                    Approval required before action
+                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-3 md:grid-cols-2">
                 {advisory.decisions.map((decision) => (
-                  <div key={decision.id} className="min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4">
+                  <div
+                    key={decision.id}
+                    className="min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4"
+                  >
                     <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                       <div>
                         <p className="text-sm font-semibold">{decision.title}</p>
-                        <p className="mt-1 text-xs capitalize text-muted-foreground">{decision.area} · {decision.priority} priority</p>
+                        <p className="mt-1 text-xs capitalize text-muted-foreground">
+                          {decision.area} · {decision.priority} priority
+                        </p>
                       </div>
-                      <Badge variant={decision.approvalRequired ? "outline" : "secondary"}>{decision.approvalRequired ? "Review" : "Informational"}</Badge>
+                      <Badge variant={decision.approvalRequired ? "outline" : "secondary"}>
+                        {decision.approvalRequired ? "Review" : "Informational"}
+                      </Badge>
                     </div>
-                    <p className="mt-3 text-sm leading-6 text-muted-foreground">{decision.evidence}</p>
-                    <p className="mt-3 text-sm leading-6"><span className="font-semibold">Next move:</span> {decision.recommendation}</p>
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                      {decision.evidence}
+                    </p>
+                    <p className="mt-3 text-sm leading-6">
+                      <span className="font-semibold">Next move:</span> {decision.recommendation}
+                    </p>
                     {decision.missingData.length > 0 ? (
-                      <p className="mt-3 break-words text-xs leading-5 text-amber-700 dark:text-amber-300">Missing or unavailable: {decision.missingData.join(", ")}</p>
+                      <p className="mt-3 break-words text-xs leading-5 text-amber-700 dark:text-amber-300">
+                        Missing or unavailable: {decision.missingData.join(", ")}
+                      </p>
                     ) : null}
                   </div>
                 ))}
@@ -384,22 +447,38 @@ function AurenPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <RefreshCw className="h-4 w-4 text-primary" /> Live evidence refresh
-                  <Badge variant="outline" className="ml-auto text-xs">Read-only · 30 min</Badge>
+                  <Badge variant="outline" className="ml-auto text-xs">
+                    Read-only · 30 min
+                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-3 md:grid-cols-3">
                 {advisory.liveEvidence.slice(0, 9).map((evidence) => (
-                  <div key={`${evidence.sourceType}-${evidence.sourceKey}-${evidence.observedAt}`} className="auren-evidence-card min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4">
+                  <div
+                    key={`${evidence.sourceType}-${evidence.sourceKey}-${evidence.observedAt}`}
+                    className="auren-evidence-card min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4"
+                  >
                     <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                       <div>
-                        <p className="text-sm font-semibold">{evidence.sourceType.replaceAll("_", " ")}</p>
+                        <p className="text-sm font-semibold">
+                          {evidence.sourceType.replaceAll("_", " ")}
+                        </p>
                         <p className="mt-1 text-xs text-muted-foreground">{evidence.sourceKey}</p>
                       </div>
-                      <Badge variant={evidence.status === "ok" ? "secondary" : "outline"}>{evidence.status === "ok" ? "Fresh" : evidence.status}</Badge>
+                      <Badge variant={evidence.status === "ok" ? "secondary" : "outline"}>
+                        {evidence.status === "ok" ? "Fresh" : evidence.status}
+                      </Badge>
                     </div>
-                    <p className="mt-3 text-sm leading-6 text-muted-foreground">{evidence.summary ?? "No source summary was returned."}</p>
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                      {evidence.summary ?? "No source summary was returned."}
+                    </p>
                     {evidence.sourceUrl ? (
-                      <a href={evidence.sourceUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex max-w-full min-w-0 items-center gap-1 break-all text-xs font-semibold text-primary hover:underline">
+                      <a
+                        href={evidence.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-flex max-w-full min-w-0 items-center gap-1 break-all text-xs font-semibold text-primary hover:underline"
+                      >
                         View source <ExternalLink className="h-3.5 w-3.5" />
                       </a>
                     ) : null}
@@ -414,18 +493,27 @@ function AurenPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <ShieldCheck className="h-4 w-4 text-primary" /> Public context and source coverage
-                  <Badge variant="outline" className="ml-auto text-xs">Background only</Badge>
+                  <Badge variant="outline" className="ml-auto text-xs">
+                    Background only
+                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-3 md:grid-cols-3">
                 {advisory.externalContext.map((context) => (
-                  <div key={context.business} className="auren-evidence-card min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4">
+                  <div
+                    key={context.business}
+                    className="auren-evidence-card min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4"
+                  >
                     <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                       <div>
                         <p className="text-sm font-semibold">{context.business}</p>
                         <p className="mt-1 text-xs text-muted-foreground">{context.sourceTitle}</p>
                       </div>
-                      <Badge variant={context.status === "verified_brand_context" ? "secondary" : "outline"}>
+                      <Badge
+                        variant={
+                          context.status === "verified_brand_context" ? "secondary" : "outline"
+                        }
+                      >
                         {context.status === "verified_brand_context" ? "Reviewed" : "Source needed"}
                       </Badge>
                     </div>
@@ -437,11 +525,18 @@ function AurenPage() {
                       </ul>
                     ) : (
                       <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                        I am waiting to receive an entity-verified public source for this business. Until then Auren will not invent competitor or market claims — only your internal AlexOS records count for revenue and stock decisions.
+                        I am waiting to receive an entity-verified public source for this business.
+                        Until then Auren will not invent competitor or market claims — only your
+                        internal AlexOS records count for revenue and stock decisions.
                       </p>
                     )}
                     {context.sourceUrl ? (
-                      <a href={context.sourceUrl} target="_blank" rel="noreferrer" className="mt-3 inline-flex max-w-full min-w-0 items-center gap-1 break-all text-xs font-semibold text-primary hover:underline">
+                      <a
+                        href={context.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-3 inline-flex max-w-full min-w-0 items-center gap-1 break-all text-xs font-semibold text-primary hover:underline"
+                      >
                         View public source <ExternalLink className="h-3.5 w-3.5" />
                       </a>
                     ) : null}
@@ -460,15 +555,21 @@ function AurenPage() {
               </CardHeader>
               <CardContent className="grid gap-3 md:grid-cols-2">
                 {advisory.recommendations.map((recommendation) => (
-                  <div key={recommendation.id} className="min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4">
+                  <div
+                    key={recommendation.id}
+                    className="min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4"
+                  >
                     <p className="text-sm font-semibold">{recommendation.title}</p>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{recommendation.evidence}</p>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      {recommendation.evidence}
+                    </p>
                     <p className="mt-2 text-sm leading-6">{recommendation.recommendation}</p>
                     {recommendation.action ? (
                       <Button asChild variant="link" className="mt-2 h-auto px-0 text-xs">
-                        <Link to={recommendation.action.to}>
-                          {recommendation.action.label} <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                        </Link>
+                        <a href={recommendation.action.to}>
+                          {recommendation.action.label}{" "}
+                          <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                        </a>
                       </Button>
                     ) : null}
                   </div>
@@ -479,9 +580,18 @@ function AurenPage() {
 
           <div className="grid gap-3 lg:grid-cols-2">
             <ForecastCard label={`Income outlook · ${horizonDays}d`} forecast={advisory.forecasts.income} />
-            <ForecastCard label={`Expense outlook · ${horizonDays}d`} forecast={advisory.forecasts.expenses} />
-            <ForecastCard label={`Net cash-flow outlook · ${horizonDays}d`} forecast={advisory.forecasts.netCashFlow} />
-            <ForecastCard label={`DailyGear revenue outlook · ${horizonDays}d`} forecast={advisory.forecasts.dailyGearRevenue} />
+            <ForecastCard
+              label={`Expense outlook · ${horizonDays}d`}
+              forecast={advisory.forecasts.expenses}
+            />
+            <ForecastCard
+              label={`Net cash-flow outlook · ${horizonDays}d`}
+              forecast={advisory.forecasts.netCashFlow}
+            />
+            <ForecastCard
+              label={`DailyGear revenue outlook · ${horizonDays}d`}
+              forecast={advisory.forecasts.dailyGearRevenue}
+            />
           </div>
 
           <Card className="rounded-3xl border-dashed border-border/70">
@@ -494,19 +604,25 @@ function AurenPage() {
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                 {Object.entries(advisory.dataQuality.sourceRows).map(([label, count]) => (
                   <div key={label} className="rounded-2xl bg-muted/50 p-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{label.replace(/([A-Z])/g, " $1")}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      {label.replace(/([A-Z])/g, " $1")}
+                    </p>
                     <p className="mt-1 text-lg font-bold tabular-nums">{count.toLocaleString()}</p>
                   </div>
                 ))}
               </div>
               <div className="mt-4 space-y-1 text-xs leading-5 text-muted-foreground">
                 {advisory.dataQuality.warnings.length > 0 ? (
-                  advisory.dataQuality.warnings.map((warning) => <p key={warning}>Data note: {warning}</p>)
+                  advisory.dataQuality.warnings.map((warning) => (
+                    <p key={warning}>Data note: {warning}</p>
+                  ))
                 ) : (
                   <p>No data-quality warnings were triggered for this view.</p>
                 )}
                 <p>
-                  Forecast method: current recorded active-day run-rate with a ±25% operating-variance range. Auren does not treat this range as a statistical confidence interval.
+                  Forecast method: current recorded active-day run-rate with a ±25%
+                  operating-variance range. Auren does not treat this range as a statistical
+                  confidence interval.
                 </p>
               </div>
             </CardContent>
