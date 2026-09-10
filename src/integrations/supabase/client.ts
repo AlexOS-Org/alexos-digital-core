@@ -6,6 +6,10 @@ function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
 }
 
+function isBrowserSafeSupabaseKey(value: string): boolean {
+  return !value.startsWith("sb_secret_");
+}
+
 function createSupabaseFetch(supabaseKey: string): typeof fetch {
   return (input, init) => {
     const headers = new Headers(
@@ -36,7 +40,7 @@ type RuntimeSupabaseConfig = {
 let runtimeConfig: RuntimeSupabaseConfig | undefined;
 
 export function applyRuntimeSupabaseConfig(config: RuntimeSupabaseConfig): void {
-  if (!config.supabaseUrl || !config.supabasePublishableKey) return;
+  if (!config.supabaseUrl || !isBrowserSafeSupabaseKey(config.supabasePublishableKey)) return;
   runtimeConfig = config;
   _supabase = undefined;
 }
@@ -52,7 +56,14 @@ export async function loadRuntimeSupabaseConfig(): Promise<boolean> {
     if (!response.ok) return false;
 
     const payload = (await response.json()) as Partial<RuntimeSupabaseConfig> & { ok?: boolean };
-    if (!payload.ok || !payload.supabaseUrl || !payload.supabasePublishableKey) return false;
+    if (
+      !payload.ok ||
+      !payload.supabaseUrl ||
+      !payload.supabasePublishableKey ||
+      !isBrowserSafeSupabaseKey(payload.supabasePublishableKey)
+    ) {
+      return false;
+    }
 
     applyRuntimeSupabaseConfig({
       supabaseUrl: payload.supabaseUrl,
@@ -68,7 +79,9 @@ export async function loadRuntimeSupabaseConfig(): Promise<boolean> {
 function getSupabaseConfig(): RuntimeSupabaseConfig | undefined {
   const url = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
   const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
-  if (url && key) return { supabaseUrl: url, supabasePublishableKey: key };
+  if (url && key && isBrowserSafeSupabaseKey(key)) {
+    return { supabaseUrl: url, supabasePublishableKey: key };
+  }
   return runtimeConfig;
 }
 

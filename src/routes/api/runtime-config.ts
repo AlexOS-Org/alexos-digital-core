@@ -17,11 +17,11 @@ export const Route = createFileRoute("/api/runtime-config")({
         const url = process.env.SUPABASE_URL?.trim();
         const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY?.trim();
 
-        if (!url || !publishableKey) {
+        if (!url || !publishableKey || publishableKey.startsWith("sb_secret_")) {
           return json(
             {
               ok: false,
-              error: "Supabase browser configuration is unavailable.",
+              error: "A browser-safe Supabase publishable key is required.",
             },
             503,
           );
