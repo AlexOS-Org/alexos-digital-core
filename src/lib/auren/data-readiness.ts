@@ -1,4 +1,4 @@
-import type { AurenCapability } from "./capability-gateway";
+import type { AurenCapability, CapabilityId } from "./capability-gateway";
 import type { AurenAdvisorySnapshot } from "./advisor.server";
 import type { AurenPublicContextRecord } from "./public-context";
 
@@ -18,10 +18,14 @@ export interface AurenDataFeed {
   detail?: string;
 }
 
-function rowCount(
-  sourceRows: Record<string, number>,
-  key: string,
-): number {
+const COMPETITOR_CAPABILITY_IDS: readonly CapabilityId[] = [
+  "seo-competitor:read",
+  "similarweb:read",
+  "content-gap:read",
+  "analytics:read",
+];
+
+function rowCount(sourceRows: Record<string, number>, key: string): number {
   return Number(sourceRows[key] ?? 0);
 }
 
@@ -31,7 +35,7 @@ function rowCount(
  */
 export function buildAurenDataReadiness(
   advisory: AurenAdvisorySnapshot,
-  responseStatus: "ready" | "no_data" | "ai_unavailable" | null,
+  _responseStatus: "ready" | "no_data" | "ai_unavailable" | null,
 ): AurenDataFeed[] {
   const rows = advisory.dataQuality.sourceRows;
   const feeds: AurenDataFeed[] = [];
@@ -105,8 +109,7 @@ export function buildAurenDataReadiness(
   feeds.push({
     id: "live-evidence",
     source: "Live evidence · ads, social, funnel",
-    status:
-      liveOk > 0 ? "ready" : livePartial > 0 || liveTotal > 0 ? "partial" : "waiting",
+    status: liveOk > 0 ? "ready" : livePartial > 0 || liveTotal > 0 ? "partial" : "waiting",
     waitingFor:
       liveOk > 0
         ? "Receiving scheduled Meta / Instagram / funnel snapshots."
@@ -119,28 +122,18 @@ export function buildAurenDataReadiness(
         : "No snapshots in the last refresh window",
   });
 
-  // External / competitor capabilities (honest: contract-only until connectors exist)
   const competitorCaps = advisory.capabilities.filter((c) =>
-    ["seo-competitor:read", "similarweb:read", "content-gap:read", "analytics:read"].includes(
-      c.id,
-    ),
+    COMPETITOR_CAPABILITY_IDS.includes(c.id),
   );
   for (const cap of competitorCaps) {
     feeds.push(capabilityToFeed(cap));
   }
 
-  // Public brand context per business
   for (const ctx of advisory.externalContext) {
     feeds.push(publicContextToFeed(ctx));
   }
 
-  if (responseStatus === "no_data") {
-    // Ensure at least the first-party feeds stay ordered with waiting first
-    feeds.sort((a, b) => statusRank(a.status) - statusRank(b.status));
-  } else {
-    feeds.sort((a, b) => statusRank(a.status) - statusRank(b.status));
-  }
-
+  feeds.sort((a, b) => statusRank(a.status) - statusRank(b.status));
   return feeds;
 }
 
@@ -164,7 +157,7 @@ function capabilityToFeed(cap: AurenCapability): AurenDataFeed {
   };
 }
 
-function competitorBenefit(id: string): string | null {
+function competitorBenefit(id: CapabilityId): string | null {
   switch (id) {
     case "seo-competitor:read":
       return "Shows organic visibility and page-type gaps so you can prioritise content that competes for the same Kenya demand.";
