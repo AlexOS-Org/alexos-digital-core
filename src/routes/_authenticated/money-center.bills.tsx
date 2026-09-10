@@ -89,7 +89,9 @@ function BillsPage() {
   );
 
   const overdue = useMemo(() => {
-    return activeBills.filter((bill) => getBillDueState(bill.due_date, bill.status).kind === "overdue");
+    return activeBills.filter(
+      (bill) => getBillDueState(bill.due_date, bill.status).kind === "overdue",
+    );
   }, [activeBills]);
 
   const upcoming = useMemo(() => {
@@ -118,20 +120,11 @@ function BillsPage() {
         expenseScope: account?.financial_scope === "business" ? "business" : "personal",
         businessId: account?.business_id ?? null,
       });
-      const next =
-        paying.frequency !== "one_time" && paying.due_date
-          ? getBillDueState(
-              // approximate next label after advance
-              paying.due_date,
-              "pending",
-            )
-          : null;
       toast.success(
         paying.frequency === "one_time"
           ? `Paid from ${accountName.get(payAccountId) ?? "account"}`
           : `Paid from ${accountName.get(payAccountId) ?? "account"}. Next cycle scheduled.`,
       );
-      void next;
       setPaying(null);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not mark bill paid");
