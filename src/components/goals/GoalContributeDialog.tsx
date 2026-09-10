@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +31,14 @@ export function GoalContributeDialog({ open, onOpenChange, goal }: Props) {
   const [amount, setAmount] = useState("");
   const [accountId, setAccountId] = useState<string>("");
   const [note, setNote] = useState("");
+
+  useEffect(() => {
+    if (open && goal) {
+      setAccountId(goal.account_id ?? "");
+      setAmount("");
+      setNote("");
+    }
+  }, [open, goal]);
 
   const submit = async () => {
     if (!goal) return;
@@ -71,7 +79,7 @@ export function GoalContributeDialog({ open, onOpenChange, goal }: Props) {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>From Account (optional)</Label>
+              <Label>Into account</Label>
               <Select value={accountId} onValueChange={setAccountId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Choose account" />
@@ -84,6 +92,11 @@ export function GoalContributeDialog({ open, onOpenChange, goal }: Props) {
                   ))}
                 </SelectContent>
               </Select>
+              {goal.account_id && (
+                <p className="text-xs text-muted-foreground">
+                  Defaults to this goal&apos;s linked savings account.
+                </p>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label>Note</Label>

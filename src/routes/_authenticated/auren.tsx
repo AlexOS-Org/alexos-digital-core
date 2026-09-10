@@ -422,17 +422,20 @@ function AurenPage() {
                       <div>
                         <p className="text-sm font-semibold">{decision.title}</p>
                         <p className="mt-1 text-xs capitalize text-muted-foreground">
-                          {decision.severity} · {decision.category.replace(/_/g, " ")}
+                          {decision.priority} · {decision.area.replace(/_/g, " ")}
                         </p>
                       </div>
                       <Badge variant="outline" className="text-[10px]">
-                        {confidenceLabel(decision.confidence)}
+                        {decision.status.replace(/_/g, " ")}
                       </Badge>
                     </div>
-                    <p className="mt-3 text-sm leading-6 text-muted-foreground">{decision.rationale}</p>
-                    {decision.evidence.length > 0 ? (
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                      {decision.evidence}
+                    </p>
+                    <p className="mt-2 text-sm leading-6">{decision.recommendation}</p>
+                    {decision.missingData.length > 0 ? (
                       <p className="mt-2 text-xs text-muted-foreground">
-                        Evidence: {decision.evidence.join(" · ")}
+                        Missing: {decision.missingData.join(" · ")}
                       </p>
                     ) : null}
                   </div>
@@ -441,24 +444,22 @@ function AurenPage() {
             </Card>
           ) : null}
 
-          {advisory.forecasts.length > 0 ? (
-            <div className="grid gap-3 md:grid-cols-2">
-              {advisory.forecasts.map((forecast) => (
-                <ForecastCard
-                  key={`${forecast.horizonDays}-${forecast.metric}`}
-                  label={`${forecast.horizonDays}-day ${forecast.metric.replace(/_/g, " ")}`}
-                  forecast={forecast}
-                />
-              ))}
-            </div>
-          ) : null}
+          <div className="grid gap-3 md:grid-cols-2">
+            <ForecastCard label="Income outlook" forecast={advisory.forecasts.income} />
+            <ForecastCard label="Expense outlook" forecast={advisory.forecasts.expenses} />
+            <ForecastCard label="Net cash flow outlook" forecast={advisory.forecasts.netCashFlow} />
+            <ForecastCard
+              label="DailyGear revenue outlook"
+              forecast={advisory.forecasts.dailyGearRevenue}
+            />
+          </div>
 
           {advisory.externalContext.length > 0 ? (
             <Card className="rounded-3xl border-border/60 soft-shadow">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <ShieldCheck className="h-4 w-4 text-primary" />{" "}
-                  Public context and source coverage
+                  <ShieldCheck className="h-4 w-4 text-primary" /> Public context and source
+                  coverage
                   <Badge variant="outline" className="ml-auto text-xs">
                     Background only
                   </Badge>
@@ -485,14 +486,24 @@ function AurenPage() {
                           : "Source missing"}
                       </Badge>
                     </div>
-                    <p className="mt-3 text-sm leading-6 text-muted-foreground">{context.summary}</p>
+                    {context.facts.length > 0 ? (
+                      <ul className="mt-3 list-disc space-y-1 pl-4 text-sm leading-6 text-muted-foreground">
+                        {context.facts.slice(0, 3).map((fact) => (
+                          <li key={fact.slice(0, 40)}>{fact}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                        {context.limitations[0] ?? "No verified public source for this brand."}
+                      </p>
+                    )}
                   </div>
                 ))}
               </CardContent>
             </Card>
           ) : null}
 
-          {advisory.liveEvidence && advisory.liveEvidence.items.length > 0 ? (
+          {advisory.liveEvidence.length > 0 ? (
             <Card className="rounded-3xl border-border/60 soft-shadow">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
@@ -503,16 +514,21 @@ function AurenPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-3 md:grid-cols-2">
-                {advisory.liveEvidence.items.map((item) => (
+                {advisory.liveEvidence.map((item) => (
                   <div
-                    key={item.id}
+                    key={`${item.sourceType}-${item.sourceKey}-${item.observedAt}`}
                     className="min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4"
                   >
-                    <p className="text-sm font-semibold">{item.title}</p>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.snippet}</p>
-                    {item.url ? (
+                    <p className="text-sm font-semibold">{item.sourceKey}</p>
+                    <p className="mt-1 text-xs capitalize text-muted-foreground">
+                      {item.sourceType.replace(/_/g, " ")} · {item.status}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      {item.summary ?? "No summary available for this observation."}
+                    </p>
+                    {item.sourceUrl ? (
                       <a
-                        href={item.url}
+                        href={item.sourceUrl}
                         target="_blank"
                         rel="noreferrer"
                         className="mt-2 inline-flex items-center gap-1 text-xs text-primary"
