@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Pencil, Archive, Target, TrendingUp, CheckCircle2 } from "lucide-react";
+import { Plus, Pencil, Archive, Target, TrendingUp, CheckCircle2, Wallet } from "lucide-react";
 import { useGoals, useGoalProgress, useArchiveGoal, type Goal } from "@/lib/goals/api";
+import { useAccounts } from "@/lib/money/api";
 import { formatMoney, formatDate } from "@/lib/money/format";
 import { GoalFormDialog, GOAL_ICONS } from "@/components/goals/GoalFormDialog";
 import { GoalContributeDialog } from "@/components/goals/GoalContributeDialog";
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/_authenticated/goals")({
 function GoalsPage() {
   const { data: goals = [], isLoading } = useGoals();
   const { data: progress = [] } = useGoalProgress();
+  const { data: accounts = [] } = useAccounts();
   const archive = useArchiveGoal();
   const [formOpen, setFormOpen] = useState(false);
   const [contribOpen, setContribOpen] = useState(false);
@@ -26,6 +28,7 @@ function GoalsPage() {
   const [contributing, setContributing] = useState<Goal | null>(null);
 
   const progressMap = new Map(progress.map((p) => [p.goal_id, Number(p.current_amount)]));
+  const accountMap = new Map(accounts.map((a) => [a.id, a.name]));
   const totalTarget = goals.reduce((s, g) => s + Number(g.target_amount), 0);
   const totalSaved = goals.reduce((s, g) => s + (progressMap.get(g.id) ?? 0), 0);
   const achieved = goals.filter((g) => g.status === "achieved").length;
@@ -122,7 +125,8 @@ function GoalsPage() {
         {!isLoading && goals.length === 0 && (
           <div className="rounded-2xl border border-dashed p-10 text-center text-sm text-muted-foreground">
             No goals yet. Add your first goal — Audi Fund, Emergency Fund, School Fees, or anything
-            else.
+            else. You can link each goal to a bank or wallet account (Equity, NCBA, Absa, Family
+            Bank).
           </div>
         )}
         <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -132,6 +136,7 @@ function GoalsPage() {
             const pct = target > 0 ? Math.min(100, (current / target) * 100) : 0;
             const remaining = Math.max(0, target - current);
             const Icon = GOAL_ICONS[g.icon] ?? Target;
+            const linkedAccount = g.account_id ? accountMap.get(g.account_id) : null;
             return (
               <Card key={g.id} className="rounded-2xl transition-shadow hover:shadow-md">
                 <CardContent className="p-5 space-y-4">
@@ -178,6 +183,22 @@ function GoalsPage() {
                       <span className="text-muted-foreground">{formatMoney(remaining)} to go</span>
                     </div>
                   </div>
+
+                  {linkedAccount ? (
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Wallet className="h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">Saving in {linkedAccount}</span>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => openEdit(g)}
+                      className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 hover:underline"
+                    >
+                      <Wallet className="h-3.5 w-3.5 shrink-0" />
+                      Link a savings account
+                    </button>
+                  )}
 
                   {g.target_date && (
                     <div className="text-xs text-muted-foreground">
