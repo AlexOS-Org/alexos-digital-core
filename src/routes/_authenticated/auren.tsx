@@ -75,7 +75,9 @@ function Metric({
   return (
     <div className="auren-evidence-card min-w-0 rounded-2xl border border-border/60 bg-card/70 p-4">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          {label}
+        </p>
         <Icon className="h-4 w-4 text-primary" />
       </div>
       <p className="mt-2 text-xl font-black tabular-nums">{value}</p>
@@ -97,7 +99,9 @@ function ForecastCard({ label, forecast }: { label: string; forecast: AurenForec
       </div>
       {valuesAvailable ? (
         <>
-          <p className="mt-3 text-xl font-black tabular-nums">{money(forecast.base, forecast.currency)}</p>
+          <p className="mt-3 text-xl font-black tabular-nums">
+            {money(forecast.base, forecast.currency)}
+          </p>
           <p className="mt-1 text-xs text-muted-foreground">
             Scenario range: {money(forecast.lower, forecast.currency)} –{" "}
             {money(forecast.upper, forecast.currency)}
@@ -567,7 +571,7 @@ function AurenPage() {
                     {recommendation.action ? (
                       <Button asChild variant="link" className="mt-2 h-auto px-0 text-xs">
                         <a href={recommendation.action.to}>
-                          {recommendation.action.label}{" "}
+                          {recommendation.action.label}
                           <ArrowRight className="ml-1 h-3.5 w-3.5" />
                         </a>
                       </Button>
@@ -579,7 +583,10 @@ function AurenPage() {
           ) : null}
 
           <div className="grid gap-3 lg:grid-cols-2">
-            <ForecastCard label={`Income outlook · ${horizonDays}d`} forecast={advisory.forecasts.income} />
+            <ForecastCard
+              label={`Income outlook · ${horizonDays}d`}
+              forecast={advisory.forecasts.income}
+            />
             <ForecastCard
               label={`Expense outlook · ${horizonDays}d`}
               forecast={advisory.forecasts.expenses}
