@@ -56,7 +56,7 @@ export function useGoals(includeArchived = false) {
       if (!includeArchived) q = q.neq("status", "archived");
       const { data, error } = await q;
       if (error) throw error;
-      return (data ?? []) as Goal[];
+      return (data ?? []) as unknown as Goal[];
     },
   });
 }
@@ -92,9 +92,7 @@ export function useGoalContributions(goalId?: string) {
 export function useSaveGoal() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (
-      input: Partial<Goal> & { id?: string; account_id?: string | null },
-    ) => {
+    mutationFn: async (input: Partial<Goal> & { id?: string; account_id?: string | null }) => {
       const user_id = await uid();
       const payload = { ...input, user_id };
       const { error } = input.id
