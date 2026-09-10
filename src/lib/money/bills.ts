@@ -240,7 +240,12 @@ export function useMarkBillPaid() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ bill, accountId, expenseScope = "personal", businessId }: MarkBillPaidInput) => {
+    mutationFn: async ({
+      bill,
+      accountId,
+      expenseScope = "personal",
+      businessId,
+    }: MarkBillPaidInput) => {
       if (!accountId) {
         throw new Error("Choose the account this bill was paid from.");
       }
