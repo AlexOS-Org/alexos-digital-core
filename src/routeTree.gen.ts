@@ -1,1 +1,1 @@
-@file:///tmp/alexos-rt/src/routeTree.gen.ts
+LOADING_FROM_FILE
