@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { buildGoalContributionLedger } from "./contribute-ledger";
 
 export interface Goal {
   id: string;
@@ -111,22 +112,60 @@ export function useSaveGoal() {
   });
 }
 
+/**
+ * Record a goal contribution and, when a destination account is set, post the
+ * matching Money Center movement so linked-account progress stays truthful.
+ *
+ * - from_account_id set → transfer into the savings account
+ * - only account_id → income deposit on the savings account
+ * - neither → contribution row only (unlinked goal progress)
+ */
 export function useContribute() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: {
       goal_id: string;
+      goal_name?: string;
       amount: number;
       account_id?: string | null;
+      from_account_id?: string | null;
       note?: string | null;
       occurred_at?: string;
     }) => {
       const user_id = await uid();
+      const amount = Number(input.amount);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        throw new Error("Enter a positive contribution amount.");
+      }
+
+      const destination = input.account_id ?? null;
+      const from = input.from_account_id ?? null;
+
+      if (destination) {
+        const ledger = buildGoalContributionLedger({
+          goalId: input.goal_id,
+          goalName: input.goal_name?.trim() || "Goal",
+          amount,
+          accountId: destination,
+          fromAccountId: from,
+          note: input.note,
+          occurredAt: input.occurred_at,
+          userId: user_id,
+        });
+        if (ledger.kind === "none") {
+          throw new Error(ledger.reason);
+        }
+        const { error: txError } = await supabase
+          .from("transactions")
+          .insert(ledger.transaction as never);
+        if (txError) throw txError;
+      }
+
       const { error } = await supabase.from("goal_contributions").insert({
         user_id,
         goal_id: input.goal_id,
-        amount: input.amount,
-        account_id: input.account_id ?? null,
+        amount,
+        account_id: destination,
         note: input.note ?? null,
         occurred_at: input.occurred_at ?? new Date().toISOString(),
       } as never);
@@ -135,6 +174,8 @@ export function useContribute() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["goal_progress"] });
       qc.invalidateQueries({ queryKey: ["goal_contributions"] });
+      qc.invalidateQueries({ queryKey: ["transactions"] });
+      qc.invalidateQueries({ queryKey: ["account_balances"] });
       toast.success("Contribution recorded");
     },
     onError: (e: Error) => toast.error(e.message),
