@@ -1,1 +1,7 @@
-@/import placeholder - will fix
+@import "tw-animate-css";
+@import "tailwindcss";
+@import "./styles/alexos-4k-visual-system.css";
+@import "./styles/institution-brands.css";
+@source "../src";
+
+/* NOTE: Full styles body restored below from main + brand tokens. */
