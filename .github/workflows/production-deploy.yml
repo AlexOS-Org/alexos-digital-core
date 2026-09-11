@@ -1,0 +1,78 @@
+name: Production Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Do not deploy two main commits concurrently. A later commit waits for the
+# earlier release to finish so schema and Worker versions remain ordered.
+concurrency:
+  group: alexos-production-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Migrate Supabase and deploy Cloudflare Worker
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      SUPABASE_PROJECT_ID: goafwbrayepaihxbqsse
+
+    steps:
+      - name: Check out the exact main commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assert this run is deploying main
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "main"
+          test "${GITHUB_SHA}" = "$(git rev-parse HEAD)"
+          test -z "$(git status --porcelain)"
+
+      - name: Check required deployment secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${SUPABASE_ACCESS_TOKEN:?Missing GitHub secret SUPABASE_ACCESS_TOKEN}"
+          : "${SUPABASE_DB_PASSWORD:?Missing GitHub secret SUPABASE_DB_PASSWORD}"
+          : "${CLOUDFLARE_API_TOKEN:?Missing GitHub secret CLOUDFLARE_API_TOKEN}"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Run application verification
+        run: npm run verify
+        env:
+          VITE_SUPABASE_URL: https://goafwbrayepaihxbqsse.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link production Supabase project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Apply pending Supabase migrations
+        run: supabase db push
+
+      - name: Deploy the verified main build to Cloudflare Workers
+        run: npm run deploy
