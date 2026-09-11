@@ -5,7 +5,10 @@ import { QuickActions } from "@/components/money/QuickActions";
 import { MoneyAllocationPanel } from "@/components/money/MoneyAllocationPanel";
 import { useAccountBalances, useAccounts, useExpected, useTransactions } from "@/lib/money/api";
 import { useBills } from "@/lib/money/bills";
-import { ACCOUNT_ICONS } from "@/lib/money/constants";
+import {
+  getAccountLogo,
+  getInstitutionStyle,
+} from "@/lib/money/institution-branding";
 import { formatDate, formatMoney, formatTime } from "@/lib/money/format";
 import {
   ArrowDownRight,
@@ -250,28 +253,58 @@ function MoneyDashboard() {
             ))}
           {accounts.map((a) => {
             const bal = balances.find((b) => b.account_id === a.id);
-            const Icon = ACCOUNT_ICONS[a.icon] ?? Wallet;
             const state = getAccountState(a);
+            const institution = getInstitutionStyle(a.name);
+            const logo = getAccountLogo(a.name);
             return (
               <Card
                 key={a.id}
                 data-status={state.low ? "low" : "healthy"}
-                className="money-account-card overflow-hidden rounded-[1.5rem] shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+                className={cn(
+                  "money-account-card institution-card relative overflow-hidden rounded-[1.5rem] shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md",
+                  `institution-card-${institution.key}`,
+                  state.low && "institution-card-low",
+                )}
               >
-                <CardContent className="p-5">
+                {logo ? (
+                  <img
+                    src={logo}
+                    alt=""
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-y-0 right-[-2.5rem] z-0 h-full w-2/3 object-contain opacity-[0.14]"
+                    loading="lazy"
+                  />
+                ) : null}
+                <div
+                  className={cn(
+                    "absolute inset-x-0 top-0 z-10 h-1",
+                    state.low ? "bg-red-500" : institution.accentClass,
+                  )}
+                />
+                <CardContent className="relative z-10 p-5">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       <div
                         className={cn(
-                          "money-account-icon grid h-11 w-11 shrink-0 place-items-center rounded-2xl",
+                          "institution-logo-tile grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/35 bg-white/95 shadow-md ring-2 ring-white/10",
+                          !logo && institution.iconClass,
                         )}
                       >
-                        <Icon className="h-5 w-5" />
+                        {logo ? (
+                          <img
+                            src={logo}
+                            alt={`${a.name} logo`}
+                            className="h-9 w-9 rounded-lg object-contain"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <span className="text-xs font-bold tracking-wide">{institution.initials}</span>
+                        )}
                       </div>
                       <div className="min-w-0">
                         <div className="truncate text-sm font-semibold">{a.name}</div>
                         <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                          {a.currency}
+                          {institution.brandLabel} · {a.currency}
                         </div>
                       </div>
                     </div>
@@ -280,14 +313,10 @@ function MoneyDashboard() {
                   <div
                     className={cn(
                       "mt-5 rounded-2xl px-4 py-3",
-                      "money-account-balance rounded-2xl px-4 py-3",
+                      "money-account-balance institution-card-balance",
                     )}
                   >
-                    <div
-                      className={cn(
-                        "money-account-balance-value text-2xl font-semibold tracking-tight",
-                      )}
-                    >
+                    <div className="money-account-balance-value text-2xl font-semibold tracking-tight">
                       {displayMoney(state.balance, a.currency)}
                     </div>
                     {state.low ? (

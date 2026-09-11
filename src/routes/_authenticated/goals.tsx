@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,9 +10,12 @@ import { Plus, Pencil, Archive, Target, TrendingUp, CheckCircle2, Wallet } from 
 import { useGoals, useGoalProgress, useArchiveGoal, type Goal } from "@/lib/goals/api";
 import { useAccounts, useAccountBalances } from "@/lib/money/api";
 import { formatMoney, formatDate } from "@/lib/money/format";
+import {
+  getAccountLogo,
+  getInstitutionStyle,
+} from "@/lib/money/institution-branding";
 import { GoalFormDialog, GOAL_ICONS } from "@/components/goals/GoalFormDialog";
 import { GoalContributeDialog } from "@/components/goals/GoalContributeDialog";
-import { cn } from "@/lib/utils";
 import { buildGoalProgressMap, resolveGoalProgress } from "@/lib/goals/progress";
 
 export const Route = createFileRoute("/_authenticated/goals")({
@@ -37,10 +41,6 @@ function GoalsPage() {
       resolveGoalProgress(goal, contributionProgressMap.get(goal.id) ?? 0, accountBalances),
     ]),
   );
-  const totalTarget = goals.reduce((s, g) => s + Number(g.target_amount), 0);
-  const totalSaved = goals.reduce((s, g) => s + (goalProgressMap.get(g.id)?.currentAmount ?? 0), 0);
-  const achieved = goals.filter((g) => g.status === "achieved").length;
-  const overall = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0;
 
   const openNew = () => {
     setEditing(null);
@@ -55,70 +55,49 @@ function GoalsPage() {
     setContribOpen(true);
   };
 
-  return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      <Card className="rounded-2xl border border-emerald-200/70 dark:border-emerald-900/50 bg-gradient-to-br from-emerald-600 via-emerald-600 to-teal-600 text-white shadow-sm">
-        <CardContent className="p-6 sm:p-8 space-y-4">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <div className="text-[11px] uppercase tracking-widest text-white/70">Goals</div>
-              <div className="mt-1 text-sm text-white/75">Total Saved</div>
-              <div className="text-3xl sm:text-4xl font-semibold tracking-tight mt-1">
-                {formatMoney(totalSaved)}
-              </div>
-              <div className="text-xs text-white/70 mt-1">of {formatMoney(totalTarget)} target</div>
-            </div>
-            <Button
-              onClick={openNew}
-              variant="secondary"
-              className="rounded-xl bg-white/95 text-emerald-700 hover:bg-white"
-            >
-              <Plus className="h-4 w-4 mr-1" /> New Goal
-            </Button>
-          </div>
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs text-white/85">
-              <span>Overall Progress</span>
-              <span>{overall.toFixed(1)}%</span>
-            </div>
-            <Progress value={overall} className="h-2 bg-white/20 [&>div]:bg-white" />
-          </div>
-        </CardContent>
-      </Card>
+  const totalTarget = goals.reduce((s, g) => s + Number(g.target_amount), 0);
+  const totalSaved = goals.reduce((s, g) => s + (goalProgressMap.get(g.id)?.currentAmount ?? 0), 0);
+  const achieved = goals.filter((g) => g.status === "achieved").length;
+  const overall = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0;
 
-      <section className="grid gap-3 grid-cols-3">
-        {[
-          {
-            label: "Active Goals",
-            value: goals.filter((g) => g.status === "active").length,
-            icon: Target,
-            tone: "text-emerald-600 dark:text-emerald-400",
-          },
-          {
-            label: "Achieved",
-            value: achieved,
-            icon: CheckCircle2,
-            tone: "text-[color:var(--success)]",
-          },
-          {
-            label: "In Progress",
-            value: `${overall.toFixed(0)}%`,
-            icon: TrendingUp,
-            tone: "text-amber-600 dark:text-amber-400",
-          },
-        ].map((k) => (
-          <Card key={k.label} className="rounded-2xl">
-            <CardHeader className="pb-1 flex flex-row items-center justify-between space-y-0">
-              <CardTitle className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
-                {k.label}
-              </CardTitle>
-              <k.icon className={cn("h-4 w-4", k.tone)} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-lg font-semibold tracking-tight">{k.value}</div>
-            </CardContent>
-          </Card>
-        ))}
+  return (
+    <div className="space-y-6">
+      <header className="flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Goals</h1>
+          <p className="text-sm text-muted-foreground">
+            Track savings goals and link each one to a bank or wallet account.
+          </p>
+        </div>
+        <Button onClick={openNew} className="rounded-xl">
+          <Plus className="h-4 w-4 mr-1" /> New Goal
+        </Button>
+      </header>
+
+      <section className="grid gap-3 sm:grid-cols-3">
+        <Card className="rounded-2xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Active goals</CardTitle>
+          </CardHeader>
+          <CardContent className="text-2xl font-semibold">
+            {goals.filter((g) => g.status === "active").length}
+          </CardContent>
+        </Card>
+        <Card className="rounded-2xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Saved</CardTitle>
+          </CardHeader>
+          <CardContent className="text-2xl font-semibold">{formatMoney(totalSaved)}</CardContent>
+        </Card>
+        <Card className="rounded-2xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Overall progress</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-semibold">{overall.toFixed(0)}%</div>
+            <Progress value={Math.min(100, overall)} className="mt-2 h-2" />
+          </CardContent>
+        </Card>
       </section>
 
       <section className="space-y-3">
@@ -166,20 +145,32 @@ function GoalsPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-1">
-                      <Button size="icon" variant="ghost" onClick={() => openEdit(g)}>
-                        <Pencil className="h-4 w-4" />
+                    <div className="flex gap-1 shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => openEdit(g)}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
                       </Button>
-                      <Button size="icon" variant="ghost" onClick={() => archive.mutate(g.id)}>
-                        <Archive className="h-4 w-4" />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() =>
+                          archive.mutate({ id: g.id, archived: g.status !== "archived" })
+                        }
+                      >
+                        <Archive className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </div>
 
                   <div>
-                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                      <span>{formatMoney(current)}</span>
-                      <span>{formatMoney(target)}</span>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="font-semibold">{formatMoney(current)}</span>
+                      <span className="text-muted-foreground">of {formatMoney(target)}</span>
                     </div>
                     <Progress
                       value={pct}
@@ -196,8 +187,28 @@ function GoalsPage() {
                   {linkedAccount ? (
                     <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1.5 min-w-0">
-                        <Wallet className="h-3.5 w-3.5 shrink-0" />
-                        <span className="truncate">Balance in {linkedAccount}</span>
+                        {(() => {
+                          const inst = getInstitutionStyle(linkedAccount);
+                          const logo = getAccountLogo(linkedAccount);
+                          return logo ? (
+                            <img
+                              src={logo}
+                              alt=""
+                              className="h-4 w-4 shrink-0 rounded object-contain"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <span
+                              className={cn(
+                                "grid h-4 w-4 shrink-0 place-items-center rounded text-[8px] font-bold",
+                                inst.iconClass,
+                              )}
+                            >
+                              {inst.initials}
+                            </span>
+                          );
+                        })()}
+                        <span className="truncate">Saving in {linkedAccount}</span>
                       </span>
                       <span className="font-medium text-foreground shrink-0">
                         {formatMoney(current)}

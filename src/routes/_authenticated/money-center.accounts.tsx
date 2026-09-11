@@ -16,225 +16,14 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { CryptoHoldingsPanel } from "@/components/money/CryptoHoldingsPanel";
 import { useBalanceVisibility } from "@/components/money/BalanceVisibility";
-import mpesaLogo from "@/assets/branding/accounts/mpesa.png";
-import kcbLogo from "@/assets/branding/accounts/kcb.png";
-import imBankLogo from "@/assets/branding/accounts/im-bank.jpg";
-import sbmLogo from "@/assets/branding/accounts/sbm.png";
-import binanceLogo from "@/assets/branding/accounts/binance.png";
-import cashLogo from "@/assets/branding/accounts/cash.png";
-
-const LOW_BALANCE_THRESHOLDS = {
-  mobileMoney: 500,
-  bank: 1000,
-  salary: 5000,
-  crypto: 1000,
-  cash: 500,
-} as const;
+import {
+  getAccountLogo,
+  getInstitutionStyle,
+} from "@/lib/money/institution-branding";
 
 export const Route = createFileRoute("/_authenticated/money-center/accounts")({
   component: AccountsPage,
 });
-
-function institutionStyle(name: string) {
-  const value = name.toLowerCase();
-  if (/m[- ]?pesa/.test(value)) {
-    return {
-      iconClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300",
-      panelClass: "bg-emerald-50/70 dark:bg-emerald-950/20",
-      cardClass:
-        "border-emerald-300/80 bg-gradient-to-br from-emerald-200/90 via-emerald-100/70 to-emerald-50/60 dark:border-emerald-800/60 dark:from-emerald-950/60 dark:via-emerald-950/35 dark:to-background",
-      actionClass:
-        "border-emerald-300/70 bg-white/70 hover:bg-emerald-50 dark:border-emerald-800/70 dark:bg-background/50",
-      accentClass: "bg-emerald-500",
-      warningThreshold: LOW_BALANCE_THRESHOLDS.mobileMoney,
-    };
-  }
-  if (/kcb/.test(value)) {
-    return {
-      iconClass: "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
-      panelClass: "bg-blue-50/70 dark:bg-blue-950/20",
-      cardClass:
-        "border-blue-300/80 bg-gradient-to-br from-blue-200/90 via-blue-100/70 to-blue-50/60 dark:border-blue-800/60 dark:from-blue-950/60 dark:via-blue-950/35 dark:to-background",
-      actionClass:
-        "border-blue-300/70 bg-white/70 hover:bg-blue-50 dark:border-blue-800/70 dark:bg-background/50",
-      accentClass: "bg-blue-600",
-      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
-    };
-  }
-  if (/i&m|im bank/.test(value)) {
-    return {
-      iconClass: "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300",
-      panelClass: "bg-orange-50/70 dark:bg-orange-950/20",
-      cardClass:
-        "border-orange-300/80 bg-gradient-to-br from-orange-200/90 via-orange-100/70 to-orange-50/60 dark:border-orange-800/60 dark:from-orange-950/60 dark:via-orange-950/35 dark:to-background",
-      actionClass:
-        "border-orange-300/70 bg-white/70 hover:bg-orange-50 dark:border-orange-800/70 dark:bg-background/50",
-      accentClass: "bg-orange-500",
-      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
-    };
-  }
-  if (/sbm/.test(value)) {
-    return {
-      iconClass: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300",
-      panelClass: "bg-red-50/70 dark:bg-red-950/20",
-      cardClass:
-        "border-red-300/80 bg-gradient-to-br from-red-200/90 via-red-100/70 to-red-50/60 dark:border-red-800/60 dark:from-red-950/60 dark:via-red-950/35 dark:to-background",
-      actionClass:
-        "border-red-300/70 bg-white/70 hover:bg-red-50 dark:border-red-800/70 dark:bg-background/50",
-      accentClass: "bg-red-600",
-      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
-    };
-  }
-  if (/equity/.test(value)) {
-    return {
-      iconClass: "bg-lime-100 text-lime-800 dark:bg-lime-950/40 dark:text-lime-300",
-      panelClass: "bg-lime-50/70 dark:bg-lime-950/20",
-      cardClass:
-        "border-lime-300/80 bg-gradient-to-br from-lime-200/90 via-lime-100/70 to-lime-50/60 dark:border-lime-800/60 dark:from-lime-950/60 dark:via-lime-950/35 dark:to-background",
-      actionClass:
-        "border-lime-300/70 bg-white/70 hover:bg-lime-50 dark:border-lime-800/70 dark:bg-background/50",
-      accentClass: "bg-lime-600",
-      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
-    };
-  }
-  if (/co[- ]?operative|co-op|coop/.test(value)) {
-    return {
-      iconClass: "bg-teal-100 text-teal-800 dark:bg-teal-950/40 dark:text-teal-300",
-      panelClass: "bg-teal-50/70 dark:bg-teal-950/20",
-      cardClass:
-        "border-teal-300/80 bg-gradient-to-br from-teal-200/90 via-teal-100/70 to-teal-50/60 dark:border-teal-800/60 dark:from-teal-950/60 dark:via-teal-950/35 dark:to-background",
-      actionClass:
-        "border-teal-300/70 bg-white/70 hover:bg-teal-50 dark:border-teal-800/70 dark:bg-background/50",
-      accentClass: "bg-teal-600",
-      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
-    };
-  }
-  if (/ncba/.test(value)) {
-    return {
-      iconClass: "bg-sky-100 text-sky-800 dark:bg-sky-950/40 dark:text-sky-300",
-      panelClass: "bg-sky-50/70 dark:bg-sky-950/20",
-      cardClass:
-        "border-sky-300/80 bg-gradient-to-br from-sky-200/90 via-sky-100/70 to-sky-50/60 dark:border-sky-800/60 dark:from-sky-950/60 dark:via-sky-950/35 dark:to-background",
-      actionClass:
-        "border-sky-300/70 bg-white/70 hover:bg-sky-50 dark:border-sky-800/70 dark:bg-background/50",
-      accentClass: "bg-sky-600",
-      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
-    };
-  }
-  if (/absa/.test(value)) {
-    return {
-      iconClass: "bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300",
-      panelClass: "bg-rose-50/70 dark:bg-rose-950/20",
-      cardClass:
-        "border-rose-300/80 bg-gradient-to-br from-rose-200/90 via-rose-100/70 to-rose-50/60 dark:border-rose-800/60 dark:from-rose-950/60 dark:via-rose-950/35 dark:to-background",
-      actionClass:
-        "border-rose-300/70 bg-white/70 hover:bg-rose-50 dark:border-rose-800/70 dark:bg-background/50",
-      accentClass: "bg-rose-600",
-      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
-    };
-  }
-  if (/stanbic/.test(value)) {
-    return {
-      iconClass: "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300",
-      panelClass: "bg-indigo-50/70 dark:bg-indigo-950/20",
-      cardClass:
-        "border-indigo-300/80 bg-gradient-to-br from-indigo-200/90 via-indigo-100/70 to-indigo-50/60 dark:border-indigo-800/60 dark:from-indigo-950/60 dark:via-indigo-950/35 dark:to-background",
-      actionClass:
-        "border-indigo-300/70 bg-white/70 hover:bg-indigo-50 dark:border-indigo-800/70 dark:bg-background/50",
-      accentClass: "bg-indigo-600",
-      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
-    };
-  }
-  if (/family bank/.test(value)) {
-    return {
-      iconClass: "bg-cyan-100 text-cyan-800 dark:bg-cyan-950/40 dark:text-cyan-300",
-      panelClass: "bg-cyan-50/70 dark:bg-cyan-950/20",
-      cardClass:
-        "border-cyan-300/80 bg-gradient-to-br from-cyan-200/90 via-cyan-100/70 to-cyan-50/60 dark:border-cyan-800/60 dark:from-cyan-950/60 dark:via-cyan-950/35 dark:to-background",
-      actionClass:
-        "border-cyan-300/70 bg-white/70 hover:bg-cyan-50 dark:border-cyan-800/70 dark:bg-background/50",
-      accentClass: "bg-cyan-600",
-      warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
-    };
-  }
-  if (/airtel/.test(value)) {
-    return {
-      iconClass: "bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300",
-      panelClass: "bg-red-50/70 dark:bg-red-950/20",
-      cardClass:
-        "border-red-300/80 bg-gradient-to-br from-red-200/90 via-red-100/70 to-red-50/60 dark:border-red-800/60 dark:from-red-950/60 dark:via-red-950/35 dark:to-background",
-      actionClass:
-        "border-red-300/70 bg-white/70 hover:bg-red-50 dark:border-red-800/70 dark:bg-background/50",
-      accentClass: "bg-red-600",
-      warningThreshold: LOW_BALANCE_THRESHOLDS.mobileMoney,
-    };
-  }
-  if (/salary/.test(value)) {
-    return {
-      iconClass: "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300",
-      panelClass: "bg-violet-50/70 dark:bg-violet-950/20",
-      cardClass:
-        "border-violet-300/80 bg-gradient-to-br from-violet-200/90 via-violet-100/70 to-violet-50/60 dark:border-violet-800/60 dark:from-violet-950/60 dark:via-violet-950/35 dark:to-background",
-      actionClass:
-        "border-violet-300/70 bg-white/70 hover:bg-violet-50 dark:border-violet-800/70 dark:bg-background/50",
-      accentClass: "bg-violet-600",
-      warningThreshold: LOW_BALANCE_THRESHOLDS.salary,
-    };
-  }
-  if (/binance|crypto/.test(value)) {
-    return {
-      iconClass: "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300",
-      panelClass: "bg-amber-50/70 dark:bg-amber-950/20",
-      cardClass:
-        "border-amber-300/80 bg-gradient-to-br from-amber-200/90 via-amber-100/70 to-amber-50/60 dark:border-amber-800/60 dark:from-amber-950/60 dark:via-amber-950/35 dark:to-background",
-      actionClass:
-        "border-amber-300/70 bg-white/70 hover:bg-amber-50 dark:border-amber-800/70 dark:bg-background/50",
-      accentClass: "bg-amber-500",
-      warningThreshold: LOW_BALANCE_THRESHOLDS.crypto,
-    };
-  }
-  return {
-    iconClass: "bg-primary/10 text-primary",
-    panelClass: "bg-muted/40",
-    cardClass:
-      "border-slate-300/80 bg-gradient-to-br from-slate-200/80 via-slate-100/60 to-background dark:border-slate-700/70 dark:from-slate-900/60 dark:via-slate-900/30 dark:to-background",
-    actionClass:
-      "border-slate-300/70 bg-white/70 hover:bg-slate-50 dark:border-slate-700/70 dark:bg-background/50",
-    accentClass: "bg-primary",
-    warningThreshold: null,
-  };
-}
-
-function institutionKey(name: string) {
-  const value = name.toLowerCase();
-  if (/m[- ]?pesa/.test(value)) return "mpesa";
-  if (/kcb/.test(value)) return "kcb";
-  if (/i&m|im bank/.test(value)) return "im";
-  if (/sbm/.test(value)) return "sbm";
-  if (/equity/.test(value)) return "equity";
-  if (/co[- ]?operative|co-op|coop/.test(value)) return "coop";
-  if (/ncba/.test(value)) return "ncba";
-  if (/absa/.test(value)) return "absa";
-  if (/stanbic/.test(value)) return "stanbic";
-  if (/family bank/.test(value)) return "family";
-  if (/airtel/.test(value)) return "airtel";
-  if (/salary/.test(value)) return "salary";
-  if (/binance|crypto/.test(value)) return "binance";
-  if (/cash/.test(value)) return "cash";
-  return "default";
-}
-
-function accountLogo(name: string) {
-  const value = name.toLowerCase();
-  if (/m[- ]?pesa/.test(value)) return mpesaLogo;
-  if (/kcb/.test(value)) return kcbLogo;
-  if (/i&m|im bank/.test(value)) return imBankLogo;
-  if (/sbm/.test(value)) return sbmLogo;
-  if (/binance|crypto/.test(value)) return binanceLogo;
-  if (/cash/.test(value)) return cashLogo;
-  if (/salary/.test(value)) return cashLogo;
-  return null;
-}
 
 function AccountsPage() {
   const { maskBalance } = useBalanceVisibility();
@@ -305,8 +94,8 @@ function AccountsPage() {
           const balance = Number(bal?.balance ?? 0);
           const Icon = ACCOUNT_ICONS[a.icon] ?? Wallet;
           const isArchived = a.status === "archived";
-          const institution = institutionStyle(a.name);
-          const logo = accountLogo(a.name);
+          const institution = getInstitutionStyle(a.name);
+          const logo = getAccountLogo(a.name);
           const warningThreshold = institution.warningThreshold;
           const isMpesa = isMpesaAccountName(a.name);
           const isOverdrawn = isMpesa && balance < 0;
@@ -320,7 +109,7 @@ function AccountsPage() {
               className={cn(
                 "institution-card relative min-w-0 overflow-hidden rounded-2xl shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
                 institution.cardClass,
-                `institution-card-${institutionKey(a.name)}`,
+                `institution-card-${institution.key}`,
                 (isLowBalance || isOverdrawn) && "institution-card-low",
                 (isLowBalance || isOverdrawn) &&
                   "border-red-400/90 bg-gradient-to-br from-red-200/95 via-red-100/80 to-red-50/70 dark:border-red-800/70 dark:from-red-950/70 dark:via-red-950/45 dark:to-background",
@@ -367,7 +156,7 @@ function AccountsPage() {
                           loading="lazy"
                         />
                       ) : (
-                        <Icon className="h-5 w-5" />
+                        <span className="text-sm font-bold tracking-wide">{institution.initials}</span>
                       )}
                     </div>
                     <div>

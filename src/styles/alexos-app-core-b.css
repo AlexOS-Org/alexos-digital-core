@@ -1,0 +1,174 @@
+/* Money Center + institution card surfaces */
+.money-center-shell .money-account-card,
+.money-center-shell .money-kpi-card {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.money-kpi-card,
+.money-account-card,
+.money-data-card {
+  border-color: oklch(0.9 0.04 250 / 13%);
+  background: color-mix(in oklch, oklch(0.12 0.04 255) 91%, transparent);
+  color: oklch(0.96 0.02 250);
+  box-shadow: 0 20px 50px -34px oklch(0.02 0.01 255 / 92%);
+  backdrop-filter: blur(18px);
+}
+
+.money-account-icon {
+  background: color-mix(in oklch, var(--alexos-blue) 18%, oklch(0.08 0.025 255));
+  color: oklch(0.86 0.12 230);
+  border: 1px solid oklch(0.9 0.04 250 / 12%);
+}
+
+.institution-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: oklch(0.97 0.02 250);
+  border-color: color-mix(
+    in oklch,
+    var(--institution-accent, var(--primary)) 62%,
+    oklch(0.95 0.03 250 / 20%)
+  );
+  background: linear-gradient(
+    125deg,
+    var(--institution-surface, oklch(0.13 0.04 255 / 96%)),
+    oklch(0.08 0.025 255 / 96%)
+  );
+  box-shadow: 0 24px 64px -42px
+    color-mix(in oklch, var(--institution-accent, var(--primary)) 72%, transparent);
+}
+
+.institution-card-mpesa {
+  --institution-accent: oklch(0.78 0.18 155);
+  --institution-surface: oklch(0.12 0.05 155 / 96%);
+}
+.institution-card-kcb {
+  --institution-accent: oklch(0.72 0.19 255);
+  --institution-surface: oklch(0.11 0.045 255 / 96%);
+}
+.institution-card-im {
+  --institution-accent: oklch(0.78 0.16 55);
+  --institution-surface: oklch(0.15 0.05 50 / 96%);
+}
+.institution-card-sbm {
+  --institution-accent: oklch(0.7 0.2 25);
+  --institution-surface: oklch(0.15 0.05 25 / 96%);
+}
+.institution-card-salary {
+  --institution-accent: oklch(0.72 0.2 300);
+  --institution-surface: oklch(0.14 0.05 300 / 96%);
+}
+.institution-card-binance {
+  --institution-accent: oklch(0.82 0.17 85);
+  --institution-surface: oklch(0.16 0.05 75 / 96%);
+}
+.institution-card-equity {
+  --institution-accent: oklch(0.78 0.18 130);
+  --institution-surface: oklch(0.14 0.05 130 / 96%);
+}
+.institution-card-ncba {
+  --institution-accent: oklch(0.72 0.14 230);
+  --institution-surface: oklch(0.12 0.04 230 / 96%);
+}
+.institution-card-absa {
+  --institution-accent: oklch(0.68 0.18 15);
+  --institution-surface: oklch(0.14 0.05 15 / 96%);
+}
+.institution-card-family {
+  --institution-accent: oklch(0.74 0.12 210);
+  --institution-surface: oklch(0.13 0.04 210 / 96%);
+}
+.institution-card-stanbic {
+  --institution-accent: oklch(0.68 0.16 275);
+  --institution-surface: oklch(0.13 0.045 275 / 96%);
+}
+.institution-card-coop {
+  --institution-accent: oklch(0.72 0.14 180);
+  --institution-surface: oklch(0.13 0.04 180 / 96%);
+}
+.institution-card-airtel {
+  --institution-accent: oklch(0.7 0.2 25);
+  --institution-surface: oklch(0.15 0.05 25 / 96%);
+}
+.institution-card-cash,
+.institution-card-default {
+  --institution-accent: oklch(0.74 0.12 220);
+  --institution-surface: oklch(0.12 0.04 230 / 96%);
+}
+
+.institution-card-low {
+  --institution-accent: oklch(0.7 0.22 25);
+  --institution-surface: oklch(0.16 0.06 25 / 96%);
+  border-color: oklch(0.7 0.22 25 / 78%) !important;
+}
+
+.institution-card::after {
+  position: absolute;
+  inset: auto -10% -30% 32%;
+  z-index: -1;
+  height: 68%;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--institution-accent, var(--primary)) 12%, transparent);
+  content: "";
+  filter: blur(30px);
+}
+
+.institution-card::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    120deg,
+    transparent 22%,
+    color-mix(in oklch, var(--institution-accent) 18%, transparent) 100%
+  );
+  content: "";
+  pointer-events: none;
+}
+
+.institution-card .institution-logo-tile {
+  background: oklch(0.98 0.01 250 / 94%);
+  border-color: oklch(1 0 0 / 44%);
+}
+
+.institution-card .institution-card-balance {
+  background: oklch(0.05 0.02 255 / 42%);
+  border: 1px solid oklch(0.95 0.03 250 / 14%);
+}
+
+.institution-card .institution-card-action {
+  color: oklch(0.95 0.02 250);
+  border-color: oklch(0.95 0.03 250 / 18%);
+  background: oklch(0.95 0.03 250 / 8%);
+}
+
+.institution-card .institution-card-action:hover {
+  background: color-mix(in oklch, var(--institution-accent) 18%, transparent);
+}
+
+.institution-card .institution-card-content .text-muted-foreground {
+  color: oklch(0.8 0.03 250 / 78%) !important;
+}
+
+@media (max-width: 639px) {
+  .institution-card {
+    border-radius: 1.25rem;
+  }
+
+  .institution-card .institution-card-content {
+    padding: 1rem;
+  }
+
+  .institution-card .institution-logo-tile {
+    height: 3.25rem;
+    width: 3.25rem;
+    border-radius: 1rem;
+  }
+
+  .institution-card .institution-logo-tile img {
+    height: 2.5rem;
+    width: 2.5rem;
+  }
+}
