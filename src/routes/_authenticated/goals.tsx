@@ -38,11 +38,7 @@ function GoalsPage() {
   const goalProgressMap = new Map(
     goals.map((goal) => [
       goal.id,
-      resolveGoalProgress(
-        goal,
-        contributionProgressMap.get(goal.id)?.currentAmount ?? 0,
-        accountBalances,
-      ),
+      resolveGoalProgress(goal, contributionProgressMap.get(goal.id) ?? 0, accountBalances),
     ]),
   );
 
@@ -59,13 +55,10 @@ function GoalsPage() {
     setContribOpen(true);
   };
 
-  const active = goals.filter((g) => g.status === "active");
-  const totalTarget = active.reduce((s, g) => s + Number(g.target_amount), 0);
-  const totalCurrent = active.reduce(
-    (s, g) => s + (goalProgressMap.get(g.id)?.currentAmount ?? 0),
-    0,
-  );
-  const overallPct = totalTarget > 0 ? Math.min(100, (totalCurrent / totalTarget) * 100) : 0;
+  const totalTarget = goals.reduce((s, g) => s + Number(g.target_amount), 0);
+  const totalSaved = goals.reduce((s, g) => s + (goalProgressMap.get(g.id)?.currentAmount ?? 0), 0);
+  const achieved = goals.filter((g) => g.status === "achieved").length;
+  const overall = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -86,21 +79,23 @@ function GoalsPage() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Active goals</CardTitle>
           </CardHeader>
-          <CardContent className="text-2xl font-semibold">{active.length}</CardContent>
+          <CardContent className="text-2xl font-semibold">
+            {goals.filter((g) => g.status === "active").length}
+          </CardContent>
         </Card>
         <Card className="rounded-2xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Saved</CardTitle>
           </CardHeader>
-          <CardContent className="text-2xl font-semibold">{formatMoney(totalCurrent)}</CardContent>
+          <CardContent className="text-2xl font-semibold">{formatMoney(totalSaved)}</CardContent>
         </Card>
         <Card className="rounded-2xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Overall progress</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-semibold">{overallPct.toFixed(0)}%</div>
-            <Progress value={overallPct} className="mt-2 h-2" />
+            <div className="text-2xl font-semibold">{overall.toFixed(0)}%</div>
+            <Progress value={Math.min(100, overall)} className="mt-2 h-2" />
           </CardContent>
         </Card>
       </section>
@@ -151,14 +146,21 @@ function GoalsPage() {
                       </div>
                     </div>
                     <div className="flex gap-1 shrink-0">
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(g)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => openEdit(g)}
+                      >
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => archive.mutate({ id: g.id, archived: g.status !== "archived" })}
+                        onClick={() =>
+                          archive.mutate({ id: g.id, archived: g.status !== "archived" })
+                        }
                       >
                         <Archive className="h-3.5 w-3.5" />
                       </Button>
