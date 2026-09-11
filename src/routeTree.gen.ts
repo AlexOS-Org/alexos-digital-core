@@ -1,1 +1,1 @@
-@file:///tmp/alexos-rt/src/routeTree.gen.ts
+PLACEHOLDER_WILL_REPLACE
