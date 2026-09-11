@@ -15,6 +15,7 @@ import { useStorefront } from "@/lib/storefront/api";
 import { trackMetaPixel, useMetaPixel } from "@/lib/storefront/meta-pixel";
 import { trackGoogleAnalytics } from "@/lib/storefront/google-analytics";
 import { DAILYGEAR_SOCIAL_LINKS, whatsappHref } from "@/lib/storefront/social-links";
+import { MpesaStkPayButton } from "@/components/storefront/MpesaStkPayButton";
 
 interface ConfirmationSnapshot {
   customerName: string | null;
@@ -273,6 +274,13 @@ function ThankYou() {
                 {confirmation.paymentInstructions.account}. Use your order number as an optional
                 reference and keep the confirmation message.
               </p>
+              {order ? (
+                <MpesaStkPayButton
+                  orderNumber={order}
+                  phone={confirmation.customerPhone}
+                  amount={confirmation.paymentInstructions.amount}
+                />
+              ) : null}
               <p className="mt-2 text-muted-foreground">
                 Online payment helps us prioritise dispatch. An approved online-payment offer may
                 save up to <strong className="text-foreground">KES 75</strong> when active; the
