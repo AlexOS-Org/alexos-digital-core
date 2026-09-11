@@ -7,11 +7,12 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Pencil, Archive, Target, TrendingUp, CheckCircle2, Wallet } from "lucide-react";
 import { useGoals, useGoalProgress, useArchiveGoal, type Goal } from "@/lib/goals/api";
-import { useAccounts } from "@/lib/money/api";
+import { useAccounts, useAccountBalances } from "@/lib/money/api";
 import { formatMoney, formatDate } from "@/lib/money/format";
 import { GoalFormDialog, GOAL_ICONS } from "@/components/goals/GoalFormDialog";
 import { GoalContributeDialog } from "@/components/goals/GoalContributeDialog";
 import { cn } from "@/lib/utils";
+import { buildGoalProgressMap, resolveGoalProgress } from "@/lib/goals/progress";
 
 export const Route = createFileRoute("/_authenticated/goals")({
   component: GoalsPage,
@@ -21,16 +22,23 @@ function GoalsPage() {
   const { data: goals = [], isLoading } = useGoals();
   const { data: progress = [] } = useGoalProgress();
   const { data: accounts = [] } = useAccounts();
+  const { data: accountBalances = [] } = useAccountBalances();
   const archive = useArchiveGoal();
   const [formOpen, setFormOpen] = useState(false);
   const [contribOpen, setContribOpen] = useState(false);
   const [editing, setEditing] = useState<Goal | null>(null);
   const [contributing, setContributing] = useState<Goal | null>(null);
 
-  const progressMap = new Map(progress.map((p) => [p.goal_id, Number(p.current_amount)]));
+  const contributionProgressMap = buildGoalProgressMap(progress);
   const accountMap = new Map(accounts.map((a) => [a.id, a.name]));
+  const goalProgressMap = new Map(
+    goals.map((goal) => [
+      goal.id,
+      resolveGoalProgress(goal, contributionProgressMap.get(goal.id) ?? 0, accountBalances),
+    ]),
+  );
   const totalTarget = goals.reduce((s, g) => s + Number(g.target_amount), 0);
-  const totalSaved = goals.reduce((s, g) => s + (progressMap.get(g.id) ?? 0), 0);
+  const totalSaved = goals.reduce((s, g) => s + (goalProgressMap.get(g.id)?.currentAmount ?? 0), 0);
   const achieved = goals.filter((g) => g.status === "achieved").length;
   const overall = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0;
 
@@ -131,9 +139,10 @@ function GoalsPage() {
         )}
         <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {goals.map((g) => {
-            const current = progressMap.get(g.id) ?? 0;
+            const resolvedProgress = goalProgressMap.get(g.id);
+            const current = resolvedProgress?.currentAmount ?? 0;
             const target = Number(g.target_amount);
-            const pct = target > 0 ? Math.min(100, (current / target) * 100) : 0;
+            const pct = target > 0 ? Math.min(100, (Math.max(0, current) / target) * 100) : 0;
             const remaining = Math.max(0, target - current);
             const Icon = GOAL_ICONS[g.icon] ?? Target;
             const linkedAccount = g.account_id ? accountMap.get(g.account_id) : null;
@@ -185,9 +194,14 @@ function GoalsPage() {
                   </div>
 
                   {linkedAccount ? (
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Wallet className="h-3.5 w-3.5 shrink-0" />
-                      <span className="truncate">Saving in {linkedAccount}</span>
+                    <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1.5 min-w-0">
+                        <Wallet className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">Balance in {linkedAccount}</span>
+                      </span>
+                      <span className="font-medium text-foreground shrink-0">
+                        {formatMoney(current)}
+                      </span>
                     </div>
                   ) : (
                     <button
