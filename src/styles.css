@@ -2,7 +2,6 @@
 @import "tailwindcss";
 @import "./styles/alexos-4k-visual-system.css";
 @import "./styles/institution-brands.css";
-@import "./styles/alexos-app-part1.css";
-@import "./styles/alexos-app-part2.css";
-@import "./styles/alexos-app-part3.css";
+@import "./styles/alexos-app-core-a.css";
+@import "./styles/alexos-app-core-b.css";
 @source "../src";
