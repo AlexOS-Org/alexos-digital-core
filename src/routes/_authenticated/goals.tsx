@@ -10,10 +10,7 @@ import { Plus, Pencil, Archive, Target, TrendingUp, CheckCircle2, Wallet } from 
 import { useGoals, useGoalProgress, useArchiveGoal, type Goal } from "@/lib/goals/api";
 import { useAccounts, useAccountBalances } from "@/lib/money/api";
 import { formatMoney, formatDate } from "@/lib/money/format";
-import {
-  getAccountLogo,
-  getInstitutionStyle,
-} from "@/lib/money/institution-branding";
+import { getAccountLogo, getInstitutionStyle } from "@/lib/money/institution-branding";
 import { GoalFormDialog, GOAL_ICONS } from "@/components/goals/GoalFormDialog";
 import { GoalContributeDialog } from "@/components/goals/GoalContributeDialog";
 import { buildGoalProgressMap, resolveGoalProgress } from "@/lib/goals/progress";
@@ -77,7 +74,9 @@ function GoalsPage() {
       <section className="grid gap-3 sm:grid-cols-3">
         <Card className="rounded-2xl">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Active goals</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Active goals
+            </CardTitle>
           </CardHeader>
           <CardContent className="text-2xl font-semibold">
             {goals.filter((g) => g.status === "active").length}
@@ -91,7 +90,9 @@ function GoalsPage() {
         </Card>
         <Card className="rounded-2xl">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Overall progress</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Overall progress
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">{overall.toFixed(0)}%</div>
@@ -158,9 +159,7 @@ function GoalsPage() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() =>
-                          archive.mutate({ id: g.id, archived: g.status !== "archived" })
-                        }
+                        onClick={() => archive.mutate(g.id)}
                       >
                         <Archive className="h-3.5 w-3.5" />
                       </Button>

@@ -5,10 +5,7 @@ import { QuickActions } from "@/components/money/QuickActions";
 import { MoneyAllocationPanel } from "@/components/money/MoneyAllocationPanel";
 import { useAccountBalances, useAccounts, useExpected, useTransactions } from "@/lib/money/api";
 import { useBills } from "@/lib/money/bills";
-import {
-  getAccountLogo,
-  getInstitutionStyle,
-} from "@/lib/money/institution-branding";
+import { getAccountLogo, getInstitutionStyle } from "@/lib/money/institution-branding";
 import { formatDate, formatMoney, formatTime } from "@/lib/money/format";
 import {
   ArrowDownRight,
@@ -298,7 +295,9 @@ function MoneyDashboard() {
                             loading="lazy"
                           />
                         ) : (
-                          <span className="text-xs font-bold tracking-wide">{institution.initials}</span>
+                          <span className="text-xs font-bold tracking-wide">
+                            {institution.initials}
+                          </span>
                         )}
                       </div>
                       <div className="min-w-0">

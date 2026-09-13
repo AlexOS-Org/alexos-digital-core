@@ -16,10 +16,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { CryptoHoldingsPanel } from "@/components/money/CryptoHoldingsPanel";
 import { useBalanceVisibility } from "@/components/money/BalanceVisibility";
-import {
-  getAccountLogo,
-  getInstitutionStyle,
-} from "@/lib/money/institution-branding";
+import { getAccountLogo, getInstitutionStyle } from "@/lib/money/institution-branding";
 
 export const Route = createFileRoute("/_authenticated/money-center/accounts")({
   component: AccountsPage,
@@ -156,7 +153,9 @@ function AccountsPage() {
                           loading="lazy"
                         />
                       ) : (
-                        <span className="text-sm font-bold tracking-wide">{institution.initials}</span>
+                        <span className="text-sm font-bold tracking-wide">
+                          {institution.initials}
+                        </span>
                       )}
                     </div>
                     <div>
@@ -205,8 +204,8 @@ function AccountsPage() {
                     <div className="mt-1 space-y-0.5 text-[11px] text-red-600/80 dark:text-red-400/80">
                       <div className="font-medium">Fuliza overdraft active</div>
                       <div>
-                        Access fee 1% + daily{" "}
-                        {displayMoney(dailyFuliza, a.currency)} while below KES 0
+                        Access fee 1% + daily {displayMoney(dailyFuliza, a.currency)} while below
+                        KES 0
                       </div>
                     </div>
                   )}

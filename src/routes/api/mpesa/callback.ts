@@ -19,7 +19,7 @@ export const Route = createFileRoute("/api/mpesa/callback")({
         try {
           const raw = await request.json().catch(() => null);
           const result = await handleStkCallback(raw);
-          return json({ ok: true, ...result });
+          return json({ ...result, ok: true });
         } catch (error) {
           console.error("[mpesa/callback]", error);
           // Still 200 so Safaricom stops retrying noisy parse errors after log.
