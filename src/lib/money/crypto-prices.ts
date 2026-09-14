@@ -92,10 +92,7 @@ export function useLiveCryptoPrices(enabled = true) {
   });
 }
 
-export function liveKesPrice(
-  prices: LiveCryptoPrices | undefined,
-  symbol: string,
-): number | null {
+export function liveKesPrice(prices: LiveCryptoPrices | undefined, symbol: string): number | null {
   if (!prices?.pricesKes) return null;
   const n = prices.pricesKes[symbol as CryptoSymbol];
   return typeof n === "number" && Number.isFinite(n) ? n : null;
