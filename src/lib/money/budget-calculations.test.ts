@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { carryForwardBudgets } from "./budget-calculations";
+import {
+  carryForwardBudgets,
+  expenseCategoriesForBudget,
+  spentForBudgetCategory,
+} from "./budget-calculations";
 
 describe("carryForwardBudgets", () => {
   it("carries the latest limit into a future month", () => {
@@ -35,5 +39,38 @@ describe("carryForwardBudgets", () => {
     ];
 
     expect(carryForwardBudgets(rows, "2026-03-01")).toEqual([]);
+  });
+});
+
+describe("spentForBudgetCategory (Kids rollup)", () => {
+  const spent = {
+    Kids: 1_000,
+    "Kids — School Fees": 5_000,
+    "Kids — Expenses": 2_000,
+    "Kids — Shopping": 500,
+    Food: 3_000,
+  };
+
+  it("rolls all kids subcategory spend into the parent Kids budget", () => {
+    expect(spentForBudgetCategory(spent, "Kids")).toBe(8_500);
+  });
+
+  it("keeps exact match for subcategory budgets", () => {
+    expect(spentForBudgetCategory(spent, "Kids — School Fees")).toBe(5_000);
+    expect(spentForBudgetCategory(spent, "Kids — Expenses")).toBe(2_000);
+  });
+
+  it("does not affect non-kids budgets", () => {
+    expect(spentForBudgetCategory(spent, "Food")).toBe(3_000);
+    expect(spentForBudgetCategory(spent, "Rent")).toBe(0);
+  });
+
+  it("lists parent Kids categories", () => {
+    expect(expenseCategoriesForBudget("Kids")).toEqual([
+      "Kids",
+      "Kids — School Fees",
+      "Kids — Expenses",
+      "Kids — Shopping",
+    ]);
   });
 });

@@ -11,6 +11,7 @@ import { BudgetFormDialog } from "@/components/money/BudgetFormDialog";
 import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { normalizeExpenseCategory } from "@/lib/money/constants";
+import { spentForBudgetCategory } from "@/lib/money/budget-calculations";
 
 export const Route = createFileRoute("/_authenticated/money-center/budgets")({
   component: BudgetsPage,
@@ -48,7 +49,7 @@ function BudgetsPage() {
 
   const totals = useMemo(() => {
     const budget = budgets.reduce((s, b) => s + Number(b.amount), 0);
-    const spent = budgets.reduce((s, b) => s + (spentByCat[b.category] ?? 0), 0);
+    const spent = budgets.reduce((s, b) => s + spentForBudgetCategory(spentByCat, b.category), 0);
     return { budget, spent, remaining: budget - spent };
   }, [budgets, spentByCat]);
 
@@ -144,7 +145,7 @@ function BudgetsPage() {
           </div>
         )}
         {budgets.map((b) => {
-          const spent = spentByCat[b.category] ?? 0;
+          const spent = spentForBudgetCategory(spentByCat, b.category);
           const remaining = Number(b.amount) - spent;
           const pct = b.amount > 0 ? Math.min(100, (spent / Number(b.amount)) * 100) : 0;
           const over = spent > Number(b.amount);
@@ -161,6 +162,9 @@ function BudgetsPage() {
                       {b.month === month
                         ? "Started this month"
                         : `Recurring from ${monthLabel(b.month)}`}
+                      {b.category === "Kids"
+                        ? " · Includes School Fees, Expenses & Shopping"
+                        : null}
                     </div>
                   </div>
                   <Badge variant={over ? "destructive" : pct > 80 ? "secondary" : "default"}>

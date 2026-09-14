@@ -27,3 +27,34 @@ export function carryForwardBudgets<T extends BudgetSnapshot>(rows: T[], selecte
     .filter((row) => row.deleted_at == null)
     .sort((a, b) => a.category.localeCompare(b.category));
 }
+
+/** Expense category labels that roll into the parent "Kids" monthly budget. */
+export const KIDS_BUDGET_SPEND_CATEGORIES = [
+  "Kids",
+  "Kids — School Fees",
+  "Kids — Expenses",
+  "Kids — Shopping",
+] as const;
+
+/**
+ * Categories whose posted expenses count toward a given budget card.
+ * Parent "Kids" includes all kids subcategories so school fees / expenses /
+ * shopping hit the Kids monthly limit. Any other budget (including a
+ * subcategory budget, if one exists) still matches exact category only.
+ */
+export function expenseCategoriesForBudget(budgetCategory: string): string[] {
+  const cat = (budgetCategory ?? "").trim();
+  if (cat === "Kids") return [...KIDS_BUDGET_SPEND_CATEGORIES];
+  return cat ? [cat] : [];
+}
+
+/** Sum spent amounts for the categories that apply to this budget card. */
+export function spentForBudgetCategory(
+  spentByCat: Record<string, number>,
+  budgetCategory: string,
+): number {
+  return expenseCategoriesForBudget(budgetCategory).reduce(
+    (sum, key) => sum + (spentByCat[key] ?? 0),
+    0,
+  );
+}
