@@ -1,10 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import {
-  FULIZA_CATEGORY,
-  isMpesaAccountName,
-  planFulizaFees,
-  type LedgerTx,
-} from "./fuliza";
+import { FULIZA_CATEGORY, isMpesaAccountName, planFulizaFees, type LedgerTx } from "./fuliza";
 import { expenseTypeForCategory } from "./constants";
 
 /**
@@ -40,9 +35,7 @@ export async function ensureMpesaFulizaCharges(): Promise<{ posted: number }> {
 
     const { data: txs, error: txErr } = await supabase
       .from("transactions")
-      .select(
-        "type,amount,account_id,transfer_account_id,status,deleted_at,occurred_at,reference",
-      )
+      .select("type,amount,account_id,transfer_account_id,status,deleted_at,occurred_at,reference")
       .or(`account_id.eq.${account.id},transfer_account_id.eq.${account.id}`)
       .is("deleted_at", null)
       .order("occurred_at", { ascending: true })
@@ -79,7 +72,12 @@ export async function ensureMpesaFulizaCharges(): Promise<{ posted: number }> {
         status: "posted",
       } as never);
       if (error) {
-        if (String(error.message ?? "").toLowerCase().includes("duplicate")) continue;
+        if (
+          String(error.message ?? "")
+            .toLowerCase()
+            .includes("duplicate")
+        )
+          continue;
         throw error;
       }
       posted += 1;

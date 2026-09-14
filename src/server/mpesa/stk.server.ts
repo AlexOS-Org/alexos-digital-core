@@ -17,10 +17,7 @@ function phonesMatch(a: string, b: string): boolean {
   return na === nb || na.endsWith(nb.slice(-9)) || nb.endsWith(na.slice(-9));
 }
 
-export async function initiateOrderStkPush(input: {
-  orderNumber: string;
-  phone: string;
-}): Promise<
+export async function initiateOrderStkPush(input: { orderNumber: string; phone: string }): Promise<
   | {
       ok: true;
       checkoutRequestId: string;
@@ -43,7 +40,9 @@ export async function initiateOrderStkPush(input: {
     };
   }
 
-  const orderNumber = String(input.orderNumber ?? "").trim().toUpperCase();
+  const orderNumber = String(input.orderNumber ?? "")
+    .trim()
+    .toUpperCase();
   const phone = normalizeKenyaMsisdn(input.phone);
   if (!orderNumber) return { ok: false, error: "Order number is required.", status: 400 };
   if (!phone) {
@@ -235,7 +234,9 @@ export async function getStkStatus(input: {
     };
   }
 
-  const orderNumber = String(input.orderNumber ?? "").trim().toUpperCase();
+  const orderNumber = String(input.orderNumber ?? "")
+    .trim()
+    .toUpperCase();
   const phone = input.phone ? normalizeKenyaMsisdn(input.phone) : null;
   if (!orderNumber || !phone) {
     return { ok: false, error: "orderNumber + phone or checkoutRequestId required." };
