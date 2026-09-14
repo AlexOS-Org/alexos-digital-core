@@ -45,15 +45,13 @@ export function readDarajaEnv(): DarajaEnv | null {
   if (!consumerKey || !consumerSecret || !passkey || !shortcode) return null;
 
   const environment =
-    process.env.MPESA_ENVIRONMENT?.trim().toLowerCase() === "production"
-      ? "production"
-      : "sandbox";
+    process.env.MPESA_ENVIRONMENT?.trim().toLowerCase() === "production" ? "production" : "sandbox";
 
-  const publicUrl = (
-    process.env.DAILYGEAR_PUBLIC_URL?.trim() || "https://dailygear.co.ke"
-  ).replace(/\/$/, "");
-  const callbackUrl =
-    process.env.MPESA_CALLBACK_URL?.trim() || `${publicUrl}/api/mpesa/callback`;
+  const publicUrl = (process.env.DAILYGEAR_PUBLIC_URL?.trim() || "https://dailygear.co.ke").replace(
+    /\/$/,
+    "",
+  );
+  const callbackUrl = process.env.MPESA_CALLBACK_URL?.trim() || `${publicUrl}/api/mpesa/callback`;
 
   const transactionType =
     process.env.MPESA_TRANSACTION_TYPE?.trim() === "CustomerBuyGoodsOnline"
@@ -107,10 +105,9 @@ export async function getDarajaAccessToken(env: DarajaEnv): Promise<string> {
   if (cachedToken && cachedToken.expiresAt > now + 30_000) return cachedToken.value;
 
   const auth = btoa(`${env.consumerKey}:${env.consumerSecret}`);
-  const res = await fetch(
-    `${baseUrl(env)}/oauth/v1/generate?grant_type=client_credentials`,
-    { headers: { Authorization: `Basic ${auth}` } },
-  );
+  const res = await fetch(`${baseUrl(env)}/oauth/v1/generate?grant_type=client_credentials`, {
+    headers: { Authorization: `Basic ${auth}` },
+  });
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     throw new Error(`Daraja OAuth failed (${res.status}): ${body.slice(0, 200)}`);
