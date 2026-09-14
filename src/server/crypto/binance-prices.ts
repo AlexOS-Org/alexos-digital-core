@@ -9,7 +9,7 @@ const BINANCE_SYMBOL: Record<CryptoSymbol, string | null> = {
   BNB: "BNBUSDT",
   SOL: "SOLUSDT",
   XRP: "XRPUSDT",
-  USDT: null, // 1 USDT ≈ 1 USD
+  USDT: null,
   USDC: "USDCUSDT",
 };
 
@@ -22,11 +22,7 @@ export type LiveCryptoPrices = {
 };
 
 async function fetchJson<T>(url: string): Promise<T> {
-  const res = await fetch(url, {
-    headers: { Accept: "application/json" },
-    // @ts-expect-error Cloudflare / undici optional
-    cf: { cacheTtl: 30, cacheEverything: true },
-  });
+  const res = await fetch(url, { headers: { Accept: "application/json" } });
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     throw new Error(`Price fetch failed (${res.status}): ${body.slice(0, 120)}`);
@@ -53,7 +49,6 @@ async function resolveUsdtKes(): Promise<number> {
   } catch {
     /* fall through */
   }
-  // Last-resort Kenya-ish USDT/KES so the UI still works offline from FX APIs
   return 129;
 }
 
