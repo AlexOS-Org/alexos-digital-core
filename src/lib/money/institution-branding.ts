@@ -1,4 +1,4 @@
-import "./../../styles/institution-brands.css";
+import "@/styles/institution-brands.css";
 
 import mpesaLogo from "@/assets/branding/accounts/mpesa.png";
 import kcbLogo from "@/assets/branding/accounts/kcb.png";
@@ -42,7 +42,6 @@ export type InstitutionStyle = {
   actionClass: string;
   accentClass: string;
   softAccent: string;
-  /** Hex for SVG brand marks */
   brandHex: string;
   warningThreshold: number | null;
 };
@@ -63,7 +62,6 @@ const DEFAULT_STYLE: InstitutionStyle = {
   warningThreshold: null,
 };
 
-/** Tiny SVG data-URI so banks without PNG still show a colored brand tile. */
 function brandMarkDataUri(initials: string, hex: string): string {
   const safe = initials.slice(0, 3).toUpperCase();
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img"><rect width="64" height="64" rx="14" fill="${hex}"/><text x="32" y="38" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif" font-size="20" font-weight="700" fill="#ffffff">${safe}</text></svg>`;
@@ -90,7 +88,7 @@ function matchInstitution(name: string): InstitutionStyle {
       warningThreshold: LOW_BALANCE_THRESHOLDS.mobileMoney,
     };
   }
-  if (/\bkcb\b|kenya commercial/.test(value)) {
+  if (/kcb|kenya commercial/.test(value)) {
     return {
       key: "kcb",
       initials: "KC",
@@ -124,7 +122,7 @@ function matchInstitution(name: string): InstitutionStyle {
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
-  if (/\bsbm\b/.test(value)) {
+  if (/sbm/.test(value)) {
     return {
       key: "sbm",
       initials: "SB",
@@ -158,7 +156,7 @@ function matchInstitution(name: string): InstitutionStyle {
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
-  if (/co[- ]?operative|\bco-?op\b|coop bank/.test(value)) {
+  if (/co[- ]?operative|co-?op|coop bank/.test(value)) {
     return {
       key: "coop",
       initials: "CO",
@@ -175,7 +173,7 @@ function matchInstitution(name: string): InstitutionStyle {
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
-  if (/\bncba\b/.test(value)) {
+  if (/ncba/.test(value)) {
     return {
       key: "ncba",
       initials: "NC",
@@ -192,7 +190,7 @@ function matchInstitution(name: string): InstitutionStyle {
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
-  if (/\babsa\b/.test(value)) {
+  if (/absa/.test(value)) {
     return {
       key: "absa",
       initials: "AB",
@@ -323,22 +321,17 @@ export function getInstitutionKey(name: string): InstitutionKey {
   return matchInstitution(name).key;
 }
 
-/**
- * Logo URL for the account tile. PNG when on disk; otherwise a brand-colored
- * SVG mark so Absa / Family / Equity / etc. are never blank.
- */
 export function getAccountLogo(name: string): string | null {
   const style = matchInstitution(name);
   const value = name.toLowerCase();
 
   if (/m[- ]?pesa/.test(value)) return mpesaLogo;
-  if (/\bkcb\b|kenya commercial/.test(value)) return kcbLogo;
+  if (/kcb|kenya commercial/.test(value)) return kcbLogo;
   if (/i&m|im bank|i and m/.test(value)) return imBankLogo;
-  if (/\bsbm\b/.test(value)) return sbmLogo;
+  if (/sbm/.test(value)) return sbmLogo;
   if (/binance|crypto/.test(value)) return binanceLogo;
   if (/\bcash\b/.test(value) || /salary/.test(value)) return cashLogo;
 
-  // Synthetic brand marks for banks without uploaded PNG assets
   if (style.key !== "default") {
     return brandMarkDataUri(style.initials, style.brandHex);
   }
