@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bitcoin, CircleAlert, Plus, Trash2 } from "lucide-react";
+import { Bitcoin, CircleAlert, Plus, RefreshCw, Trash2, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatMoney } from "@/lib/money/format";
+import { liveKesPrice, useLiveCryptoPrices } from "@/lib/money/crypto-prices";
+import { cn } from "@/lib/utils";
 
 const COINS = ["BTC", "ETH", "BNB", "SOL", "XRP", "USDT", "USDC"] as const;
 type Coin = (typeof COINS)[number];
@@ -47,6 +49,8 @@ export function CryptoHoldingsPanel() {
   const [quantity, setQuantity] = useState("");
   const [priceKes, setPriceKes] = useState("");
   const [notes, setNotes] = useState("");
+  const live = useLiveCryptoPrices(true);
+
   const holdings = useQuery({
     queryKey: ["money", "crypto_holdings"],
     queryFn: async () => {
@@ -58,10 +62,15 @@ export function CryptoHoldingsPanel() {
       return (data ?? []) as unknown as Holding[];
     },
   });
+
+  const liveForForm = liveKesPrice(live.data, symbol);
+  const effectivePriceInput =
+    priceKes !== "" ? priceKes : liveForForm != null ? String(Math.round(liveForForm)) : "";
+
   const save = useMutation({
     mutationFn: async () => {
       const q = Number(quantity);
-      const price = Number(priceKes);
+      const price = Number(effectivePriceInput);
       if (!Number.isFinite(q) || q <= 0) throw new Error("Enter a valid coin quantity.");
       if (!Number.isFinite(price) || price < 0) throw new Error("Enter a valid KES price.");
       const { data: userData } = await supabase.auth.getUser();
@@ -86,6 +95,7 @@ export function CryptoHoldingsPanel() {
     },
     onError: (error: Error) => toast.error(error.message),
   });
+
   const remove = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
@@ -100,40 +110,148 @@ export function CryptoHoldingsPanel() {
     },
     onError: (error: Error) => toast.error(error.message),
   });
-  const total = useMemo(
+
+  const applyLivePrices = useMutation({
+    mutationFn: async () => {
+      if (!live.data) throw new Error("Live prices not loaded yet.");
+      const rows = holdings.data ?? [];
+      if (rows.length === 0) throw new Error("No holdings to update.");
+      const now = new Date().toISOString();
+      for (const h of rows) {
+        const price = liveKesPrice(live.data, h.symbol);
+        if (price == null) continue;
+        const { error } = await supabase
+          .from("money_crypto_holdings" as never)
+          .update({ price_kes: price, valued_at: now } as never)
+          .eq("id", h.id);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["money", "crypto_holdings"] });
+      toast.success("Holdings revalued at live Binance prices");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const updateQuantity = useMutation({
+    mutationFn: async ({ id, quantity: q }: { id: string; quantity: number }) => {
+      if (!Number.isFinite(q) || q <= 0) throw new Error("Invalid quantity");
+      const holding = holdings.data?.find((h) => h.id === id);
+      const price = liveKesPrice(live.data, holding?.symbol ?? "");
+      const payload: Record<string, unknown> = { quantity: q };
+      if (price != null) {
+        payload.price_kes = price;
+        payload.valued_at = new Date().toISOString();
+      }
+      const { error } = await supabase
+        .from("money_crypto_holdings" as never)
+        .update(payload as never)
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["money", "crypto_holdings"] });
+      toast.success("Quantity updated");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const storedTotal = useMemo(
     () =>
       (holdings.data ?? []).reduce((sum, holding) => sum + holding.quantity * holding.price_kes, 0),
     [holdings.data],
   );
 
+  const liveTotal = useMemo(() => {
+    if (!live.data) return null;
+    return (holdings.data ?? []).reduce((sum, h) => {
+      const p = liveKesPrice(live.data, h.symbol) ?? h.price_kes;
+      return sum + h.quantity * p;
+    }, 0);
+  }, [holdings.data, live.data]);
+
   return (
-    <Card className="rounded-2xl">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
-            <Bitcoin className="h-4 w-4" />
+    <Card className="rounded-2xl border-amber-300/40 dark:border-amber-800/40">
+      <CardHeader className="space-y-2">
+        <CardTitle className="flex flex-wrap items-center justify-between gap-2 text-base">
+          <span className="flex items-center gap-2">
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+              <Bitcoin className="h-4 w-4" />
+            </span>
+            Binance crypto holdings
           </span>
-          Binance crypto holdings
+          <span className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="rounded-lg"
+              disabled={live.isFetching}
+              onClick={() => void live.refetch()}
+            >
+              <RefreshCw className={cn("mr-1.5 h-3.5 w-3.5", live.isFetching && "animate-spin")} />
+              Refresh prices
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              className="rounded-lg"
+              disabled={
+                applyLivePrices.isPending || !live.data || (holdings.data ?? []).length === 0
+              }
+              onClick={() => applyLivePrices.mutate()}
+            >
+              <TrendingUp className="mr-1.5 h-3.5 w-3.5" />
+              {applyLivePrices.isPending ? "Updating…" : "Apply live prices"}
+            </Button>
+          </span>
         </CardTitle>
         <p className="text-xs text-muted-foreground">
-          Track major coins manually. These are assets, not income or expenses. Enter the current
-          KES value yourself.
+          Live prices from Binance public market data (no API keys). Use{" "}
+          <strong>Apply live prices</strong> when the market moves to update stored KES values.
+          Quantity is what you hold — edit it after buys/sells. Does not log into Binance.
         </p>
+        {live.data && (
+          <p className="text-[11px] text-muted-foreground">
+            USDT/KES ≈ {live.data.usdtKes.toFixed(2)} · updated{" "}
+            {new Date(live.data.updatedAt).toLocaleTimeString()}
+            {liveForForm != null && (
+              <>
+                {" · "}
+                {symbol} live {formatMoney(liveForForm, "KES")}
+              </>
+            )}
+          </p>
+        )}
+        {live.isError && (
+          <p className="text-xs text-destructive">Live prices unavailable — enter KES manually.</p>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-3 sm:grid-cols-4">
           <div className="space-y-1.5">
             <Label>Coin</Label>
-            <Select value={symbol} onValueChange={(value) => setSymbol(value as Coin)}>
+            <Select
+              value={symbol}
+              onValueChange={(value) => {
+                setSymbol(value as Coin);
+                setPriceKes("");
+              }}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {COINS.map((coin) => (
-                  <SelectItem key={coin} value={coin}>
-                    {coin}
-                  </SelectItem>
-                ))}
+                {COINS.map((coin) => {
+                  const p = liveKesPrice(live.data, coin);
+                  return (
+                    <SelectItem key={coin} value={coin}>
+                      {coin}
+                      {p != null ? ` · ${formatMoney(p, "KES")}` : ""}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>
@@ -156,9 +274,9 @@ export function CryptoHoldingsPanel() {
               type="number"
               min="0"
               step="0.01"
-              value={priceKes}
+              value={effectivePriceInput}
               onChange={(e) => setPriceKes(e.target.value)}
-              placeholder="0"
+              placeholder={liveForForm != null ? String(Math.round(liveForForm)) : "0"}
             />
           </div>
           <div className="space-y-1.5">
@@ -174,22 +292,43 @@ export function CryptoHoldingsPanel() {
           <Plus className="mr-1.5 h-3.5 w-3.5" />
           {save.isPending ? "Adding…" : "Add holding"}
         </Button>
-        <div className="flex items-center justify-between rounded-xl bg-muted/40 px-3 py-2 text-sm">
-          <span className="text-muted-foreground">Tracked crypto value</span>
-          <strong>{formatMoney(total, "KES")}</strong>
+
+        <div className="grid gap-2 sm:grid-cols-2">
+          <div className="flex items-center justify-between rounded-xl bg-muted/40 px-3 py-2 text-sm">
+            <span className="text-muted-foreground">Stored value</span>
+            <strong>{formatMoney(storedTotal, "KES")}</strong>
+          </div>
+          <div className="flex items-center justify-between rounded-xl bg-amber-500/10 px-3 py-2 text-sm">
+            <span className="text-muted-foreground">Live value</span>
+            <strong className="text-amber-800 dark:text-amber-300">
+              {liveTotal != null ? formatMoney(liveTotal, "KES") : "—"}
+            </strong>
+          </div>
         </div>
+
         <div className="space-y-2">
           {(holdings.data ?? []).map((holding) => {
-            const value = holding.quantity * holding.price_kes;
-            const low = value < 1000;
+            const storedValue = holding.quantity * holding.price_kes;
+            const livePrice = liveKesPrice(live.data, holding.symbol);
+            const liveValue = livePrice != null ? holding.quantity * livePrice : storedValue;
+            const delta = liveValue - storedValue;
+            const low = liveValue < 1000;
             return (
               <div
                 key={holding.id}
-                className={`flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 ${low ? "border-red-300 bg-red-50/70 dark:border-red-900/60 dark:bg-red-950/20" : ""}`}
+                className={cn(
+                  "flex flex-wrap items-center justify-between gap-3 rounded-xl border px-3 py-2.5",
+                  low && "border-red-300 bg-red-50/70 dark:border-red-900/60 dark:bg-red-950/20",
+                )}
               >
                 <div className="flex min-w-0 items-center gap-2.5">
                   <span
-                    className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-[10px] font-bold ${low ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300" : coinStyle(holding.symbol)}`}
+                    className={cn(
+                      "grid h-8 w-8 shrink-0 place-items-center rounded-full text-[10px] font-bold",
+                      low
+                        ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
+                        : coinStyle(holding.symbol),
+                    )}
                   >
                     {holding.symbol}
                   </span>
@@ -198,17 +337,57 @@ export function CryptoHoldingsPanel() {
                       {holding.exchange} · {holding.symbol}
                     </p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {holding.quantity} × {formatMoney(holding.price_kes, "KES")}
+                      {holding.quantity} coins
+                      {livePrice != null
+                        ? ` · live ${formatMoney(livePrice, "KES")} / coin`
+                        : ` · stored ${formatMoney(holding.price_kes, "KES")}`}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <strong className={low ? "text-red-600 dark:text-red-400" : ""}>
-                    {formatMoney(value, "KES")}
-                  </strong>
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="text-right">
+                    <strong className={low ? "text-red-600 dark:text-red-400" : ""}>
+                      {formatMoney(liveValue, "KES")}
+                    </strong>
+                    {livePrice != null && Math.abs(delta) >= 1 && (
+                      <div
+                        className={cn(
+                          "text-[11px]",
+                          delta >= 0
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : "text-rose-600 dark:text-rose-400",
+                        )}
+                      >
+                        {delta >= 0 ? "+" : ""}
+                        {formatMoney(delta, "KES")} vs stored
+                      </div>
+                    )}
+                  </div>
                   {low && (
                     <CircleAlert className="h-4 w-4 text-red-600" aria-label="Below KES 1,000" />
                   )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 rounded-lg text-xs"
+                    disabled={updateQuantity.isPending}
+                    onClick={() => {
+                      const next = window.prompt(
+                        `New ${holding.symbol} quantity (current ${holding.quantity})`,
+                        String(holding.quantity),
+                      );
+                      if (next == null) return;
+                      const q = Number(next);
+                      if (!Number.isFinite(q) || q <= 0) {
+                        toast.error("Invalid quantity");
+                        return;
+                      }
+                      updateQuantity.mutate({ id: holding.id, quantity: q });
+                    }}
+                  >
+                    Edit qty
+                  </Button>
                   <Button
                     type="button"
                     variant="ghost"
@@ -225,7 +404,7 @@ export function CryptoHoldingsPanel() {
           })}
           {!holdings.isLoading && (holdings.data ?? []).length === 0 && (
             <p className="rounded-xl border border-dashed p-4 text-center text-sm text-muted-foreground">
-              No crypto holdings recorded yet.
+              No crypto holdings recorded yet. Add your coin quantities — prices fill from Binance.
             </p>
           )}
         </div>
