@@ -1,11 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
-import type { CryptoSymbol, LiveCryptoPrices } from "@/server/crypto/binance-prices";
 
-export type { CryptoSymbol, LiveCryptoPrices };
+export const CRYPTO_SYMBOLS = ["BTC", "ETH", "BNB", "SOL", "XRP", "USDT", "USDC"] as const;
+export type CryptoSymbol = (typeof CRYPTO_SYMBOLS)[number];
+
+export type LiveCryptoPrices = {
+  updatedAt: string;
+  usdtKes: number;
+  pricesKes: Partial<Record<CryptoSymbol, number>>;
+  pricesUsdt: Partial<Record<CryptoSymbol, number>>;
+  source: "binance_public";
+  ok?: boolean;
+  error?: string;
+};
 
 export async function loadLiveCryptoPrices(): Promise<LiveCryptoPrices> {
   const res = await fetch("/api/crypto/prices", { credentials: "same-origin" });
-  const body = (await res.json()) as LiveCryptoPrices & { ok?: boolean; error?: string };
+  const body = (await res.json()) as LiveCryptoPrices;
   if (!res.ok || body.ok === false) {
     throw new Error(body.error || "Live prices unavailable");
   }
