@@ -1,3 +1,5 @@
+import "@/styles/institution-brands.css";
+
 import mpesaLogo from "@/assets/branding/accounts/mpesa.png";
 import kcbLogo from "@/assets/branding/accounts/kcb.png";
 import imBankLogo from "@/assets/branding/accounts/im-bank.jpg";
@@ -32,17 +34,15 @@ export type InstitutionKey =
 
 export type InstitutionStyle = {
   key: InstitutionKey;
-  /** Short label for initials fallback when no logo asset exists */
   initials: string;
-  /** Brand label for UI chips */
   brandLabel: string;
   iconClass: string;
   panelClass: string;
   cardClass: string;
   actionClass: string;
   accentClass: string;
-  /** Soft accent usable on dark glass overview cards */
   softAccent: string;
+  brandHex: string;
   warningThreshold: number | null;
 };
 
@@ -58,8 +58,15 @@ const DEFAULT_STYLE: InstitutionStyle = {
     "border-slate-300/70 bg-white/70 hover:bg-slate-50 dark:border-slate-700/70 dark:bg-background/50",
   accentClass: "bg-primary",
   softAccent: "oklch(0.74 0.12 220)",
+  brandHex: "#64748b",
   warningThreshold: null,
 };
+
+function brandMarkDataUri(initials: string, hex: string): string {
+  const safe = initials.slice(0, 3).toUpperCase();
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img"><rect width="64" height="64" rx="14" fill="${hex}"/><text x="32" y="38" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif" font-size="20" font-weight="700" fill="#ffffff">${safe}</text></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
 
 function matchInstitution(name: string): InstitutionStyle {
   const value = name.toLowerCase();
@@ -77,10 +84,11 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-emerald-300/70 bg-white/70 hover:bg-emerald-50 dark:border-emerald-800/70 dark:bg-background/50",
       accentClass: "bg-emerald-500",
       softAccent: "oklch(0.78 0.18 155)",
+      brandHex: "#00A651",
       warningThreshold: LOW_BALANCE_THRESHOLDS.mobileMoney,
     };
   }
-  if (/kcb/.test(value)) {
+  if (/kcb|kenya commercial/.test(value)) {
     return {
       key: "kcb",
       initials: "KC",
@@ -93,6 +101,7 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-blue-300/70 bg-white/70 hover:bg-blue-50 dark:border-blue-800/70 dark:bg-background/50",
       accentClass: "bg-blue-600",
       softAccent: "oklch(0.72 0.19 255)",
+      brandHex: "#0033A0",
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
@@ -109,6 +118,7 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-orange-300/70 bg-white/70 hover:bg-orange-50 dark:border-orange-800/70 dark:bg-background/50",
       accentClass: "bg-orange-500",
       softAccent: "oklch(0.78 0.16 55)",
+      brandHex: "#E85D04",
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
@@ -125,6 +135,7 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-red-300/70 bg-white/70 hover:bg-red-50 dark:border-red-800/70 dark:bg-background/50",
       accentClass: "bg-red-600",
       softAccent: "oklch(0.7 0.2 25)",
+      brandHex: "#C8102E",
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
@@ -141,10 +152,11 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-lime-300/70 bg-white/70 hover:bg-lime-50 dark:border-lime-800/70 dark:bg-background/50",
       accentClass: "bg-lime-600",
       softAccent: "oklch(0.78 0.18 130)",
+      brandHex: "#6BBE45",
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
-  if (/co[- ]?operative|co-op|coop/.test(value)) {
+  if (/co[- ]?operative|co-?op|coop bank/.test(value)) {
     return {
       key: "coop",
       initials: "CO",
@@ -157,6 +169,7 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-teal-300/70 bg-white/70 hover:bg-teal-50 dark:border-teal-800/70 dark:bg-background/50",
       accentClass: "bg-teal-600",
       softAccent: "oklch(0.72 0.14 180)",
+      brandHex: "#00857C",
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
@@ -173,6 +186,7 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-sky-300/70 bg-white/70 hover:bg-sky-50 dark:border-sky-800/70 dark:bg-background/50",
       accentClass: "bg-sky-600",
       softAccent: "oklch(0.72 0.14 230)",
+      brandHex: "#00A3E0",
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
@@ -189,6 +203,7 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-rose-300/70 bg-white/70 hover:bg-rose-50 dark:border-rose-800/70 dark:bg-background/50",
       accentClass: "bg-rose-600",
       softAccent: "oklch(0.68 0.18 15)",
+      brandHex: "#AF0C3E",
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
@@ -205,10 +220,11 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-indigo-300/70 bg-white/70 hover:bg-indigo-50 dark:border-indigo-800/70 dark:bg-background/50",
       accentClass: "bg-indigo-600",
       softAccent: "oklch(0.68 0.16 275)",
+      brandHex: "#0033A1",
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
-  if (/family bank|family/.test(value) && /bank|family/.test(value)) {
+  if (/family/.test(value)) {
     return {
       key: "family",
       initials: "FB",
@@ -221,6 +237,7 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-cyan-300/70 bg-white/70 hover:bg-cyan-50 dark:border-cyan-800/70 dark:bg-background/50",
       accentClass: "bg-cyan-600",
       softAccent: "oklch(0.74 0.12 210)",
+      brandHex: "#008C95",
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
@@ -237,6 +254,7 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-red-300/70 bg-white/70 hover:bg-red-50 dark:border-red-800/70 dark:bg-background/50",
       accentClass: "bg-red-600",
       softAccent: "oklch(0.7 0.2 25)",
+      brandHex: "#ED1C24",
       warningThreshold: LOW_BALANCE_THRESHOLDS.mobileMoney,
     };
   }
@@ -253,6 +271,7 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-violet-300/70 bg-white/70 hover:bg-violet-50 dark:border-violet-800/70 dark:bg-background/50",
       accentClass: "bg-violet-600",
       softAccent: "oklch(0.72 0.2 300)",
+      brandHex: "#7C3AED",
       warningThreshold: LOW_BALANCE_THRESHOLDS.salary,
     };
   }
@@ -269,10 +288,11 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-amber-300/70 bg-white/70 hover:bg-amber-50 dark:border-amber-800/70 dark:bg-background/50",
       accentClass: "bg-amber-500",
       softAccent: "oklch(0.82 0.17 85)",
+      brandHex: "#F0B90B",
       warningThreshold: LOW_BALANCE_THRESHOLDS.crypto,
     };
   }
-  if (/cash/.test(value)) {
+  if (/\bcash\b/.test(value)) {
     return {
       key: "cash",
       initials: "CA",
@@ -285,6 +305,7 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-slate-300/70 bg-white/70 hover:bg-slate-50 dark:border-slate-700/70 dark:bg-background/50",
       accentClass: "bg-slate-500",
       softAccent: "oklch(0.74 0.12 220)",
+      brandHex: "#64748B",
       warningThreshold: LOW_BALANCE_THRESHOLDS.cash,
     };
   }
@@ -292,7 +313,6 @@ function matchInstitution(name: string): InstitutionStyle {
   return DEFAULT_STYLE;
 }
 
-/** Resolve full institution style from an account display name. */
 export function getInstitutionStyle(name: string): InstitutionStyle {
   return matchInstitution(name);
 }
@@ -301,20 +321,23 @@ export function getInstitutionKey(name: string): InstitutionKey {
   return matchInstitution(name).key;
 }
 
-/** Return logo asset URL when available, otherwise null (use initials). */
 export function getAccountLogo(name: string): string | null {
+  const style = matchInstitution(name);
   const value = name.toLowerCase();
+
   if (/m[- ]?pesa/.test(value)) return mpesaLogo;
-  if (/kcb/.test(value)) return kcbLogo;
+  if (/kcb|kenya commercial/.test(value)) return kcbLogo;
   if (/i&m|im bank|i and m/.test(value)) return imBankLogo;
   if (/sbm/.test(value)) return sbmLogo;
   if (/binance|crypto/.test(value)) return binanceLogo;
-  if (/cash/.test(value)) return cashLogo;
-  if (/salary/.test(value)) return cashLogo;
+  if (/\bcash\b/.test(value) || /salary/.test(value)) return cashLogo;
+
+  if (style.key !== "default") {
+    return brandMarkDataUri(style.initials, style.brandHex);
+  }
   return null;
 }
 
-/** Two-letter initials for banks without a logo asset. */
 export function getInstitutionInitials(name: string): string {
   return matchInstitution(name).initials;
 }
