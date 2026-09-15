@@ -12,8 +12,9 @@ export interface AurenDataFeed {
   waitingFor: string;
   /** Why this feed matters for decisions. */
   benefit: string;
-  /** Where the owner can add or fix the data. */
+  /** Concrete next step label when the owner can act in-app. */
   actionLabel?: string;
+  /** In-app route that fills this feed. */
   actionTo?: string;
   detail?: string;
 }
@@ -31,7 +32,7 @@ function rowCount(sourceRows: Record<string, number>, key: string): number {
 
 /**
  * Build an honest catalog of what Auren can already use versus what it is
- * still waiting to receive — including decision benefits for each feed.
+ * still waiting to receive — including decision benefits and where to add data.
  */
 export function buildAurenDataReadiness(
   advisory: AurenAdvisorySnapshot,
@@ -48,11 +49,11 @@ export function buildAurenDataReadiness(
     waitingFor:
       tx > 0
         ? "Receiving posted income, expense and transfer records."
-        : "I am waiting to receive information from Money Center transactions (income, expenses, transfers).",
+        : "No income, expense, or transfer rows in this period yet. Add activity in Money Center so Auren can judge cash direction.",
     benefit: "Lets you judge cash direction, spend spikes, and whether new commitments are safe.",
-    actionLabel: "Open Money Center",
-    actionTo: "/money-center",
-    detail: tx > 0 ? `${tx.toLocaleString()} rows in scope` : undefined,
+    actionLabel: tx > 0 ? "Review transactions" : "Add transactions",
+    actionTo: "/money-center/transactions",
+    detail: tx > 0 ? `${tx.toLocaleString()} rows in scope` : "Next step: post at least one income or expense.",
   });
 
   const expected = rowCount(rows, "expected");
@@ -63,11 +64,14 @@ export function buildAurenDataReadiness(
     waitingFor:
       expected > 0
         ? "Receiving pending expected inflows."
-        : "I am waiting to receive information from Expected Money (pending inflows and probabilities).",
+        : "No expected inflows logged. Track salary, invoices, or other pending money so near-term cash plans are grounded.",
     benefit: "Improves near-term cash planning and reduces surprise shortfalls.",
-    actionLabel: "Track expected",
+    actionLabel: expected > 0 ? "Review expected money" : "Add expected income",
     actionTo: "/money-center/expected",
-    detail: expected > 0 ? `${expected.toLocaleString()} expected item(s)` : undefined,
+    detail:
+      expected > 0
+        ? `${expected.toLocaleString()} expected item(s)`
+        : "Next step: add pending inflows with dates and amounts.",
   });
 
   const leads = rowCount(rows, "leads");
@@ -78,11 +82,11 @@ export function buildAurenDataReadiness(
     waitingFor:
       leads > 0
         ? "Receiving open pipeline and lead records."
-        : "I am waiting to receive information from CRM leads (pipeline value, stages, follow-ups).",
+        : "No leads in the pipeline yet. Add contacts and stages in People so Auren can surface deals that need follow-up.",
     benefit: "Shows which deals need attention and where revenue may close next.",
-    actionLabel: "Open pipeline",
+    actionLabel: leads > 0 ? "Open pipeline" : "Add leads",
     actionTo: "/people/leads",
-    detail: leads > 0 ? `${leads.toLocaleString()} lead row(s)` : undefined,
+    detail: leads > 0 ? `${leads.toLocaleString()} lead row(s)` : "Next step: create at least one lead with a stage.",
   });
 
   const dgOrders = rowCount(rows, "dailyGearOrders");
@@ -93,12 +97,20 @@ export function buildAurenDataReadiness(
     source: "DailyGear · catalogue and orders",
     status: dgReady ? (dgOrders > 0 && dgProducts > 0 ? "ready" : "partial") : "waiting",
     waitingFor: dgReady
-      ? "Receiving storefront catalogue and/or order evidence."
-      : "I am waiting to receive information from DailyGear products and orders.",
+      ? dgOrders > 0 && dgProducts > 0
+        ? "Receiving storefront catalogue and order evidence."
+        : dgProducts > 0
+          ? "Catalogue is present, but no orders in scope yet — revenue trend stays limited."
+          : "Orders are present, but the product catalogue is thin — inventory risk stays limited."
+      : "No storefront products or orders in scope. Add catalogue items and record orders under E-commerce.",
     benefit:
       "Supports inventory risk, storefront revenue trend, and fulfilment pressure decisions.",
-    actionLabel: "Open DailyGear",
-    actionTo: "/dailygear",
+    actionLabel: dgReady
+      ? dgOrders === 0
+        ? "Open orders"
+        : "Open products"
+      : "Open E-commerce products",
+    actionTo: dgReady && dgOrders === 0 ? "/e-commerce/orders" : "/e-commerce/products",
     detail: `Products ${dgProducts.toLocaleString()} · Orders ${dgOrders.toLocaleString()}`,
   });
 
@@ -112,13 +124,17 @@ export function buildAurenDataReadiness(
     waitingFor:
       liveOk > 0
         ? "Receiving scheduled Meta / Instagram / funnel snapshots."
-        : "I am waiting to receive information from live evidence refresh (Meta Ads, Instagram, public ads library, funnel events).",
+        : liveTotal > 0
+          ? "Snapshots exist but none are fully healthy. Check evidence refresh and ad connectors."
+          : "No Meta, Instagram, or funnel snapshots in the last refresh window. Connect ads evidence or run a refresh from E-commerce.",
     benefit:
       "Lets you compare ad spend and funnel drop-off against real sales before changing budget.",
+    actionLabel: liveOk > 0 ? "Review evidence" : "Open ads evidence",
+    actionTo: "/e-commerce/evidence",
     detail:
       liveTotal > 0
         ? `${liveOk} ok · ${livePartial} partial · ${liveTotal} snapshot(s)`
-        : "No snapshots in the last refresh window",
+        : "Next step: refresh evidence or connect Meta / Instagram when available.",
   });
 
   const competitorCaps = advisory.capabilities.filter((c) =>
@@ -150,9 +166,13 @@ function capabilityToFeed(cap: AurenCapability): AurenDataFeed {
     status: connected ? "ready" : "waiting",
     waitingFor: connected
       ? `Connected: ${cap.freshnessLabel}.`
-      : `I am waiting to receive information from ${cap.label} (${cap.freshnessLabel}). The connector contract exists but no live provider is wired yet.`,
+      : `${cap.label} is not live yet. The read contract exists, but no approved provider API is wired — Auren will not invent competitor or traffic numbers.`,
     benefit: competitorBenefit(cap.id) ?? cap.description,
-    detail: connected ? "Adapter connected" : "Contract only — not live data",
+    actionLabel: connected ? undefined : "See competitor workspace",
+    actionTo: connected ? undefined : "/e-commerce/competitors",
+    detail: connected
+      ? "Adapter connected"
+      : "Needs provider keys in production before this card can leave Waiting.",
   };
 }
 
@@ -182,6 +202,8 @@ function publicContextToFeed(ctx: AurenPublicContextRecord): AurenDataFeed {
       waitingFor: `Reviewed public brand context for ${ctx.business} (not operational stock or revenue).`,
       benefit:
         "Gives background positioning only. Decisions on stock, price and revenue must still use Money Center and DailyGear records.",
+      actionLabel: "Open Money Center",
+      actionTo: "/money-center",
       detail: `${ctx.facts.length} public fact(s) · ${ctx.confidence} confidence`,
     };
   }
@@ -189,10 +211,12 @@ function publicContextToFeed(ctx: AurenPublicContextRecord): AurenDataFeed {
     id: `public-${ctx.business}`,
     source: `Public / competitor context · ${ctx.business}`,
     status: "waiting",
-    waitingFor: `I am waiting to receive an entity-verified public source for ${ctx.business}. Unrelated web results are refused so Auren does not invent market claims.`,
+    waitingFor: `No entity-verified public source for ${ctx.business} yet. Unrelated web results are refused so Auren does not invent market claims.`,
     benefit:
       "Once a verified source exists, you can compare positioning and public offers without mixing them into private revenue numbers.",
-    detail: ctx.sourceTitle,
+    actionLabel: "Open competitors",
+    actionTo: "/e-commerce/competitors",
+    detail: ctx.sourceTitle ?? "Next step: approve a verified public source for this brand.",
   };
 }
 
@@ -207,9 +231,9 @@ export function summarizeReadiness(feeds: AurenDataFeed[]): {
   const ready = feeds.filter((f) => f.status === "ready").length;
   const headline =
     waiting === 0 && partial === 0
-      ? "All listed first-party feeds have data in this view."
+      ? "All listed feeds have data in this view. Recommendations can stay grounded in verified records."
       : waiting > 0
-        ? `Auren is waiting on ${waiting} data source(s) before some decisions can be fully grounded.`
-        : `Auren has partial coverage on ${partial} source(s); treat those recommendations as incomplete.`;
+        ? `${waiting} source${waiting === 1 ? "" : "s"} still need data. Use the links on each card to fill the gap — Auren will not invent values.`
+        : `${partial} source${partial === 1 ? "" : "s"} only have partial coverage. Treat related recommendations as incomplete until they are fully ready.`;
   return { waiting, partial, ready, headline };
 }
