@@ -75,6 +75,7 @@ import { Route as AuthenticatedMoneyCenterTransactionsRouteImport } from './rout
 import { Route as AuthenticatedMoneyCenterTransfersRouteImport } from './routes/_authenticated/money-center.transfers'
 import { Route as AuthenticatedPeopleIndexRouteImport } from './routes/_authenticated/people.index'
 import { Route as AuthenticatedPeopleLeadsRouteImport } from './routes/_authenticated/people.leads'
+import { Route as ApiCryptoPricesRouteImport } from './routes/api/crypto/prices'
 import { Route as ApiMetaAdsWebhookRouteImport } from './routes/api/meta/ads-webhook'
 import { Route as ApiMpesaCallbackRouteImport } from './routes/api/mpesa/callback'
 import { Route as ApiMpesaStatusRouteImport } from './routes/api/mpesa/status'
@@ -451,6 +452,11 @@ const AuthenticatedPeopleLeadsRoute =
     path: '/leads',
     getParentRoute: () => AuthenticatedPeopleRoute,
   } as any)
+const ApiCryptoPricesRoute = ApiCryptoPricesRouteImport.update({
+  id: '/api/crypto/prices',
+  path: '/api/crypto/prices',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiMetaAdsWebhookRoute = ApiMetaAdsWebhookRouteImport.update({
   id: '/api/meta/ads-webhook',
   path: '/api/meta/ads-webhook',
@@ -574,6 +580,7 @@ export interface FileRoutesByFullPath {
   '/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/api/crypto/prices': typeof ApiCryptoPricesRoute
   '/api/meta/ads-webhook': typeof ApiMetaAdsWebhookRoute
   '/api/mpesa/callback': typeof ApiMpesaCallbackRoute
   '/api/mpesa/status': typeof ApiMpesaStatusRoute
@@ -648,6 +655,7 @@ export interface FileRoutesByTo {
   '/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/api/crypto/prices': typeof ApiCryptoPricesRoute
   '/api/meta/ads-webhook': typeof ApiMetaAdsWebhookRoute
   '/api/mpesa/callback': typeof ApiMpesaCallbackRoute
   '/api/mpesa/status': typeof ApiMpesaStatusRoute
@@ -728,6 +736,7 @@ export interface FileRoutesById {
   '/_authenticated/money-center/transactions': typeof AuthenticatedMoneyCenterTransactionsRoute
   '/_authenticated/money-center/transfers': typeof AuthenticatedMoneyCenterTransfersRoute
   '/_authenticated/people/leads': typeof AuthenticatedPeopleLeadsRouteWithChildren
+  '/api/crypto/prices': typeof ApiCryptoPricesRoute
   '/api/meta/ads-webhook': typeof ApiMetaAdsWebhookRoute
   '/api/mpesa/callback': typeof ApiMpesaCallbackRoute
   '/api/mpesa/status': typeof ApiMpesaStatusRoute
@@ -808,6 +817,7 @@ export interface FileRouteTypes {
     | '/money-center/transactions'
     | '/money-center/transfers'
     | '/people/leads'
+    | '/api/crypto/prices'
     | '/api/meta/ads-webhook'
     | '/api/mpesa/callback'
     | '/api/mpesa/status'
@@ -882,6 +892,7 @@ export interface FileRouteTypes {
     | '/money-center/transactions'
     | '/money-center/transfers'
     | '/people/leads'
+    | '/api/crypto/prices'
     | '/api/meta/ads-webhook'
     | '/api/mpesa/callback'
     | '/api/mpesa/status'
@@ -961,6 +972,7 @@ export interface FileRouteTypes {
     | '/_authenticated/money-center/transactions'
     | '/_authenticated/money-center/transfers'
     | '/_authenticated/people/leads'
+    | '/api/crypto/prices'
     | '/api/meta/ads-webhook'
     | '/api/mpesa/callback'
     | '/api/mpesa/status'
@@ -984,6 +996,7 @@ export interface RootRouteChildren {
   ShopRoute: typeof ShopRouteWithChildren
   ApiRuntimeConfigRoute: typeof ApiRuntimeConfigRoute
   FunnelSlugRoute: typeof FunnelSlugRoute
+  ApiCryptoPricesRoute: typeof ApiCryptoPricesRoute
   ApiMetaAdsWebhookRoute: typeof ApiMetaAdsWebhookRoute
   ApiMpesaCallbackRoute: typeof ApiMpesaCallbackRoute
   ApiMpesaStatusRoute: typeof ApiMpesaStatusRoute
@@ -1455,6 +1468,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPeopleLeadsRouteImport
       parentRoute: typeof AuthenticatedPeopleRoute
     }
+    '/api/crypto/prices': {
+      id: '/api/crypto/prices'
+      path: '/api/crypto/prices'
+      fullPath: '/api/crypto/prices'
+      preLoaderRoute: typeof ApiCryptoPricesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/meta/ads-webhook': {
       id: '/api/meta/ads-webhook'
       path: '/api/meta/ads-webhook'
@@ -1774,6 +1794,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopRoute: ShopRouteWithChildren,
   ApiRuntimeConfigRoute: ApiRuntimeConfigRoute,
   FunnelSlugRoute: FunnelSlugRoute,
+  ApiCryptoPricesRoute: ApiCryptoPricesRoute,
   ApiMetaAdsWebhookRoute: ApiMetaAdsWebhookRoute,
   ApiMpesaCallbackRoute: ApiMpesaCallbackRoute,
   ApiMpesaStatusRoute: ApiMpesaStatusRoute,

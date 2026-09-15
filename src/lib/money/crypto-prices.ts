@@ -3,16 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 export const CRYPTO_SYMBOLS = ["BTC", "ETH", "BNB", "SOL", "XRP", "USDT", "USDC"] as const;
 export type CryptoSymbol = (typeof CRYPTO_SYMBOLS)[number];
 
-const BINANCE_PAIR: Record<CryptoSymbol, string | null> = {
-  BTC: "BTCUSDT",
-  ETH: "ETHUSDT",
-  BNB: "BNBUSDT",
-  SOL: "SOLUSDT",
-  XRP: "XRPUSDT",
-  USDT: null,
-  USDC: "USDCUSDT",
-};
-
 export type LiveCryptoPrices = {
   updatedAt: string;
   usdtKes: number;
@@ -21,65 +11,17 @@ export type LiveCryptoPrices = {
   source: "binance_public";
 };
 
-async function fetchJson<T>(url: string): Promise<T> {
-  const res = await fetch(url, { headers: { Accept: "application/json" } });
-  if (!res.ok) throw new Error(`Price fetch failed (${res.status})`);
-  return res.json() as Promise<T>;
-}
+type CryptoPricesResponse = LiveCryptoPrices & { ok: boolean; error?: string };
 
-async function resolveUsdtKes(): Promise<number> {
-  try {
-    const row = await fetchJson<{ price: string }>(
-      "https://api.binance.com/api/v3/ticker/price?symbol=USDTKES",
-    );
-    const n = Number(row.price);
-    if (Number.isFinite(n) && n > 0) return n;
-  } catch {
-    /* fall through */
+async function loadLiveCryptoPrices(): Promise<LiveCryptoPrices> {
+  const res = await fetch("/api/crypto/prices", {
+    headers: { Accept: "application/json" },
+  });
+  const data = (await res.json()) as CryptoPricesResponse;
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || `Price fetch failed (${res.status})`);
   }
-  try {
-    const fx = await fetchJson<{ rates?: { KES?: number } }>(
-      "https://open.er-api.com/v6/latest/USD",
-    );
-    const n = Number(fx.rates?.KES);
-    if (Number.isFinite(n) && n > 0) return n;
-  } catch {
-    /* fall through */
-  }
-  return 129;
-}
-
-/** Public Binance tickers only — no API keys, no account access. */
-export async function loadLiveCryptoPrices(): Promise<LiveCryptoPrices> {
-  const usdtKes = await resolveUsdtKes();
-  const pricesUsdt: Partial<Record<CryptoSymbol, number>> = { USDT: 1 };
-  const pricesKes: Partial<Record<CryptoSymbol, number>> = { USDT: usdtKes };
-
-  await Promise.all(
-    CRYPTO_SYMBOLS.filter((s) => s !== "USDT").map(async (symbol) => {
-      const pair = BINANCE_PAIR[symbol];
-      if (!pair) return;
-      try {
-        const row = await fetchJson<{ price: string }>(
-          `https://api.binance.com/api/v3/ticker/price?symbol=${pair}`,
-        );
-        const usdt = Number(row.price);
-        if (!Number.isFinite(usdt) || usdt <= 0) return;
-        pricesUsdt[symbol] = usdt;
-        pricesKes[symbol] = usdt * usdtKes;
-      } catch {
-        /* skip coin */
-      }
-    }),
-  );
-
-  return {
-    updatedAt: new Date().toISOString(),
-    usdtKes,
-    pricesKes,
-    pricesUsdt,
-    source: "binance_public",
-  };
+  return data;
 }
 
 export function useLiveCryptoPrices(enabled = true) {
