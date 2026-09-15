@@ -83,12 +83,15 @@ describe("buildAurenDataReadiness", () => {
     const feeds = buildAurenDataReadiness(emptyAdvisory(), "no_data");
     const money = feeds.find((f) => f.id === "money-transactions");
     expect(money?.status).toBe("waiting");
-    expect(money?.waitingFor).toMatch(/I am waiting to receive information from Money Center/);
+    expect(money?.waitingFor).toMatch(/No income, expense, or transfer/i);
+    expect(money?.actionTo).toBe("/money-center/transactions");
+    expect(money?.actionLabel).toMatch(/Add transactions/i);
     expect(money?.benefit).toMatch(/cash direction/i);
 
     const seo = feeds.find((f) => f.id === "cap-seo-competitor:read");
     expect(seo?.status).toBe("waiting");
-    expect(seo?.waitingFor).toMatch(/I am waiting to receive information/);
+    expect(seo?.waitingFor).toMatch(/not live yet/i);
+    expect(seo?.actionTo).toBe("/e-commerce/competitors");
     expect(seo?.benefit).toMatch(/organic visibility/i);
   });
 
@@ -96,6 +99,6 @@ describe("buildAurenDataReadiness", () => {
     const feeds = buildAurenDataReadiness(emptyAdvisory(), "no_data");
     const summary = summarizeReadiness(feeds);
     expect(summary.waiting).toBeGreaterThan(0);
-    expect(summary.headline).toMatch(/waiting on/i);
+    expect(summary.headline).toMatch(/still need data|Use the links/i);
   });
 });
