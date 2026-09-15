@@ -1,1 +1,2 @@
-export default "data:image/jpeg;base64,PLACEHOLDER";
+/** @deprecated use bank-logo-assets */
+export { absaLogo as default } from "../bank-logo-assets";
