@@ -6,6 +6,12 @@ import imBankLogo from "@/assets/branding/accounts/im-bank.jpg";
 import sbmLogo from "@/assets/branding/accounts/sbm.png";
 import binanceLogo from "@/assets/branding/accounts/binance.png";
 import cashLogo from "@/assets/branding/accounts/cash.png";
+import {
+  absaLogo,
+  equityLogo,
+  familyLogo,
+  ncbaLogo,
+} from "@/assets/branding/accounts/bank-logo-assets";
 
 export const LOW_BALANCE_THRESHOLDS = {
   mobileMoney: 500,
@@ -144,15 +150,15 @@ function matchInstitution(name: string): InstitutionStyle {
       key: "equity",
       initials: "EQ",
       brandLabel: "Equity",
-      iconClass: "bg-lime-100 text-lime-800 dark:bg-lime-950/40 dark:text-lime-300",
-      panelClass: "bg-lime-50/70 dark:bg-lime-950/20",
+      iconClass: "bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300",
+      panelClass: "bg-red-50/70 dark:bg-red-950/20",
       cardClass:
-        "border-lime-300/80 bg-gradient-to-br from-lime-200/90 via-lime-100/70 to-lime-50/60 dark:border-lime-800/60 dark:from-lime-950/60 dark:via-lime-950/35 dark:to-background",
+        "border-red-300/80 bg-gradient-to-br from-red-200/90 via-red-100/70 to-red-50/60 dark:border-red-800/60 dark:from-red-950/60 dark:via-red-950/35 dark:to-background",
       actionClass:
-        "border-lime-300/70 bg-white/70 hover:bg-lime-50 dark:border-lime-800/70 dark:bg-background/50",
-      accentClass: "bg-lime-600",
-      softAccent: "oklch(0.78 0.18 130)",
-      brandHex: "#6BBE45",
+        "border-red-300/70 bg-white/70 hover:bg-red-50 dark:border-red-800/70 dark:bg-background/50",
+      accentClass: "bg-red-700",
+      softAccent: "oklch(0.55 0.18 25)",
+      brandHex: "#8B1A1A",
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
@@ -178,15 +184,15 @@ function matchInstitution(name: string): InstitutionStyle {
       key: "ncba",
       initials: "NC",
       brandLabel: "NCBA",
-      iconClass: "bg-sky-100 text-sky-800 dark:bg-sky-950/40 dark:text-sky-300",
-      panelClass: "bg-sky-50/70 dark:bg-sky-950/20",
+      iconClass: "bg-stone-100 text-stone-800 dark:bg-stone-950/40 dark:text-stone-300",
+      panelClass: "bg-stone-50/70 dark:bg-stone-950/20",
       cardClass:
-        "border-sky-300/80 bg-gradient-to-br from-sky-200/90 via-sky-100/70 to-sky-50/60 dark:border-sky-800/60 dark:from-sky-950/60 dark:via-sky-950/35 dark:to-background",
+        "border-stone-300/80 bg-gradient-to-br from-stone-200/90 via-stone-100/70 to-stone-50/60 dark:border-stone-800/60 dark:from-stone-950/60 dark:via-stone-950/35 dark:to-background",
       actionClass:
-        "border-sky-300/70 bg-white/70 hover:bg-sky-50 dark:border-sky-800/70 dark:bg-background/50",
-      accentClass: "bg-sky-600",
-      softAccent: "oklch(0.72 0.14 230)",
-      brandHex: "#00A3E0",
+        "border-stone-300/70 bg-white/70 hover:bg-stone-50 dark:border-stone-800/70 dark:bg-background/50",
+      accentClass: "bg-stone-700",
+      softAccent: "oklch(0.45 0.04 50)",
+      brandHex: "#3D2B1F",
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
@@ -237,7 +243,7 @@ function matchInstitution(name: string): InstitutionStyle {
         "border-cyan-300/70 bg-white/70 hover:bg-cyan-50 dark:border-cyan-800/70 dark:bg-background/50",
       accentClass: "bg-cyan-600",
       softAccent: "oklch(0.74 0.12 210)",
-      brandHex: "#008C95",
+      brandHex: "#0088CE",
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
@@ -331,6 +337,10 @@ export function getAccountLogo(name: string): string | null {
   if (/sbm/.test(value)) return sbmLogo;
   if (/binance|crypto/.test(value)) return binanceLogo;
   if (/\bcash\b/.test(value) || /salary/.test(value)) return cashLogo;
+  if (/absa/.test(value)) return absaLogo;
+  if (/equity/.test(value)) return equityLogo;
+  if (/family/.test(value)) return familyLogo;
+  if (/ncba/.test(value)) return ncbaLogo;
 
   if (style.key !== "default") {
     return brandMarkDataUri(style.initials, style.brandHex);
