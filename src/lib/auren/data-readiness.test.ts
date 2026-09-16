@@ -98,4 +98,12 @@ describe("buildAurenDataReadiness", () => {
     expect(summary.waiting).toBeGreaterThan(0);
     expect(summary.headline).toMatch(/waiting on/i);
   });
+
+  it("gives waiting feeds an actionable destination", () => {
+    const feeds = buildAurenDataReadiness(emptyAdvisory(), "no_data");
+    for (const feed of feeds.filter((item) => item.status === "waiting")) {
+      expect(feed.actionLabel, `${feed.id} should explain what to do next`).toBeTruthy();
+      expect(feed.actionTo, `${feed.id} should link to an owner action`).toMatch(/^\//);
+    }
+  });
 });

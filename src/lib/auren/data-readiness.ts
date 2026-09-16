@@ -115,6 +115,8 @@ export function buildAurenDataReadiness(
         : "I am waiting to receive information from live evidence refresh (Meta Ads, Instagram, public ads library, funnel events).",
     benefit:
       "Lets you compare ad spend and funnel drop-off against real sales before changing budget.",
+    actionLabel: "Review evidence",
+    actionTo: "/e-commerce/evidence",
     detail:
       liveTotal > 0
         ? `${liveOk} ok · ${livePartial} partial · ${liveTotal} snapshot(s)`
@@ -152,8 +154,22 @@ function capabilityToFeed(cap: AurenCapability): AurenDataFeed {
       ? `Connected: ${cap.freshnessLabel}.`
       : `I am waiting to receive information from ${cap.label} (${cap.freshnessLabel}). The connector contract exists but no live provider is wired yet.`,
     benefit: competitorBenefit(cap.id) ?? cap.description,
+    ...capabilityAction(cap.id),
     detail: connected ? "Adapter connected" : "Contract only — not live data",
   };
+}
+
+function capabilityAction(id: CapabilityId): Pick<AurenDataFeed, "actionLabel" | "actionTo"> {
+  switch (id) {
+    case "seo-competitor:read":
+    case "similarweb:read":
+    case "content-gap:read":
+      return { actionLabel: "Review competitors", actionTo: "/e-commerce/competitors" };
+    case "analytics:read":
+      return { actionLabel: "Review marketing", actionTo: "/e-commerce/marketing" };
+    default:
+      return { actionLabel: "Review Auren", actionTo: "/auren" };
+  }
 }
 
 function competitorBenefit(id: CapabilityId): string | null {
@@ -182,6 +198,8 @@ function publicContextToFeed(ctx: AurenPublicContextRecord): AurenDataFeed {
       waitingFor: `Reviewed public brand context for ${ctx.business} (not operational stock or revenue).`,
       benefit:
         "Gives background positioning only. Decisions on stock, price and revenue must still use Money Center and DailyGear records.",
+      actionLabel: "Review Auren",
+      actionTo: "/auren",
       detail: `${ctx.facts.length} public fact(s) · ${ctx.confidence} confidence`,
     };
   }
@@ -192,6 +210,8 @@ function publicContextToFeed(ctx: AurenPublicContextRecord): AurenDataFeed {
     waitingFor: `I am waiting to receive an entity-verified public source for ${ctx.business}. Unrelated web results are refused so Auren does not invent market claims.`,
     benefit:
       "Once a verified source exists, you can compare positioning and public offers without mixing them into private revenue numbers.",
+    actionLabel: "Review Auren",
+    actionTo: "/auren",
     detail: ctx.sourceTitle,
   };
 }

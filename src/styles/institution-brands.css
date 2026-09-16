@@ -62,3 +62,59 @@
   --institution-accent: oklch(0.7 0.22 25);
   --institution-surface: oklch(0.16 0.06 25 / 96%);
 }
+
+/* Theme-safe overrides for the legacy global card rules. */
+.institution-card {
+  color: var(--card-foreground) !important;
+  border-color: color-mix(
+    in oklch,
+    var(--institution-accent, var(--primary)) 40%,
+    var(--border) 60%
+  ) !important;
+  background: linear-gradient(
+      125deg,
+      color-mix(in oklch, var(--card) 94%, var(--institution-accent, var(--primary)) 6%),
+      var(--card)
+    )
+    !important;
+}
+
+.institution-card .institution-logo-tile {
+  background: color-mix(in oklch, var(--card) 94%, white 6%) !important;
+  border-color: color-mix(in oklch, var(--border) 72%, white 28%) !important;
+}
+
+.institution-card .institution-card-balance {
+  background: color-mix(in oklch, var(--muted) 72%, transparent) !important;
+  border: 1px solid color-mix(in oklch, var(--border) 80%, var(--institution-accent) 20%) !important;
+}
+
+.institution-card .institution-card-action {
+  color: var(--foreground) !important;
+  border-color: color-mix(in oklch, var(--border) 78%, var(--institution-accent) 22%) !important;
+  background: color-mix(in oklch, var(--card) 84%, var(--institution-accent) 16%) !important;
+}
+
+.institution-card .institution-card-action:hover {
+  background: color-mix(in oklch, var(--institution-accent) 18%, transparent) !important;
+}
+
+.institution-card .institution-card-content .text-muted-foreground {
+  color: var(--muted-foreground) !important;
+}
+
+.institution-card-watermark {
+  opacity: 0.08 !important;
+}
+
+.dark .institution-card .institution-logo-tile {
+  background: color-mix(in oklch, var(--card) 86%, white 14%) !important;
+}
+
+.dark .institution-card .institution-card-action {
+  color: var(--card-foreground) !important;
+}
+
+.dark .institution-card .institution-card-content .text-muted-foreground {
+  color: var(--muted-foreground) !important;
+}

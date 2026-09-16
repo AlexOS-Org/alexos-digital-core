@@ -22,6 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useBalanceVisibility } from "@/components/money/BalanceVisibility";
 import { getDashboardSceneAsset } from "@/components/theme/dashboard-scene-assets";
+import { BINANCE_WITHDRAWAL_MINIMUM_KES, useLiveBinanceBalance } from "@/lib/money/crypto-prices";
 
 export const Route = createFileRoute("/_authenticated/money-center/")({
   component: MoneyDashboard,
@@ -38,6 +39,7 @@ function MoneyDashboard() {
   };
   const { data: accounts = [], isLoading: accLoading } = useAccounts();
   const { data: balances = [] } = useAccountBalances();
+  const liveBinance = useLiveBinanceBalance();
   const { data: txs = [] } = useTransactions({ limit: 8 });
   const { data: pendingExpected = [] } = useExpected("pending");
   const { data: bills = [] } = useBills();
@@ -78,14 +80,22 @@ function MoneyDashboard() {
       : 0;
 
   const getAccountState = (a: (typeof accounts)[number]) => {
-    const balance = Number(balances.find((b) => b.account_id === a.id)?.balance ?? 0);
+    const storedBalance = Number(balances.find((b) => b.account_id === a.id)?.balance ?? 0);
+    const isBinance = /binance|crypto/i.test(a.name);
+    const balance = isBinance ? (liveBinance.balance ?? storedBalance) : storedBalance;
     const isMpesa = /m[- ]?pesa/i.test(a.name);
     const isBank =
       /bank|kcb|equity|coop|co-operative|absa|ncba|stanbic|family|dtb|i&m|im bank|sidian|prime/i.test(
         `${a.name} ${a.type}`,
       );
-    const threshold = isMpesa ? 300 : isBank ? 500 : null;
-    return { balance, low: threshold !== null && balance < threshold, threshold };
+    const threshold = isBinance
+      ? BINANCE_WITHDRAWAL_MINIMUM_KES
+      : isMpesa
+        ? 300
+        : isBank
+          ? 500
+          : null;
+    return { balance, low: threshold !== null && balance <= threshold, threshold, isBinance };
   };
 
   const kpis = [
@@ -268,7 +278,7 @@ function MoneyDashboard() {
                     src={logo}
                     alt=""
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-y-0 right-[-2.5rem] z-0 h-full w-2/3 object-contain opacity-[0.14]"
+                    className="pointer-events-none absolute inset-y-0 right-[-2.5rem] z-0 h-full w-2/3 object-contain opacity-[0.08]"
                     loading="lazy"
                   />
                 ) : null}
@@ -291,7 +301,7 @@ function MoneyDashboard() {
                           <img
                             src={logo}
                             alt={`${a.name} logo`}
-                            className="h-9 w-9 rounded-lg object-contain"
+                            className="h-10 w-10 rounded-lg object-contain drop-shadow-sm"
                             loading="lazy"
                           />
                         ) : (
@@ -320,7 +330,9 @@ function MoneyDashboard() {
                     </div>
                     {state.low ? (
                       <div className="money-account-status mt-1 text-[11px]">
-                        Below {displayMoney(state.threshold!, a.currency)} comfort level
+                        {state.isBinance
+                          ? `Withdrawals unlock above ${displayMoney(BINANCE_WITHDRAWAL_MINIMUM_KES, "KES")}`
+                          : `Below ${displayMoney(state.threshold!, a.currency)} comfort level`}
                       </div>
                     ) : (
                       <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
@@ -332,6 +344,12 @@ function MoneyDashboard() {
                           <ArrowUpRight className="h-3 w-3" />
                           {displayMoney(bal?.money_out ?? 0, a.currency)}
                         </span>
+                      </div>
+                    )}
+                    {state.isBinance && !state.low && (
+                      <div className="money-account-status mt-1 text-[11px] text-emerald-700 dark:text-emerald-300">
+                        Withdrawable balance · above{" "}
+                        {displayMoney(BINANCE_WITHDRAWAL_MINIMUM_KES, "KES")}
                       </div>
                     )}
                   </div>

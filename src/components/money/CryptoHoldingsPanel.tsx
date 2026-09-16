@@ -15,7 +15,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatMoney } from "@/lib/money/format";
-import { liveKesPrice, useLiveCryptoPrices } from "@/lib/money/crypto-prices";
+import {
+  BINANCE_WITHDRAWAL_MINIMUM_KES,
+  liveKesPrice,
+  useLiveCryptoPrices,
+} from "@/lib/money/crypto-prices";
 import { cn } from "@/lib/utils";
 
 const COINS = ["BTC", "ETH", "BNB", "SOL", "XRP", "USDT", "USDC"] as const;
@@ -312,7 +316,7 @@ export function CryptoHoldingsPanel() {
             const livePrice = liveKesPrice(live.data, holding.symbol);
             const liveValue = livePrice != null ? holding.quantity * livePrice : storedValue;
             const delta = liveValue - storedValue;
-            const low = liveValue < 1000;
+            const low = liveValue <= BINANCE_WITHDRAWAL_MINIMUM_KES;
             return (
               <div
                 key={holding.id}
@@ -364,7 +368,10 @@ export function CryptoHoldingsPanel() {
                     )}
                   </div>
                   {low && (
-                    <CircleAlert className="h-4 w-4 text-red-600" aria-label="Below KES 1,000" />
+                    <CircleAlert
+                      className="h-4 w-4 text-red-600"
+                      aria-label={`At or below KES ${BINANCE_WITHDRAWAL_MINIMUM_KES.toLocaleString()}`}
+                    />
                   )}
                   <Button
                     type="button"
