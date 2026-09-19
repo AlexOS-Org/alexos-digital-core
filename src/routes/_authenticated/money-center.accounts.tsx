@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { CryptoHoldingsPanel } from "@/components/money/CryptoHoldingsPanel";
 import { useBalanceVisibility } from "@/components/money/BalanceVisibility";
 import { getAccountLogo, getInstitutionStyle } from "@/lib/money/institution-branding";
+import { BINANCE_WITHDRAWAL_MINIMUM_KES, useLiveBinanceBalance } from "@/lib/money/crypto-prices";
 
 export const Route = createFileRoute("/_authenticated/money-center/accounts")({
   component: AccountsPage,
@@ -30,6 +31,7 @@ function AccountsPage() {
   const [showArchived, setShowArchived] = useState(false);
   const { data: accounts = [], isLoading } = useAccounts(showArchived);
   const { data: balances = [] } = useAccountBalances();
+  const liveBinance = useLiveBinanceBalance();
   const archive = useArchiveAccount();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Account | null>(null);
@@ -88,7 +90,9 @@ function AccountsPage() {
         {isLoading && <div className="text-sm text-muted-foreground">Loading...</div>}
         {accounts.map((a) => {
           const bal = balances.find((b) => b.account_id === a.id);
-          const balance = Number(bal?.balance ?? 0);
+          const storedBalance = Number(bal?.balance ?? 0);
+          const isBinance = /binance|crypto/i.test(a.name);
+          const balance = isBinance ? (liveBinance.balance ?? storedBalance) : storedBalance;
           const Icon = ACCOUNT_ICONS[a.icon] ?? Wallet;
           const isArchived = a.status === "archived";
           const institution = getInstitutionStyle(a.name);
@@ -96,8 +100,9 @@ function AccountsPage() {
           const warningThreshold = institution.warningThreshold;
           const isMpesa = isMpesaAccountName(a.name);
           const isOverdrawn = isMpesa && balance < 0;
-          const isLowBalance =
-            !isOverdrawn && warningThreshold !== null && balance < warningThreshold;
+          const isLowBalance = isBinance
+            ? balance <= BINANCE_WITHDRAWAL_MINIMUM_KES
+            : !isOverdrawn && warningThreshold !== null && balance < warningThreshold;
           const dailyFuliza = isOverdrawn ? fulizaDailyFee(overdraftAmount(balance)) : 0;
 
           return (
@@ -117,7 +122,7 @@ function AccountsPage() {
                   src={logo}
                   alt=""
                   aria-hidden="true"
-                  className="institution-card-watermark pointer-events-none absolute inset-y-0 right-[-3rem] z-0 h-full w-3/4 object-contain opacity-[0.16]"
+                  className="institution-card-watermark pointer-events-none absolute inset-y-0 right-[-3rem] z-0 h-full w-3/4 object-contain opacity-[0.08]"
                   loading="lazy"
                 />
               ) : (
@@ -128,7 +133,7 @@ function AccountsPage() {
                   <Icon className="h-40 w-40" strokeWidth={1} />
                 </div>
               )}
-              <CardContent className="institution-card-content relative z-10 space-y-4 p-5 pt-6 text-slate-100 sm:p-6 sm:pt-7">
+              <CardContent className="institution-card-content relative z-10 space-y-4 p-5 pt-6 sm:p-6 sm:pt-7">
                 <div
                   className={cn(
                     "absolute inset-x-0 top-0 h-1",
@@ -211,7 +216,15 @@ function AccountsPage() {
                   )}
                   {isLowBalance && (
                     <div className="mt-1 text-[11px] text-red-600/75 dark:text-red-400/75">
-                      Below your {displayMoney(warningThreshold!, a.currency)} comfort level
+                      {isBinance
+                        ? `Withdrawals unlock above ${displayMoney(BINANCE_WITHDRAWAL_MINIMUM_KES, "KES")}`
+                        : `Below your ${displayMoney(warningThreshold!, a.currency)} comfort level`}
+                    </div>
+                  )}
+                  {isBinance && !isLowBalance && (
+                    <div className="mt-1 text-[11px] text-emerald-700 dark:text-emerald-300">
+                      Withdrawable balance · above{" "}
+                      {displayMoney(BINANCE_WITHDRAWAL_MINIMUM_KES, "KES")}
                     </div>
                   )}
                 </div>

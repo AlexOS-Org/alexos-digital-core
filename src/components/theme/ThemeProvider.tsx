@@ -45,7 +45,7 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 function getStoredTheme(): Theme {
   if (typeof window === "undefined") return "system";
   const stored = window.localStorage.getItem(STORAGE_KEY);
-  return stored === "light" || stored === "dark" || stored === "system" ? stored : "dark";
+  return stored === "light" || stored === "dark" || stored === "system" ? stored : "light";
 }
 function getSystemTheme(): ResolvedTheme {
   if (typeof window === "undefined") return "light";
