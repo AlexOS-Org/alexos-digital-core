@@ -125,20 +125,23 @@ export function useBills() {
 }
 
 export function nextBillDueDate(dueDate: string, frequency: BillFrequency): string {
-  const d = new Date(dueDate + "T00:00:00");
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(dueDate);
+  if (!match) return dueDate;
+
+  const d = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
 
   switch (frequency) {
     case "weekly":
-      d.setDate(d.getDate() + 7);
+      d.setUTCDate(d.getUTCDate() + 7);
       break;
     case "monthly":
-      d.setMonth(d.getMonth() + 1);
+      d.setUTCMonth(d.getUTCMonth() + 1);
       break;
     case "quarterly":
-      d.setMonth(d.getMonth() + 3);
+      d.setUTCMonth(d.getUTCMonth() + 3);
       break;
     case "yearly":
-      d.setFullYear(d.getFullYear() + 1);
+      d.setUTCFullYear(d.getUTCFullYear() + 1);
       break;
     case "one_time":
       break;
