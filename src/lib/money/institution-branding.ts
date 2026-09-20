@@ -68,6 +68,9 @@ const DEFAULT_STYLE: InstitutionStyle = {
   warningThreshold: null,
 };
 
+const ABSA_NAME_PATTERN = /a\.?\s*b\.?\s*s\.?\s*a/;
+const NCBA_NAME_PATTERN = /n\.?\s*c\.?\s*b\.?\s*a/;
+
 function brandMarkDataUri(initials: string, hex: string): string {
   const safe = initials.slice(0, 3).toUpperCase();
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img"><rect width="64" height="64" rx="14" fill="${hex}"/><text x="32" y="38" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif" font-size="20" font-weight="700" fill="#ffffff">${safe}</text></svg>`;
@@ -179,7 +182,7 @@ function matchInstitution(name: string): InstitutionStyle {
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
-  if (/ncba/.test(value)) {
+  if (NCBA_NAME_PATTERN.test(value)) {
     return {
       key: "ncba",
       initials: "NC",
@@ -196,7 +199,7 @@ function matchInstitution(name: string): InstitutionStyle {
       warningThreshold: LOW_BALANCE_THRESHOLDS.bank,
     };
   }
-  if (/absa/.test(value)) {
+  if (ABSA_NAME_PATTERN.test(value)) {
     return {
       key: "absa",
       initials: "AB",
@@ -337,10 +340,10 @@ export function getAccountLogo(name: string): string | null {
   if (/sbm/.test(value)) return sbmLogo;
   if (/binance|crypto/.test(value)) return binanceLogo;
   if (/\bcash\b/.test(value) || /salary/.test(value)) return cashLogo;
-  if (/absa/.test(value)) return absaLogo;
+  if (ABSA_NAME_PATTERN.test(value)) return absaLogo;
   if (/equity/.test(value)) return equityLogo;
   if (/family/.test(value)) return familyLogo;
-  if (/ncba/.test(value)) return ncbaLogo;
+  if (NCBA_NAME_PATTERN.test(value)) return ncbaLogo;
 
   if (style.key !== "default") {
     return brandMarkDataUri(style.initials, style.brandHex);
