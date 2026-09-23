@@ -46,4 +46,25 @@ describe("CI quality gates", () => {
       expect(workflow).toContain("npm run verify");
     }
   });
+
+  it("the production deploy workflow verifies, then deploys with required secrets and public URL", () => {
+    const workflow = read(".github/workflows/production-deploy.yml");
+
+    expect(workflow).toContain("environment: production");
+    expect(workflow).toContain("VITE_SUPABASE_URL: https://goafwbrayepaihxbqsse.supabase.co");
+    expect(workflow).toContain("SUPABASE_URL: https://goafwbrayepaihxbqsse.supabase.co");
+    for (const secret of [
+      "SUPABASE_ACCESS_TOKEN",
+      "SUPABASE_DB_PASSWORD",
+      "CLOUDFLARE_API_TOKEN",
+      "VITE_SUPABASE_PUBLISHABLE_KEY",
+    ]) {
+      expect(workflow).toContain(secret);
+    }
+    expect(workflow).toContain("npm run verify");
+    expect(workflow).toContain("supabase db push");
+    expect(workflow).toContain("npm run deploy");
+    expect(workflow.indexOf("npm run verify")).toBeLessThan(workflow.indexOf("supabase db push"));
+    expect(workflow.indexOf("supabase db push")).toBeLessThan(workflow.indexOf("npm run deploy"));
+  });
 });
