@@ -84,7 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "AlexOS — Business Operating System" },
       {
         name: "description",
-        content: "AlexOS is a business operating system with a built-in intelligence layer.",
+        content: "AlexOS is a business operating system with Auren Intelligence built in.",
       },
       { name: "theme-color", content: "#071329", media: "(prefers-color-scheme: dark)" },
       { name: "theme-color", content: "#f8f9fc", media: "(prefers-color-scheme: light)" },
@@ -95,14 +95,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "A business operating system with a built-in intelligence layer for money, people, goals and operations.",
+          "A business operating system with Auren Intelligence for money, people, goals and operations.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "AlexOS" },
       {
         name: "twitter:description",
-        content: "Your business operating system, with a built-in intelligence layer.",
+        content: "Your business operating system, with Auren Intelligence.",
       },
     ],
     links: [
