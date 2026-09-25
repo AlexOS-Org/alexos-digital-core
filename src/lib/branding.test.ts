@@ -15,6 +15,7 @@ describe("AlexOS product language", () => {
       source("src/routes/_authenticated/businesses.tsx"),
       source("src/routes/_authenticated/route.tsx"),
       source("src/routes/auth.tsx"),
+      source("src/routes/__root.tsx"),
       source("src/components/dashboard/DashboardKpiStrip.tsx"),
       source("src/components/dashboard/MoneySnapshot.tsx"),
     ].join("\n");
@@ -22,6 +23,7 @@ describe("AlexOS product language", () => {
     expect(sources).toContain("Nuvora");
     expect(sources).toContain("CarBar Motion");
     expect(sources).toContain("Auren Intelligence");
+    expect(sources).not.toContain("built-in intelligence layer");
     expect(sources).not.toContain("Novera");
     expect(sources).not.toContain("Car-Bar Motion.ke");
     expect(sources).not.toContain("AI assistant");
