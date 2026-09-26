@@ -57,6 +57,7 @@ export interface GuestOrderInput {
   deliveryDetails?: string | null;
   city?: string | null;
   notes?: string | null;
+  mpesaReference?: string | null;
   paymentMethod: string;
   items: GuestOrderLineInput[];
   recoveryToken?: string | null;
@@ -81,6 +82,7 @@ export function validateGuestOrder(raw: unknown): GuestOrderInput {
   const county = text(input["county"], 100);
   const town = text(input["town"], 100);
   const deliveryDetails = text(input["deliveryDetails"], 500);
+  const mpesaReference = text(input["mpesaReference"], 80);
   const storeSlug = text(input["storeSlug"], 80);
   const paymentMethod = text(input["paymentMethod"], 40) || "cod";
   const items = Array.isArray(input["items"]) ? input["items"] : [];
@@ -157,6 +159,7 @@ export function validateGuestOrder(raw: unknown): GuestOrderInput {
     deliveryDetails: deliveryDetails || null,
     city: town,
     notes: text(input["notes"], 800) || null,
+    mpesaReference: mpesaReference || null,
     paymentMethod,
     items: parsed,
     recoveryToken: /^[a-f0-9]{64}$/i.test(text(input["recoveryToken"], 100))
@@ -277,6 +280,15 @@ export async function placeGuestOrderImpl(input: GuestOrderInput) {
 
   if (!result || typeof result.orderNumber !== "string") {
     throw new Error("The order was not created. Please try again.");
+  }
+
+  if (input.mpesaReference && input.paymentMethod === "mpesa") {
+    const { error: referenceError } = await supabaseAdmin
+      .from("dg_orders" as never)
+      .update({ mpesa_reference: input.mpesaReference } as never)
+      .eq("order_number", result.orderNumber)
+      .is("deleted_at", null);
+    if (referenceError) throw referenceError;
   }
 
   if (input.recoveryToken) {

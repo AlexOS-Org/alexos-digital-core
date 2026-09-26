@@ -165,6 +165,7 @@ function CheckoutPage() {
     deliveryDetails: "",
     city: "",
     notes: "",
+    mpesaReference: "",
     paymentMethod: "cod",
   });
   const selectedCounty = KENYA_COUNTIES.find((county) => county.name === form.county);
@@ -686,6 +687,20 @@ function CheckoutPage() {
                   message so we can match your receipt. You may choose pay on delivery instead if
                   that option is available for your route.
                 </p>
+                <div className="mt-3 space-y-1.5">
+                  <Label htmlFor="mpesa-reference">M-Pesa confirmation/reference (optional)</Label>
+                  <Input
+                    id="mpesa-reference"
+                    value={form.mpesaReference}
+                    onChange={(event) => setForm({ ...form, mpesaReference: event.target.value })}
+                    placeholder="e.g. QLJ7ABC123"
+                    autoComplete="off"
+                    maxLength={80}
+                  />
+                  <p className="text-muted-foreground">
+                    Adding the code helps DailyGear match your payment faster. Never enter your PIN.
+                  </p>
+                </div>
               </div>
             ) : null}
           </section>

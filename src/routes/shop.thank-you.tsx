@@ -126,9 +126,6 @@ function ThankYou() {
   const activeOfferProduct = activeOfferStep
     ? (funnel?.offerProducts.find((product) => product.id === activeOfferStep.productId) ?? null)
     : null;
-  const nearbyDeliveryArea = new Set(["nairobi", "kiambu", "kajiado"]).has(
-    confirmation?.shippingCounty?.trim().toLowerCase() ?? "",
-  );
   const whatsapp = whatsappHref(store?.whatsapp);
   const supportEmail = store?.support_email?.trim() || null;
 
@@ -291,18 +288,9 @@ function ThankYou() {
             <div className="rounded-2xl border border-primary/20 bg-primary/[0.05] p-4 text-sm">
               <p className="font-bold">Cash on delivery</p>
               <p className="mt-1 text-muted-foreground">
-                {nearbyDeliveryArea
-                  ? "For Nairobi, Kiambu, Kajiado and nearby delivery routes, pay when your order arrives. Keep your phone available so the delivery team can confirm the route."
-                  : "Cash on delivery is intended for Nairobi and its environs. For delivery outside that area, contact us first so the team can confirm the route and whether the KES 350 upfront dispatch payment applies."}
+                Cash on delivery is available across Kenya. Keep your phone available so the
+                delivery team can confirm the route and delivery details.
               </p>
-              {!nearbyDeliveryArea ? (
-                <p className="mt-2 text-muted-foreground">
-                  Do not send an upfront payment until DailyGear confirms your order. If confirmed,
-                  use M-Pesa Paybill <strong className="text-foreground">542542</strong>, account{" "}
-                  <strong className="text-foreground">184545</strong>, and send the M-Pesa code with
-                  your customer name and order number.
-                </p>
-              ) : null}
             </div>
           ) : null}
         </section>

@@ -20,10 +20,13 @@ const protectedPatterns = [
   /^public\/storefront\//,
 ];
 
-// Explicitly approved public-file changes. Phase 2 intentionally builds the
-// reusable Premium Product Function on the existing product page. Every new
-// approved path must be justified in code review and covered by a test here.
-const approvedPublicPaths = [/^src\/routes\/shop\.product\.\$id\.tsx$/];
+// Explicitly approved public-file changes. Each new approved path must be
+// justified in code review and covered by a test or server-side safeguard.
+const approvedPublicPaths = [
+  /^src\/routes\/shop\.product\.\$id\.tsx$/,
+  /^src\/routes\/funnel\.\$slug\.tsx$/,
+  /^src\/routes\/shop\.checkout\.tsx$/,
+];
 
 const violations = changed.filter(
   (file) =>

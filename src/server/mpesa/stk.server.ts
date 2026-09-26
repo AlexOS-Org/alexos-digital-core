@@ -191,7 +191,19 @@ export async function handleStkCallback(rawBody: unknown): Promise<{ ok: true; s
     } as never)
     .eq("id", row.id);
 
-  // Phase A: log only. Do not auto-call dg_confirm_order_payment.
+  if (status === "success") {
+    const { data: settlement, error: settlementError } = await supabaseAdmin.rpc(
+      "dg_settle_mpesa_stk_success" as never,
+      { p_attempt_id: row.id } as never,
+    );
+    if (settlementError) throw settlementError;
+    const settlementStatus =
+      settlement && typeof settlement === "object" && "status" in settlement
+        ? String((settlement as { status?: unknown }).status)
+        : "settlement_pending";
+    return { ok: true, status: `${status}:${settlementStatus}` };
+  }
+
   return { ok: true, status };
 }
 

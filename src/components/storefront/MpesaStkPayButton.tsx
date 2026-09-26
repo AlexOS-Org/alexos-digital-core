@@ -8,10 +8,7 @@ interface Props {
   amount: number;
 }
 
-/**
- * Phase A STK trigger on the thank-you page.
- * Logs attempts server-side; does not auto-confirm order payment.
- */
+/** STK trigger and status polling on the thank-you page. */
 export function MpesaStkPayButton({ orderNumber, phone, amount }: Props) {
   const [stkBusy, setStkBusy] = useState(false);
   const [stkMessage, setStkMessage] = useState<string | null>(null);
@@ -84,8 +81,8 @@ export function MpesaStkPayButton({ orderNumber, phone, amount }: Props) {
         if (data.status === "success") {
           setStkMessage(
             data.receipt
-              ? `Payment received on M-Pesa · receipt ${data.receipt}. DailyGear will confirm it against your order.`
-              : "Payment received on M-Pesa. DailyGear will confirm it against your order.",
+              ? `Payment received and matched · receipt ${data.receipt}. Your order is being updated.`
+              : "Payment received and matched. Your order is being updated.",
           );
         } else {
           setStkMessage(

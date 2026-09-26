@@ -352,6 +352,10 @@ function FunnelPage() {
 
   function addToCheckout() {
     if (!funnel || !product || !hasSelection) return;
+    // An advertising funnel is a single-product buying journey. Clear any
+    // unrelated local cart contents before adding the selected funnel lines;
+    // the server independently validates the funnel's primary product.
+    cartStore.clear();
     const selectedContents: Array<{ id: string; quantity: number }> = [];
     productVariants.forEach((variant) => {
       const selectedQuantity = variantQuantities[variant.id] ?? 0;
