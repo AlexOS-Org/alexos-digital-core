@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config vitest.config.mjs",
-    "verify": "npm test && npm run lint && npm run typecheck && npm run build && node scripts/assert-public-storefront-untouched.mjs",
+    "verify": "npm test && npm run lint && npm run typecheck && npm run build && node scripts/assert-public-storefront-untouched.mjs && node scripts/assert-cloudflare-workers-only.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {

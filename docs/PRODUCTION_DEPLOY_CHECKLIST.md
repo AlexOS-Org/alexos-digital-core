@@ -1,5 +1,11 @@
 # Production deployment checklist
 
+## Deployment target
+
+Cloudflare Workers is the sole supported deployment target for this repository. The application uses SSR, Worker cron triggers, the Cloudflare AI binding, and `wrangler deploy`; it is not configured as a Netlify or Cloudflare Pages site.
+
+The repository verification gate fails if a Netlify deployment artifact, Netlify deployment reference, or non-Worker production command is introduced. The external Netlify site integration must be disconnected separately in the Netlify project dashboard by removing the Git provider/site connection; no Netlify credentials or deployment hook are stored in this repository.
+
 This checklist is intentionally explicit because the repository cannot create or validate production secrets. Complete it in GitHub and the hosting providers before treating `main` as deployed.
 
 ## GitHub Actions production environment
