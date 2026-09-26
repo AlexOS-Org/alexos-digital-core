@@ -1,268 +1,158 @@
-.alexos-route-canvas {
-  position: relative;
-  isolation: isolate;
+
+/* Lively command-center palette — authenticated workspace only. */
+.dashboard-canvas,
+.money-center-shell {
+  --alexos-lively-teal: oklch(0.68 0.16 176);
+  --alexos-lively-blue: oklch(0.62 0.19 250);
+  --alexos-lively-violet: oklch(0.63 0.19 302);
+  --alexos-lively-coral: oklch(0.69 0.19 28);
+  --alexos-lively-amber: oklch(0.78 0.16 78);
+}
+
+.dashboard-canvas .dashboard-kpi-card {
+  --kpi-tone: var(--alexos-lively-blue);
+  border-color: color-mix(in oklch, var(--kpi-tone) 30%, var(--border));
   background:
-    radial-gradient(
-      circle at 12% 0%,
-      color-mix(in oklch, var(--alexos-visual-accent) 6%, transparent),
-      transparent 30rem
-    ),
-    radial-gradient(
-      circle at 94% 18%,
-      color-mix(in oklch, var(--alexos-purple) 5%, transparent),
-      transparent 28rem
-    );
+    radial-gradient(circle at 100% 0%, color-mix(in oklch, var(--kpi-tone) 23%, transparent), transparent 11rem),
+    linear-gradient(145deg, color-mix(in oklch, var(--card) 91%, var(--kpi-tone) 9%), var(--card));
+  box-shadow: 0 22px 60px -42px color-mix(in oklch, var(--kpi-tone) 80%, transparent);
 }
 
-/* Premium internal workspace stage. This is intentionally scoped to the
-   authenticated AlexOS shell; storefront and funnel routes keep their own
-   visual language. */
-.alexos-internal-workspace {
-  --enterprise-stage: oklch(0.975 0.012 245);
-  --enterprise-stage-deep: oklch(0.94 0.026 250);
-  --enterprise-line: color-mix(in oklch, var(--alexos-blue) 12%, transparent);
-  position: relative;
-  isolation: isolate;
-  overflow: clip;
-  background:
-    radial-gradient(
-      circle at 8% 0%,
-      color-mix(in oklch, var(--alexos-blue) 12%, transparent),
-      transparent 32rem
-    ),
-    radial-gradient(
-      circle at 92% 12%,
-      color-mix(in oklch, var(--alexos-purple) 10%, transparent),
-      transparent 30rem
-    ),
-    linear-gradient(135deg, var(--enterprise-stage), var(--enterprise-stage-deep));
+.dashboard-canvas .dashboard-kpi-card[data-tone="green"] {
+  --kpi-tone: var(--alexos-lively-teal);
 }
 
-.dark .alexos-internal-workspace {
-  --enterprise-stage: oklch(0.16 0.025 255);
-  --enterprise-stage-deep: oklch(0.12 0.035 265);
-  --enterprise-line: color-mix(in oklch, white 9%, transparent);
+.dashboard-canvas .dashboard-kpi-card[data-tone="purple"] {
+  --kpi-tone: var(--alexos-lively-violet);
 }
 
-.alexos-internal-workspace::before {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    linear-gradient(var(--enterprise-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--enterprise-line) 1px, transparent 1px),
-    radial-gradient(
-      circle at 50% -12%,
-      color-mix(in oklch, var(--primary) 10%, transparent),
-      transparent 34rem
-    );
-  background-size:
-    44px 44px,
-    44px 44px,
-    100% 100%;
-  mask-image: linear-gradient(to bottom, black 0%, transparent 72%);
-  content: "";
-  opacity: 0.6;
+.dashboard-canvas .dashboard-kpi-card[data-tone="amber"] {
+  --kpi-tone: var(--alexos-lively-amber);
 }
 
-.alexos-internal-workspace > div:not([data-sidebar="sidebar"]) {
-  background: color-mix(in oklch, var(--enterprise-stage) 68%, transparent);
+.dashboard-canvas .dashboard-kpi-card::before {
+  width: 72%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--kpi-tone), color-mix(in oklch, var(--kpi-tone) 15%, transparent));
+  opacity: 1;
 }
 
-.alexos-internal-workspace .alexos-route-canvas {
-  background: transparent;
+.dashboard-canvas .dashboard-kpi-icon {
+  color: color-mix(in oklch, var(--kpi-tone) 80%, var(--foreground));
+  background: color-mix(in oklch, var(--kpi-tone) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--kpi-tone) 24%, transparent);
 }
 
-/* Keep information cards calm and legible over the ambient stage. */
-.dashboard-canvas .dashboard-surface,
-.dashboard-canvas .dashboard-surface-muted,
+.dashboard-canvas .dashboard-kpi-label {
+  color: color-mix(in oklch, var(--kpi-tone) 72%, var(--muted-foreground));
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 .dashboard-canvas .dashboard-feature-surface {
-  background: linear-gradient(
-    145deg,
-    color-mix(in oklch, var(--card) 97%, var(--alexos-visual-accent) 3%),
-    color-mix(in oklch, var(--card) 94%, transparent)
-  );
-  border-color: color-mix(in oklch, var(--border) 86%, var(--alexos-visual-accent) 14%);
-  box-shadow: 0 18px 52px -42px color-mix(in oklch, var(--foreground) 34%, transparent);
+  background:
+    radial-gradient(circle at 90% -10%, color-mix(in oklch, var(--alexos-lively-violet) 25%, transparent), transparent 20rem),
+    radial-gradient(circle at 0% 100%, color-mix(in oklch, var(--alexos-lively-teal) 16%, transparent), transparent 22rem),
+    linear-gradient(135deg, color-mix(in oklch, var(--card) 86%, var(--alexos-lively-blue) 14%), var(--card));
 }
 
-.dark .dashboard-canvas .dashboard-surface,
-.dark .dashboard-canvas .dashboard-surface-muted,
-.dark .dashboard-canvas .dashboard-feature-surface {
-  background: linear-gradient(
-    145deg,
-    color-mix(in oklch, var(--card) 92%, var(--alexos-visual-accent) 8%),
-    color-mix(in oklch, var(--card) 86%, transparent)
-  );
-  border-color: color-mix(in oklch, var(--border) 82%, var(--alexos-visual-accent) 18%);
-}
-
-.dashboard-canvas .dashboard-surface > h1,
-.dashboard-canvas .dashboard-surface > h2,
-.dashboard-canvas .dashboard-surface > h3,
-.dashboard-canvas .dashboard-feature-surface > h1,
-.dashboard-canvas .dashboard-feature-surface > h2,
-.dashboard-canvas .dashboard-feature-surface > h3 {
-  letter-spacing: -0.025em;
-}
-
-.alexos-route-content {
+.money-center-shell {
   position: relative;
-  min-width: 0;
-  width: 100%;
-}
-
-/* Prefer cascade specificity over !important so modules can express state. */
-.alexos-route-canvas .alexos-module-card,
-.alexos-module-shell .alexos-module-card {
-  border-color: color-mix(in oklch, var(--border) 72%, var(--alexos-visual-accent) 28%);
-  background:
-    radial-gradient(circle at 100% 0%, var(--alexos-visual-accent-faint), transparent 18rem),
-    color-mix(in oklch, var(--card) 96%, var(--alexos-visual-accent) 4%);
-  box-shadow: 0 22px 68px -48px color-mix(in oklch, var(--alexos-visual-accent) 66%, transparent);
-}
-
-.alexos-route-canvas .alexos-module-card:hover,
-.alexos-module-shell .alexos-module-card:hover {
-  border-color: color-mix(in oklch, var(--border) 54%, var(--alexos-visual-accent) 46%);
-  box-shadow: 0 28px 82px -52px color-mix(in oklch, var(--alexos-visual-accent) 74%, transparent);
-}
-
-@media (min-width: 2560px) {
-  .alexos-route-canvas {
-    padding-inline: clamp(2rem, 3vw, 5rem);
-  }
-
-  .alexos-route-content {
-    max-width: 2400px;
-    margin-inline: auto;
-  }
-}
-
-@media (min-width: 3840px) {
-  .alexos-route-content {
-    max-width: 3200px;
-  }
-}
-
-/* Authenticated entry surface: intentionally scoped to /auth and never shared with commerce. */
-.alexos-auth-shell {
   isolation: isolate;
-  background:
-    radial-gradient(
-      circle at 12% 8%,
-      color-mix(in oklch, var(--primary) 9%, transparent),
-      transparent 30rem
-    ),
-    radial-gradient(
-      circle at 88% 82%,
-      color-mix(in oklch, var(--alexos-purple) 8%, transparent),
-      transparent 32rem
-    ),
-    var(--background);
 }
 
-.alexos-auth-shell::before {
+.money-center-shell::before {
+  position: absolute;
+  inset: -8rem -10rem auto;
+  z-index: -1;
+  height: 34rem;
+  pointer-events: none;
+  content: "";
+  background:
+    radial-gradient(circle at 18% 25%, color-mix(in oklch, var(--alexos-lively-teal) 16%, transparent), transparent 22rem),
+    radial-gradient(circle at 82% 10%, color-mix(in oklch, var(--alexos-lively-violet) 14%, transparent), transparent 24rem);
+  filter: blur(12px);
+}
+
+.money-center-shell .money-hero {
+  background:
+    radial-gradient(circle at 88% 0%, color-mix(in oklch, var(--alexos-lively-teal) 32%, transparent), transparent 20rem),
+    radial-gradient(circle at 10% 100%, color-mix(in oklch, var(--alexos-lively-violet) 27%, transparent), transparent 22rem),
+    linear-gradient(135deg, oklch(0.19 0.055 255), oklch(0.14 0.055 280) 58%, oklch(0.17 0.06 190));
+  border: 1px solid color-mix(in oklch, var(--alexos-lively-teal) 24%, transparent);
+  box-shadow: 0 30px 90px -42px color-mix(in oklch, var(--alexos-lively-blue) 70%, transparent);
+}
+
+.money-center-shell .money-hero::after {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image:
-    linear-gradient(color-mix(in oklch, var(--foreground) 4%, transparent) 1px, transparent 1px),
-    linear-gradient(
-      90deg,
-      color-mix(in oklch, var(--foreground) 4%, transparent) 1px,
-      transparent 1px
-    );
-  background-size: 56px 56px;
-  mask-image: linear-gradient(to bottom, black, transparent 72%);
   content: "";
+  background: linear-gradient(115deg, transparent 10%, color-mix(in oklch, white 7%, transparent) 42%, transparent 70%);
+  opacity: 0.45;
 }
 
-.alexos-auth-brand-panel {
-  isolation: isolate;
-  background: linear-gradient(
-    145deg,
-    color-mix(in oklch, var(--sidebar) 92%, var(--alexos-purple) 8%),
-    var(--sidebar)
-  );
+.money-center-shell .money-kpi-card {
+  --money-tone: var(--alexos-lively-blue);
+  border-color: color-mix(in oklch, var(--money-tone) 30%, var(--border));
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in oklch, var(--money-tone) 18%, transparent), transparent 13rem),
+    linear-gradient(145deg, color-mix(in oklch, var(--card) 92%, var(--money-tone) 8%), var(--card));
+  box-shadow: 0 20px 56px -42px color-mix(in oklch, var(--money-tone) 78%, transparent);
 }
 
-.alexos-auth-brand-panel::before,
-.alexos-auth-brand-panel::after {
-  position: absolute;
-  border-radius: 999px;
-  pointer-events: none;
-  content: "";
+.money-center-shell .money-kpi-card[data-tone="green"],
+.money-center-shell .money-kpi-card[data-tone="emerald"],
+.money-center-shell .money-kpi-card[data-tone="teal"] {
+  --money-tone: var(--alexos-lively-teal);
 }
 
-.alexos-auth-brand-panel::before {
-  top: 12%;
-  right: -12rem;
-  width: 30rem;
-  height: 30rem;
-  background: color-mix(in oklch, var(--alexos-blue) 18%, transparent);
-  filter: blur(10px);
-  opacity: 0.8;
+.money-center-shell .money-kpi-card[data-tone="purple"],
+.money-center-shell .money-kpi-card[data-tone="violet"] {
+  --money-tone: var(--alexos-lively-violet);
 }
 
-.alexos-auth-brand-panel::after {
-  bottom: -16rem;
-  left: -8rem;
-  width: 32rem;
-  height: 32rem;
-  border: 1px solid color-mix(in oklch, var(--sidebar-foreground) 12%, transparent);
-  box-shadow:
-    0 0 0 4rem color-mix(in oklch, var(--sidebar-foreground) 3%, transparent),
-    0 0 0 8rem color-mix(in oklch, var(--sidebar-foreground) 2%, transparent);
+.money-center-shell .money-kpi-card[data-tone="amber"],
+.money-center-shell .money-kpi-card[data-tone="orange"] {
+  --money-tone: var(--alexos-lively-amber);
 }
 
-.alexos-auth-brand-panel > * {
-  position: relative;
-  z-index: 1;
+.money-center-shell .money-kpi-card[data-tone="rose"] {
+  --money-tone: var(--alexos-lively-coral);
 }
 
-.alexos-auth-form-panel {
-  position: relative;
-  z-index: 1;
+.money-center-shell .money-kpi-card::before {
+  background: linear-gradient(90deg, var(--money-tone), color-mix(in oklch, var(--money-tone) 12%, transparent));
+  box-shadow: 0 0 18px color-mix(in oklch, var(--money-tone) 70%, transparent);
 }
 
-.alexos-auth-card {
-  background: linear-gradient(
-    145deg,
-    color-mix(in oklch, var(--card) 96%, var(--primary) 4%),
-    var(--card)
-  );
-  backdrop-filter: blur(20px);
+.money-center-shell .money-kpi-icon {
+  color: color-mix(in oklch, var(--money-tone) 82%, var(--foreground));
+  background: color-mix(in oklch, var(--money-tone) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--money-tone) 24%, transparent);
 }
 
-.alexos-auth-card input,
-.alexos-auth-card button,
-.alexos-auth-card [role="tab"] {
-  min-height: 2.75rem;
+.money-center-shell .money-account-card {
+  border-color: color-mix(in oklch, var(--institution-accent, var(--alexos-lively-blue)) 36%, var(--border));
+  background:
+    radial-gradient(circle at 96% 0%, color-mix(in oklch, var(--institution-accent, var(--alexos-lively-blue)) 22%, transparent), transparent 14rem),
+    linear-gradient(145deg, color-mix(in oklch, var(--card) 91%, var(--institution-accent, var(--alexos-lively-blue)) 9%), var(--card));
+  box-shadow: 0 22px 62px -45px color-mix(in oklch, var(--institution-accent, var(--alexos-lively-blue)) 74%, transparent);
 }
 
-.alexos-auth-card input:focus-visible,
-.alexos-auth-card button:focus-visible,
-.alexos-auth-card [role="tab"]:focus-visible {
-  outline: 2px solid color-mix(in oklch, var(--ring) 82%, transparent);
-  outline-offset: 2px;
-}
-
-@media (max-width: 639px) {
-  .alexos-auth-form-panel {
-    align-items: flex-start;
-    padding-top: 2.5rem;
-  }
-
-  .alexos-auth-card {
-    border-radius: 1.5rem;
-  }
+.money-center-shell .money-account-card:hover,
+.dashboard-canvas .dashboard-kpi-card:hover,
+.money-center-shell .money-kpi-card:hover {
+  border-color: color-mix(in oklch, var(--institution-accent, var(--money-tone, var(--kpi-tone, var(--primary)))) 56%, var(--border));
+  box-shadow: 0 28px 78px -46px color-mix(in oklch, var(--institution-accent, var(--money-tone, var(--kpi-tone, var(--primary)))) 82%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .alexos-auth-card,
-  .alexos-auth-card button {
+  .money-center-shell .money-account-card,
+  .money-center-shell .money-kpi-card,
+  .dashboard-canvas .dashboard-kpi-card {
     transition: none;
   }
 }
