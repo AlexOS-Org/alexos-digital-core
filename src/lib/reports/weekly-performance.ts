@@ -76,6 +76,18 @@ export interface WeeklyFinancialSummary {
   hasTransactions: boolean;
   expectedPendingCount: number;
   expectedPendingTotal: number | null;
+  courierPrepaymentCount: number;
+  courierPrepaymentTotal: number | null;
+  courierAmountDue: number | null;
+}
+
+export interface CourierPrepayment {
+  order_id: string;
+  amount: number;
+  status: string;
+  paid_at: string;
+  due_on_delivery: number;
+  currency: string;
 }
 
 export function computeWeeklyFinancials(
@@ -84,6 +96,7 @@ export function computeWeeklyFinancials(
   expected: Expected[],
   from: string,
   until: string,
+  courierPrepayments: CourierPrepayment[] = [],
 ): WeeklyFinancialSummary {
   const currencySafety = summarizeCurrencySafety(accounts);
 
@@ -105,6 +118,22 @@ export function computeWeeklyFinancials(
     0,
   );
 
+  const courierInPeriod = courierPrepayments.filter((payment) => {
+    const day = payment.paid_at.slice(0, 10);
+    return payment.status === "paid" && day >= from && day <= until;
+  });
+  const latestDueByOrder = new Map<string, number>();
+  for (const payment of courierPrepayments) {
+    if (payment.status === "paid") {
+      latestDueByOrder.set(payment.order_id, Number(payment.due_on_delivery || 0));
+    }
+  }
+  const rawCourierTotal = courierInPeriod.reduce(
+    (sum, payment) => sum + Number(payment.amount || 0),
+    0,
+  );
+  const rawCourierDue = [...latestDueByOrder.values()].reduce((sum, amount) => sum + amount, 0);
+
   if (currencySafety.isMixed) {
     return {
       currency: null,
@@ -118,6 +147,9 @@ export function computeWeeklyFinancials(
       hasTransactions: weekTransactions.length > 0,
       expectedPendingCount: pendingExpectedInPeriod.length,
       expectedPendingTotal: null,
+      courierPrepaymentCount: courierInPeriod.length,
+      courierPrepaymentTotal: null,
+      courierAmountDue: null,
     };
   }
 
@@ -140,6 +172,9 @@ export function computeWeeklyFinancials(
     hasTransactions,
     expectedPendingCount: pendingExpectedInPeriod.length,
     expectedPendingTotal: pendingExpectedInPeriod.length > 0 ? rawExpectedTotal : null,
+    courierPrepaymentCount: courierInPeriod.length,
+    courierPrepaymentTotal: courierInPeriod.length > 0 ? rawCourierTotal : null,
+    courierAmountDue: latestDueByOrder.size > 0 ? rawCourierDue : null,
   };
 }
 

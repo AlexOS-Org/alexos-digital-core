@@ -87,6 +87,18 @@ export interface Expected {
   business_name: string | null;
 }
 
+export interface DeliveryPrepayment {
+  id: string;
+  order_id: string;
+  courier_provider: string;
+  status: string;
+  amount: number;
+  currency: string;
+  payment_reference: string;
+  due_on_delivery: number;
+  paid_at: string;
+}
+
 async function uid() {
   const { data } = await supabase.auth.getUser();
   if (!data.user) throw new Error("Not authenticated");
@@ -256,6 +268,26 @@ export function useTransactions(filter: TxFilter = {}) {
       const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as Transaction[];
+    },
+  });
+}
+
+export function useDeliveryPrepayments(from?: string, until?: string) {
+  return useQuery({
+    queryKey: ["delivery-prepayments", from, until],
+    queryFn: async () => {
+      let query = supabase
+        .from("dg_delivery_prepayments" as never)
+        .select(
+          "id,order_id,courier_provider,status,amount,currency,payment_reference,due_on_delivery,paid_at",
+        )
+        .order("paid_at", { ascending: false })
+        .limit(1000);
+      if (from) query = query.gte("paid_at", `${from}T00:00:00Z`);
+      if (until) query = query.lte("paid_at", `${until}T23:59:59Z`);
+      const { data, error } = await query;
+      if (error) throw error;
+      return (data ?? []) as unknown as DeliveryPrepayment[];
     },
   });
 }

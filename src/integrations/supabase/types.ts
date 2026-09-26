@@ -389,6 +389,191 @@ export type Database = {
           },
         ]
       }
+      banking_employee_prospects: {
+        Row: {
+          account_status: string
+          consent_status: string
+          created_at: string
+          crm_contact_id: string | null
+          email: string | null
+          employer_id: string
+          estimated_salary: number | null
+          first_name: string
+          id: string
+          job_title: string | null
+          last_name: string | null
+          next_action_at: string | null
+          notes: string | null
+          phone: string | null
+          stage: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_status?: string
+          consent_status?: string
+          created_at?: string
+          crm_contact_id?: string | null
+          email?: string | null
+          employer_id: string
+          estimated_salary?: number | null
+          first_name: string
+          id?: string
+          job_title?: string | null
+          last_name?: string | null
+          next_action_at?: string | null
+          notes?: string | null
+          phone?: string | null
+          stage?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_status?: string
+          consent_status?: string
+          created_at?: string
+          crm_contact_id?: string | null
+          email?: string | null
+          employer_id?: string
+          estimated_salary?: number | null
+          first_name?: string
+          id?: string
+          job_title?: string | null
+          last_name?: string | null
+          next_action_at?: string | null
+          notes?: string | null
+          phone?: string | null
+          stage?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banking_employee_prospects_crm_contact_id_fkey"
+            columns: ["crm_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "banking_employee_prospects_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "banking_employers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      banking_employers: {
+        Row: {
+          company_name: string
+          created_at: string
+          employee_count: number | null
+          hiring_momentum_score: number
+          hr_contact_email: string | null
+          hr_contact_name: string | null
+          hr_contact_phone: string | null
+          id: string
+          industry: string | null
+          last_hiring_signal_at: string | null
+          location: string | null
+          notes: string | null
+          priority: string
+          recruitment_frequency: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          employee_count?: number | null
+          hiring_momentum_score?: number
+          hr_contact_email?: string | null
+          hr_contact_name?: string | null
+          hr_contact_phone?: string | null
+          id?: string
+          industry?: string | null
+          last_hiring_signal_at?: string | null
+          location?: string | null
+          notes?: string | null
+          priority?: string
+          recruitment_frequency?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          employee_count?: number | null
+          hiring_momentum_score?: number
+          hr_contact_email?: string | null
+          hr_contact_name?: string | null
+          hr_contact_phone?: string | null
+          id?: string
+          industry?: string | null
+          last_hiring_signal_at?: string | null
+          location?: string | null
+          notes?: string | null
+          priority?: string
+          recruitment_frequency?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      banking_recruitment_signals: {
+        Row: {
+          created_at: string
+          detected_at: string
+          employer_id: string
+          estimated_hires: number
+          id: string
+          notes: string | null
+          signal_type: string
+          source_url: string | null
+          status: string
+          title: string
+          user_id: string
+          vacancy_count: number
+        }
+        Insert: {
+          created_at?: string
+          detected_at?: string
+          employer_id: string
+          estimated_hires?: number
+          id?: string
+          notes?: string | null
+          signal_type: string
+          source_url?: string | null
+          status?: string
+          title: string
+          user_id: string
+          vacancy_count?: number
+        }
+        Update: {
+          created_at?: string
+          detected_at?: string
+          employer_id?: string
+          estimated_hires?: number
+          id?: string
+          notes?: string | null
+          signal_type?: string
+          source_url?: string | null
+          status?: string
+          title?: string
+          user_id?: string
+          vacancy_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banking_recruitment_signals_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "banking_employers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bills: {
         Row: {
           account_id: string | null
@@ -1206,6 +1391,101 @@ export type Database = {
         }
         Relationships: []
       }
+      dg_delivery_prepayments: {
+        Row: {
+          account_id: string
+          amount: number
+          courier_provider: string
+          courier_tracking_number: string | null
+          created_at: string
+          currency: string
+          delivered_at: string | null
+          dispatched_at: string | null
+          due_on_delivery: number
+          id: string
+          money_transaction_id: string | null
+          notes: string | null
+          order_id: string
+          paid_at: string
+          payment_method: string
+          payment_reference: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          courier_provider?: string
+          courier_tracking_number?: string | null
+          created_at?: string
+          currency?: string
+          delivered_at?: string | null
+          dispatched_at?: string | null
+          due_on_delivery?: number
+          id?: string
+          money_transaction_id?: string | null
+          notes?: string | null
+          order_id: string
+          paid_at?: string
+          payment_method?: string
+          payment_reference: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          courier_provider?: string
+          courier_tracking_number?: string | null
+          created_at?: string
+          currency?: string
+          delivered_at?: string | null
+          dispatched_at?: string | null
+          due_on_delivery?: number
+          id?: string
+          money_transaction_id?: string | null
+          notes?: string | null
+          order_id?: string
+          paid_at?: string
+          payment_method?: string
+          payment_reference?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dg_delivery_prepayments_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "account_balances"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "dg_delivery_prepayments_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dg_delivery_prepayments_money_transaction_id_fkey"
+            columns: ["money_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dg_delivery_prepayments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "dg_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dg_funnel_steps: {
         Row: {
           body: string | null
@@ -1328,6 +1608,89 @@ export type Database = {
             columns: ["storefront_id"]
             isOneToOne: false
             referencedRelation: "dg_storefronts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dg_mpesa_stk_attempts: {
+        Row: {
+          account_reference: string
+          amount: number
+          callback_amount: number | null
+          callback_phone: string | null
+          checkout_request_id: string | null
+          created_at: string
+          currency: string
+          error_message: string | null
+          id: string
+          merchant_request_id: string | null
+          mpesa_receipt_number: string | null
+          order_id: string
+          order_number: string
+          phone: string
+          raw_callback: Json | null
+          raw_initiate: Json | null
+          result_code: number | null
+          result_desc: string | null
+          status: string
+          transaction_date: string | null
+          transaction_desc: string
+          updated_at: string
+        }
+        Insert: {
+          account_reference: string
+          amount: number
+          callback_amount?: number | null
+          callback_phone?: string | null
+          checkout_request_id?: string | null
+          created_at?: string
+          currency?: string
+          error_message?: string | null
+          id?: string
+          merchant_request_id?: string | null
+          mpesa_receipt_number?: string | null
+          order_id: string
+          order_number: string
+          phone: string
+          raw_callback?: Json | null
+          raw_initiate?: Json | null
+          result_code?: number | null
+          result_desc?: string | null
+          status?: string
+          transaction_date?: string | null
+          transaction_desc: string
+          updated_at?: string
+        }
+        Update: {
+          account_reference?: string
+          amount?: number
+          callback_amount?: number | null
+          callback_phone?: string | null
+          checkout_request_id?: string | null
+          created_at?: string
+          currency?: string
+          error_message?: string | null
+          id?: string
+          merchant_request_id?: string | null
+          mpesa_receipt_number?: string | null
+          order_id?: string
+          order_number?: string
+          phone?: string
+          raw_callback?: Json | null
+          raw_initiate?: Json | null
+          result_code?: number | null
+          result_desc?: string | null
+          status?: string
+          transaction_date?: string | null
+          transaction_desc?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dg_mpesa_stk_attempts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "dg_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -1681,10 +2044,15 @@ export type Database = {
           customer_id: string | null
           deleted_at: string | null
           delivered_at: string | null
+          delivery_amount_due: number
+          delivery_payment_status: string
+          delivery_prepayment_amount: number
+          delivery_provider: string | null
           discount: number
           funnel_id: string | null
           id: string
           internal_notes: string | null
+          mpesa_reference: string | null
           notes: string | null
           order_number: string
           payment_method: string | null
@@ -1714,10 +2082,15 @@ export type Database = {
           customer_id?: string | null
           deleted_at?: string | null
           delivered_at?: string | null
+          delivery_amount_due?: number
+          delivery_payment_status?: string
+          delivery_prepayment_amount?: number
+          delivery_provider?: string | null
           discount?: number
           funnel_id?: string | null
           id?: string
           internal_notes?: string | null
+          mpesa_reference?: string | null
           notes?: string | null
           order_number: string
           payment_method?: string | null
@@ -1747,10 +2120,15 @@ export type Database = {
           customer_id?: string | null
           deleted_at?: string | null
           delivered_at?: string | null
+          delivery_amount_due?: number
+          delivery_payment_status?: string
+          delivery_prepayment_amount?: number
+          delivery_provider?: string | null
           discount?: number
           funnel_id?: string | null
           id?: string
           internal_notes?: string | null
+          mpesa_reference?: string | null
           notes?: string | null
           order_number?: string
           payment_method?: string | null
@@ -2406,6 +2784,7 @@ export type Database = {
       }
       goals: {
         Row: {
+          account_id: string | null
           category: string | null
           created_at: string
           deleted_at: string | null
@@ -2421,6 +2800,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           category?: string | null
           created_at?: string
           deleted_at?: string | null
@@ -2436,6 +2816,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string | null
           category?: string | null
           created_at?: string
           deleted_at?: string | null
@@ -2450,7 +2831,22 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "goals_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "account_balances"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "goals_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lead_stage_history: {
         Row: {
@@ -2805,6 +3201,39 @@ export type Database = {
           },
         ]
       }
+      money_weekly_summary_preferences: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          last_sent_period: string | null
+          send_claim_period: string | null
+          send_claim_token: string | null
+          send_claimed_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          last_sent_period?: string | null
+          send_claim_period?: string | null
+          send_claim_token?: string | null
+          send_claimed_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          last_sent_period?: string | null
+          send_claim_period?: string | null
+          send_claim_token?: string | null
+          send_claimed_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notes: {
         Row: {
           contact_id: string | null
@@ -3127,6 +3556,14 @@ export type Database = {
       }
     }
     Functions: {
+      claim_money_weekly_summary_send: {
+        Args: { p_claim_token: string; p_period: string; p_user_id: string }
+        Returns: boolean
+      }
+      complete_money_weekly_summary_send: {
+        Args: { p_claim_token: string; p_period: string; p_user_id: string }
+        Returns: boolean
+      }
       dg_confirm_order_payment: {
         Args: {
           p_account_id: string
@@ -3174,6 +3611,19 @@ export type Database = {
         Returns: undefined
       }
       dg_purge_expired_order_trash: { Args: never; Returns: number }
+      dg_record_delivery_prepayment: {
+        Args: {
+          p_account_id: string
+          p_amount: number
+          p_courier_provider: string
+          p_due_on_delivery?: number
+          p_notes?: string
+          p_order_id: string
+          p_payment_method: string
+          p_payment_reference: string
+        }
+        Returns: Json
+      }
       dg_record_order_fulfilment:
         | {
             Args: {
@@ -3234,6 +3684,10 @@ export type Database = {
       dg_seed_default_categories: {
         Args: { _user_id: string }
         Returns: undefined
+      }
+      dg_settle_mpesa_stk_success: {
+        Args: { p_attempt_id: string }
+        Returns: Json
       }
       dg_update_admin_order: {
         Args: {
@@ -3322,12 +3776,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3351,11 +3805,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3376,11 +3830,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3401,11 +3855,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3418,11 +3872,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

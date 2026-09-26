@@ -17,7 +17,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useAccounts, useExpected, useTransactions } from "@/lib/money/api";
+import { useAccounts, useDeliveryPrepayments, useExpected, useTransactions } from "@/lib/money/api";
 import { formatMoney } from "@/lib/money/format";
 import { getDailyGearProfitCashFlow } from "@/lib/dailygear/profit-cash-flow.functions";
 import type { DailyGearProfitCashFlowResponse } from "@/lib/dailygear/profit-cash-flow.server";
@@ -43,6 +43,11 @@ export function WeeklyPerformanceView() {
   const { data: transactions = [], isLoading: txLoading } = useTransactions({});
   const { data: accounts = [], isLoading: accountsLoading } = useAccounts();
   const { data: expected = [], isLoading: expectedLoading } = useExpected();
+  const previousPeriod = useMemo(() => getWeekBoundaries(new Date(), -1), []);
+  const { data: courierPrepayments = [], isLoading: courierLoading } = useDeliveryPrepayments(
+    previousPeriod.from,
+    period.until,
+  );
 
   // E-commerce state
   const [ecommerceData, setEcommerceData] = useState<DailyGearProfitCashFlowResponse | null>(null);
@@ -128,8 +133,16 @@ export function WeeklyPerformanceView() {
 
   // Derived summaries
   const financialSummary = useMemo(
-    () => computeWeeklyFinancials(transactions, accounts, expected, period.from, period.until),
-    [transactions, accounts, expected, period.from, period.until],
+    () =>
+      computeWeeklyFinancials(
+        transactions,
+        accounts,
+        expected,
+        period.from,
+        period.until,
+        courierPrepayments,
+      ),
+    [transactions, accounts, expected, period.from, period.until, courierPrepayments],
   );
 
   const ecommerceSummary = useMemo(() => summarizeWeeklyEcommerce(ecommerceData), [ecommerceData]);
@@ -141,7 +154,7 @@ export function WeeklyPerformanceView() {
     [financialSummary, ecommerceSummary, vitalsSummary],
   );
 
-  const isInitialLoading = txLoading || accountsLoading || expectedLoading;
+  const isInitialLoading = txLoading || accountsLoading || expectedLoading || courierLoading;
 
   return (
     <div className="space-y-6">
@@ -328,6 +341,65 @@ export function WeeklyPerformanceView() {
             </Card>
           </div>
         )}
+      </section>
+
+      <section className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Banknote className="h-4 w-4 text-primary" />
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Courier prepayments
+          </h3>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Card className="rounded-2xl border-border/60">
+            <CardHeader className="p-5 pb-2">
+              <span className="text-xs font-medium text-muted-foreground">Paid this period</span>
+            </CardHeader>
+            <CardContent className="p-5 pt-0">
+              <p className="text-2xl font-bold tabular-nums text-foreground">
+                {financialSummary.courierPrepaymentTotal !== null
+                  ? formatMoney(
+                      financialSummary.courierPrepaymentTotal,
+                      financialSummary.currency || "KES",
+                    )
+                  : "No activity"}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {financialSummary.courierPrepaymentCount} ledger payment
+                {financialSummary.courierPrepaymentCount === 1 ? "" : "s"} posted
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="rounded-2xl border-border/60">
+            <CardHeader className="p-5 pb-2">
+              <span className="text-xs font-medium text-muted-foreground">Due on delivery</span>
+            </CardHeader>
+            <CardContent className="p-5 pt-0">
+              <p className="text-2xl font-bold tabular-nums text-foreground">
+                {financialSummary.courierAmountDue !== null
+                  ? formatMoney(
+                      financialSummary.courierAmountDue,
+                      financialSummary.currency || "KES",
+                    )
+                  : "No balance"}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Outstanding after courier prepayments
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="rounded-2xl border-border/60">
+            <CardHeader className="p-5 pb-2">
+              <span className="text-xs font-medium text-muted-foreground">Settlement rule</span>
+            </CardHeader>
+            <CardContent className="p-5 pt-0">
+              <p className="text-sm font-semibold text-foreground">Separate from sales revenue</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Courier receipts are tagged independently in Money Center.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </section>
 
       {/* E-Commerce (DailyGear) Performance Section */}

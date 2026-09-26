@@ -144,6 +144,24 @@ describe("Weekly Performance Data Layer", () => {
       expect(result.currency).toBe("KES");
     });
 
+    it("reports courier prepayments separately from sales cash flow", () => {
+      const result = computeWeeklyFinancials([], mockAccounts, [], "2026-09-14", "2026-09-20", [
+        {
+          order_id: "order-1",
+          amount: 350,
+          status: "paid",
+          paid_at: "2026-09-16T10:00:00Z",
+          due_on_delivery: 850,
+          currency: "KES",
+        },
+      ]);
+
+      expect(result.income).toBeNull();
+      expect(result.courierPrepaymentCount).toBe(1);
+      expect(result.courierPrepaymentTotal).toBe(350);
+      expect(result.courierAmountDue).toBe(850);
+    });
+
     it("withholds totals when accounts have mixed currencies", () => {
       const mixedAccounts: Account[] = [
         ...mockAccounts,

@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { computeWeeklyFinancials, getWeekBoundaries } from "@/lib/reports/weekly-performance";
-import type { Account, Expected, Transaction } from "@/lib/money/api";
+import type { Account, DeliveryPrepayment, Expected, Transaction } from "@/lib/money/api";
 
 const CRON = "0 17 * * 6";
 
@@ -97,6 +97,16 @@ function renderEmail(input: {
       money(current.netCashFlow, currency),
       comparison(current.netCashFlow, previous.netCashFlow, currency),
     ],
+    [
+      "Courier prepayments",
+      money(current.courierPrepaymentTotal, currency),
+      `${current.courierPrepaymentCount} payment${current.courierPrepaymentCount === 1 ? "" : "s"}`,
+    ],
+    [
+      "Due on delivery",
+      money(current.courierAmountDue, currency),
+      "Tracked separately from sales revenue",
+    ],
   ];
   const htmlRows = rows
     .map(
@@ -108,7 +118,7 @@ function renderEmail(input: {
   const safePulse = escapeHtml(pulse);
   const safeDetail = escapeHtml(detail);
   const subject = `Money Center weekly report: ${pulse}`;
-  const text = `Hi ${name || "there"},\n\n${periodLabel} (${range})\nPerformance score: ${score}/100\n${pulse}: ${detail}\n\nCash inflow: ${rows[0][1]} — vs last week ${rows[0][2]}\nExpenditure: ${rows[1][1]} — vs last week ${rows[1][2]}\nNet cash flow: ${rows[2][1]} — vs last week ${rows[2][2]}\n\nOpen Money Center: ${process.env.DAILYGEAR_PUBLIC_URL || "https://dailygear.co.ke"}/money-center`;
+  const text = `Hi ${name || "there"},\n\n${periodLabel} (${range})\nPerformance score: ${score}/100\n${pulse}: ${detail}\n\nCash inflow: ${rows[0][1]} — vs last week ${rows[0][2]}\nExpenditure: ${rows[1][1]} — vs last week ${rows[1][2]}\nNet cash flow: ${rows[2][1]} — vs last week ${rows[2][2]}\nCourier prepayments: ${rows[3][1]} — ${rows[3][2]}\nDue on delivery: ${rows[4][1]} — ${rows[4][2]}\n\nOpen Money Center: ${process.env.DAILYGEAR_PUBLIC_URL || "https://dailygear.co.ke"}/money-center`;
   const html = `<!doctype html><html><body style="margin:0;background:#f8fafc;font-family:Arial,sans-serif;color:#0f172a"><div style="max-width:620px;margin:0 auto;padding:32px 18px"><div style="border-radius:24px;background:linear-gradient(135deg,#020617,#1e3a8a);padding:28px;color:#fff"><div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#a7f3d0">Money Center</div><h1 style="margin:12px 0 4px;font-size:28px">Weekly performance report</h1><p style="margin:0;color:#bfdbfe">${escapeHtml(periodLabel)} · ${escapeHtml(range)}</p></div><div style="margin-top:16px;border-radius:20px;background:#fff;padding:24px;border:1px solid #e2e8f0"><p>Hi ${safeName},</p><div style="border-radius:14px;padding:16px;background:${improved ? "#ecfdf5" : "#fffbeb"};border:1px solid ${improved ? "#a7f3d0" : "#fde68a"}"><strong>${safePulse}</strong><p style="margin:6px 0 0;color:#475569;font-size:14px">${safeDetail}</p></div><div style="margin-top:18px;border-radius:14px;background:#0f172a;color:#fff;padding:16px"><div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px">Performance score</div><div style="font-size:36px;font-weight:700;margin-top:5px">${score}<span style="font-size:14px;color:#94a3b8"> / 100</span></div></div><table style="width:100%;border-collapse:collapse;margin-top:12px">${htmlRows}</table><a href="${escapeHtml(process.env.DAILYGEAR_PUBLIC_URL || "https://dailygear.co.ke")}/money-center" style="display:inline-block;margin-top:22px;padding:12px 16px;border-radius:10px;background:#0f172a;color:#fff;text-decoration:none;font-weight:700">Open Money Center</a></div><p style="font-size:12px;color:#64748b;text-align:center">This weekly report uses posted Money Center activity and is sent every Saturday at 8:00 PM EAT.</p></div></body></html>`;
   return { subject, html, text };
 }
@@ -155,6 +165,7 @@ export async function sendWeeklyMoneySummaries() {
       { data: transactions, error: transactionsError },
       { data: accounts, error: accountsError },
       { data: expected, error: expectedError },
+      { data: courierPrepayments, error: courierError },
     ] = await Promise.all([
       supabaseAdmin
         .from("transactions")
@@ -175,18 +186,25 @@ export async function sendWeeklyMoneySummaries() {
         .eq("user_id", preference.user_id)
         .is("deleted_at", null)
         .limit(1000),
+      supabaseAdmin
+        .from("dg_delivery_prepayments" as never)
+        .select("order_id,amount,status,paid_at,due_on_delivery,currency")
+        .eq("user_id", preference.user_id)
+        .limit(2000),
     ]);
-    if (transactionsError || accountsError || expectedError)
-      throw transactionsError || accountsError || expectedError;
+    if (transactionsError || accountsError || expectedError || courierError)
+      throw transactionsError || accountsError || expectedError || courierError;
     const typedTransactions = (transactions ?? []) as unknown as Transaction[];
     const typedAccounts = (accounts ?? []) as unknown as Account[];
     const typedExpected = (expected ?? []) as unknown as Expected[];
+    const typedCourierPrepayments = (courierPrepayments ?? []) as unknown as DeliveryPrepayment[];
     const current = computeWeeklyFinancials(
       typedTransactions,
       typedAccounts,
       typedExpected,
       period.from,
       period.until,
+      typedCourierPrepayments,
     );
     const prior = computeWeeklyFinancials(
       typedTransactions,
@@ -194,6 +212,7 @@ export async function sendWeeklyMoneySummaries() {
       typedExpected,
       previous.from,
       previous.until,
+      typedCourierPrepayments,
     );
     const user = userData.user as UserRecord;
     const recipientEmail = user.email;
