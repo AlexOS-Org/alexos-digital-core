@@ -62,9 +62,12 @@ describe("CI quality gates", () => {
       expect(workflow).toContain(secret);
     }
     expect(workflow).toContain("npm run verify");
-    expect(workflow).toContain("supabase db push");
+    expect(workflow).toContain("supabase db query");
+    expect(workflow).toContain("supabase migration repair");
     expect(workflow).toContain("npm run deploy");
-    expect(workflow.indexOf("npm run verify")).toBeLessThan(workflow.indexOf("supabase db push"));
-    expect(workflow.indexOf("supabase db push")).toBeLessThan(workflow.indexOf("npm run deploy"));
+    expect(workflow.indexOf("npm run verify")).toBeLessThan(workflow.indexOf("supabase db query"));
+    expect(workflow.indexOf("supabase migration repair")).toBeLessThan(
+      workflow.indexOf("npm run deploy"),
+    );
   });
 });
