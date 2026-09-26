@@ -89,13 +89,16 @@ jobs:
         with:
           version: latest
 
+      - name: Set up PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+
       - name: Apply post-baseline Supabase migrations directly
         shell: bash
         run: |
           set -euo pipefail
           migration_baseline=20260915085639
-          deploy_dir="$(mktemp -d)"
-          trap 'rm -rf "$deploy_dir"' EXIT
 
           export SUPABASE_DB_URL="$(python3 - <<'PY'
           import os
@@ -124,13 +127,10 @@ jobs:
                 continue
               fi
 
-              apply_file="$deploy_dir/${version}.sql"
-              {
-                echo "begin;"
-                cat "$migration"
-                echo "commit;"
-              } > "$apply_file"
-              supabase db query --db-url "$SUPABASE_DB_URL" --file "$apply_file"
+              psql "$SUPABASE_DB_URL" \
+                --set ON_ERROR_STOP=1 \
+                --single-transaction \
+                --file "$migration"
               supabase migration repair \
                 --db-url "$SUPABASE_DB_URL" \
                 --status applied \
