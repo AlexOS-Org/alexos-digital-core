@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Bell, Lock, Database, Globe, Check } from "lucide-react";
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/settings")({ component: Settings });
 
@@ -54,14 +55,31 @@ function Settings() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    setNotificationPrefs(readNotificationPrefs());
+    const prefs = readNotificationPrefs();
+    setNotificationPrefs(prefs);
     setHydrated(true);
+    void supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) return;
+      void supabase
+        .from("money_weekly_summary_preferences" as never)
+        .upsert({ user_id: data.user.id, enabled: prefs.weeklySummary } as never, {
+          onConflict: "user_id",
+        });
+    });
   }, []);
 
   const updatePref = <K extends keyof NotificationPrefs>(key: K, value: NotificationPrefs[K]) => {
     setNotificationPrefs((prev) => {
       const next = { ...prev, [key]: value };
       writeNotificationPrefs(next);
+      if (key === "weeklySummary") {
+        void supabase.auth.getUser().then(({ data }) => {
+          if (!data.user) return;
+          void supabase
+            .from("money_weekly_summary_preferences" as never)
+            .upsert({ user_id: data.user.id, enabled: value } as never, { onConflict: "user_id" });
+        });
+      }
       return next;
     });
   };

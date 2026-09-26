@@ -94,6 +94,13 @@ export default {
         console.info("Scheduled Auren evidence refresh completed", refresh);
       }
 
+      if (controller.cron === "0 17 * * 6") {
+        const { sendWeeklyMoneySummaries } =
+          await import("@/server/notifications/weekly-money-summary-email");
+        const weekly = await sendWeeklyMoneySummaries();
+        console.info("Scheduled weekly Money Center summaries completed", weekly);
+      }
+
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { processAbandonedCartFollowUps } =
         await import("@/server/notifications/cart-recovery-email");

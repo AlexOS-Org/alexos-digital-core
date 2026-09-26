@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowDownRight, ArrowUpRight, RefreshCw, Sparkles, Wallet } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -6,13 +6,28 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAccounts, useExpected, useTransactions } from "@/lib/money/api";
 import { formatMoney } from "@/lib/money/format";
-import { computeWeeklyFinancials, getWeekBoundaries } from "@/lib/reports/weekly-performance";
+import {
+  computeWeeklyFinancials,
+  getWeekBoundaries,
+  getWeeklySummaryPreference,
+} from "@/lib/reports/weekly-performance";
 import { cn } from "@/lib/utils";
 import { useBalanceVisibility } from "@/components/money/BalanceVisibility";
+import { supabase } from "@/integrations/supabase/client";
 
 export function WeeklyCashSummary() {
   const [offsetWeeks, setOffsetWeeks] = useState<0 | -1>(0);
   const { maskBalance } = useBalanceVisibility();
+  useEffect(() => {
+    void supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) return;
+      void supabase
+        .from("money_weekly_summary_preferences" as never)
+        .upsert({ user_id: data.user.id, enabled: getWeeklySummaryPreference() } as never, {
+          onConflict: "user_id",
+        });
+    });
+  }, []);
   const period = useMemo(() => getWeekBoundaries(new Date(), offsetWeeks), [offsetWeeks]);
   const {
     data: transactions = [],
