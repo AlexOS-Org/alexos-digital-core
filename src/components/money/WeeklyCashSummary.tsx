@@ -49,6 +49,21 @@ export function WeeklyCashSummary() {
       ),
     [transactions, accounts, expected, previousPeriod.from, previousPeriod.until],
   );
+  const trend = useMemo(
+    () =>
+      Array.from({ length: 8 }, (_, index) => {
+        const trendPeriod = getWeekBoundaries(new Date(), (offsetWeeks - (7 - index)) as -1);
+        const trendSummary = computeWeeklyFinancials(
+          transactions,
+          accounts,
+          expected,
+          trendPeriod.from,
+          trendPeriod.until,
+        );
+        return { label: trendPeriod.from.slice(5), value: trendSummary.netCashFlow };
+      }),
+    [transactions, accounts, expected, offsetWeeks],
+  );
   const loading = transactionsLoading || accountsLoading || expectedLoading;
   const money = (value: number | null) =>
     value === null ? "Unavailable" : maskBalance(formatMoney(value, summary.currency ?? "KES"));
@@ -124,40 +139,140 @@ export function WeeklyCashSummary() {
             ))}
           </div>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-3">
-            <CashMetric
-              label="Cash Inflow"
-              value={money(summary.income)}
-              comparison={compare(summary.income, previousSummary.income, money)}
-              hint="Posted income"
-              icon={ArrowUpRight}
-              className="text-emerald-600 dark:text-emerald-400"
+          <>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <CashMetric
+                label="Cash Inflow"
+                value={money(summary.income)}
+                comparison={compare(summary.income, previousSummary.income, money)}
+                hint="Posted income"
+                icon={ArrowUpRight}
+                className="text-emerald-600 dark:text-emerald-400"
+              />
+              <CashMetric
+                label="Expenditure"
+                value={money(summary.expenses)}
+                comparison={compare(summary.expenses, previousSummary.expenses, money)}
+                hint="Posted expenses"
+                icon={ArrowDownRight}
+                className="text-rose-600 dark:text-rose-400"
+              />
+              <CashMetric
+                label="Net Cash Flow"
+                value={money(summary.netCashFlow)}
+                comparison={compare(summary.netCashFlow, previousSummary.netCashFlow, money)}
+                hint={`${summary.transactionCount} posted transaction${summary.transactionCount === 1 ? "" : "s"}`}
+                icon={Wallet}
+                className={cn(
+                  summary.netCashFlow !== null && summary.netCashFlow >= 0
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-rose-600 dark:text-rose-400",
+                )}
+              />
+            </div>
+            <PremiumInsights
+              trend={trend}
+              current={summary}
+              previous={previousSummary}
+              money={money}
             />
-            <CashMetric
-              label="Expenditure"
-              value={money(summary.expenses)}
-              comparison={compare(summary.expenses, previousSummary.expenses, money)}
-              hint="Posted expenses"
-              icon={ArrowDownRight}
-              className="text-rose-600 dark:text-rose-400"
-            />
-            <CashMetric
-              label="Net Cash Flow"
-              value={money(summary.netCashFlow)}
-              comparison={compare(summary.netCashFlow, previousSummary.netCashFlow, money)}
-              hint={`${summary.transactionCount} posted transaction${summary.transactionCount === 1 ? "" : "s"}`}
-              icon={Wallet}
-              className={cn(
-                summary.netCashFlow !== null && summary.netCashFlow >= 0
-                  ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-rose-600 dark:text-rose-400",
-              )}
-            />
-          </div>
+          </>
         )}
       </CardContent>
     </Card>
   );
+}
+
+function PremiumInsights({
+  trend,
+  current,
+  previous,
+  money,
+}: {
+  trend: Array<{ label: string; value: number | null }>;
+  current: ReturnType<typeof computeWeeklyFinancials>;
+  previous: ReturnType<typeof computeWeeklyFinancials>;
+  money: (value: number | null) => string;
+}) {
+  const values = trend.map((item) => item.value).filter((value): value is number => value !== null);
+  const max = Math.max(...values.map((value) => Math.abs(value)), 1);
+  const score = calculateScore(current, previous);
+
+  return (
+    <div className="mt-4 grid gap-4 border-t border-border/60 pt-4 lg:grid-cols-[1fr_180px]">
+      <div>
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              8-week cash trend
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">Net cash flow by week</p>
+          </div>
+          <span className="text-[11px] text-muted-foreground">Oldest → current</span>
+        </div>
+        <div className="mt-4 flex h-24 items-end gap-1.5 sm:gap-2">
+          {trend.map((item) => {
+            const height =
+              item.value === null ? 6 : Math.max(10, (Math.abs(item.value) / max) * 100);
+            const positive = item.value === null || item.value >= 0;
+            return (
+              <div
+                key={item.label}
+                className="flex h-full flex-1 flex-col items-center justify-end gap-1"
+              >
+                <div
+                  className={cn(
+                    "w-full rounded-t-md transition-all",
+                    item.value === null
+                      ? "bg-muted"
+                      : positive
+                        ? "bg-emerald-500/75"
+                        : "bg-rose-500/75",
+                  )}
+                  style={{ height: `${height}%` }}
+                  title={`${item.label}: ${money(item.value)}`}
+                />
+                <span className="text-[9px] text-muted-foreground">{item.label}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-slate-950 to-slate-800 p-4 text-white">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/60">
+          Performance score
+        </p>
+        <div className="mt-2 flex items-end gap-1">
+          <span className="text-4xl font-semibold tracking-tight">{score}</span>
+          <span className="mb-1 text-xs text-white/50">/100</span>
+        </div>
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/15">
+          <div className="h-full rounded-full bg-emerald-300" style={{ width: `${score}%` }} />
+        </div>
+        <p className="mt-3 text-[11px] leading-relaxed text-white/60">
+          Based on net cash direction, expenditure control, and posted activity.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function calculateScore(
+  current: ReturnType<typeof computeWeeklyFinancials>,
+  previous: ReturnType<typeof computeWeeklyFinancials>,
+): number {
+  if (current.netCashFlow === null) return 0;
+  let score = current.netCashFlow >= 0 ? 50 : 25;
+  if (previous.netCashFlow !== null && current.netCashFlow >= previous.netCashFlow) score += 20;
+  if (
+    current.expenses !== null &&
+    previous.expenses !== null &&
+    current.expenses <= previous.expenses
+  ) {
+    score += 20;
+  }
+  if (current.transactionCount > 0) score += 10;
+  return Math.min(100, score);
 }
 
 function CashMetric({
