@@ -74,6 +74,39 @@
   background: transparent;
 }
 
+/* Keep information cards calm and legible over the ambient stage. */
+.dashboard-canvas .dashboard-surface,
+.dashboard-canvas .dashboard-surface-muted,
+.dashboard-canvas .dashboard-feature-surface {
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklch, var(--card) 97%, var(--alexos-visual-accent) 3%),
+    color-mix(in oklch, var(--card) 94%, transparent)
+  );
+  border-color: color-mix(in oklch, var(--border) 86%, var(--alexos-visual-accent) 14%);
+  box-shadow: 0 18px 52px -42px color-mix(in oklch, var(--foreground) 34%, transparent);
+}
+
+.dark .dashboard-canvas .dashboard-surface,
+.dark .dashboard-canvas .dashboard-surface-muted,
+.dark .dashboard-canvas .dashboard-feature-surface {
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklch, var(--card) 92%, var(--alexos-visual-accent) 8%),
+    color-mix(in oklch, var(--card) 86%, transparent)
+  );
+  border-color: color-mix(in oklch, var(--border) 82%, var(--alexos-visual-accent) 18%);
+}
+
+.dashboard-canvas .dashboard-surface > h1,
+.dashboard-canvas .dashboard-surface > h2,
+.dashboard-canvas .dashboard-surface > h3,
+.dashboard-canvas .dashboard-feature-surface > h1,
+.dashboard-canvas .dashboard-feature-surface > h2,
+.dashboard-canvas .dashboard-feature-surface > h3 {
+  letter-spacing: -0.025em;
+}
+
 .alexos-route-content {
   position: relative;
   min-width: 0;
