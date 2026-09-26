@@ -96,19 +96,6 @@ jobs:
           migration_baseline=20260915085639
           deploy_dir="$(mktemp -d)"
           trap 'rm -rf "$deploy_dir"' EXIT
-          mkdir -p "$deploy_dir/supabase/migrations"
-          cp supabase/config.toml "$deploy_dir/supabase/config.toml"
-
-          # The production ledger was audited through this baseline. Older
-          # repository files include historical/squashed migrations and must
-          # not be replayed. The explicitly review-only price-guard proposal
-          # is also excluded until separately approved.
-          while IFS= read -r migration; do
-            version="$(basename "$migration" | cut -d_ -f1)"
-            if [[ "$version" > "$migration_baseline" ]] && [[ "$(basename "$migration")" != "20260901000000_dailygear_positive_order_price_guard.sql" ]]; then
-              cp "$migration" "$deploy_dir/supabase/migrations/"
-            fi
-          done < <(find supabase/migrations -maxdepth 1 -type f -name '*.sql' | sort)
 
           export SUPABASE_DB_URL="$(python3 - <<'PY'
           import os
@@ -119,32 +106,44 @@ jobs:
           PY
           )"
 
-          # The remote ledger contains historical versions whose local files
-          # were later squashed or renamed. Add empty placeholders for those
-          # already-applied versions so db push can validate history without
-          # replaying them. Only tracked post-baseline files contain SQL.
-          while IFS= read -r version; do
-            [ -z "$version" ] && continue
-            if ! compgen -G "$deploy_dir/supabase/migrations/${version}_*.sql" > /dev/null; then
-              : > "$deploy_dir/supabase/migrations/${version}_remote_baseline.sql"
-            fi
-          done < <(
-            supabase migration list \
-              --db-url "$SUPABASE_DB_URL" \
-              --workdir "$deploy_dir" \
-              --output csv 2>/dev/null \
-              | grep -oE '[0-9]{14}' \
-              | sort -u
-          )
+          # Apply only new post-baseline files transactionally. The remote
+          # ledger contains historical versions whose local files were later
+          # squashed or renamed, so db push cannot be used with a partial
+          # migration directory. Record each successful file explicitly after
+          # execution; reruns then skip versions already in the ledger.
+          applied=0
+          while IFS= read -r migration; do
+            version="$(basename "$migration" | cut -d_ -f1)"
+            if [[ "$version" > "$migration_baseline" ]] && [[ "$(basename "$migration")" != "20260901000000_dailygear_positive_order_price_guard.sql" ]]; then
+              if supabase db query \
+                --db-url "$SUPABASE_DB_URL" \
+                --output csv \
+                "select version from supabase_migrations.schema_migrations where version = '${version}' limit 1" \
+                | grep -q "$version"; then
+                echo "Migration $version already applied."
+                continue
+              fi
 
-          if compgen -G "$deploy_dir/supabase/migrations/*.sql" > /dev/null; then
-            supabase db push \
-              --db-url "$SUPABASE_DB_URL" \
-              --workdir "$deploy_dir" \
-              --skip-vault \
-              --yes
+              apply_file="$deploy_dir/${version}.sql"
+              {
+                echo "begin;"
+                cat "$migration"
+                echo "commit;"
+              } > "$apply_file"
+              supabase db query --db-url "$SUPABASE_DB_URL" --file "$apply_file"
+              supabase migration repair \
+                --db-url "$SUPABASE_DB_URL" \
+                --status applied \
+                --yes \
+                "$version"
+              applied=$((applied + 1))
+            fi
+          done < <(find supabase/migrations -maxdepth 1 -type f -name '*.sql' | sort)
+
+          if [ "$applied" -eq 0 ]; then
+            echo "No new post-baseline production migrations to apply."
           else
-            echo "No post-baseline production migrations to apply."
+            echo "Applied $applied post-baseline production migration(s)."
           fi
 
       - name: Deploy the verified main build to Cloudflare Workers
