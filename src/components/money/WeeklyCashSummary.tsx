@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowDownRight, ArrowUpRight, RefreshCw, Wallet } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, RefreshCw, Sparkles, Wallet } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -103,6 +103,15 @@ export function WeeklyCashSummary() {
         </div>
       </CardHeader>
       <CardContent>
+        {!summary.isMixedCurrency && !loading && (
+          <PerformancePulse
+            currentNet={summary.netCashFlow}
+            previousNet={previousSummary.netCashFlow}
+            currentExpenses={summary.expenses}
+            previousExpenses={previousSummary.expenses}
+            money={money}
+          />
+        )}
         {summary.isMixedCurrency ? (
           <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-900 dark:text-amber-100">
             <p className="font-semibold">Multiple currencies detected</p>
@@ -175,6 +184,59 @@ function CashMetric({
       <p className="mt-2 text-xl font-semibold tabular-nums text-foreground">{value}</p>
       <p className="mt-1 text-[11px] font-medium text-muted-foreground">{comparison}</p>
       <p className="mt-1 text-[11px] text-muted-foreground">{hint}</p>
+    </div>
+  );
+}
+
+function PerformancePulse({
+  currentNet,
+  previousNet,
+  currentExpenses,
+  previousExpenses,
+  money,
+}: {
+  currentNet: number | null;
+  previousNet: number | null;
+  currentExpenses: number | null;
+  previousExpenses: number | null;
+  money: (value: number | null) => string;
+}) {
+  const netChange = currentNet !== null && previousNet !== null ? currentNet - previousNet : null;
+  const expenseChange =
+    currentExpenses !== null && previousExpenses !== null
+      ? currentExpenses - previousExpenses
+      : null;
+  const improved =
+    netChange !== null && netChange >= 0 && (expenseChange === null || expenseChange <= 0);
+  const title = improved ? "Performance improved" : "Performance needs attention";
+  const detail =
+    netChange === null
+      ? "Add posted activity in both periods to unlock a complete performance read."
+      : `${netChange >= 0 ? "Net cash flow improved" : "Net cash flow declined"} by ${money(Math.abs(netChange))} versus last week${expenseChange !== null ? `, while expenditure ${expenseChange <= 0 ? "fell" : "rose"} by ${money(Math.abs(expenseChange))}.` : "."}`;
+
+  return (
+    <div
+      className={cn(
+        "mb-4 flex items-start gap-3 rounded-2xl border p-4",
+        improved
+          ? "border-emerald-500/25 bg-gradient-to-r from-emerald-500/10 via-card to-cyan-500/5"
+          : "border-amber-500/25 bg-gradient-to-r from-amber-500/10 via-card to-rose-500/5",
+      )}
+    >
+      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-background/80 shadow-sm">
+        <Sparkles
+          className={cn(
+            "h-4 w-4",
+            improved
+              ? "text-emerald-600 dark:text-emerald-400"
+              : "text-amber-600 dark:text-amber-400",
+          )}
+        />
+      </div>
+      <div>
+        <p className="text-sm font-semibold text-foreground">{title}</p>
+        <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{detail}</p>
+      </div>
     </div>
   );
 }
