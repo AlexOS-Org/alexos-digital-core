@@ -116,7 +116,7 @@ jobs:
           from urllib.parse import quote
           password = quote(os.environ["SUPABASE_DB_PASSWORD"], safe="")
           project = os.environ["SUPABASE_PROJECT_ID"]
-          print(f"postgresql://postgres:{password}@db.{project}.supabase.co:5432/postgres?sslmode=require")
+          print(f"postgresql://postgres.{project}:{password}@aws-0-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require")
           PY
           )"
             supabase db push \
