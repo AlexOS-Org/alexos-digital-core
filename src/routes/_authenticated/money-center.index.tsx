@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { useBalanceVisibility } from "@/components/money/BalanceVisibility";
 import { getDashboardSceneAsset } from "@/components/theme/dashboard-scene-assets";
 import { BINANCE_WITHDRAWAL_MINIMUM_KES, useLiveBinanceBalance } from "@/lib/money/crypto-prices";
+import { WeeklyCashSummary } from "@/components/money/WeeklyCashSummary";
 
 export const Route = createFileRoute("/_authenticated/money-center/")({
   component: MoneyDashboard,
@@ -211,6 +212,8 @@ function MoneyDashboard() {
       <QuickActions />
 
       <MoneyAllocationPanel />
+
+      <WeeklyCashSummary />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {kpis.map((k) => {
