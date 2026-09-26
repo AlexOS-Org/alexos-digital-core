@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBalanceVisibility } from "@/components/money/BalanceVisibility";
-import { getDashboardSceneAsset } from "@/components/theme/dashboard-scene-assets";
 import { BINANCE_WITHDRAWAL_MINIMUM_KES, useLiveBinanceBalance } from "@/lib/money/crypto-prices";
 import { WeeklyCashSummary } from "@/components/money/WeeklyCashSummary";
 
@@ -144,10 +143,7 @@ function MoneyDashboard() {
   ];
 
   return (
-    <div
-      className="money-center-shell space-y-7"
-      style={{ backgroundImage: `url(${getDashboardSceneAsset("mountains")})` }}
-    >
+    <div className="money-center-shell space-y-7">
       <Card className="money-hero relative overflow-hidden rounded-[2rem] border-0 bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white shadow-[0_24px_70px_-35px_rgba(15,23,42,0.65)]">
         <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-emerald-300/15 blur-3xl" />
         <div className="pointer-events-none absolute bottom-[-5rem] left-[30%] h-52 w-52 rounded-full bg-cyan-300/10 blur-3xl" />

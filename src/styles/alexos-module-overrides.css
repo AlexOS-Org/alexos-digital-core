@@ -14,6 +14,66 @@
     );
 }
 
+/* Premium internal workspace stage. This is intentionally scoped to the
+   authenticated AlexOS shell; storefront and funnel routes keep their own
+   visual language. */
+.alexos-internal-workspace {
+  --enterprise-stage: oklch(0.975 0.012 245);
+  --enterprise-stage-deep: oklch(0.94 0.026 250);
+  --enterprise-line: color-mix(in oklch, var(--alexos-blue) 12%, transparent);
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background:
+    radial-gradient(
+      circle at 8% 0%,
+      color-mix(in oklch, var(--alexos-blue) 12%, transparent),
+      transparent 32rem
+    ),
+    radial-gradient(
+      circle at 92% 12%,
+      color-mix(in oklch, var(--alexos-purple) 10%, transparent),
+      transparent 30rem
+    ),
+    linear-gradient(135deg, var(--enterprise-stage), var(--enterprise-stage-deep));
+}
+
+.dark .alexos-internal-workspace {
+  --enterprise-stage: oklch(0.16 0.025 255);
+  --enterprise-stage-deep: oklch(0.12 0.035 265);
+  --enterprise-line: color-mix(in oklch, white 9%, transparent);
+}
+
+.alexos-internal-workspace::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--enterprise-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--enterprise-line) 1px, transparent 1px),
+    radial-gradient(
+      circle at 50% -12%,
+      color-mix(in oklch, var(--primary) 10%, transparent),
+      transparent 34rem
+    );
+  background-size:
+    44px 44px,
+    44px 44px,
+    100% 100%;
+  mask-image: linear-gradient(to bottom, black 0%, transparent 72%);
+  content: "";
+  opacity: 0.6;
+}
+
+.alexos-internal-workspace > div:not([data-sidebar="sidebar"]) {
+  background: color-mix(in oklch, var(--enterprise-stage) 68%, transparent);
+}
+
+.alexos-internal-workspace .alexos-route-canvas {
+  background: transparent;
+}
+
 .alexos-route-content {
   position: relative;
   min-width: 0;

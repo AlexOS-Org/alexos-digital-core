@@ -129,10 +129,21 @@ export async function sendWeeklyMoneySummaries() {
   let sent = 0;
   let skipped = 0;
   for (const preference of (preferences ?? []) as unknown as WeeklyPreference[]) {
-    if (preference.last_sent_period === period.from) {
+    const claimToken = crypto.randomUUID();
+    const { data: claimed, error: claimError } = await supabaseAdmin.rpc(
+      "claim_money_weekly_summary_send" as never,
+      {
+        p_user_id: preference.user_id,
+        p_period: period.from,
+        p_claim_token: claimToken,
+      } as never,
+    );
+    if (claimError) throw claimError;
+    if (!claimed) {
       skipped += 1;
       continue;
     }
+
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(
       preference.user_id,
     );
@@ -204,6 +215,7 @@ export async function sendWeeklyMoneySummaries() {
       headers: {
         Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
         "Content-Type": "application/json",
+        "Idempotency-Key": claimToken,
       },
       body: JSON.stringify({
         from: process.env.DAILYGEAR_EMAIL_FROM,
@@ -220,11 +232,17 @@ export async function sendWeeklyMoneySummaries() {
       throw new Error(
         `Weekly summary email failed (${response.status}): ${(await response.text()).slice(0, 300)}`,
       );
-    const { error: updateError } = await supabaseAdmin
-      .from("money_weekly_summary_preferences" as never)
-      .update({ last_sent_period: period.from, updated_at: new Date().toISOString() } as never)
-      .eq("user_id", preference.user_id);
-    if (updateError) throw updateError;
+
+    const { data: completed, error: completeError } = await supabaseAdmin.rpc(
+      "complete_money_weekly_summary_send" as never,
+      {
+        p_user_id: preference.user_id,
+        p_period: period.from,
+        p_claim_token: claimToken,
+      } as never,
+    );
+    if (completeError) throw completeError;
+    if (!completed) throw new Error("Weekly summary claim could not be completed");
     sent += 1;
   }
   return { sent, skipped, period: period.from } as const;
