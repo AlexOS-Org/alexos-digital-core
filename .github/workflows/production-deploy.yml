@@ -110,8 +110,7 @@ jobs:
             fi
           done < <(find supabase/migrations -maxdepth 1 -type f -name '*.sql' | sort)
 
-          if compgen -G "$deploy_dir/supabase/migrations/*.sql" > /dev/null; then
-            export SUPABASE_DB_URL="$(python3 - <<'PY'
+          export SUPABASE_DB_URL="$(python3 - <<'PY'
           import os
           from urllib.parse import quote
           password = quote(os.environ["SUPABASE_DB_PASSWORD"], safe="")
@@ -119,6 +118,26 @@ jobs:
           print(f"postgresql://postgres.{project}:{password}@aws-0-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require")
           PY
           )"
+
+          # The remote ledger contains historical versions whose local files
+          # were later squashed or renamed. Add empty placeholders for those
+          # already-applied versions so db push can validate history without
+          # replaying them. Only tracked post-baseline files contain SQL.
+          while IFS= read -r version; do
+            [ -z "$version" ] && continue
+            if ! compgen -G "$deploy_dir/supabase/migrations/${version}_*.sql" > /dev/null; then
+              : > "$deploy_dir/supabase/migrations/${version}_remote_baseline.sql"
+            fi
+          done < <(
+            supabase migration list \
+              --db-url "$SUPABASE_DB_URL" \
+              --workdir "$deploy_dir" \
+              --output csv 2>/dev/null \
+              | grep -oE '[0-9]{14}' \
+              | sort -u
+          )
+
+          if compgen -G "$deploy_dir/supabase/migrations/*.sql" > /dev/null; then
             supabase db push \
               --db-url "$SUPABASE_DB_URL" \
               --workdir "$deploy_dir" \
