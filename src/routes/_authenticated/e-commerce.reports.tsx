@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/dailygear/PageHeader";
 import { ProfitCashFlowPanel } from "@/components/dailygear/ProfitCashFlowPanel";
+import { WeeklyPerformanceView } from "@/components/reports/WeeklyPerformanceView";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const Route = createFileRoute("/_authenticated/e-commerce/reports")({
@@ -25,6 +26,7 @@ function ReportsPage() {
         description="Revenue, COGS, Meta Spend, operating profit and cash flow."
       />
       <ProfitCashFlowPanel />
+      <WeeklyPerformanceView />
       <Card className="rounded-2xl border-border/60">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold">How to read this report</CardTitle>
