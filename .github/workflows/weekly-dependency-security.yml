@@ -1,0 +1,62 @@
+name: Weekly Dependency Security
+
+on:
+  schedule:
+    # Every Sunday at 03:30 UTC.
+    - cron: "30 3 * * 0"
+  pull_request:
+    branches: [main]
+    paths:
+      - package.json
+      - package-lock.json
+      - .github/workflows/weekly-dependency-security.yml
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch, tag, or commit to scan"
+        required: true
+        default: main
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: dependency-security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: Audit dependencies and verify branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out requested revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          # The repository storefront guard compares the branch with origin/main.
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Audit all dependencies
+        run: npm audit --audit-level=high
+
+      - name: Run full branch verification
+        run: npm run verify
+
+  # dependency-review-action is intentionally not used because GitHub's
+  # dependency graph is disabled for this repository. The locked production
+  # and full-tree npm audits above remain the supported security checks.
