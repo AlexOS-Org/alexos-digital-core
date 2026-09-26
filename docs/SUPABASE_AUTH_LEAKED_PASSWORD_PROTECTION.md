@@ -78,6 +78,17 @@ If the Management API token is unavailable:
 4. Re-run the Supabase security advisor.
 5. Confirm `auth_leaked_password_protection` is no longer reported.
 
+## AlexOS auth-flow integration
+
+The application already uses Supabase Auth's password APIs in `src/routes/auth.tsx`:
+
+- `supabase.auth.signUp({ email, password })`
+- `supabase.auth.signInWithPassword({ email, password })`
+
+No SQL migration or client-side password screening is required. Once enabled, Supabase Auth performs the leaked-password check server-side during password signup and password changes. AlexOS already surfaces Supabase Auth errors through its toast handler, so rejected passwords are visible to the user without exposing password material.
+
+This setting does not change RLS, service-role RPCs, OAuth, magic links, or existing session authorization. Re-run the Auth advisor after enabling it and treat removal of `auth_leaked_password_protection` as the completion evidence.
+
 ## Operational notes
 
 - Existing users can still sign in with an existing password that does not meet the new requirements.
