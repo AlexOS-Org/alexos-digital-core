@@ -6,12 +6,12 @@ This checklist is intentionally explicit because the repository cannot create or
 
 In **Settings → Environments → production**, configure these Actions secrets with current values:
 
-- `SUPABASE_ACCESS_TOKEN`
+- `SUPABASE_ACCESS_TOKEN` (retained for audit compatibility; not used for deployment authorization)
 - `SUPABASE_DB_PASSWORD`
 - `CLOUDFLARE_API_TOKEN`
 - `VITE_SUPABASE_PUBLISHABLE_KEY`
 
-The deployment workflow now fails before installation if any of these four values is empty.
+The deployment workflow now fails before installation if any of the three deployment values (`SUPABASE_DB_PASSWORD`, `CLOUDFLARE_API_TOKEN`, or `VITE_SUPABASE_PUBLISHABLE_KEY`) is empty. It applies only migrations newer than the audited production baseline `20260915085639` through a direct SSL database connection, so it does not require the Supabase API token to have `project_admin_read`.
 
 Use least-privilege tokens and restrict the production environment to approved reviewers. Never put secret values in repository files, workflow logs, or issue comments.
 
@@ -32,7 +32,7 @@ Verify presence without printing values. A missing optional integration should r
 Before deployment:
 
 1. Confirm the project reference is `goafwbrayepaihxbqsse`.
-2. Confirm the migration ledger matches the repository migrations.
+2. Confirm the migration ledger matches the repository migrations. The explicitly marked `20260901000000_dailygear_positive_order_price_guard.sql` proposal remains excluded from automated production deployment until separately approved.
 3. Confirm RLS is enabled on user/business/order tables.
 4. Confirm the server-only RPCs used by cron, checkout, refunds, salary schedules, and order-trash retention exist and have the intended grants.
 5. Run a controlled authenticated smoke test with non-production test data or an approved staging project.
