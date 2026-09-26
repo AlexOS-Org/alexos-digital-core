@@ -1,0 +1,159 @@
+name: Daily Repository Hygiene
+
+on:
+  schedule:
+    # 06:15 UTC every day.
+    - cron: "15 6 * * *"
+  workflow_dispatch:
+    inputs:
+      stale_days:
+        description: "Age in days after which a branch or PR is reported as stale"
+        required: false
+        default: "30"
+        type: string
+      fail_on_stale:
+        description: "Fail the manual run when stale branches or PRs are found"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  repository-hygiene:
+    name: Report stale branches and open pull requests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      STALE_DAYS: ${{ inputs.stale_days || '30' }}
+      FAIL_ON_STALE: ${{ inputs.fail_on_stale || 'false' }}
+    steps:
+      - name: Check repository hygiene
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import datetime as dt
+          import json
+          import os
+          import sys
+          import urllib.error
+          import urllib.request
+
+          repo = os.environ["GITHUB_REPOSITORY"]
+          token = os.environ["GH_TOKEN"]
+          try:
+              stale_days = max(1, int(os.environ.get("STALE_DAYS", "30")))
+          except ValueError:
+              raise SystemExit("STALE_DAYS must be a positive integer")
+          fail_on_stale = os.environ.get("FAIL_ON_STALE", "false").lower() == "true"
+          now = dt.datetime.now(dt.timezone.utc)
+          cutoff = now - dt.timedelta(days=stale_days)
+
+          def get(path):
+              request = urllib.request.Request(
+                  f"https://api.github.com/repos/{repo}{path}",
+                  headers={
+                      "Accept": "application/vnd.github+json",
+                      "Authorization": f"Bearer {token}",
+                      "X-GitHub-Api-Version": "2022-11-28",
+                      "User-Agent": "daily-repository-hygiene",
+                  },
+              )
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  return json.load(response)
+
+          def paged(path):
+              page = 1
+              results = []
+              while True:
+                  separator = "&" if "?" in path else "?"
+                  batch = get(f"{path}{separator}per_page=100&page={page}")
+                  results.extend(batch)
+                  if len(batch) < 100:
+                      return results
+                  page += 1
+
+          open_prs = paged("/pulls?state=open&sort=updated&direction=desc")
+          branches = paged("/branches")
+          open_pr_heads = {pr["head"]["ref"] for pr in open_prs}
+
+          stale_branches = []
+          for branch in branches:
+              name = branch["name"]
+              if name == "main" or name in open_pr_heads:
+                  continue
+              commit = get(f"/commits/{branch['commit']['sha']}")
+              timestamp = (
+                  commit.get("commit", {}).get("committer", {}).get("date")
+                  or commit.get("commit", {}).get("author", {}).get("date")
+              )
+              if not timestamp:
+                  continue
+              committed_at = dt.datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+              if committed_at < cutoff:
+                  stale_branches.append((name, committed_at, branch["commit"]["sha"]))
+
+          stale_prs = []
+          for pr in open_prs:
+              updated_at = dt.datetime.fromisoformat(pr["updated_at"].replace("Z", "+00:00"))
+              if updated_at < cutoff:
+                  stale_prs.append((pr, updated_at))
+
+          def age(timestamp):
+              return max(0, (now - timestamp).days)
+
+          lines = [
+              "## Daily repository hygiene",
+              "",
+              f"Checked at `{now.isoformat()}` with a stale threshold of **{stale_days} days**.",
+              "",
+              f"### Open pull requests ({len(open_prs)})",
+              "",
+          ]
+          if open_prs:
+              lines.append("| PR | Title | Branch | Last updated | Status |")
+              lines.append("|---:|---|---|---:|---|")
+              for pr in open_prs:
+                  updated_at = dt.datetime.fromisoformat(pr["updated_at"].replace("Z", "+00:00"))
+                  status = "STALE" if updated_at < cutoff else "active"
+                  lines.append(
+                      f"| [#{pr['number']}]({pr['html_url']}) | "
+                      f"{pr['title'].replace('|', '\\|')} | `{pr['head']['ref']}` | "
+                      f"{age(updated_at)} days ago | {status} |"
+                  )
+          else:
+              lines.append("No open pull requests.")
+
+          lines.extend(["", f"### Stale remote branches not attached to an open PR ({len(stale_branches)})", ""])
+          if stale_branches:
+              lines.append("| Branch | Last commit | Age | Commit |")
+              lines.append("|---|---:|---:|---|")
+              for name, committed_at, sha in sorted(stale_branches, key=lambda item: item[1]):
+                  lines.append(f"| `{name}` | {committed_at.date().isoformat()} | {age(committed_at)} days | `{sha[:12]}` |")
+          else:
+              lines.append("No stale remote branches found.")
+
+          lines.extend([
+              "",
+              "### Suggested action",
+              "",
+              "Review stale items before deleting anything. This workflow is report-only by default and does not close PRs or delete branches.",
+          ])
+
+          summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+          if summary_path:
+              with open(summary_path, "a", encoding="utf-8") as summary:
+                  summary.write("\n".join(lines) + "\n")
+          print("\n".join(lines))
+
+          if fail_on_stale and (stale_branches or stale_prs):
+              print(
+                  f"Found {len(stale_prs)} stale open PR(s) and {len(stale_branches)} stale branch(es).",
+                  file=sys.stderr,
+              )
+              raise SystemExit(1)
+          PY
