@@ -126,11 +126,11 @@ function CustomersPage() {
       </div>
 
       {/* Loading */}
-      {isLoading && <Skeleton className="h-72 w-full rounded-2xl" />}
+      {isLoading && <Skeleton className="h-72 w-full rounded-xl" />}
 
       {/* Empty */}
       {!isLoading && filtered.length === 0 && (
-        <Card className="rounded-2xl border-dashed">
+        <Card className="rounded-xl border-dashed">
           <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
             <Users className="h-6 w-6 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
@@ -150,7 +150,7 @@ function CustomersPage() {
 
       {/* Table */}
       {!isLoading && filtered.length > 0 && (
-        <Card className="rounded-2xl overflow-hidden">
+        <Card className="rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">

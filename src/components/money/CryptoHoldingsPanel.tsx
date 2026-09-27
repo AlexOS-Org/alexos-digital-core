@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AlexOSEmptyState } from "@/components/alexos/states";
 import { formatMoney } from "@/lib/money/format";
 import {
   BINANCE_WITHDRAWAL_MINIMUM_KES,
@@ -21,6 +22,7 @@ import {
   useLiveCryptoPrices,
 } from "@/lib/money/crypto-prices";
 import { cn } from "@/lib/utils";
+import type { AlexOSTone } from "@/lib/ui/status";
 
 const COINS = ["BTC", "ETH", "BNB", "SOL", "XRP", "USDT", "USDC"] as const;
 type Coin = (typeof COINS)[number];
@@ -34,18 +36,17 @@ type Holding = {
   notes: string | null;
 };
 
-function coinStyle(symbol: Coin) {
-  const styles: Record<Coin, string> = {
-    BTC: "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300",
-    ETH: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300",
-    BNB: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-300",
-    SOL: "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300",
-    XRP: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-    USDT: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300",
-    USDC: "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
-  };
-  return styles[symbol];
-}
+/** Coin identity is a category, not a status, so it reuses the semantic tone
+ *  scale instead of an arbitrary palette colour per asset. */
+const COIN_TONES: Record<Coin, AlexOSTone> = {
+  BTC: "warning",
+  ETH: "debt",
+  BNB: "warning",
+  SOL: "info",
+  XRP: "neutral",
+  USDT: "income",
+  USDC: "info",
+};
 
 export function CryptoHoldingsPanel() {
   const qc = useQueryClient();
@@ -176,12 +177,12 @@ export function CryptoHoldingsPanel() {
   }, [holdings.data, live.data]);
 
   return (
-    <Card className="rounded-2xl border-amber-300/40 dark:border-amber-800/40">
+    <Card data-tone="warning">
       <CardHeader className="space-y-2">
         <CardTitle className="flex flex-wrap items-center justify-between gap-2 text-base">
           <span className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
-              <Bitcoin className="h-4 w-4" />
+            <span className="alexos-tone-bg alexos-tone-text grid size-9 place-items-center rounded-full">
+              <Bitcoin aria-hidden="true" className="size-4" />
             </span>
             Binance crypto holdings
           </span>
@@ -190,23 +191,24 @@ export function CryptoHoldingsPanel() {
               type="button"
               size="sm"
               variant="outline"
-              className="rounded-lg"
               disabled={live.isFetching}
               onClick={() => void live.refetch()}
             >
-              <RefreshCw className={cn("mr-1.5 h-3.5 w-3.5", live.isFetching && "animate-spin")} />
+              <RefreshCw
+                aria-hidden="true"
+                className={cn("mr-1.5 size-3.5", live.isFetching && "animate-spin")}
+              />
               Refresh prices
             </Button>
             <Button
               type="button"
               size="sm"
-              className="rounded-lg"
               disabled={
                 applyLivePrices.isPending || !live.data || (holdings.data ?? []).length === 0
               }
               onClick={() => applyLivePrices.mutate()}
             >
-              <TrendingUp className="mr-1.5 h-3.5 w-3.5" />
+              <TrendingUp aria-hidden="true" className="mr-1.5 size-3.5" />
               {applyLivePrices.isPending ? "Updating…" : "Apply live prices"}
             </Button>
           </span>
@@ -229,13 +231,15 @@ export function CryptoHoldingsPanel() {
           </p>
         )}
         {live.isError && (
-          <p className="text-xs text-destructive">Live prices unavailable — enter KES manually.</p>
+          <p data-tone="danger" className="alexos-tone-text text-xs">
+            Live prices unavailable — enter KES manually.
+          </p>
         )}
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-3 sm:grid-cols-4">
           <div className="space-y-1.5">
-            <Label>Coin</Label>
+            <Label htmlFor="crypto-symbol">Coin</Label>
             <Select
               value={symbol}
               onValueChange={(value) => {
@@ -243,7 +247,7 @@ export function CryptoHoldingsPanel() {
                 setPriceKes("");
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger id="crypto-symbol">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -260,8 +264,9 @@ export function CryptoHoldingsPanel() {
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label>Quantity</Label>
+            <Label htmlFor="crypto-quantity">Quantity</Label>
             <Input
+              id="crypto-quantity"
               inputMode="decimal"
               type="number"
               min="0"
@@ -272,8 +277,9 @@ export function CryptoHoldingsPanel() {
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Price per coin (KES)</Label>
+            <Label htmlFor="crypto-price">Price per coin (KES)</Label>
             <Input
+              id="crypto-price"
               inputMode="decimal"
               type="number"
               min="0"
@@ -284,8 +290,9 @@ export function CryptoHoldingsPanel() {
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Note</Label>
+            <Label htmlFor="crypto-note">Note</Label>
             <Input
+              id="crypto-note"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Optional"
@@ -293,18 +300,21 @@ export function CryptoHoldingsPanel() {
           </div>
         </div>
         <Button type="button" size="sm" onClick={() => save.mutate()} disabled={save.isPending}>
-          <Plus className="mr-1.5 h-3.5 w-3.5" />
+          <Plus aria-hidden="true" className="mr-1.5 size-3.5" />
           {save.isPending ? "Adding…" : "Add holding"}
         </Button>
 
         <div className="grid gap-2 sm:grid-cols-2">
           <div className="flex items-center justify-between rounded-xl bg-muted/40 px-3 py-2 text-sm">
             <span className="text-muted-foreground">Stored value</span>
-            <strong>{formatMoney(storedTotal, "KES")}</strong>
+            <strong className="tabular-nums">{formatMoney(storedTotal, "KES")}</strong>
           </div>
-          <div className="flex items-center justify-between rounded-xl bg-amber-500/10 px-3 py-2 text-sm">
+          <div
+            data-tone="warning"
+            className="alexos-tone-bg flex items-center justify-between rounded-xl px-3 py-2 text-sm"
+          >
             <span className="text-muted-foreground">Live value</span>
-            <strong className="text-amber-800 dark:text-amber-300">
+            <strong className="alexos-tone-text tabular-nums">
               {liveTotal != null ? formatMoney(liveTotal, "KES") : "—"}
             </strong>
           </div>
@@ -317,22 +327,20 @@ export function CryptoHoldingsPanel() {
             const liveValue = livePrice != null ? holding.quantity * livePrice : storedValue;
             const delta = liveValue - storedValue;
             const low = liveValue <= BINANCE_WITHDRAWAL_MINIMUM_KES;
+            const tone: AlexOSTone = low ? "danger" : COIN_TONES[holding.symbol];
             return (
               <div
                 key={holding.id}
+                data-tone={tone}
                 className={cn(
                   "flex flex-wrap items-center justify-between gap-3 rounded-xl border px-3 py-2.5",
-                  low && "border-red-300 bg-red-50/70 dark:border-red-900/60 dark:bg-red-950/20",
+                  low && "alexos-tone-bg alexos-tone-border",
                 )}
               >
                 <div className="flex min-w-0 items-center gap-2.5">
                   <span
-                    className={cn(
-                      "grid h-8 w-8 shrink-0 place-items-center rounded-full text-[10px] font-bold",
-                      low
-                        ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
-                        : coinStyle(holding.symbol),
-                    )}
+                    data-tone={tone}
+                    className="alexos-tone-bg alexos-tone-text grid size-8 shrink-0 place-items-center rounded-full text-[10px] font-bold"
                   >
                     {holding.symbol}
                   </span>
@@ -350,17 +358,13 @@ export function CryptoHoldingsPanel() {
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="text-right">
-                    <strong className={low ? "text-red-600 dark:text-red-400" : ""}>
+                    <strong className={cn("tabular-nums", low && "alexos-tone-text")}>
                       {formatMoney(liveValue, "KES")}
                     </strong>
                     {livePrice != null && Math.abs(delta) >= 1 && (
                       <div
-                        className={cn(
-                          "text-[11px]",
-                          delta >= 0
-                            ? "text-emerald-600 dark:text-emerald-400"
-                            : "text-rose-600 dark:text-rose-400",
-                        )}
+                        data-tone={delta >= 0 ? "income" : "expense"}
+                        className="alexos-tone-text text-[11px] tabular-nums"
                       >
                         {delta >= 0 ? "+" : ""}
                         {formatMoney(delta, "KES")} vs stored
@@ -368,16 +372,20 @@ export function CryptoHoldingsPanel() {
                     )}
                   </div>
                   {low && (
-                    <CircleAlert
-                      className="h-4 w-4 text-red-600"
+                    <span
+                      data-tone="danger"
+                      className="alexos-tone-text"
+                      role="img"
                       aria-label={`At or below KES ${BINANCE_WITHDRAWAL_MINIMUM_KES.toLocaleString()}`}
-                    />
+                    >
+                      <CircleAlert aria-hidden="true" className="size-4" />
+                    </span>
                   )}
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="h-8 rounded-lg text-xs"
+                    className="h-8 text-xs"
                     disabled={updateQuantity.isPending}
                     onClick={() => {
                       const next = window.prompt(
@@ -399,20 +407,32 @@ export function CryptoHoldingsPanel() {
                     type="button"
                     variant="ghost"
                     size="icon"
+                    className="size-8"
                     onClick={() => remove.mutate(holding.id)}
                     disabled={remove.isPending}
-                    aria-label={`Remove ${holding.symbol}`}
+                    aria-label={`Remove ${holding.symbol} holding`}
                   >
-                    <Trash2 className="h-4 w-4 text-destructive" />
+                    <Trash2 aria-hidden="true" className="size-4 text-destructive" />
                   </Button>
                 </div>
               </div>
             );
           })}
-          {!holdings.isLoading && (holdings.data ?? []).length === 0 && (
-            <p className="rounded-xl border border-dashed p-4 text-center text-sm text-muted-foreground">
-              No crypto holdings recorded yet. Add your coin quantities — prices fill from Binance.
-            </p>
+          {holdings.isLoading ? (
+            <div className="space-y-2" aria-hidden="true">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="h-14 animate-pulse rounded-xl bg-muted" />
+              ))}
+            </div>
+          ) : (
+            (holdings.data ?? []).length === 0 && (
+              <AlexOSEmptyState
+                icon={Bitcoin}
+                title="No crypto holdings recorded"
+                description="Add your coin quantities — prices fill from Binance public market data."
+                compact
+              />
+            )
           )}
         </div>
       </CardContent>

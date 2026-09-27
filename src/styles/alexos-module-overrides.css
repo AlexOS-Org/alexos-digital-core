@@ -281,7 +281,11 @@
   --kpi-tone: var(--alexos-lively-blue);
   border-color: color-mix(in oklch, var(--kpi-tone) 30%, var(--border));
   background:
-    radial-gradient(circle at 100% 0%, color-mix(in oklch, var(--kpi-tone) 23%, transparent), transparent 11rem),
+    radial-gradient(
+      circle at 100% 0%,
+      color-mix(in oklch, var(--kpi-tone) 23%, transparent),
+      transparent 11rem
+    ),
     linear-gradient(145deg, color-mix(in oklch, var(--card) 91%, var(--kpi-tone) 9%), var(--card));
   box-shadow: 0 22px 60px -42px color-mix(in oklch, var(--kpi-tone) 80%, transparent);
 }
@@ -301,7 +305,11 @@
 .dashboard-canvas .dashboard-kpi-card::before {
   width: 72%;
   height: 3px;
-  background: linear-gradient(90deg, var(--kpi-tone), color-mix(in oklch, var(--kpi-tone) 15%, transparent));
+  background: linear-gradient(
+    90deg,
+    var(--kpi-tone),
+    color-mix(in oklch, var(--kpi-tone) 15%, transparent)
+  );
   opacity: 1;
 }
 
@@ -321,9 +329,21 @@
 
 .dashboard-canvas .dashboard-feature-surface {
   background:
-    radial-gradient(circle at 90% -10%, color-mix(in oklch, var(--alexos-lively-violet) 25%, transparent), transparent 20rem),
-    radial-gradient(circle at 0% 100%, color-mix(in oklch, var(--alexos-lively-teal) 16%, transparent), transparent 22rem),
-    linear-gradient(135deg, color-mix(in oklch, var(--card) 86%, var(--alexos-lively-blue) 14%), var(--card));
+    radial-gradient(
+      circle at 90% -10%,
+      color-mix(in oklch, var(--alexos-lively-violet) 25%, transparent),
+      transparent 20rem
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      color-mix(in oklch, var(--alexos-lively-teal) 16%, transparent),
+      transparent 22rem
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--card) 86%, var(--alexos-lively-blue) 14%),
+      var(--card)
+    );
 }
 
 .money-center-shell {
@@ -339,15 +359,31 @@
   pointer-events: none;
   content: "";
   background:
-    radial-gradient(circle at 18% 25%, color-mix(in oklch, var(--alexos-lively-teal) 16%, transparent), transparent 22rem),
-    radial-gradient(circle at 82% 10%, color-mix(in oklch, var(--alexos-lively-violet) 14%, transparent), transparent 24rem);
+    radial-gradient(
+      circle at 18% 25%,
+      color-mix(in oklch, var(--alexos-lively-teal) 16%, transparent),
+      transparent 22rem
+    ),
+    radial-gradient(
+      circle at 82% 10%,
+      color-mix(in oklch, var(--alexos-lively-violet) 14%, transparent),
+      transparent 24rem
+    );
   filter: blur(12px);
 }
 
 .money-center-shell .money-hero {
   background:
-    radial-gradient(circle at 88% 0%, color-mix(in oklch, var(--alexos-lively-teal) 32%, transparent), transparent 20rem),
-    radial-gradient(circle at 10% 100%, color-mix(in oklch, var(--alexos-lively-violet) 27%, transparent), transparent 22rem),
+    radial-gradient(
+      circle at 88% 0%,
+      color-mix(in oklch, var(--alexos-lively-teal) 32%, transparent),
+      transparent 20rem
+    ),
+    radial-gradient(
+      circle at 10% 100%,
+      color-mix(in oklch, var(--alexos-lively-violet) 27%, transparent),
+      transparent 22rem
+    ),
     linear-gradient(135deg, oklch(0.19 0.055 255), oklch(0.14 0.055 280) 58%, oklch(0.17 0.06 190));
   border: 1px solid color-mix(in oklch, var(--alexos-lively-teal) 24%, transparent);
   box-shadow: 0 30px 90px -42px color-mix(in oklch, var(--alexos-lively-blue) 70%, transparent);
@@ -358,7 +394,12 @@
   inset: 0;
   pointer-events: none;
   content: "";
-  background: linear-gradient(115deg, transparent 10%, color-mix(in oklch, white 7%, transparent) 42%, transparent 70%);
+  background: linear-gradient(
+    115deg,
+    transparent 10%,
+    color-mix(in oklch, white 7%, transparent) 42%,
+    transparent 70%
+  );
   opacity: 0.45;
 }
 
@@ -366,7 +407,11 @@
   --money-tone: var(--alexos-lively-blue);
   border-color: color-mix(in oklch, var(--money-tone) 30%, var(--border));
   background:
-    radial-gradient(circle at 100% 0%, color-mix(in oklch, var(--money-tone) 18%, transparent), transparent 13rem),
+    radial-gradient(
+      circle at 100% 0%,
+      color-mix(in oklch, var(--money-tone) 18%, transparent),
+      transparent 13rem
+    ),
     linear-gradient(145deg, color-mix(in oklch, var(--card) 92%, var(--money-tone) 8%), var(--card));
   box-shadow: 0 20px 56px -42px color-mix(in oklch, var(--money-tone) 78%, transparent);
 }
@@ -392,7 +437,11 @@
 }
 
 .money-center-shell .money-kpi-card::before {
-  background: linear-gradient(90deg, var(--money-tone), color-mix(in oklch, var(--money-tone) 12%, transparent));
+  background: linear-gradient(
+    90deg,
+    var(--money-tone),
+    color-mix(in oklch, var(--money-tone) 12%, transparent)
+  );
   box-shadow: 0 0 18px color-mix(in oklch, var(--money-tone) 70%, transparent);
 }
 
@@ -403,18 +452,40 @@
 }
 
 .money-center-shell .money-account-card {
-  border-color: color-mix(in oklch, var(--institution-accent, var(--alexos-lively-blue)) 36%, var(--border));
+  border-color: color-mix(
+    in oklch,
+    var(--institution-accent, var(--alexos-lively-blue)) 36%,
+    var(--border)
+  );
   background:
-    radial-gradient(circle at 96% 0%, color-mix(in oklch, var(--institution-accent, var(--alexos-lively-blue)) 22%, transparent), transparent 14rem),
-    linear-gradient(145deg, color-mix(in oklch, var(--card) 91%, var(--institution-accent, var(--alexos-lively-blue)) 9%), var(--card));
-  box-shadow: 0 22px 62px -45px color-mix(in oklch, var(--institution-accent, var(--alexos-lively-blue)) 74%, transparent);
+    radial-gradient(
+      circle at 96% 0%,
+      color-mix(in oklch, var(--institution-accent, var(--alexos-lively-blue)) 22%, transparent),
+      transparent 14rem
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--card) 91%, var(--institution-accent, var(--alexos-lively-blue)) 9%),
+      var(--card)
+    );
+  box-shadow: 0 22px 62px -45px
+    color-mix(in oklch, var(--institution-accent, var(--alexos-lively-blue)) 74%, transparent);
 }
 
 .money-center-shell .money-account-card:hover,
 .dashboard-canvas .dashboard-kpi-card:hover,
 .money-center-shell .money-kpi-card:hover {
-  border-color: color-mix(in oklch, var(--institution-accent, var(--money-tone, var(--kpi-tone, var(--primary)))) 56%, var(--border));
-  box-shadow: 0 28px 78px -46px color-mix(in oklch, var(--institution-accent, var(--money-tone, var(--kpi-tone, var(--primary)))) 82%, transparent);
+  border-color: color-mix(
+    in oklch,
+    var(--institution-accent, var(--money-tone, var(--kpi-tone, var(--primary)))) 56%,
+    var(--border)
+  );
+  box-shadow: 0 28px 78px -46px
+    color-mix(
+      in oklch,
+      var(--institution-accent, var(--money-tone, var(--kpi-tone, var(--primary)))) 82%,
+      transparent
+    );
 }
 
 @media (prefers-reduced-motion: reduce) {

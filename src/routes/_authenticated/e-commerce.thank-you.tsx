@@ -43,8 +43,8 @@ function ThankYouPage() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-3xl border border-border bg-success/5 p-8 text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-success text-success-foreground">
+      <div className="rounded-xl border border-border bg-success/5 p-8 text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-success text-success-foreground">
           <CheckCircle2 className="h-8 w-8" />
         </div>
         <h1 className="mt-6 text-3xl font-semibold tracking-tight">Thank you!</h1>
@@ -64,7 +64,7 @@ function ThankYouPage() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        <Card className="rounded-3xl border-border">
+        <Card className="rounded-xl border-border">
           <CardContent className="space-y-3">
             <h2 className="text-lg font-semibold">Order details</h2>
             {order ? (
@@ -99,7 +99,7 @@ function ThankYouPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-3xl border-border">
+        <Card className="rounded-xl border-border">
           <CardContent className="space-y-3">
             <h2 className="text-lg font-semibold">Customer</h2>
             {customer ? (

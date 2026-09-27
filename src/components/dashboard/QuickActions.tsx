@@ -61,20 +61,18 @@ export function QuickActions({ compact = false }: { compact?: boolean }) {
 
   return (
     <section
-      className={`space-y-4 rounded-[1.5rem] border border-border/50 bg-card/35 ${compact ? "p-4" : "p-4 sm:p-5"}`}
+      className={`space-y-4 rounded-xl border border-border/50 bg-card/35 ${compact ? "p-4" : "p-4 sm:p-5"}`}
     >
       <div className="flex items-end justify-between gap-3">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-primary sm:text-xs">
-            Quick actions
-          </p>
+          <p className="alexos-eyebrow alexos-eyebrow-accent">Quick actions</p>
           <h2 className="mt-1 text-xl font-semibold tracking-tight">Move things forward.</h2>
           <p className="text-xs text-muted-foreground sm:text-sm">
             {compact ? "The things you use most." : "The things you use most, one swipe away."}
           </p>
         </div>
         <ChevronRight
-          className="mb-1 h-4 w-4 shrink-0 text-muted-foreground sm:hidden"
+          className="mb-1 size-4 shrink-0 text-muted-foreground sm:hidden"
           aria-hidden="true"
         />
       </div>
@@ -84,13 +82,17 @@ export function QuickActions({ compact = false }: { compact?: boolean }) {
         aria-label="Quick actions"
       >
         {visibleActions.map((action) => (
-          <Link key={action.title} to={action.to} className="min-w-[116px] snap-start sm:min-w-0">
-            <Card className="h-full cursor-pointer rounded-2xl border-border/60 bg-card/85 shadow-[0_12px_28px_-22px_var(--alexos-glow)] transition-all hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-[0_18px_34px_-22px_var(--alexos-glow)]">
+          <Link
+            key={action.title}
+            to={action.to}
+            className="alexos-focusable min-w-[116px] snap-start rounded-xl sm:min-w-0"
+          >
+            <Card className="alexos-card-interactive h-full cursor-pointer">
               <CardContent className="flex min-h-[104px] flex-col items-center justify-center gap-2.5 p-3 sm:min-h-[128px] sm:gap-3 sm:p-4">
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-2xl ring-1 sm:h-12 sm:w-12 ${action.color}`}
+                  className={`grid size-10 place-items-center rounded-lg ring-1 sm:size-12 ${action.color}`}
                 >
-                  <action.icon className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
+                  <action.icon aria-hidden="true" className="size-4 sm:size-5" />
                 </div>
                 <span className="text-center text-[11px] font-semibold leading-4 sm:text-sm sm:leading-5">
                   {action.title}

@@ -27,7 +27,7 @@ function ReportsPage() {
       />
       <ProfitCashFlowPanel />
       <WeeklyPerformanceView />
-      <Card className="rounded-2xl border-border/60">
+      <Card className="rounded-xl border-border/60">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold">How to read this report</CardTitle>
         </CardHeader>

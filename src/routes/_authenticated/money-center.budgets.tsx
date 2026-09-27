@@ -1,10 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { AlexOSMetricCard } from "@/components/alexos/metric-card";
+import { AlexOSEmptyState } from "@/components/alexos/states";
+import { AlexOSPageHeader } from "@/components/alexos/page-header";
+import { AlexOSStatusBadge } from "@/components/alexos/status-badge";
 import { useArchiveBudget, useBudgets, useTransactions, type Budget } from "@/lib/money/api";
 import { formatMoney, monthKey, monthLabel } from "@/lib/money/format";
 import { BudgetFormDialog } from "@/components/money/BudgetFormDialog";
@@ -64,98 +67,105 @@ function BudgetsPage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Budgets</h1>
-          <p className="text-sm text-muted-foreground">
-            Recurring monthly limits per category. The limit rolls forward automatically; monthly
-            spending resets to zero when you change months.
-          </p>
-        </div>
-        <Button onClick={openNew} className="rounded-xl">
-          <Plus className="h-4 w-4 mr-1" /> New Budget
-        </Button>
-      </header>
+      <AlexOSPageHeader
+        title="Budgets"
+        description="Recurring monthly limits per category. The limit rolls forward automatically; monthly spending resets to zero when you change months."
+        breadcrumbs={[{ label: "Money Center", to: "/money-center" }, { label: "Budgets" }]}
+        actions={
+          <Button onClick={openNew}>
+            <Plus aria-hidden="true" /> New budget
+          </Button>
+        }
+      />
 
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={() => setMonth(shiftMonth(month, -1))}>
-            <ChevronLeft className="h-4 w-4" />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Previous month"
+            onClick={() => setMonth(shiftMonth(month, -1))}
+          >
+            <ChevronLeft aria-hidden="true" />
           </Button>
-          <div className="text-sm font-semibold min-w-[10rem] text-center">{monthLabel(month)}</div>
-          <Button variant="outline" size="icon" onClick={() => setMonth(shiftMonth(month, 1))}>
-            <ChevronRight className="h-4 w-4" />
+          <p className="min-w-[9rem] text-center text-sm font-semibold" aria-live="polite">
+            {monthLabel(month)}
+          </p>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Next month"
+            onClick={() => setMonth(shiftMonth(month, 1))}
+          >
+            <ChevronRight aria-hidden="true" />
           </Button>
         </div>
-        <Input
-          type="month"
-          value={month.slice(0, 7)}
-          onChange={(e) => setMonth(`${e.target.value}-01`)}
-          className="w-40"
-        />
+        <div>
+          <label htmlFor="budget-month" className="sr-only">
+            Jump to month
+          </label>
+          <Input
+            id="budget-month"
+            type="month"
+            value={month.slice(0, 7)}
+            onChange={(e) => setMonth(`${e.target.value}-01`)}
+            className="w-40"
+          />
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <Card className="rounded-2xl">
-          <CardHeader className="pb-1">
-            <CardTitle className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              Budgeted
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-semibold">{formatMoney(totals.budget)}</div>
-          </CardContent>
-        </Card>
-        <Card className="rounded-2xl">
-          <CardHeader className="pb-1">
-            <CardTitle className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              Spent
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-semibold text-destructive">
-              {formatMoney(totals.spent)}
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="rounded-2xl">
-          <CardHeader className="pb-1">
-            <CardTitle className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              Remaining
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div
-              className={cn(
-                "text-xl font-semibold",
-                totals.remaining >= 0 ? "text-[color:var(--success)]" : "text-destructive",
-              )}
-            >
-              {formatMoney(totals.remaining)}
-            </div>
-          </CardContent>
-        </Card>
+        <AlexOSMetricCard
+          label="Budgeted"
+          hint="Total of all limits this month"
+          value={formatMoney(totals.budget)}
+          tone="neutral"
+          emphasis
+        />
+        <AlexOSMetricCard
+          label="Spent"
+          hint="Against budgeted categories"
+          value={formatMoney(totals.spent)}
+          tone="expense"
+        />
+        <AlexOSMetricCard
+          label="Remaining"
+          hint={totals.remaining >= 0 ? "Still available" : "Over the combined limit"}
+          value={formatMoney(totals.remaining)}
+          tone={totals.remaining >= 0 ? "income" : "expense"}
+        />
       </div>
 
-      <div className="grid gap-3 grid-cols-1 md:grid-cols-2">
-        {budgets.length === 0 && (
-          <div className="col-span-full text-sm text-muted-foreground border border-dashed rounded-2xl p-8 text-center">
-            No recurring budgets are available for {monthLabel(month)}. Create one to set a limit
-            that will continue into future months.
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        {budgets.length === 0 ? (
+          <div className="col-span-full">
+            <AlexOSEmptyState
+              title={`No budgets for ${monthLabel(month)}`}
+              description="Create a budget to set a monthly limit for a category. The limit carries forward into future months, and spend against it is calculated from your recorded expenses."
+              action={
+                <Button onClick={openNew}>
+                  <Plus aria-hidden="true" /> New budget
+                </Button>
+              }
+            />
           </div>
-        )}
+        ) : null}
         {budgets.map((b) => {
           const spent = spentForBudgetCategory(spentByCat, b.category);
           const remaining = Number(b.amount) - spent;
           const pct = b.amount > 0 ? Math.min(100, (spent / Number(b.amount)) * 100) : 0;
           const over = spent > Number(b.amount);
+          const state = over ? "over" : pct > 80 ? "overdue" : "active";
           return (
-            <Card key={b.id} className="rounded-2xl">
-              <CardContent className="p-5 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
+            <Card
+              key={b.id}
+              data-tone={state === "over" ? "danger" : state === "overdue" ? "warning" : "success"}
+            >
+              <CardContent className="space-y-3 p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
                     <div className="font-medium">{b.category}</div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="alexos-num text-xs text-muted-foreground">
                       {formatMoney(spent)} of {formatMoney(b.amount)} this month
                     </div>
                     <div className="text-[11px] text-muted-foreground/80">
@@ -167,36 +177,41 @@ function BudgetsPage() {
                         : null}
                     </div>
                   </div>
-                  <Badge variant={over ? "destructive" : pct > 80 ? "secondary" : "default"}>
-                    {Math.round(pct)}%
-                  </Badge>
+                  <AlexOSStatusBadge
+                    tone={state === "over" ? "danger" : state === "overdue" ? "warning" : "income"}
+                    label={state === "over" ? "Over budget" : `${Math.round(pct)}% used`}
+                    showDot
+                  />
                 </div>
-                <Progress value={pct} className={cn("h-2", over && "[&>div]:bg-destructive")} />
-                <div className="flex items-center justify-between">
+                <Progress
+                  value={pct}
+                  aria-label={`${b.category} budget usage`}
+                  className={cn("h-2", over && "[&>div]:bg-destructive")}
+                />
+                <div className="flex items-center justify-between gap-2">
                   <div
-                    className={cn(
-                      "text-sm font-medium",
-                      remaining >= 0 ? "text-[color:var(--success)]" : "text-destructive",
-                    )}
+                    data-tone={remaining >= 0 ? "income" : "expense"}
+                    className="alexos-tone-text text-sm font-medium"
                   >
                     {remaining >= 0 ? "Remaining" : "Over"}: {formatMoney(Math.abs(remaining))}
                   </div>
                   <div className="flex gap-1">
                     <Button
                       variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
+                      size="icon-sm"
+                      aria-label={`Edit ${b.category} budget`}
                       onClick={() => openEdit(b)}
                     >
-                      <Pencil className="h-3.5 w-3.5" />
+                      <Pencil aria-hidden="true" />
                     </Button>
                     <Button
                       variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
+                      size="icon-sm"
+                      aria-label={`Remove ${b.category} budget`}
                       onClick={() => archive.mutate(b.id)}
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                     >
-                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                      <Trash2 aria-hidden="true" />
                     </Button>
                   </div>
                 </div>

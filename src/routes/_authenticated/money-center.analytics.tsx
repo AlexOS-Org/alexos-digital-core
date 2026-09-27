@@ -1,6 +1,8 @@
 import { lazy, Suspense, useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlexOSPageHeader } from "@/components/alexos/page-header";
 import {
   useAccountBalances,
   useAccounts,
@@ -132,17 +134,22 @@ function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Analytics</h1>
-        <p className="text-sm text-muted-foreground">Visual insights across your money.</p>
-      </header>
+      <AlexOSPageHeader
+        title="Analytics"
+        description="Visual trends across your money — cashflow, category spend, income sources, budget usage and net worth."
+        breadcrumbs={[{ label: "Money Center", to: "/money-center" }, { label: "Analytics" }]}
+      />
       {currencySafety.isMixed ? (
         <div
           role="alert"
-          className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-900 dark:text-amber-100"
+          data-tone="warning"
+          className="alexos-tone-bg alexos-tone-border flex items-start gap-2.5 rounded-xl border px-4 py-3"
         >
-          Analytics totals are unavailable because active accounts use multiple currencies. Review
-          each account separately rather than combining values as KES.
+          <AlertTriangle aria-hidden="true" className="alexos-tone-text mt-0.5 size-4 shrink-0" />
+          <p className="alexos-tone-text text-sm">
+            Analytics totals are unavailable because active accounts use multiple currencies. Review
+            each account separately rather than combining values as KES.
+          </p>
         </div>
       ) : (
         <Suspense fallback={<ChartsLoadingState />}>
@@ -165,14 +172,15 @@ function AnalyticsPage() {
 
 function ChartsLoadingState() {
   return (
-    <div className="grid gap-4 lg:grid-cols-2" aria-label="Loading analytics charts">
+    <div className="grid gap-4 lg:grid-cols-2" role="status" aria-live="polite">
+      <span className="sr-only">Loading analytics charts</span>
       {Array.from({ length: 8 }, (_, index) => (
-        <Card key={index} className="rounded-2xl">
+        <Card key={index}>
           <CardHeader>
             <CardTitle className="text-base">Loading chart…</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[260px] animate-pulse rounded-xl bg-muted" />
+            <div aria-hidden="true" className="h-[260px] animate-pulse rounded-lg bg-muted" />
           </CardContent>
         </Card>
       ))}

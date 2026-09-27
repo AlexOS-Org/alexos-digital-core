@@ -72,7 +72,7 @@ function BusinessesPage() {
           const Icon = workspace.icon;
           return (
             <Link key={workspace.href} to={workspace.href} className="group">
-              <Card className="h-full rounded-3xl border-border/60 bg-card/80 transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5">
+              <Card className="h-full rounded-xl border-border/60 bg-card/80 transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5">
                 <CardContent className="flex h-full flex-col gap-5 p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div

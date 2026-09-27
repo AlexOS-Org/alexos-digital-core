@@ -312,7 +312,7 @@ function InventoryPage() {
 
       {/* Dead-stock signal banner */}
       {!isLoading && summary.deadStock > 0 && (
-        <div className="flex items-start gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
+        <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
           <p className="text-sm text-amber-700 dark:text-amber-300">
             <span className="font-semibold">{summary.deadStock} items</span> have had no sales in
@@ -333,10 +333,10 @@ function InventoryPage() {
         />
       </div>
 
-      {isLoading && <Skeleton className="h-72 w-full rounded-2xl" />}
+      {isLoading && <Skeleton className="h-72 w-full rounded-xl" />}
 
       {!isLoading && sorted.length === 0 && (
-        <Card className="rounded-2xl border-dashed">
+        <Card className="rounded-xl border-dashed">
           <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
             <Boxes className="h-6 w-6 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
@@ -349,7 +349,7 @@ function InventoryPage() {
       )}
 
       {!isLoading && sorted.length > 0 && (
-        <Card className="rounded-2xl overflow-hidden">
+        <Card className="rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">

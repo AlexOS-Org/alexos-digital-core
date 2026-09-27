@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Rocket } from "lucide-react";
-import { AlexOSEmptyState } from "@/components/alexos-empty-state";
+import { AlexOSRoadmapModule } from "@/components/alexos-roadmap-module";
 
 export const Route = createFileRoute("/_authenticated/missions")({
   component: MissionsPage,
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/missions")({
 
 function MissionsPage() {
   return (
-    <AlexOSEmptyState
+    <AlexOSRoadmapModule
       title="Missions"
       description="Strategic priorities, milestones and mission execution — connecting your goals to daily action."
       icon={Rocket}

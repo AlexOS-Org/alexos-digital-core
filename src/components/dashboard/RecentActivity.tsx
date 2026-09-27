@@ -10,10 +10,10 @@ export default function RecentActivity() {
     .slice(0, 5);
 
   return (
-    <Card className="h-full rounded-[1.8rem] border-border/60 bg-card/80 shadow-sm">
+    <Card className="h-full rounded-xl border-border/60 bg-card/80 shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl dashboard-tone-blue dashboard-tone-icon">
+          <div className="grid size-10 place-items-center rounded-lg dashboard-tone-blue dashboard-tone-icon">
             <Activity className="h-5 w-5" />
           </div>
           <div>
@@ -21,24 +21,22 @@ export default function RecentActivity() {
             <p className="mt-0.5 text-xs text-muted-foreground">Your latest money moves</p>
           </div>
         </div>
-        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          Live
-        </span>
+        <span className="alexos-eyebrow">Live</span>
       </CardHeader>
       <CardContent className="space-y-2">
         {recent.length === 0 ? (
-          <div className="rounded-2xl border border-dashed p-6 text-sm text-muted-foreground">
+          <div className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">
             No recent transactions yet.
           </div>
         ) : (
           recent.map((item) => (
             <div
               key={item.id}
-              className="group flex items-center justify-between gap-4 rounded-2xl border border-border/50 bg-muted/20 p-3.5 transition-colors hover:bg-muted/50"
+              className="group flex items-center justify-between gap-4 rounded-xl border border-border/50 bg-muted/20 p-3.5 transition-colors hover:bg-muted/50"
             >
               <div className="flex min-w-0 items-center gap-3">
                 <div
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${item.type === "income" ? "dashboard-tone-green dashboard-tone-icon" : item.type === "expense" ? "dashboard-tone-danger dashboard-tone-icon" : "dashboard-tone-blue dashboard-tone-icon"}`}
+                  className={`grid size-10 shrink-0 place-items-center rounded-lg ${item.type === "income" ? "dashboard-tone-green dashboard-tone-icon" : item.type === "expense" ? "dashboard-tone-danger dashboard-tone-icon" : "dashboard-tone-blue dashboard-tone-icon"}`}
                 >
                   {item.type === "income" ? (
                     <ArrowDownLeft className="h-4 w-4" />
@@ -59,7 +57,7 @@ export default function RecentActivity() {
               </div>
               <div className="shrink-0 text-right">
                 <p className="text-sm font-bold">{formatMoney(Number(item.amount))}</p>
-                <p className="text-[10px] capitalize text-muted-foreground">{item.type}</p>
+                <p className="text-[11px] capitalize text-muted-foreground">{item.type}</p>
               </div>
             </div>
           ))

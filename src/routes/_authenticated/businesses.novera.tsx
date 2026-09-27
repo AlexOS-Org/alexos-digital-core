@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Gem } from "lucide-react";
-import { AlexOSEmptyState } from "@/components/alexos-empty-state";
+import { AlexOSRoadmapModule } from "@/components/alexos-roadmap-module";
 
 export const Route = createFileRoute("/_authenticated/businesses/novera")({
   component: NuvoraPage,
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/businesses/novera")({
 
 function NuvoraPage() {
   return (
-    <AlexOSEmptyState
+    <AlexOSRoadmapModule
       title="Nuvora"
       description="Business operations and growth for Nuvora. Connect live workspace data to bring this view online."
       icon={Gem}

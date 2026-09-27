@@ -93,7 +93,7 @@ export function ProductEvidencePanel() {
 
   return (
     <div className="space-y-5">
-      <Card className="overflow-hidden rounded-3xl border-primary/15 bg-card/80 shadow-[0_18px_60px_-42px_hsl(var(--primary)/0.55)]">
+      <Card className="overflow-hidden rounded-xl border-primary/15 bg-card/80 shadow-[0_18px_60px_-42px_hsl(var(--primary)/0.55)]">
         <CardHeader className="border-b border-border/60 bg-gradient-to-r from-primary/[0.08] via-transparent to-emerald-500/[0.08]">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -261,11 +261,11 @@ export function ProductEvidencePanel() {
       </Card>
 
       {isLoading ? (
-        <Card className="rounded-3xl border-dashed p-6 text-sm text-muted-foreground">
+        <Card className="rounded-xl border-dashed p-6 text-sm text-muted-foreground">
           Loading evidence records…
         </Card>
       ) : evidence.length === 0 ? (
-        <Card className="rounded-3xl border-dashed p-6 text-sm text-muted-foreground">
+        <Card className="rounded-xl border-dashed p-6 text-sm text-muted-foreground">
           No evidence records are stored yet. Connect a candidate to a real product only after its
           source, current availability and catalogue identity are verified.
         </Card>

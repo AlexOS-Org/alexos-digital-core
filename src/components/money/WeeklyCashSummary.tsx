@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowDownRight, ArrowUpRight, RefreshCw, Sparkles, Wallet } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { AlexOSStatusBadge } from "@/components/alexos/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAccounts, useExpected, useTransactions } from "@/lib/money/api";
@@ -12,6 +12,7 @@ import {
   getWeeklySummaryPreference,
 } from "@/lib/reports/weekly-performance";
 import { cn } from "@/lib/utils";
+import type { AlexOSTone } from "@/lib/ui/status";
 import { useBalanceVisibility } from "@/components/money/BalanceVisibility";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -84,26 +85,24 @@ export function WeeklyCashSummary() {
     value === null ? "Unavailable" : maskBalance(formatMoney(value, summary.currency ?? "KES"));
 
   return (
-    <Card className="rounded-[1.5rem] border-border/60 shadow-sm">
+    <Card className="border-border/60">
       <CardHeader className="gap-4 pb-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
             <CardTitle className="text-base">Weekly Cash Summary</CardTitle>
-            <Badge variant="outline" className="text-xs">
-              {period.label}
-            </Badge>
+            <AlexOSStatusBadge tone="info" label={period.label} />
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
             Posted Money Center activity from {period.formattedRange}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="inline-flex rounded-xl border border-border/60 bg-muted/40 p-1">
+          <div className="inline-flex rounded-lg border border-border/60 bg-muted/40 p-1">
             <Button
               type="button"
               size="sm"
               variant={offsetWeeks === 0 ? "secondary" : "ghost"}
-              className="h-8 rounded-lg text-xs"
+              className="h-8 text-xs"
               onClick={() => setOffsetWeeks(0)}
             >
               This Week
@@ -112,7 +111,7 @@ export function WeeklyCashSummary() {
               type="button"
               size="sm"
               variant={offsetWeeks === -1 ? "secondary" : "ghost"}
-              className="h-8 rounded-lg text-xs"
+              className="h-8 text-xs"
               onClick={() => setOffsetWeeks(-1)}
             >
               Last Week
@@ -122,13 +121,13 @@ export function WeeklyCashSummary() {
             type="button"
             size="icon"
             variant="ghost"
-            className="h-9 w-9 rounded-xl border border-border/60"
-            title="Refresh weekly cash summary"
+            className="rounded-lg border border-border/60"
+            aria-label="Refresh weekly cash summary"
             onClick={() => {
               void Promise.all([refetchTransactions(), refetchAccounts(), refetchExpected()]);
             }}
           >
-            <RefreshCw className="h-4 w-4" />
+            <RefreshCw aria-hidden="true" className="size-4" />
           </Button>
         </div>
       </CardHeader>
@@ -143,7 +142,11 @@ export function WeeklyCashSummary() {
           />
         )}
         {summary.isMixedCurrency ? (
-          <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-900 dark:text-amber-100">
+          <div
+            role="alert"
+            data-tone="warning"
+            className="alexos-tone-bg alexos-tone-border alexos-tone-text rounded-xl border p-4 text-sm"
+          >
             <p className="font-semibold">Multiple currencies detected</p>
             <p className="mt-1 text-xs">{summary.warning}</p>
           </div>
@@ -157,12 +160,12 @@ export function WeeklyCashSummary() {
           <>
             <div className="grid gap-3 sm:grid-cols-3">
               <CashMetric
-                label="Cash Inflow"
+                label="Cash inflow"
                 value={money(summary.income)}
                 comparison={compare(summary.income, previousSummary.income, money)}
                 hint="Posted income"
                 icon={ArrowUpRight}
-                className="text-emerald-600 dark:text-emerald-400"
+                tone="income"
               />
               <CashMetric
                 label="Expenditure"
@@ -170,19 +173,17 @@ export function WeeklyCashSummary() {
                 comparison={compare(summary.expenses, previousSummary.expenses, money)}
                 hint="Posted expenses"
                 icon={ArrowDownRight}
-                className="text-rose-600 dark:text-rose-400"
+                tone="expense"
               />
               <CashMetric
-                label="Net Cash Flow"
+                label="Net cash flow"
                 value={money(summary.netCashFlow)}
                 comparison={compare(summary.netCashFlow, previousSummary.netCashFlow, money)}
                 hint={`${summary.transactionCount} posted transaction${summary.transactionCount === 1 ? "" : "s"}`}
                 icon={Wallet}
-                className={cn(
-                  summary.netCashFlow !== null && summary.netCashFlow >= 0
-                    ? "text-emerald-600 dark:text-emerald-400"
-                    : "text-rose-600 dark:text-rose-400",
-                )}
+                tone={
+                  summary.netCashFlow !== null && summary.netCashFlow >= 0 ? "income" : "expense"
+                }
               />
             </div>
             <PremiumInsights
@@ -214,13 +215,11 @@ function PremiumInsights({
   const score = calculateScore(current, previous);
 
   return (
-    <div className="mt-4 grid gap-4 border-t border-border/60 pt-4 lg:grid-cols-[1fr_180px]">
+    <div className="mt-4 grid gap-4 border-t border-border/60 pt-4 lg:grid-cols-[1fr_200px]">
       <div>
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              8-week cash trend
-            </p>
+            <p className="alexos-metric-label">8-week cash trend</p>
             <p className="mt-1 text-xs text-muted-foreground">Net cash flow by week</p>
           </div>
           <span className="text-[11px] text-muted-foreground">Oldest → current</span>
@@ -233,16 +232,13 @@ function PremiumInsights({
             return (
               <div
                 key={item.label}
+                data-tone={item.value === null ? "neutral" : positive ? "income" : "expense"}
                 className="flex h-full flex-1 flex-col items-center justify-end gap-1"
               >
                 <div
                   className={cn(
-                    "w-full rounded-t-md transition-all",
-                    item.value === null
-                      ? "bg-muted"
-                      : positive
-                        ? "bg-emerald-500/75"
-                        : "bg-rose-500/75",
+                    "alexos-tone-bg w-full rounded-t-sm",
+                    item.value === null && "bg-muted",
                   )}
                   style={{ height: `${height}%` }}
                   title={`${item.label}: ${money(item.value)}`}
@@ -253,18 +249,26 @@ function PremiumInsights({
           })}
         </div>
       </div>
-      <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-slate-950 to-slate-800 p-4 text-white">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/60">
-          Performance score
-        </p>
+      <div
+        data-tone={score >= 70 ? "income" : score >= 40 ? "warning" : "danger"}
+        className="alexos-tone-bg rounded-xl border p-4"
+      >
+        <p className="alexos-metric-label">Performance score</p>
         <div className="mt-2 flex items-end gap-1">
-          <span className="text-4xl font-semibold tracking-tight">{score}</span>
-          <span className="mb-1 text-xs text-white/50">/100</span>
+          <span className="alexos-amount text-4xl tracking-tight">{score}</span>
+          <span className="mb-1 text-xs text-muted-foreground">/100</span>
         </div>
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/15">
-          <div className="h-full rounded-full bg-emerald-300" style={{ width: `${score}%` }} />
+        <div
+          role="progressbar"
+          aria-label="Performance score"
+          aria-valuenow={score}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted"
+        >
+          <div className="alexos-tone-rule h-full rounded-full" style={{ width: `${score}%` }} />
         </div>
-        <p className="mt-3 text-[11px] leading-relaxed text-white/60">
+        <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
           Based on net cash direction, expenditure control, and posted activity.
         </p>
       </div>
@@ -296,22 +300,22 @@ function CashMetric({
   comparison,
   hint,
   icon: Icon,
-  className,
+  tone,
 }: {
   label: string;
   value: string;
   comparison: string;
   hint: string;
   icon: LucideIcon;
-  className: string;
+  tone: AlexOSTone;
 }) {
   return (
-    <div className="rounded-xl border border-border/60 bg-muted/20 p-4">
+    <div data-tone={tone} className="alexos-card p-4">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-xs font-medium text-muted-foreground">{label}</span>
-        <Icon className={cn("h-4 w-4", className)} />
+        <span className="alexos-metric-label">{label}</span>
+        <Icon aria-hidden="true" className="alexos-tone-text size-4" />
       </div>
-      <p className="mt-2 text-xl font-semibold tabular-nums text-foreground">{value}</p>
+      <p className="alexos-amount mt-2 text-xl">{value}</p>
       <p className="mt-1 text-[11px] font-medium text-muted-foreground">{comparison}</p>
       <p className="mt-1 text-[11px] text-muted-foreground">{hint}</p>
     </div>
@@ -346,23 +350,12 @@ function PerformancePulse({
 
   return (
     <div
-      className={cn(
-        "mb-4 flex items-start gap-3 rounded-2xl border p-4",
-        improved
-          ? "border-emerald-500/25 bg-gradient-to-r from-emerald-500/10 via-card to-cyan-500/5"
-          : "border-amber-500/25 bg-gradient-to-r from-amber-500/10 via-card to-rose-500/5",
-      )}
+      data-tone={improved ? "income" : "warning"}
+      className="alexos-tone-bg alexos-tone-border mb-4 flex items-start gap-3 rounded-xl border p-4"
     >
-      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-background/80 shadow-sm">
-        <Sparkles
-          className={cn(
-            "h-4 w-4",
-            improved
-              ? "text-emerald-600 dark:text-emerald-400"
-              : "text-amber-600 dark:text-amber-400",
-          )}
-        />
-      </div>
+      <span className="alexos-tone-bg alexos-tone-border alexos-tone-text grid size-9 shrink-0 place-items-center rounded-lg border">
+        <Sparkles aria-hidden="true" className="size-4" />
+      </span>
       <div>
         <p className="text-sm font-semibold text-foreground">{title}</p>
         <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{detail}</p>

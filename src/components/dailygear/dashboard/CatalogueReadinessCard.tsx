@@ -19,13 +19,13 @@ export function CatalogueReadinessCard({
   products: Product[];
   loading?: boolean;
 }) {
-  if (loading) return <Skeleton className="h-52 w-full rounded-[1.75rem]" />;
+  if (loading) return <Skeleton className="h-52 w-full rounded-xl" />;
   const active = products.filter((product) => product.status === "active").length;
   const drafts = products.length - active;
   const needsReview = products.filter((product) => !product.availability_confirmed).length;
   const progress = products.length ? Math.round((active / products.length) * 100) : 0;
   return (
-    <Card className="group relative overflow-hidden rounded-[1.75rem] border-primary/20 bg-gradient-to-br from-card via-card to-primary/[0.07] shadow-[0_22px_60px_-36px_var(--alexos-glow)]">
+    <Card className="group relative overflow-hidden rounded-xl border-primary/20 bg-gradient-to-br from-card via-card to-primary/[0.07] shadow-[0_22px_60px_-36px_var(--alexos-glow)]">
       <div className="alexos-visual-strip absolute inset-x-0 top-0 h-1 opacity-90" />
       <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
       <CardContent className="relative p-5 sm:p-6">

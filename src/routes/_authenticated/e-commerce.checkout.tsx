@@ -256,7 +256,7 @@ function CheckoutPage() {
 
       <div className="grid gap-4 xl:grid-cols-[1.4fr_0.75fr]">
         <div className="space-y-4">
-          <Card className="rounded-3xl border-border">
+          <Card className="rounded-xl border-border">
             <CardHeader>
               <CardTitle>Order details</CardTitle>
             </CardHeader>
@@ -282,7 +282,7 @@ function CheckoutPage() {
                   </Select>
                 </div>
                 {customerId === "walk-in" ? (
-                  <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-4 sm:col-span-2">
+                  <div className="rounded-xl border border-primary/20 bg-primary/[0.04] p-4 sm:col-span-2">
                     <p className="text-sm font-semibold">New customer details</p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Use this for WhatsApp, phone, or walk-in orders. These details will be saved
@@ -412,7 +412,7 @@ function CheckoutPage() {
                   onChange={(e) => setShippingFee(Math.max(0, Number(e.target.value) || 0))}
                   placeholder="Shipping fee"
                 />
-                <div className="rounded-2xl border border-border p-3 bg-muted/50">
+                <div className="rounded-xl border border-border p-3 bg-muted/50">
                   <p className="text-sm font-medium">Estimate</p>
                   <p className="mt-2 text-sm text-muted-foreground">
                     {shippingMethod === "Delivery" ? "1–3 business days" : "Ready for pickup today"}
@@ -422,7 +422,7 @@ function CheckoutPage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-3xl border-border">
+          <Card className="rounded-xl border-border">
             <CardHeader>
               <CardTitle>Shipping & contact</CardTitle>
             </CardHeader>
@@ -511,7 +511,7 @@ function CheckoutPage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-3xl border-border">
+          <Card className="rounded-xl border-border">
             <CardHeader>
               <CardTitle>Coupon</CardTitle>
             </CardHeader>
@@ -532,12 +532,12 @@ function CheckoutPage() {
           </Card>
         </div>
 
-        <Card className="rounded-3xl border-border">
+        <Card className="rounded-xl border-border">
           <CardHeader>
             <CardTitle>Order summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {isLoading && <Skeleton className="h-48 rounded-3xl" />}
+            {isLoading && <Skeleton className="h-48 rounded-xl" />}
             {!isLoading && cart.items.length === 0 && (
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">
@@ -558,7 +558,7 @@ function CheckoutPage() {
                       : 0;
                     const variantList = product?.id ? productVariants(product.id) : [];
                     return (
-                      <Card key={item.id} className="rounded-3xl border-border">
+                      <Card key={item.id} className="rounded-xl border-border">
                         <CardContent className="space-y-3">
                           <div className="grid gap-3">
                             <Select
@@ -625,7 +625,7 @@ function CheckoutPage() {
                   })}
                 </div>
 
-                <div className="rounded-3xl border border-border p-4 bg-muted/50">
+                <div className="rounded-xl border border-border p-4 bg-muted/50">
                   <div className="space-y-2 text-sm text-muted-foreground">
                     <div className="flex justify-between">
                       <span>Subtotal</span>

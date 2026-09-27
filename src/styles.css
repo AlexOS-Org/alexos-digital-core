@@ -1,6 +1,7 @@
 ﻿@import "tw-animate-css";
 @import "tailwindcss";
 @import "./styles/alexos-4k-visual-system.css";
+@import "./styles/alexos-ui-system.css";
 @source "../src";
 
 @custom-variant dark (&:is(.dark *));
@@ -54,6 +55,22 @@
   --color-alexos-green-dark: var(--alexos-green-dark);
   --color-alexos-amber: var(--alexos-amber);
   --color-alexos-coral: var(--alexos-coral);
+  /* Semantic AlexOS tones. Prefer these over raw palette colours so status
+     and financial direction stay consistent across every module and theme. */
+  --color-tone-income: var(--alexos-tone-income);
+  --color-tone-expense: var(--alexos-tone-expense);
+  --color-tone-debt: var(--alexos-tone-debt);
+  --color-tone-success: var(--alexos-tone-success);
+  --color-tone-warning: var(--alexos-tone-warning);
+  --color-tone-danger: var(--alexos-tone-danger);
+  --color-tone-info: var(--alexos-tone-info);
+  --color-tone-neutral: var(--alexos-tone-neutral);
+  --font-sans: var(--alexos-font-sans);
+  --font-mono: var(--alexos-font-mono);
+  --radius-control: calc(var(--alexos-radius-control) - 2px);
+  --radius-card: var(--alexos-radius-card);
+  --radius-panel: var(--alexos-radius-panel);
+  --radius-hero: var(--alexos-radius-hero);
 }
 
 :root {

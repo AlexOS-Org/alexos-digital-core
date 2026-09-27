@@ -187,7 +187,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
 
   return (
     <div className="alexos-module-shell space-y-6 rounded-[2rem] p-1 sm:p-2">
-      <div className="dashboard-feature-surface relative overflow-hidden rounded-[1.85rem] p-6 sm:p-8">
+      <div className="dashboard-feature-surface relative overflow-hidden rounded-xl p-6 sm:p-8">
         <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
         <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex gap-4">
@@ -213,7 +213,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {config.labels.map((label, i) => (
-          <Card key={label} className="alexos-data-metric alexos-module-card rounded-[1.35rem]">
+          <Card key={label} className="alexos-data-metric alexos-module-card rounded-xl">
             <CardContent className="relative z-[1] p-4">
               <p className="dashboard-eyebrow text-[10px]">{label}</p>
               <p className="mt-2 text-2xl font-semibold tracking-tight">{stats[i]}</p>
@@ -223,7 +223,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <Card className="dashboard-surface alexos-module-card rounded-[1.75rem]">
+        <Card className="dashboard-surface alexos-module-card rounded-xl">
           <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle className="text-base">Workspace activity</CardTitle>
             <div className="relative w-full sm:w-48">
@@ -296,7 +296,7 @@ export function ModuleWorkbench({ mode }: { mode: Mode }) {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-surface alexos-module-card rounded-[1.75rem]">
+        <Card className="dashboard-surface alexos-module-card rounded-xl">
           <CardHeader>
             <CardTitle className="text-base">Quick add</CardTitle>
           </CardHeader>

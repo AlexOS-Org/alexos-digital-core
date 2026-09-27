@@ -50,8 +50,7 @@ export function MobileAurenBriefing() {
   const briefing = data?.briefing;
   const topPriority = briefing?.topPriority;
   return (
-    <section className="alexos-mesh relative overflow-hidden rounded-[1.75rem] dashboard-tone-purple border p-4 shadow-[0_18px_52px_-34px_var(--alexos-glow)] sm:p-5">
-      <div className="pointer-events-none absolute -right-12 -top-16 h-36 w-36 rounded-full dashboard-tone-purple dashboard-tone-panel blur-3xl" />
+    <section className="alexos-mesh relative overflow-hidden rounded-xl border p-4 sm:p-5">
       <div className="relative">
         <MobileSectionHeader
           eyebrow="Auren briefing"
@@ -62,15 +61,22 @@ export function MobileAurenBriefing() {
         <div className="mt-4 space-y-2">
           {isLoading ? (
             Array.from({ length: 2 }).map((_, index) => (
-              <Skeleton key={index} className="h-[68px] rounded-2xl" />
+              <Skeleton key={index} className="h-[68px] rounded-xl" />
             ))
           ) : isError || !data || !briefing ? (
-            <div className="rounded-2xl border dashboard-tone-danger dashboard-tone-panel p-3 text-xs text-muted-foreground">
+            <div
+              data-tone="danger"
+              data-role="panel"
+              className="dashboard-tone-danger rounded-xl border p-3 text-xs text-muted-foreground"
+            >
               Auren briefing is unavailable right now. Your data is safe; refresh to retry.
             </div>
           ) : briefing.status === "no_data" ? (
-            <div className="flex items-start gap-3 rounded-2xl border dashboard-tone-green dashboard-tone-panel p-3">
-              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 dashboard-tone-green dashboard-tone-text" />
+            <div className="dashboard-tone-green dashboard-tone-panel flex items-start gap-3 rounded-xl border p-3">
+              <Sparkles
+                aria-hidden="true"
+                className="dashboard-tone-green dashboard-tone-text mt-0.5 size-4 shrink-0"
+              />
               <div>
                 <p className="text-sm font-semibold">No CRM priorities yet</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
@@ -83,13 +89,13 @@ export function MobileAurenBriefing() {
               {topPriority ? (
                 <Link
                   to="/auren"
-                  className="group flex items-center gap-3 rounded-2xl border border-primary/20 bg-card/75 p-3"
+                  className="alexos-focusable group flex items-center gap-3 rounded-xl border border-primary/20 bg-card/75 p-3"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl dashboard-tone-purple dashboard-tone-icon">
-                    <ArrowUpRight className="h-4 w-4" />
+                  <div className="grid size-10 shrink-0 place-items-center rounded-lg dashboard-tone-purple dashboard-tone-icon">
+                    <ArrowUpRight aria-hidden="true" className="size-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                    <p className="alexos-eyebrow truncate">
                       {topPriority.priority} priority · {topPriority.type}
                     </p>
                     <p className="mt-1 truncate text-sm font-semibold">{topPriority.title}</p>
@@ -99,7 +105,7 @@ export function MobileAurenBriefing() {
                   </div>
                 </Link>
               ) : null}
-              <p className="px-1 text-[10px] text-muted-foreground">
+              <p className="px-1 text-[11px] text-muted-foreground">
                 {briefing.metrics.meetingsToday} meetings · {briefing.metrics.actionItems} open
                 actions · read-only
               </p>
@@ -158,13 +164,15 @@ export function MobileMetricTiles() {
         {tiles.map((tile) => {
           const Icon = tile.icon;
           return (
-            <Link key={tile.label} to={tile.to} className="group min-w-0">
-              <Card className="relative h-full overflow-hidden rounded-2xl border-border/60 bg-card/85 transition-all hover:-translate-y-0.5 hover:shadow-md">
+            <Link
+              key={tile.label}
+              to={tile.to}
+              className="alexos-focusable group block min-w-0 rounded-xl"
+            >
+              <Card className="alexos-card-interactive relative h-full overflow-hidden">
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                      {tile.label}
-                    </p>
+                    <p className="alexos-eyebrow truncate">{tile.label}</p>
                     <div
                       className={cn(
                         "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ring-1",
@@ -216,7 +224,7 @@ export function MobileRevenueToday() {
   );
   const hasRevenue = guardedRevenueToday !== null && guardedRevenueToday > 0;
   return (
-    <section className="relative overflow-hidden rounded-[1.75rem] border border-border/60 bg-card/75 p-4 shadow-[0_18px_50px_-35px_var(--alexos-glow)] sm:p-5">
+    <section className="relative overflow-hidden rounded-xl border border-border/60 bg-card/75 p-4 sm:p-5">
       <div className="alexos-visual-strip absolute inset-x-0 top-0 h-1 opacity-80" />
       <MobileSectionHeader
         eyebrow="Revenue today"
@@ -232,7 +240,7 @@ export function MobileRevenueToday() {
         }
         action={{ label: "View money", to: "/money-center" }}
       />
-      <div className="mt-5 flex h-24 items-end gap-1.5 rounded-2xl border border-border/50 bg-muted/30 px-3 py-3 sm:h-28">
+      <div className="mt-5 flex h-24 items-end gap-1.5 rounded-xl border border-border/50 bg-muted/30 px-3 py-3 sm:h-28">
         {values.map((value, index) => (
           <div key={index} className="flex h-full flex-1 items-end" aria-hidden="true">
             <div

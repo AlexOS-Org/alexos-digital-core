@@ -31,10 +31,10 @@ function LandingPagesRedirect() {
         title="Landing pages now live in Funnels"
         description="Landing content, offers, checkout and thank-you steps are configured together so every campaign has one clear customer journey."
       />
-      <Card className="rounded-3xl">
+      <Card className="rounded-xl">
         <CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
               <GitBranch className="h-5 w-5" />
             </span>
             <div>

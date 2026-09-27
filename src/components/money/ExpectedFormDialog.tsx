@@ -1,14 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { AlexOSFormField } from "@/components/alexos/form";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -34,9 +28,11 @@ export function ExpectedFormDialog({ open, onOpenChange, editing }: Props) {
   const [amount, setAmount] = useState("");
   const [probability, setProbability] = useState(80);
   const [description, setDescription] = useState("");
+  const [amountError, setAmountError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
+    setAmountError(null);
     if (editing) {
       setDate(editing.expected_date);
       setSource(editing.source);
@@ -54,7 +50,11 @@ export function ExpectedFormDialog({ open, onOpenChange, editing }: Props) {
 
   const submit = async () => {
     const amt = Number(amount);
-    if (!amt || amt <= 0) return;
+    if (!amt || amt <= 0) {
+      setAmountError("Enter an amount greater than zero.");
+      return;
+    }
+    setAmountError(null);
     await save.mutateAsync({
       id: editing?.id,
       expected_date: date,
@@ -68,75 +68,110 @@ export function ExpectedFormDialog({ open, onOpenChange, editing }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{editing ? "Edit Expected" : "Add Expected Money"}</DialogTitle>
+          <DialogTitle>{editing ? "Edit expected money" : "Add expected money"}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label>Expected Date</Label>
-              <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Amount</Label>
-              <Input
-                type="number"
-                step="0.01"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0.00"
-              />
-            </div>
+        <form
+          className="space-y-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void submit();
+          }}
+        >
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <AlexOSFormField label="Expected date" required>
+              {({ id, describedBy }) => (
+                <Input
+                  id={id}
+                  aria-describedby={describedBy}
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+              )}
+            </AlexOSFormField>
+            <AlexOSFormField
+              label="Amount"
+              required
+              error={amountError}
+              hint="The full value you expect to receive."
+            >
+              {({ id, describedBy, invalid }) => (
+                <Input
+                  id={id}
+                  aria-describedby={describedBy}
+                  aria-invalid={invalid}
+                  type="number"
+                  inputMode="decimal"
+                  step="0.01"
+                  className="alexos-num"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0.00"
+                />
+              )}
+            </AlexOSFormField>
           </div>
 
-          <div className="space-y-1.5">
-            <Label>Source</Label>
-            <Select value={source} onValueChange={setSource}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {EXPECTED_SOURCES.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <AlexOSFormField label="Source" required>
+            {({ id, describedBy }) => (
+              <Select value={source} onValueChange={setSource}>
+                <SelectTrigger id={id} aria-describedby={describedBy}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {EXPECTED_SOURCES.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </AlexOSFormField>
 
-          <div className="space-y-2">
+          <div className="alexos-field">
             <div className="flex items-center justify-between">
-              <Label>Probability</Label>
-              <span className="text-sm font-medium text-primary">{probability}%</span>
+              <span className="alexos-label" id="probability-label">
+                Probability
+              </span>
+              <span className="alexos-amount text-sm text-primary">{probability}%</span>
             </div>
             <Slider
+              aria-labelledby="probability-label"
               value={[probability]}
               onValueChange={([v]) => setProbability(v)}
               max={100}
               step={5}
             />
+            <p className="alexos-hint">
+              Used to weight the expected total. 100% means certain, 50% means a coin flip.
+            </p>
           </div>
 
-          <div className="space-y-1.5">
-            <Label>Description</Label>
-            <Textarea
-              rows={2}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Optional note"
-            />
+          <AlexOSFormField label="Description">
+            {({ id, describedBy }) => (
+              <Textarea
+                id={id}
+                aria-describedby={describedBy}
+                rows={2}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Optional note"
+              />
+            )}
+          </AlexOSFormField>
+
+          <div className="flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:justify-end">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={save.isPending}>
+              {save.isPending ? "Saving…" : editing ? "Save changes" : "Add expected money"}
+            </Button>
           </div>
-        </div>
-        <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={submit} disabled={save.isPending}>
-            {save.isPending ? "Saving..." : "Save"}
-          </Button>
-        </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

@@ -3,13 +3,19 @@ import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { AlexOSDataTable, AlexOSTableToolbar } from "@/components/alexos/data-table";
+import { AlexOSEmptyState, AlexOSLoadingState } from "@/components/alexos/states";
+import { AlexOSPageHeader } from "@/components/alexos/page-header";
+import { AlexOSStatusBadge } from "@/components/alexos/status-badge";
 import {
   Table,
+  TableActionsCell,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
+  TableNumericCell,
+  TableNumericHead,
   TableRow,
 } from "@/components/ui/table";
 import {
@@ -34,7 +40,6 @@ import {
 import { formatDate, formatMoney, formatTime } from "@/lib/money/format";
 import { Download, MoreHorizontal, Printer, Search, Trash2 } from "lucide-react";
 import { TransactionFormDialog } from "@/components/money/TransactionFormDialog";
-import { cn } from "@/lib/utils";
 import { normalizeExpenseCategory } from "@/lib/money/constants";
 
 export const Route = createFileRoute("/_authenticated/money-center/transactions")({
@@ -61,6 +66,8 @@ function TransactionsPage() {
     () => Object.fromEntries(accounts.map((a) => [a.id, a.name])),
     [accounts],
   );
+
+  const hasFilters = type !== "all" || account !== "all" || search.trim().length > 0;
 
   const exportCsv = () => {
     const rows = [
@@ -114,46 +121,42 @@ function TransactionsPage() {
     setDialogOpen(true);
   };
 
-  const typeTone = (t: Transaction["type"]) =>
-    t === "income"
-      ? "text-[color:var(--success)]"
-      : t === "expense"
-        ? "text-destructive"
-        : "text-primary";
-
   return (
-    <div className="space-y-4">
-      <header className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Transactions</h1>
-          <p className="text-sm text-muted-foreground">
-            Permanent, sortable record of every entry.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={exportCsv} className="rounded-lg">
-            <Download className="h-4 w-4 mr-1" /> CSV
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => window.print()} className="rounded-lg">
-            <Printer className="h-4 w-4 mr-1" /> Print
-          </Button>
-        </div>
-      </header>
+    <div className="space-y-6">
+      <AlexOSPageHeader
+        title="Transactions"
+        description="Permanent, sortable record of every entry. Posted transactions can be edited or voided; voided entries stay in the ledger for audit."
+        breadcrumbs={[{ label: "Money Center", to: "/money-center" }, { label: "Transactions" }]}
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={exportCsv}>
+              <Download aria-hidden="true" /> CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => window.print()}>
+              <Printer aria-hidden="true" /> Print
+            </Button>
+          </>
+        }
+      />
 
-      <Card className="rounded-2xl">
-        <CardContent className="p-4 space-y-3">
-          <div className="grid gap-2 sm:grid-cols-4">
-            <div className="relative sm:col-span-2">
-              <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+      <Card>
+        <CardContent className="space-y-4">
+          <AlexOSTableToolbar>
+            <div className="relative w-full sm:max-w-xs">
+              <Search
+                aria-hidden="true"
+                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+              />
               <Input
-                placeholder="Search description, reference, category..."
+                aria-label="Search transactions"
+                placeholder="Search description, reference, category…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9"
               />
             </div>
             <Select value={type} onValueChange={setType}>
-              <SelectTrigger>
+              <SelectTrigger aria-label="Filter by type" className="w-full sm:w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -165,7 +168,7 @@ function TransactionsPage() {
               </SelectContent>
             </Select>
             <Select value={account} onValueChange={setAccount}>
-              <SelectTrigger>
+              <SelectTrigger aria-label="Filter by account" className="w-full sm:w-48">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -177,9 +180,38 @@ function TransactionsPage() {
                 ))}
               </SelectContent>
             </Select>
-          </div>
+          </AlexOSTableToolbar>
 
-          <div className="overflow-x-auto rounded-xl border">
+          <AlexOSDataTable
+            label="Transactions"
+            minWidth={960}
+            isLoading={isLoading}
+            loading={<AlexOSLoadingState label="Loading transactions" rows={6} height="h-9" />}
+            empty={
+              hasFilters ? (
+                <AlexOSEmptyState
+                  compact
+                  variant="no-results"
+                  title="No transactions match these filters"
+                  description="Widen the type or account filter, or clear the search term to see the full ledger."
+                />
+              ) : (
+                <AlexOSEmptyState
+                  compact
+                  title="No transactions recorded yet"
+                  description="Record your first income, expense or transfer and balances across Money Center will start calculating from it."
+                />
+              )
+            }
+            footer={
+              <>
+                <span>
+                  {txs.length} transaction{txs.length === 1 ? "" : "s"}
+                </span>
+                <span>Amounts shown in the account currency</span>
+              </>
+            }
+          >
             <Table>
               <TableHeader>
                 <TableRow>
@@ -190,85 +222,60 @@ function TransactionsPage() {
                   <TableHead>Scope</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Reference</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
+                  <TableNumericHead>Amount</TableNumericHead>
                   <TableHead>Status</TableHead>
-                  <TableHead />
+                  <TableHead className="alexos-cell-actions">
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoading && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={10}
-                      className="text-center text-sm text-muted-foreground py-8"
-                    >
-                      Loading...
-                    </TableCell>
-                  </TableRow>
-                )}
-                {!isLoading && txs.length === 0 && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={10}
-                      className="text-center text-sm text-muted-foreground py-8"
-                    >
-                      No transactions match your filters.
-                    </TableCell>
-                  </TableRow>
-                )}
                 {txs.map((t) => (
-                  <TableRow key={t.id} className="hover:bg-accent/40">
-                    <TableCell className="text-xs whitespace-nowrap">
+                  <TableRow key={t.id}>
+                    <TableCell className="alexos-cell-id whitespace-nowrap">
                       <div>{formatDate(t.occurred_at)}</div>
                       <div className="text-muted-foreground">{formatTime(t.occurred_at)}</div>
                     </TableCell>
-                    <TableCell>
-                      <span className={cn("text-xs font-medium capitalize", typeTone(t.type))}>
-                        {t.type}
-                      </span>
+                    <TableCell data-tone={t.type}>
+                      <AlexOSStatusBadge status={t.type} showDot />
                     </TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell>
                       {accountName[t.account_id] ?? "—"}
-                      {t.transfer_account_id && (
+                      {t.transfer_account_id ? (
                         <span className="text-muted-foreground">
                           {" "}
                           → {accountName[t.transfer_account_id]}
                         </span>
-                      )}
+                      ) : null}
                     </TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell>
                       {t.type === "expense"
                         ? normalizeExpenseCategory(t.category)
                         : (t.category ?? t.source ?? "—")}
                     </TableCell>
-                    <TableCell className="text-xs capitalize">
+                    <TableCell className="text-muted-foreground">
                       {t.expense_scope ?? t.financial_scope ?? "—"}
                     </TableCell>
-                    <TableCell className="text-sm max-w-[220px] truncate">
-                      {t.description ?? "—"}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
+                    <TableCell className="max-w-[220px] truncate">{t.description ?? "—"}</TableCell>
+                    <TableCell className="alexos-cell-id text-muted-foreground">
                       {t.reference ?? "—"}
                     </TableCell>
-                    <TableCell
-                      className={cn("text-right font-semibold whitespace-nowrap", typeTone(t.type))}
-                    >
+                    <TableNumericCell data-tone={t.type} className="alexos-tone-text">
                       {t.type === "income" ? "+" : t.type === "expense" ? "-" : ""}
                       {formatMoney(t.amount)}
-                    </TableCell>
+                    </TableNumericCell>
                     <TableCell>
-                      <Badge
-                        variant={t.status === "posted" ? "default" : "secondary"}
-                        className="capitalize"
-                      >
-                        {t.status}
-                      </Badge>
+                      <AlexOSStatusBadge status={t.status} />
                     </TableCell>
-                    <TableCell>
+                    <TableActionsCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={`Actions for transaction on ${formatDate(t.occurred_at)}`}
+                          >
+                            <MoreHorizontal aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -283,19 +290,16 @@ function TransactionsPage() {
                             disabled={t.status !== "posted"}
                             className="text-destructive"
                           >
-                            <Trash2 className="h-4 w-4 mr-2" /> Void
+                            <Trash2 aria-hidden="true" /> Void
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </TableCell>
+                    </TableActionsCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-          </div>
-          <div className="text-xs text-muted-foreground text-right">
-            {txs.length} transaction{txs.length === 1 ? "" : "s"}
-          </div>
+          </AlexOSDataTable>
         </CardContent>
       </Card>
 

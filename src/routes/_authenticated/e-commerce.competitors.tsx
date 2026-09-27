@@ -78,7 +78,7 @@ function CompetitorResearchPanel() {
   );
 
   return (
-    <Card className="rounded-3xl border-primary/20 bg-card/80">
+    <Card className="rounded-xl border-primary/20 bg-card/80">
       <CardHeader className="space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
@@ -131,7 +131,7 @@ function CompetitorResearchPanel() {
       </CardHeader>
       <CardContent className="space-y-3">
         {sources.map((source) => (
-          <div key={source.name} className="rounded-2xl border bg-muted/20 p-4">
+          <div key={source.name} className="rounded-xl border bg-muted/20 p-4">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
@@ -170,11 +170,11 @@ function CompetitorResearchPanel() {
           </div>
         ))}
         {!sources.length ? (
-          <p className="rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+          <p className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
             No requested research source matches this search.
           </p>
         ) : null}
-        <div className="flex items-start gap-2 rounded-2xl border border-primary/15 bg-primary/[0.04] p-3 text-xs text-muted-foreground">
+        <div className="flex items-start gap-2 rounded-xl border border-primary/15 bg-primary/[0.04] p-3 text-xs text-muted-foreground">
           <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <p>
             The current browser session cannot verify follower counts when a public Facebook page

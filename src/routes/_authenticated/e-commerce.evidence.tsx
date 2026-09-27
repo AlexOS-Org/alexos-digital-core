@@ -63,7 +63,7 @@ function EvidencePage() {
             tone: "text-emerald-500",
           },
         ].map((source) => (
-          <Card key={source.label} className="rounded-2xl border-border/70 bg-card/75">
+          <Card key={source.label} className="rounded-xl border-border/70 bg-card/75">
             <CardContent className="flex gap-3 p-4">
               <source.icon className={`mt-0.5 h-5 w-5 shrink-0 ${source.tone}`} />
               <div className="min-w-0">
@@ -80,7 +80,7 @@ function EvidencePage() {
         ))}
       </div>
 
-      <Card className="rounded-3xl border-emerald-500/20 bg-emerald-500/[0.06]">
+      <Card className="rounded-xl border-emerald-500/20 bg-emerald-500/[0.06]">
         <CardContent className="flex gap-3 p-5 text-sm">
           <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
           <p className="leading-relaxed text-muted-foreground">

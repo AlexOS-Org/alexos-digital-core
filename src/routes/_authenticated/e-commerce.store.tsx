@@ -63,12 +63,12 @@ function StorePage() {
       />
 
       <div className="grid gap-4 xl:grid-cols-[320px_1fr]">
-        <Card className="rounded-3xl border-border">
+        <Card className="rounded-xl border-border">
           <CardHeader>
             <CardTitle>Order cart</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="rounded-3xl border border-border p-4 bg-muted/50">
+            <div className="rounded-xl border border-border p-4 bg-muted/50">
               <div className="flex items-center gap-3">
                 <ShoppingCart className="h-5 w-5 text-muted-foreground" />
                 <div>
@@ -88,7 +88,7 @@ function StorePage() {
                 </p>
               ) : (
                 cart.items.map((item) => (
-                  <div key={item.id} className="rounded-2xl border border-border p-3">
+                  <div key={item.id} className="rounded-xl border border-border p-3">
                     <p className="font-medium truncate">{item.name || "Unnamed item"}</p>
                     <p className="text-sm text-muted-foreground">
                       {item.quantity} × {money(item.unit_price)}
@@ -97,7 +97,7 @@ function StorePage() {
                 ))
               )}
             </div>
-            <div className="rounded-3xl border border-border p-4 bg-background">
+            <div className="rounded-xl border border-border p-4 bg-background">
               <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <span>Subtotal</span>
                 <span>{money(cart.total)}</span>
@@ -119,7 +119,7 @@ function StorePage() {
         </Card>
 
         <div className="space-y-4">
-          <Card className="rounded-3xl border-border overflow-hidden">
+          <Card className="rounded-xl border-border overflow-hidden">
             <div className="p-6 bg-primary/5">
               <div className="flex items-center gap-3">
                 <Zap className="h-5 w-5 text-primary" />
@@ -136,13 +136,13 @@ function StorePage() {
             </div>
             <CardContent className="grid gap-4">
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-border p-4">
+                <div className="rounded-xl border border-border p-4">
                   <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                     Products active
                   </p>
                   <p className="mt-2 text-2xl font-semibold">{activeProducts.length}</p>
                 </div>
-                <div className="rounded-2xl border border-border p-4">
+                <div className="rounded-xl border border-border p-4">
                   <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                     Store status
                   </p>
@@ -154,7 +154,7 @@ function StorePage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-3xl border-border">
+          <Card className="rounded-xl border-border">
             <CardHeader>
               <CardTitle>Quick actions</CardTitle>
             </CardHeader>
@@ -186,11 +186,11 @@ function StorePage() {
         {isLoading ? (
           <div className="grid gap-4 lg:grid-cols-3">
             {[...Array(3)].map((_, index) => (
-              <Skeleton key={index} className="h-44 rounded-3xl" />
+              <Skeleton key={index} className="h-44 rounded-xl" />
             ))}
           </div>
         ) : activeProducts.length === 0 ? (
-          <Card className="rounded-2xl border-dashed">
+          <Card className="rounded-xl border-dashed">
             <CardContent className="py-14 text-center text-sm text-muted-foreground">
               No active products to show. Add or publish products in your catalogue first.
             </CardContent>
@@ -198,7 +198,7 @@ function StorePage() {
         ) : (
           <div className="grid gap-4 lg:grid-cols-3">
             {activeProducts.map((product) => (
-              <Card key={product.id} className="rounded-3xl border-border">
+              <Card key={product.id} className="rounded-xl border-border">
                 <CardContent className="space-y-4">
                   <div className="flex items-start justify-between gap-4">
                     <div>

@@ -25,7 +25,7 @@ const ACTIONS = [
 
 export function QuickActionsGrid({ columns = 4 }: { columns?: number }) {
   return (
-    <Card className="h-full rounded-3xl border-border/60 soft-shadow">
+    <Card className="h-full rounded-xl border-border/60 soft-shadow">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-sm font-semibold">
           <span className="grid h-7 w-7 place-items-center rounded-xl bg-primary/10 text-primary">

@@ -18,7 +18,7 @@ export default function BusinessSnapshot() {
 
   if (isError) {
     return (
-      <Card className="rounded-[1.6rem] border-border/60">
+      <Card className="rounded-xl border-border/60">
         <CardContent className="p-5 text-sm text-muted-foreground">
           Business metrics are unavailable right now. Refresh to retry.
         </CardContent>
@@ -98,7 +98,7 @@ export default function BusinessSnapshot() {
     return (
       <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-[148px] rounded-[1.6rem]" />
+          <Skeleton key={i} className="h-[148px] rounded-xl" />
         ))}
       </div>
     );
@@ -110,20 +110,21 @@ export default function BusinessSnapshot() {
         const Icon = item.icon;
         return (
           <Link key={item.title} to={item.url} className="group">
-            <Card className="alexos-data-metric relative h-full overflow-hidden rounded-[1.6rem] border-border/60 transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-xl focus-within:ring-2 focus-within:ring-ring">
+            <Card className="alexos-data-metric alexos-card-interactive relative h-full overflow-hidden">
               <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${item.accent}`} />
               <CardContent className="relative z-[1] p-5 3xl:p-6">
                 <div className="flex items-center justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/[0.07] text-primary ring-1 ring-inset ring-primary/10">
+                  <div className="grid size-10 place-items-center rounded-full bg-primary/[0.07] text-primary">
                     <Icon className="h-5 w-5" />
                   </div>
-                  <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  <ArrowUpRight
+                    aria-hidden="true"
+                    className="size-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  />
                 </div>
                 <div className="mt-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                    {item.title}
-                  </p>
-                  <p className="mt-2 text-2xl font-bold tracking-tight 3xl:text-3xl">
+                  <p className="alexos-eyebrow">{item.title}</p>
+                  <p className="mt-2 text-2xl font-bold tabular-nums tracking-tight 3xl:text-3xl">
                     {item.value}
                   </p>
                   <p className="mt-1.5 text-xs leading-5 text-muted-foreground">
@@ -133,7 +134,7 @@ export default function BusinessSnapshot() {
                     <div className="mt-3" aria-label={item.densityLabel}>
                       <div className="h-1.5 overflow-hidden rounded-full bg-muted">
                         <div
-                          className="h-full rounded-full bg-primary/80 transition-[width] duration-500"
+                          className="h-full rounded-full bg-primary/80 transition-[width] duration-500 motion-reduce:transition-none"
                           style={{ width: `${item.density}%` }}
                         />
                       </div>

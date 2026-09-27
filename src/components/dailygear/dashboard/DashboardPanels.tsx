@@ -52,7 +52,7 @@ function PanelShell({
   return (
     <Card
       className={cn(
-        "group relative h-full overflow-hidden rounded-[1.5rem] border-border/60 bg-card/85 shadow-[0_14px_38px_-28px_var(--alexos-glow)] backdrop-blur-sm transition-shadow duration-300 hover:shadow-[0_20px_46px_-28px_var(--alexos-glow)]",
+        "group relative h-full overflow-hidden rounded-xl border-border/60 bg-card/85 shadow-[0_14px_38px_-28px_var(--alexos-glow)] backdrop-blur-sm transition-shadow duration-300 hover:shadow-[0_20px_46px_-28px_var(--alexos-glow)]",
         className,
       )}
     >

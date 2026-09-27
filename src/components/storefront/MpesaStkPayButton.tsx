@@ -33,8 +33,7 @@ export function MpesaStkPayButton({ orderNumber, phone, amount }: Props) {
       };
       if (!res.ok || !data.ok) {
         setStkMessage(
-          data.error ||
-            "Could not open the M-Pesa prompt. Use the Paybill details above instead.",
+          data.error || "Could not open the M-Pesa prompt. Use the Paybill details above instead.",
         );
         return;
       }

@@ -27,7 +27,7 @@ const STEPS = [
 
 export function StoreJourneyGuide() {
   return (
-    <section className="mt-12 overflow-hidden rounded-3xl border bg-card">
+    <section className="mt-12 overflow-hidden rounded-xl border bg-card">
       <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-center">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">

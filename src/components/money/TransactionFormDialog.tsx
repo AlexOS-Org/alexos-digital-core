@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { AlexOSEmptyState } from "@/components/alexos/states";
+import { AlexOSFormField } from "@/components/alexos/form";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -58,6 +53,12 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
   const [scope, setScope] = useState<"personal" | "business">("personal");
   const [businessId, setBusinessId] = useState("");
   const [newBusinessName, setNewBusinessName] = useState("");
+  const [errors, setErrors] = useState<{
+    amount?: string;
+    account?: string;
+    destination?: string;
+    business?: string;
+  }>({});
 
   const eligibleAccounts =
     mode !== "expense"
@@ -78,6 +79,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
 
   useEffect(() => {
     if (!open) return;
+    setErrors({});
     if (editing) {
       setDate(new Date(editing.occurred_at).toISOString().slice(0, 16));
       setAmount(String(editing.amount));
@@ -128,30 +130,41 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
 
   const submit = async () => {
     const amt = Number(amount);
-    if (!Number.isFinite(amt) || amt <= 0 || !accountId) {
-      toast.error("Enter an amount greater than zero and select an account.");
-      return;
+    const next: typeof errors = {};
+
+    if (!Number.isFinite(amt) || amt <= 0) {
+      next.amount = "Enter an amount greater than zero.";
+    }
+    if (!accountId) {
+      next.account = "Select the account this entry affects.";
     }
     if (mode === "transfer" && (!toAccountId || toAccountId === accountId)) {
-      toast.error("Select a different destination account.");
-      return;
+      next.destination = "Select a destination account different from the source.";
     }
     if (mode === "expense" && scope === "business" && !businessId) {
-      toast.error("Select the business this expense belongs to.");
+      next.business = "Select the business this expense belongs to.";
+    }
+    if (mode === "expense" && accountId && !selectedAccount) {
+      next.account = "Select the account that paid this expense.";
+    }
+    if (mode === "expense" && selectedAccount && selectedAccount.financial_scope !== scope) {
+      next.account = `Choose a ${scope} account for this expense.`;
+    }
+    if (
+      mode === "expense" &&
+      scope === "business" &&
+      businessId &&
+      selectedAccount &&
+      selectedAccount.business_id !== businessId
+    ) {
+      next.account = "Choose an account owned by the selected business.";
+    }
+
+    if (Object.keys(next).length > 0) {
+      setErrors(next);
       return;
     }
-    if (mode === "expense" && !selectedAccount) {
-      toast.error("Select the account that paid this expense.");
-      return;
-    }
-    if (mode === "expense" && selectedAccount?.financial_scope !== scope) {
-      toast.error(`Choose a ${scope} account for this expense.`);
-      return;
-    }
-    if (mode === "expense" && scope === "business" && selectedAccount?.business_id !== businessId) {
-      toast.error("Choose an account owned by the selected business.");
-      return;
-    }
+    setErrors({});
 
     const financialScope = selectedAccount?.financial_scope ?? scope;
     const expenseScope = mode === "expense" ? scope : "personal";
@@ -181,192 +194,252 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
         <DialogHeader>
           <DialogTitle>{editing ? `Edit ${title}` : title}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label>Date & Time</Label>
-              <Input type="datetime-local" value={date} onChange={(e) => setDate(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Amount</Label>
-              <Input
-                type="number"
-                step="0.01"
-                min="0.01"
-                inputMode="decimal"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0.00"
-              />
-            </div>
+        <form
+          className="space-y-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void submit();
+          }}
+        >
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <AlexOSFormField label="Date & time" required>
+              {({ id, describedBy }) => (
+                <Input
+                  id={id}
+                  aria-describedby={describedBy}
+                  type="datetime-local"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+              )}
+            </AlexOSFormField>
+            <AlexOSFormField
+              label="Amount"
+              required
+              error={errors.amount}
+              hint={errors.account ? undefined : "Enter the value in the account currency."}
+            >
+              {({ id, describedBy, invalid }) => (
+                <Input
+                  id={id}
+                  aria-describedby={describedBy}
+                  aria-invalid={invalid}
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  inputMode="decimal"
+                  className="alexos-num"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0.00"
+                />
+              )}
+            </AlexOSFormField>
           </div>
 
-          <div className="space-y-1.5">
-            <Label>{mode === "transfer" ? "From Account" : "Paid from account"}</Label>
-            <Select value={accountId} onValueChange={setAccountId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select account" />
-              </SelectTrigger>
-              <SelectContent>
-                {eligibleAccounts.map((a) => (
-                  <SelectItem key={a.id} value={a.id}>
-                    {a.name} · {a.financial_scope === "business" ? "Business" : "Personal"}
-                    {a.business_name ? ` · ${a.business_name}` : ""}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {mode === "expense" && (
-              <p className="text-xs text-muted-foreground">
-                This is the one account that will be reduced. Transfers between accounts belong in
-                Transfer Money, not as an expense.
-              </p>
-            )}
-          </div>
-
-          {mode === "transfer" && (
-            <div className="space-y-1.5">
-              <Label>To Account</Label>
-              <Select value={toAccountId} onValueChange={setToAccountId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select destination" />
+          <AlexOSFormField
+            label={mode === "transfer" ? "From account" : "Account"}
+            required
+            error={errors.account}
+            hint={
+              mode === "expense"
+                ? "The one account that will be reduced. Movements between your own accounts belong in Transfer Money, not here."
+                : mode === "transfer"
+                  ? "The account the money leaves."
+                  : "The account the money lands in."
+            }
+          >
+            {({ id, describedBy, invalid }) => (
+              <Select value={accountId} onValueChange={setAccountId}>
+                <SelectTrigger id={id} aria-describedby={describedBy} aria-invalid={invalid}>
+                  <SelectValue placeholder="Select account" />
                 </SelectTrigger>
                 <SelectContent>
-                  {accounts
-                    .filter((a) => a.id !== accountId)
-                    .map((a) => (
-                      <SelectItem key={a.id} value={a.id}>
-                        {a.name}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          {mode === "income" && (
-            <div className="space-y-1.5">
-              <Label>Source</Label>
-              <Select value={source} onValueChange={setSource}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {INCOME_SOURCES.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s}
+                  {eligibleAccounts.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.name} · {a.financial_scope === "business" ? "Business" : "Personal"}
+                      {a.business_name ? ` · ${a.business_name}` : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-          )}
+            )}
+          </AlexOSFormField>
 
-          {mode === "expense" && (
-            <>
-              <div className="space-y-1.5">
-                <Label>Expense scope</Label>
-                <Select
-                  value={scope}
-                  onValueChange={(value) => setScope(value as "personal" | "business")}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
+          {mode === "transfer" ? (
+            <AlexOSFormField
+              label="To account"
+              required
+              error={errors.destination}
+              hint="Must be different from the account it leaves."
+            >
+              {({ id, describedBy, invalid }) => (
+                <Select value={toAccountId} onValueChange={setToAccountId}>
+                  <SelectTrigger id={id} aria-describedby={describedBy} aria-invalid={invalid}>
+                    <SelectValue placeholder="Select destination" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="personal">Personal</SelectItem>
-                    <SelectItem value="business">Business</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              {scope === "business" && (
-                <div className="space-y-1.5">
-                  <Label>Business</Label>
-                  <Select
-                    value={businessId}
-                    onValueChange={setBusinessId}
-                    disabled={businesses.length === 0}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select business" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {businesses.map((business) => (
-                        <SelectItem key={business.id} value={business.id}>
-                          {business.name}
+                    {accounts
+                      .filter((a) => a.id !== accountId)
+                      .map((a) => (
+                        <SelectItem key={a.id} value={a.id}>
+                          {a.name}
                         </SelectItem>
                       ))}
-                    </SelectContent>
-                  </Select>
-                  {businesses.length === 0 && (
-                    <div className="space-y-2 rounded-xl border border-dashed border-primary/30 bg-primary/[0.04] p-3">
-                      <p className="text-xs text-muted-foreground">
-                        No active businesses are available yet. Add one to assign this expense.
-                      </p>
-                      <div className="flex gap-2">
-                        <Input
-                          aria-label="New business name"
-                          value={newBusinessName}
-                          onChange={(event) => setNewBusinessName(event.target.value)}
-                          placeholder="e.g. DailyGear"
-                        />
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={createBusiness}
-                          disabled={saveBusiness.isPending}
-                        >
-                          {saveBusiness.isPending ? "Adding..." : "Add"}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  </SelectContent>
+                </Select>
               )}
-              <div className="space-y-1.5">
-                <Label>Expense purpose</Label>
-                <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger>
+            </AlexOSFormField>
+          ) : null}
+
+          {mode === "income" ? (
+            <AlexOSFormField label="Source" required hint="Where the money came from.">
+              {({ id, describedBy }) => (
+                <Select value={source} onValueChange={setSource}>
+                  <SelectTrigger id={id} aria-describedby={describedBy}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {EXPENSE_CATEGORIES.map((purpose) => (
-                      <SelectItem key={purpose} value={purpose}>
-                        {purpose}
+                    {INCOME_SOURCES.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-            </>
-          )}
+              )}
+            </AlexOSFormField>
+          ) : null}
 
-          <div className="space-y-1.5">
-            <Label>Description</Label>
-            <Textarea
-              rows={2}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Optional note"
-            />
+          {mode === "expense" ? (
+            <>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <AlexOSFormField label="Expense scope" required>
+                  {({ id, describedBy }) => (
+                    <Select
+                      value={scope}
+                      onValueChange={(value) => setScope(value as "personal" | "business")}
+                    >
+                      <SelectTrigger id={id} aria-describedby={describedBy}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="personal">Personal</SelectItem>
+                        <SelectItem value="business">Business</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                </AlexOSFormField>
+
+                <AlexOSFormField label="Expense purpose" required>
+                  {({ id, describedBy }) => (
+                    <Select value={category} onValueChange={setCategory}>
+                      <SelectTrigger id={id} aria-describedby={describedBy}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {EXPENSE_CATEGORIES.map((purpose) => (
+                          <SelectItem key={purpose} value={purpose}>
+                            {purpose}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </AlexOSFormField>
+              </div>
+
+              {scope === "business" ? (
+                businesses.length === 0 ? (
+                  <div className="alexos-field">
+                    <span className="alexos-label">Business</span>
+                    <AlexOSEmptyState
+                      compact
+                      variant="not-configured"
+                      title="No active businesses yet"
+                      description="Add a business to assign this expense. Business-scoped spend is reported separately from personal spend."
+                      action={
+                        <div className="flex w-full flex-col gap-2 sm:flex-row">
+                          <Input
+                            aria-label="New business name"
+                            value={newBusinessName}
+                            onChange={(event) => setNewBusinessName(event.target.value)}
+                            placeholder="e.g. DailyGear"
+                          />
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={createBusiness}
+                            disabled={saveBusiness.isPending}
+                          >
+                            {saveBusiness.isPending ? "Adding…" : "Add business"}
+                          </Button>
+                        </div>
+                      }
+                    />
+                  </div>
+                ) : (
+                  <AlexOSFormField label="Business" required error={errors.business}>
+                    {({ id, describedBy, invalid }) => (
+                      <Select value={businessId} onValueChange={setBusinessId}>
+                        <SelectTrigger
+                          id={id}
+                          aria-describedby={describedBy}
+                          aria-invalid={invalid}
+                        >
+                          <SelectValue placeholder="Select business" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {businesses.map((business) => (
+                            <SelectItem key={business.id} value={business.id}>
+                              {business.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </AlexOSFormField>
+                )
+              ) : null}
+            </>
+          ) : null}
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <AlexOSFormField label="Description">
+              {({ id, describedBy }) => (
+                <Textarea
+                  id={id}
+                  aria-describedby={describedBy}
+                  rows={2}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Optional note"
+                />
+              )}
+            </AlexOSFormField>
+            <AlexOSFormField label="Reference" hint="e.g. an M-Pesa or bank reference.">
+              {({ id, describedBy }) => (
+                <Input
+                  id={id}
+                  aria-describedby={describedBy}
+                  className="alexos-num"
+                  value={reference}
+                  onChange={(e) => setReference(e.target.value)}
+                  placeholder="MPESA-XYZ123"
+                />
+              )}
+            </AlexOSFormField>
           </div>
-          <div className="space-y-1.5">
-            <Label>Reference</Label>
-            <Input
-              value={reference}
-              onChange={(e) => setReference(e.target.value)}
-              placeholder="e.g. MPESA-XYZ123"
-            />
+
+          <div className="flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:justify-end">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={save.isPending}>
+              {save.isPending ? "Saving…" : editing ? "Save changes" : "Save"}
+            </Button>
           </div>
-        </div>
-        <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={submit} disabled={save.isPending}>
-            {save.isPending ? "Saving..." : "Save"}
-          </Button>
-        </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

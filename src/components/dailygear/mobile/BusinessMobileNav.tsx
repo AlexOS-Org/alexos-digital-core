@@ -56,7 +56,7 @@ export function BusinessMobileNav() {
       </Link>
 
       <nav
-        className="safe-bottom fixed bottom-0 left-2 right-2 z-30 mx-auto max-w-xl rounded-3xl glass-panel soft-shadow"
+        className="safe-bottom fixed bottom-0 left-2 right-2 z-30 mx-auto max-w-xl rounded-xl glass-panel soft-shadow"
         aria-label="DailyGear navigation"
       >
         <div className="flex items-stretch justify-around gap-1 px-1 py-1.5">

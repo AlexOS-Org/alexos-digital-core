@@ -120,7 +120,7 @@ export function ProfitCashFlowPanel() {
   );
 
   return (
-    <Card className="rounded-3xl border-border/60 soft-shadow">
+    <Card className="rounded-xl border-border/60 soft-shadow">
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 pb-3">
         <div>
           <CardTitle className="flex items-center gap-2 text-base font-bold">

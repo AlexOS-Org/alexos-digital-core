@@ -72,11 +72,10 @@
     var(--border) 60%
   ) !important;
   background: linear-gradient(
-      125deg,
-      color-mix(in oklch, var(--card) 94%, var(--institution-accent, var(--primary)) 6%),
-      var(--card)
-    )
-    !important;
+    125deg,
+    color-mix(in oklch, var(--card) 94%, var(--institution-accent, var(--primary)) 6%),
+    var(--card)
+  ) !important;
 }
 
 .institution-card .institution-logo-tile {

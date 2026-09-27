@@ -13,8 +13,8 @@ export function AlexosDashboardFooter() {
     <footer className="alexos-dashboard-footer mt-12">
       <div className="mx-auto flex max-w-[1800px] flex-col gap-5 px-4 py-7 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
         <div className="flex items-start gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl dashboard-tone-blue dashboard-tone-icon shadow-lg shadow-[var(--alexos-glow)]">
-            <Sparkles className="h-4 w-4" aria-hidden="true" />
+          <span className="grid size-10 shrink-0 place-items-center rounded-lg dashboard-tone-blue dashboard-tone-icon">
+            <Sparkles className="size-4" aria-hidden="true" />
           </span>
           <div>
             <p className="alexos-footer-brand text-sm">AlexOS</p>
@@ -32,16 +32,16 @@ export function AlexosDashboardFooter() {
             <Link
               key={link.to}
               to={link.to}
-              className="inline-flex items-center gap-1 rounded-lg px-1 py-1 font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="alexos-focusable inline-flex items-center gap-1 rounded-lg px-1 py-1 font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               {link.label}
-              <ArrowUpRight className="h-3 w-3 opacity-50" aria-hidden="true" />
+              <ArrowUpRight className="size-3 opacity-50" aria-hidden="true" />
             </Link>
           ))}
         </nav>
 
         <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-          <Settings2 className="h-3.5 w-3.5" aria-hidden="true" />
+          <Settings2 className="size-3.5" aria-hidden="true" />
           <span>Appearance is controlled in Settings</span>
         </div>
       </div>

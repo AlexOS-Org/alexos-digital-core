@@ -3,6 +3,7 @@ import { ArrowUpRight, Sparkles } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlexOSErrorState } from "@/components/alexos/states";
 import { modules, moduleGroups } from "@/lib/modules";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import IntelligenceSearch from "@/components/dashboard/IntelligenceSearch";
@@ -36,12 +37,13 @@ class DashboardPanelBoundary extends Component<{ children: ReactNode }, { hasErr
   render() {
     if (this.state.hasError)
       return (
-        <Card className="rounded-3xl dashboard-tone-warning dashboard-tone-panel border">
-          <CardContent className="p-5">
-            <p className="text-sm font-semibold">This panel is still loading.</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              The rest of your command center is available.
-            </p>
+        <Card>
+          <CardContent>
+            <AlexOSErrorState
+              title="This panel is still loading"
+              description="The rest of your command center is available. Reload the page if it keeps failing."
+              onRetry={() => this.setState({ hasError: false })}
+            />
           </CardContent>
         </Card>
       );
@@ -68,17 +70,15 @@ function DashboardSectionRail() {
   return (
     <nav
       aria-label="Dashboard sections"
-      className="dashboard-surface sticky top-3 z-20 flex flex-col gap-2 rounded-2xl p-2 sm:flex-row sm:items-center sm:justify-between"
+      className="dashboard-surface sticky top-3 z-20 flex flex-col gap-2 rounded-xl p-2 sm:flex-row sm:items-center sm:justify-between"
     >
-      <span className="shrink-0 px-2 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
-        Jump to a working view
-      </span>
+      <span className="alexos-eyebrow shrink-0 px-2">Jump to a working view</span>
       <div className="flex min-w-0 gap-1 overflow-x-auto">
         {sections.map(([label, href]) => (
           <a
             key={href}
             href={href}
-            className="shrink-0 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="alexos-focusable shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
           >
             {label}
           </a>
@@ -131,14 +131,13 @@ function Dashboard() {
       </SafePanel>
       <DashboardSectionRail />
       <SafePanel>
-        <section className="dashboard-feature-surface relative overflow-hidden rounded-[1.75rem] p-5 sm:p-6">
-          <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
-          <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.75fr)] lg:items-center">
+        <section className="dashboard-feature-surface rounded-xl p-5 sm:p-6">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.75fr)] lg:items-center">
             <div>
-              <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-                <Sparkles className="h-3.5 w-3.5" />
+              <p className="alexos-eyebrow alexos-eyebrow-accent mb-2 flex items-center gap-2">
+                <Sparkles aria-hidden="true" className="size-3.5" />
                 Your command center
-              </div>
+              </p>
               <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
                 Know what matters. Act on it.
               </h2>
@@ -155,12 +154,10 @@ function Dashboard() {
           <SafePanel>
             <section
               id="dashboard-money"
-              className="dashboard-surface scroll-mt-24 rounded-[1.75rem] p-5 sm:p-6"
+              className="dashboard-surface scroll-mt-24 rounded-xl p-5 sm:p-6"
             >
               <div className="mb-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-                  Money
-                </p>
+                <p className="alexos-eyebrow alexos-eyebrow-accent">Money</p>
                 <h2 className="mt-1 text-2xl font-semibold tracking-tight">
                   Know where you stand.
                 </h2>
@@ -171,10 +168,8 @@ function Dashboard() {
               <MoneySnapshot />
               <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,1.45fr)_minmax(260px,0.55fr)]">
                 <MoneyFlowChart />
-                <div className="dashboard-surface-muted rounded-[1.75rem] p-5 sm:p-6">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-                    Reading the numbers
-                  </p>
+                <div className="dashboard-surface-muted rounded-xl p-5 sm:p-6">
+                  <p className="alexos-eyebrow alexos-eyebrow-accent">Reading the numbers</p>
                   <h3 className="mt-2 text-lg font-semibold tracking-tight">
                     Cash in, cash out, and what remains
                   </h3>
@@ -183,33 +178,42 @@ function Dashboard() {
                     cash and profit once. Transfers between your own accounts change location, not
                     profit.
                   </p>
-                  <div className="mt-5 space-y-3 text-xs text-muted-foreground">
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full dashboard-tone-green dashboard-tone-icon">
+                  <ol className="mt-5 space-y-3 text-xs text-muted-foreground">
+                    <li className="flex items-start gap-3">
+                      <span
+                        data-tone="income"
+                        className="alexos-tone-bg alexos-tone-text mt-0.5 grid size-7 shrink-0 place-items-center rounded-full text-[11px] font-bold"
+                      >
                         1
                       </span>
                       <span>
                         Confirm a customer payment against the exact account that received it.
                       </span>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full dashboard-tone-amber dashboard-tone-icon">
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span
+                        data-tone="warning"
+                        className="alexos-tone-bg alexos-tone-text mt-0.5 grid size-7 shrink-0 place-items-center rounded-full text-[11px] font-bold"
+                      >
                         2
                       </span>
                       <span>
                         Record supplier, delivery, and advertising costs as separate expenses.
                       </span>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full dashboard-tone-purple dashboard-tone-icon">
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span
+                        data-tone="info"
+                        className="alexos-tone-bg alexos-tone-text mt-0.5 grid size-7 shrink-0 place-items-center rounded-full text-[11px] font-bold"
+                      >
                         3
                       </span>
                       <span>
                         Use Transfers when money moves from I&amp;M to M-Pesa or another business
                         account.
                       </span>
-                    </div>
-                  </div>
+                    </li>
+                  </ol>
                 </div>
               </div>
             </section>
@@ -222,11 +226,13 @@ function Dashboard() {
             </section>
             <section id="dashboard-auren" className="scroll-mt-24">
               <SafePanel>
-                <section className="dashboard-feature-surface relative h-full overflow-hidden rounded-[1.75rem] p-4 sm:p-5 lg:p-6">
-                  <div className="pointer-events-none absolute -right-14 -top-16 h-40 w-40 rounded-full dashboard-tone-purple dashboard-tone-panel blur-3xl" />
-                  <div className="relative mb-3 flex items-center justify-between gap-3 sm:mb-4">
+                <section className="dashboard-feature-surface h-full rounded-xl p-4 sm:p-5 lg:p-6">
+                  <div className="mb-3 flex items-center justify-between gap-3 sm:mb-4">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.16em] dashboard-tone-purple dashboard-tone-text">
+                      <p
+                        data-tone="info"
+                        className="alexos-eyebrow alexos-tone-text flex items-center gap-2"
+                      >
                         Auren
                       </p>
                       <h2 className="mt-1 text-lg font-semibold tracking-tight sm:text-xl">
@@ -238,9 +244,10 @@ function Dashboard() {
                     </div>
                     <Link
                       to="/auren"
-                      className="inline-flex shrink-0 items-center text-xs font-semibold text-primary hover:underline"
+                      className="alexos-focusable inline-flex shrink-0 items-center text-xs font-semibold text-primary hover:underline"
                     >
-                      Open Auren <ArrowUpRight className="ml-1 h-3.5 w-3.5" />
+                      Open Auren
+                      <ArrowUpRight aria-hidden="true" className="ml-1 size-3.5" />
                     </Link>
                   </div>
                   <IntelligenceFeed />
@@ -258,13 +265,11 @@ function Dashboard() {
           <SafePanel>
             <section
               id="dashboard-business"
-              className="dashboard-surface relative scroll-mt-24 overflow-hidden rounded-[1.75rem] p-5 sm:p-6"
+              className="dashboard-surface relative scroll-mt-24 rounded-xl p-5 sm:p-6"
             >
               <div className="alexos-visual-strip absolute inset-x-0 top-0 h-1 opacity-80" />
               <div className="relative mb-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--alexos-purple)]">
-                  Business
-                </p>
+                <p className="alexos-eyebrow text-[var(--alexos-purple)]">Business</p>
                 <h2 className="mt-1 text-xl font-semibold tracking-tight">
                   Build what moves you forward.
                 </h2>
@@ -285,13 +290,11 @@ function Dashboard() {
       <SafePanel>
         <section
           id="dashboard-modules"
-          className="dashboard-surface scroll-mt-24 space-y-5 rounded-[1.75rem] p-5 sm:p-6"
+          className="dashboard-surface scroll-mt-24 space-y-5 rounded-xl p-5 sm:p-6"
         >
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                Your operating system
-              </p>
+              <p className="alexos-eyebrow">Your operating system</p>
               <h2 className="text-2xl font-semibold tracking-tight">
                 Everything you need. One place.
               </h2>
@@ -301,9 +304,9 @@ function Dashboard() {
             </span>
           </div>
           <Tabs defaultValue={moduleGroups[0]} className="space-y-5">
-            <TabsList className="flex h-auto w-full justify-start gap-1 overflow-x-auto rounded-2xl border border-border/60 bg-muted/50 p-1">
+            <TabsList className="flex h-auto w-full justify-start gap-1 overflow-x-auto rounded-xl border border-border/60 bg-muted/50 p-1">
               {moduleGroups.map((group) => (
-                <TabsTrigger key={group} value={group} className="rounded-xl px-4 py-2">
+                <TabsTrigger key={group} value={group} className="rounded-lg px-4 py-2">
                   {group}
                 </TabsTrigger>
               ))}
@@ -314,14 +317,21 @@ function Dashboard() {
                   {navModules
                     .filter((m) => m.group === group)
                     .map((m) => (
-                      <Link key={m.url} to={m.url} className="group">
-                        <Card className="dashboard-surface h-full rounded-3xl transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5">
+                      <Link
+                        key={m.url}
+                        to={m.url}
+                        className="alexos-focusable group block rounded-xl"
+                      >
+                        <Card className="dashboard-surface alexos-card-interactive h-full">
                           <CardContent className="space-y-4 p-5">
                             <div className="flex items-center justify-between">
-                              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-[var(--alexos-purple)]/15 text-primary ring-1 ring-primary/10">
-                                <m.icon className="h-5 w-5" />
+                              <div className="grid size-11 place-items-center rounded-lg bg-primary/10 text-primary">
+                                <m.icon aria-hidden="true" className="size-5" />
                               </div>
-                              <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                              <ArrowUpRight
+                                aria-hidden="true"
+                                className="size-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                              />
                             </div>
                             <div>
                               <p className="text-sm font-semibold">{m.title}</p>
@@ -329,9 +339,7 @@ function Dashboard() {
                                 {m.description}
                               </p>
                             </div>
-                            <span className="inline-flex rounded-full border border-border/60 bg-muted/60 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                              {m.group}
-                            </span>
+                            <span className="alexos-badge alexos-badge-outline">{m.group}</span>
                           </CardContent>
                         </Card>
                       </Link>

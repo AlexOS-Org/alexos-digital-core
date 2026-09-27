@@ -25,7 +25,7 @@ export function ProductCard({ product, currency }: Props) {
   const soldOut = product.status === "out_of_stock";
 
   return (
-    <article className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border bg-card transition-shadow hover:shadow-lg sm:rounded-3xl">
+    <article className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border bg-card transition-shadow hover:shadow-lg sm:rounded-xl">
       <Link
         to="/shop/product/$id"
         params={{ id: product.id }}

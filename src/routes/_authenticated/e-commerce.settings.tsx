@@ -97,7 +97,7 @@ function SettingsPage() {
         />
       </div>
 
-      <Card className="rounded-[1.75rem] border-primary/20 bg-card/80">
+      <Card className="rounded-xl border-primary/20 bg-card/80">
         <CardHeader className="flex flex-row items-start justify-between gap-4">
           <div>
             <CardTitle className="flex items-center gap-2 text-base">
@@ -155,7 +155,7 @@ function SettingsPage() {
                 </Field>
               </div>
 
-              <div className="grid gap-4 rounded-2xl border bg-muted/25 p-4 sm:grid-cols-3">
+              <div className="grid gap-4 rounded-xl border bg-muted/25 p-4 sm:grid-cols-3">
                 <Field
                   label="Meta Pixel ID"
                   htmlFor="meta-pixel-id"
@@ -196,7 +196,7 @@ function SettingsPage() {
                 </Field>
               </div>
 
-              <div className="grid gap-4 rounded-2xl border bg-muted/25 p-4 sm:grid-cols-2">
+              <div className="grid gap-4 rounded-xl border bg-muted/25 p-4 sm:grid-cols-2">
                 <Field
                   label="Flat shipping fee (KES)"
                   htmlFor="flat-shipping-fee"
@@ -229,7 +229,7 @@ function SettingsPage() {
                 </Field>
               </div>
 
-              <div className="flex flex-col gap-3 rounded-2xl border border-primary/15 bg-primary/[0.04] p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-3 rounded-xl border border-primary/15 bg-primary/[0.04] p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm font-semibold">Public domain</p>
                   <p className="mt-1 text-xs text-muted-foreground">
@@ -267,7 +267,7 @@ function SettingsPage() {
       </Card>
 
       <div className="grid gap-5 md:grid-cols-2">
-        <Card className="rounded-[1.75rem] border-border/70 bg-card/80">
+        <Card className="rounded-xl border-border/70 bg-card/80">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <ShieldCheck className="h-4 w-4 text-primary" />
@@ -289,7 +289,7 @@ function SettingsPage() {
             />
           </CardContent>
         </Card>
-        <Card className="rounded-[1.75rem] border-border/70 bg-card/80">
+        <Card className="rounded-xl border-border/70 bg-card/80">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Boxes className="h-4 w-4 text-primary" />

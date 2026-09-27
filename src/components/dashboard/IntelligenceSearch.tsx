@@ -9,7 +9,7 @@ export default function IntelligenceSearch() {
   const [query, setQuery] = useState("");
 
   return (
-    <div className="rounded-2xl border border-border/60 bg-card/80 p-4 shadow-sm">
+    <div className="rounded-xl border border-border/60 bg-card/80 p-4 shadow-sm">
       <div className="flex items-center gap-3">
         <Search className="h-5 w-5 shrink-0 text-muted-foreground" />
         <input

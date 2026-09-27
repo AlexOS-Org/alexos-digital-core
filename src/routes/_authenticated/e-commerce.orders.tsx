@@ -234,11 +234,11 @@ function OrdersPage() {
       )}
 
       {/* Loading */}
-      {!showTrash && isLoading && <Skeleton className="h-72 w-full rounded-2xl" />}
+      {!showTrash && isLoading && <Skeleton className="h-72 w-full rounded-xl" />}
 
       {/* Empty */}
       {!showTrash && !isLoading && filtered.length === 0 && (
-        <Card className="rounded-2xl border-dashed">
+        <Card className="rounded-xl border-dashed">
           <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
             <ShoppingCart className="h-6 w-6 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
@@ -252,7 +252,7 @@ function OrdersPage() {
 
       {/* Table */}
       {!showTrash && !isLoading && filtered.length > 0 && (
-        <Card className="rounded-2xl overflow-hidden">
+        <Card className="rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-[1120px] w-full text-sm">
               <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
@@ -393,7 +393,7 @@ function OrdersPage() {
         </Card>
       )}
       {showTrash && (
-        <Card className="rounded-2xl overflow-hidden">
+        <Card className="rounded-xl overflow-hidden">
           <div className="border-b border-border/70 px-4 py-3">
             <p className="text-sm font-semibold">Order Trash</p>
             <p className="text-xs text-muted-foreground">

@@ -1,10 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { AlexOSMetricCard } from "@/components/alexos/metric-card";
+import { AlexOSEmptyState } from "@/components/alexos/states";
+import { AlexOSPageHeader } from "@/components/alexos/page-header";
 import { useAccounts, useTransactions } from "@/lib/money/api";
 import { formatDate, formatMoney, formatTime } from "@/lib/money/format";
-import { ArrowDownCircle, Plus } from "lucide-react";
+import { ArrowDownCircle, Hash, Plus, Wallet } from "lucide-react";
 import { TransactionFormDialog } from "@/components/money/TransactionFormDialog";
 
 export const Route = createFileRoute("/_authenticated/money-center/income")({
@@ -29,82 +32,84 @@ function IncomePage() {
     acc[k] = (acc[k] ?? 0) + Number(t.amount);
     return acc;
   }, {});
+  const sources = Object.entries(bySource).sort((a, b) => b[1] - a[1]);
+  const sourceMax = sources[0]?.[1] ?? 0;
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Income</h1>
-          <p className="text-sm text-muted-foreground">All money coming in.</p>
-        </div>
-        <Button
-          onClick={() => setOpen(true)}
-          className="rounded-xl bg-[color:var(--success)] hover:bg-[color:var(--success)]/90 text-[color:var(--success-foreground)]"
-        >
-          <Plus className="h-4 w-4 mr-1" /> Quick Add Income
-        </Button>
-      </header>
+      <AlexOSPageHeader
+        title="Income"
+        description="All money coming in, grouped by the source you recorded it against."
+        breadcrumbs={[{ label: "Money Center", to: "/money-center" }, { label: "Income" }]}
+        actions={
+          <Button variant="success" onClick={() => setOpen(true)}>
+            <Plus aria-hidden="true" /> Quick add income
+          </Button>
+        }
+      />
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <Card className="rounded-2xl">
-          <CardHeader className="pb-1">
-            <CardTitle className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              This Month
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-semibold text-[color:var(--success)]">
-              {formatMoney(monthTotal)}
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="rounded-2xl">
-          <CardHeader className="pb-1">
-            <CardTitle className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              All Time
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-semibold">{formatMoney(total)}</div>
-          </CardContent>
-        </Card>
-        <Card className="rounded-2xl">
-          <CardHeader className="pb-1">
-            <CardTitle className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              Entries
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-semibold">{txs.length}</div>
-          </CardContent>
-        </Card>
+        <AlexOSMetricCard
+          label="This month"
+          hint="Income recorded since the 1st"
+          value={formatMoney(monthTotal)}
+          tone="income"
+          icon={ArrowDownCircle}
+          emphasis
+        />
+        <AlexOSMetricCard
+          label="All time"
+          hint="Every income entry on record"
+          value={formatMoney(total)}
+          tone="neutral"
+          icon={Wallet}
+        />
+        <AlexOSMetricCard
+          label="Entries"
+          hint="Individual income records"
+          value={txs.length}
+          tone="neutral"
+          icon={Hash}
+        />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="rounded-2xl lg:col-span-2">
+        <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-base">Recent Income</CardTitle>
+            <CardTitle>Recent income</CardTitle>
+            <CardDescription>The 20 most recent entries.</CardDescription>
           </CardHeader>
           <CardContent>
             {txs.length === 0 ? (
-              <div className="text-sm text-muted-foreground border border-dashed rounded-xl p-8 text-center">
-                No income recorded yet.
-              </div>
+              <AlexOSEmptyState
+                compact
+                title="No income recorded yet"
+                description="Log your first payment, salary or sale. Income entries raise your account balances and flow into every Money Center total."
+                action={
+                  <Button variant="success" onClick={() => setOpen(true)}>
+                    <Plus aria-hidden="true" /> Add income
+                  </Button>
+                }
+              />
             ) : (
-              <ul className="divide-y">
+              <ul className="divide-y divide-border">
                 {txs.slice(0, 20).map((t) => (
-                  <li key={t.id} className="py-3 flex items-center justify-between gap-3">
+                  <li key={t.id} className="flex items-center justify-between gap-3 py-3">
                     <div className="min-w-0">
-                      <div className="text-sm font-medium truncate">
+                      <div className="truncate text-sm font-medium">
                         {t.description || t.source}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         {formatDate(t.occurred_at)} · {formatTime(t.occurred_at)} ·{" "}
-                        {accName[t.account_id]} · {t.source}
+                        {accName[t.account_id] ?? "Unknown account"} · {t.source ?? "Other"}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-[color:var(--success)] font-semibold">
-                      <ArrowDownCircle className="h-4 w-4" />+{formatMoney(t.amount)}
+                    <div
+                      data-tone="income"
+                      className="alexos-tone-text flex items-center gap-1.5 text-sm font-semibold"
+                    >
+                      <ArrowDownCircle aria-hidden="true" className="size-4" />
+                      <span className="alexos-amount">+{formatMoney(t.amount)}</span>
                     </div>
                   </li>
                 ))}
@@ -112,22 +117,36 @@ function IncomePage() {
             )}
           </CardContent>
         </Card>
-        <Card className="rounded-2xl">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-base">By Source</CardTitle>
+            <CardTitle>By source</CardTitle>
+            <CardDescription>Where income is coming from.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
-            {Object.entries(bySource).length === 0 && (
-              <div className="text-sm text-muted-foreground">—</div>
-            )}
-            {Object.entries(bySource)
-              .sort((a, b) => b[1] - a[1])
-              .map(([k, v]) => (
-                <div key={k} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{k}</span>
-                  <span className="font-medium">{formatMoney(v)}</span>
+          <CardContent className="space-y-3">
+            {sources.length === 0 ? (
+              <AlexOSEmptyState
+                compact
+                title="No sources yet"
+                description="Record income with a source — salary, client, marketplace — and the split appears here."
+              />
+            ) : (
+              sources.map(([k, v]) => (
+                <div key={k} className="space-y-1">
+                  <div className="flex items-baseline justify-between gap-3 text-sm">
+                    <span className="truncate text-muted-foreground">{k}</span>
+                    <span className="alexos-amount text-tone-income">{formatMoney(v)}</span>
+                  </div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-alexos-green"
+                      style={{
+                        width: `${sourceMax > 0 ? Math.max(4, (v / sourceMax) * 100) : 0}%`,
+                      }}
+                    />
+                  </div>
                 </div>
-              ))}
+              ))
+            )}
           </CardContent>
         </Card>
       </div>

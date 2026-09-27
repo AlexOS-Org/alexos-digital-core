@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { ArrowDownCircle, ArrowUpCircle, Repeat, Clock, PiggyBank } from "lucide-react";
 import { TransactionFormDialog } from "./TransactionFormDialog";
 import { ExpectedFormDialog } from "./ExpectedFormDialog";
@@ -17,61 +16,39 @@ export function QuickActions({ compact = false }: Props) {
   >(null);
 
   const actions = [
-    {
-      key: "income",
-      label: "Receive",
-      icon: ArrowDownCircle,
-      tone: "text-[color:var(--success)] border-[color:var(--success)]/30 bg-[color:var(--success)]/5",
-    },
-    {
-      key: "expense",
-      label: "Spend",
-      icon: ArrowUpCircle,
-      tone: "text-destructive border-destructive/30 bg-destructive/5",
-    },
-    {
-      key: "transfer",
-      label: "Transfer",
-      icon: Repeat,
-      tone: "text-primary border-primary/30 bg-primary/5",
-    },
-    {
-      key: "expected",
-      label: "Expected",
-      icon: Clock,
-      tone: "text-amber-600 border-amber-500/30 bg-amber-500/5",
-    },
-    {
-      key: "budget",
-      label: "Budget",
-      icon: PiggyBank,
-      tone: "text-violet-600 border-violet-500/30 bg-violet-500/5",
-    },
+    { key: "income", label: "Receive", icon: ArrowDownCircle, tone: "income" },
+    { key: "expense", label: "Spend", icon: ArrowUpCircle, tone: "expense" },
+    { key: "transfer", label: "Transfer", icon: Repeat, tone: "info" },
+    { key: "expected", label: "Expected", icon: Clock, tone: "warning" },
+    { key: "budget", label: "Budget", icon: PiggyBank, tone: "debt" },
   ] as const;
 
   return (
     <>
-      <div
-        className={cn(
-          "grid gap-3",
-          compact ? "grid-cols-3 sm:grid-cols-5" : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5",
-        )}
-      >
-        {actions.map((a) => (
-          <Button
-            key={a.key}
-            variant="outline"
-            onClick={() => setOpen(a.key)}
-            className={cn(
-              "h-auto flex-col gap-2 py-4 rounded-xl border transition-all hover:-translate-y-0.5 hover:shadow-md",
-              a.tone,
-            )}
-          >
-            <a.icon className="h-5 w-5" />
-            <span className="text-xs font-semibold">{a.label}</span>
-          </Button>
-        ))}
-      </div>
+      <section aria-label="Quick actions" className="space-y-2">
+        <h2 className="alexos-metric-label">Record money</h2>
+        <div
+          className={cn(
+            "grid gap-2",
+            compact ? "grid-cols-3 sm:grid-cols-5" : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5",
+          )}
+        >
+          {actions.map((a) => (
+            <button
+              key={a.key}
+              type="button"
+              data-tone={a.tone}
+              onClick={() => setOpen(a.key)}
+              className="alexos-focusable alexos-card alexos-card-interactive alexos-tone-bg flex h-auto flex-col items-start gap-2 p-4 text-left"
+            >
+              <span className="alexos-tone-bg alexos-tone-border alexos-tone-text grid size-9 place-items-center rounded-lg border">
+                <a.icon aria-hidden="true" className="size-4" />
+              </span>
+              <span className="text-sm font-semibold">{a.label}</span>
+            </button>
+          ))}
+        </div>
+      </section>
 
       <TransactionFormDialog
         open={open === "income"}

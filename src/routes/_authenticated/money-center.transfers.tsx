@@ -1,10 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { AlexOSMetricCard } from "@/components/alexos/metric-card";
+import { AlexOSEmptyState } from "@/components/alexos/states";
+import { AlexOSPageHeader } from "@/components/alexos/page-header";
 import { useAccounts, useTransactions } from "@/lib/money/api";
 import { formatDate, formatMoney, formatTime } from "@/lib/money/format";
-import { Plus, Repeat } from "lucide-react";
+import { Hash, Plus, Repeat } from "lucide-react";
 import { TransactionFormDialog } from "@/components/money/TransactionFormDialog";
 
 export const Route = createFileRoute("/_authenticated/money-center/transfers")({
@@ -21,62 +24,69 @@ function TransfersPage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Transfers</h1>
-          <p className="text-sm text-muted-foreground">
-            Move money between your accounts. Not counted as income or expense.
-          </p>
-        </div>
-        <Button onClick={() => setOpen(true)} className="rounded-xl">
-          <Plus className="h-4 w-4 mr-1" /> New Transfer
-        </Button>
-      </header>
+      <AlexOSPageHeader
+        title="Transfers"
+        description="Move money between your accounts. Transfers move your position without counting as income or expense."
+        breadcrumbs={[{ label: "Money Center", to: "/money-center" }, { label: "Transfers" }]}
+        actions={
+          <Button onClick={() => setOpen(true)}>
+            <Plus aria-hidden="true" /> New transfer
+          </Button>
+        }
+      />
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Card className="rounded-2xl">
-          <CardHeader className="pb-1">
-            <CardTitle className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              Total Moved
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-semibold">{formatMoney(total)}</div>
-          </CardContent>
-        </Card>
-        <Card className="rounded-2xl">
-          <CardHeader className="pb-1">
-            <CardTitle className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              Transfers
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-semibold">{txs.length}</div>
-          </CardContent>
-        </Card>
+        <AlexOSMetricCard
+          label="Total moved"
+          hint="Sum of every transfer on record"
+          value={formatMoney(total)}
+          tone="info"
+          icon={Repeat}
+          emphasis
+        />
+        <AlexOSMetricCard
+          label="Transfers"
+          hint="Individual movement records"
+          value={txs.length}
+          tone="neutral"
+          icon={Hash}
+        />
       </div>
 
-      <Card className="rounded-2xl">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-base">Recent Transfers</CardTitle>
+          <CardTitle>Recent transfers</CardTitle>
+          <CardDescription>The 30 most recent movements between accounts.</CardDescription>
         </CardHeader>
         <CardContent>
           {txs.length === 0 ? (
-            <div className="text-sm text-muted-foreground border border-dashed rounded-xl p-8 text-center">
-              No transfers recorded yet.
-            </div>
+            <AlexOSEmptyState
+              compact
+              title="No transfers recorded yet"
+              description="Record a movement between your own accounts to keep every balance reconciled. Transfers never affect income or expense totals."
+              action={
+                <Button onClick={() => setOpen(true)}>
+                  <Plus aria-hidden="true" /> New transfer
+                </Button>
+              }
+            />
           ) : (
-            <ul className="divide-y">
+            <ul className="divide-y divide-border">
               {txs.slice(0, 30).map((t) => (
-                <li key={t.id} className="py-3 flex items-center justify-between gap-3">
-                  <div className="min-w-0 flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-lg bg-primary/10 text-primary grid place-items-center shrink-0">
-                      <Repeat className="h-4 w-4" />
+                <li key={t.id} className="flex items-center justify-between gap-3 py-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div
+                      data-tone="info"
+                      className="alexos-tone-bg alexos-tone-text grid size-9 shrink-0 place-items-center rounded-lg"
+                    >
+                      <Repeat aria-hidden="true" className="size-4" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-sm font-medium truncate">
-                        {accName[t.account_id]} →{" "}
-                        {t.transfer_account_id ? accName[t.transfer_account_id] : "—"}
+                      <div className="truncate text-sm font-medium">
+                        {accName[t.account_id] ?? "Unknown account"} →{" "}
+                        {t.transfer_account_id
+                          ? (accName[t.transfer_account_id] ?? "Unknown account")
+                          : "—"}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         {formatDate(t.occurred_at)} · {formatTime(t.occurred_at)}
@@ -84,7 +94,7 @@ function TransfersPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="text-sm font-semibold text-primary whitespace-nowrap">
+                  <div className="alexos-amount text-sm text-tone-info">
                     {formatMoney(t.amount)}
                   </div>
                 </li>

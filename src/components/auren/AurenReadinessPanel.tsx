@@ -21,7 +21,7 @@ export function AurenReadinessPanel({
   responseStatus: "ready" | "no_data" | "ai_unavailable" | null | undefined;
 }) {
   return (
-    <Card className="rounded-3xl border-violet-500/25 bg-violet-500/[0.04] soft-shadow">
+    <Card className="rounded-xl border-violet-500/25 bg-violet-500/[0.04] soft-shadow">
       <CardHeader>
         <CardTitle className="flex flex-wrap items-center gap-2 text-base">
           What Auren is receiving — and what it still needs

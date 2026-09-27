@@ -206,7 +206,7 @@ export function MobileDashboardHeader() {
       <section
         data-atmosphere={atmosphere}
         data-scene={activeScene}
-        className="alexos-dashboard-hero relative min-h-[250px] overflow-hidden rounded-[1.9rem] border border-white/15 p-5 text-white shadow-[0_22px_58px_-30px_var(--alexos-glow)]"
+        className="alexos-dashboard-hero relative min-h-[250px] overflow-hidden rounded-xl border border-white/15 p-5 text-white shadow-[0_22px_58px_-30px_var(--alexos-glow)]"
       >
         {activeScene !== "none" ? (
           <picture className="pointer-events-none absolute inset-0 block">

@@ -73,7 +73,7 @@ export function AurenPage() {
 
   return (
     <div className="space-y-6 pb-10">
-      <section className="relative overflow-hidden rounded-[2rem] border border-white/15 bg-[#071329] text-white shadow-[0_24px_70px_-30px_rgba(37,99,235,0.42)]">
+      <section className="relative overflow-hidden rounded-xl border border-white/15 bg-[#071329] text-white shadow-[0_24px_70px_-30px_rgba(37,99,235,0.42)]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(139,92,246,0.28),transparent_30%),linear-gradient(120deg,rgba(6,16,38,0.96),rgba(14,31,68,0.68))]" />
         <div className="relative grid gap-6 p-6 sm:p-8 lg:grid-cols-[1.35fr_0.65fr] lg:p-10">
           <div>
@@ -95,11 +95,9 @@ export function AurenPage() {
             </p>
           </div>
           <div className="flex items-end justify-start lg:justify-end">
-            <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-md">
+            <div className="w-full max-w-sm rounded-xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-md">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
-                  Decision lens
-                </p>
+                <p className="alexos-eyebrow text-white/60">Decision lens</p>
                 <Button
                   type="button"
                   size="icon"
@@ -118,7 +116,7 @@ export function AurenPage() {
                   setScope(event.target.value as AurenAdvisorScope);
                   if (event.target.value !== "businesses") setBusinessId(null);
                 }}
-                className="mt-3 w-full rounded-xl border border-white/15 bg-[#0d1b3c] px-3 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-violet-300/40"
+                className="mt-3 w-full rounded-xl border border-white/15 bg-[#0d1b3c] px-3 py-2.5 text-sm text-white outline-none focus-visible:ring-2 focus-visible:ring-violet-300/40"
                 aria-label="Auren advisory scope"
               >
                 {SCOPES.map((option) => (
@@ -131,7 +129,7 @@ export function AurenPage() {
                 <select
                   value={period}
                   onChange={(event) => setPeriod(event.target.value as AurenAdvisorPeriod)}
-                  className="w-full rounded-xl border border-white/15 bg-[#0d1b3c] px-3 py-2.5 text-xs text-white outline-none focus:ring-2 focus:ring-violet-300/40"
+                  className="w-full rounded-xl border border-white/15 bg-[#0d1b3c] px-3 py-2.5 text-xs text-white outline-none focus-visible:ring-2 focus-visible:ring-violet-300/40"
                   aria-label="Auren comparison period"
                 >
                   {PERIODS.map((option) => (
@@ -145,7 +143,7 @@ export function AurenPage() {
                   onChange={(event) =>
                     setHorizonDays(Number(event.target.value) as AurenForecastHorizon)
                   }
-                  className="w-full rounded-xl border border-white/15 bg-[#0d1b3c] px-3 py-2.5 text-xs text-white outline-none focus:ring-2 focus:ring-violet-300/40"
+                  className="w-full rounded-xl border border-white/15 bg-[#0d1b3c] px-3 py-2.5 text-xs text-white outline-none focus-visible:ring-2 focus-visible:ring-violet-300/40"
                   aria-label="Auren forecast horizon"
                 >
                   <option value={30}>30-day outlook</option>
@@ -163,7 +161,7 @@ export function AurenPage() {
       </section>
 
       {error ? (
-        <Card className="rounded-3xl border-amber-300/60 bg-amber-50/70 dark:border-amber-500/30 dark:bg-amber-950/20">
+        <Card data-tone="warning" className="alexos-tone-bg alexos-tone-border">
           <CardContent className="flex items-start gap-3 p-5">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
             <div>
@@ -183,7 +181,7 @@ export function AurenPage() {
       ) : null}
 
       {loading && !advisory ? (
-        <Card className="rounded-3xl border-border/60">
+        <Card className="rounded-xl border-border/60">
           <CardContent className="flex min-h-44 items-center justify-center gap-2 p-6 text-sm text-muted-foreground">
             <RefreshCw className="h-4 w-4 animate-spin" />
             Loading RLS-scoped advisory data…
@@ -192,7 +190,7 @@ export function AurenPage() {
       ) : null}
 
       {advisory && response?.summary ? (
-        <Card className="rounded-3xl border-violet-500/20 bg-violet-500/[0.04] soft-shadow">
+        <Card data-tone="info" className="alexos-tone-bg alexos-tone-border soft-shadow">
           <CardContent className="p-5 text-sm leading-7 whitespace-pre-line">
             {response.summary}
           </CardContent>

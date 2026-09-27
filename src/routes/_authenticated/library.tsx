@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { BookOpen } from "lucide-react";
-import { AlexOSEmptyState } from "@/components/alexos-empty-state";
+import { AlexOSRoadmapModule } from "@/components/alexos-roadmap-module";
 
 export const Route = createFileRoute("/_authenticated/library")({
   component: LibraryPage,
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/library")({
 
 function LibraryPage() {
   return (
-    <AlexOSEmptyState
+    <AlexOSRoadmapModule
       title="Library"
       description="Documents, contracts, files and your business knowledge base — organised and always accessible."
       icon={BookOpen}

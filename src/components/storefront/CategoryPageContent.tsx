@@ -124,7 +124,7 @@ export function CategoryPageContent({
       </header>
 
       {subcategories.length ? (
-        <section className="mt-6 rounded-3xl border bg-card p-4">
+        <section className="mt-6 rounded-xl border bg-card p-4">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
             Shop by subcategory
           </p>
@@ -152,7 +152,7 @@ export function CategoryPageContent({
         {products.isLoading || categoriesLoading ? (
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {[...Array(8)].map((_, index) => (
-              <div key={index} className="h-80 animate-pulse rounded-3xl bg-muted" />
+              <div key={index} className="h-80 animate-pulse rounded-xl bg-muted" />
             ))}
           </div>
         ) : products.data?.length ? (
@@ -162,7 +162,7 @@ export function CategoryPageContent({
             ))}
           </div>
         ) : (
-          <div className="rounded-3xl border border-dashed p-12 text-center">
+          <div className="rounded-xl border border-dashed p-12 text-center">
             <p className="text-sm font-semibold">No verified products in this category yet.</p>
             <p className="mt-1 text-sm text-muted-foreground">
               DailyGear keeps empty taxonomy categories private from the public catalogue until a

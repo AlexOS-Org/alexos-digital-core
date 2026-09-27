@@ -438,11 +438,11 @@ function FunnelsPage() {
         }
       />
 
-      <section className="alexos-mesh relative overflow-hidden rounded-3xl border border-emerald-500/35 bg-gradient-to-br from-emerald-500/[0.12] via-card/80 to-card p-5 sm:p-6">
+      <section className="alexos-mesh relative overflow-hidden rounded-xl border border-emerald-500/35 bg-gradient-to-br from-emerald-500/[0.12] via-card/80 to-card p-5 sm:p-6">
         <div className="relative z-10 grid min-w-0 gap-5 lg:grid-cols-[1.1fr_.9fr] lg:items-center">
           <div>
             <div className="flex items-center gap-2 text-primary">
-              <span className="grid h-9 w-9 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
                 <GitBranch className="h-5 w-5" />
               </span>
               <p className="text-xs font-bold uppercase tracking-[0.18em]">Native funnel engine</p>
@@ -459,7 +459,7 @@ function FunnelsPage() {
             {["Canonical product", "Atomic stock", "Honest payment state"].map((item) => (
               <div
                 key={item}
-                className="flex items-center gap-2 rounded-2xl border bg-card/75 px-3 py-2.5 text-sm"
+                className="flex items-center gap-2 rounded-xl border bg-card/75 px-3 py-2.5 text-sm"
               >
                 <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
 
@@ -471,7 +471,7 @@ function FunnelsPage() {
       </section>
 
       {!store && !loading ? (
-        <Card className="rounded-3xl">
+        <Card className="rounded-xl">
           <CardContent className="p-6">
             <p className="font-semibold">A published DailyGear storefront is required.</p>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -483,7 +483,7 @@ function FunnelsPage() {
       ) : null}
 
       <div className="grid min-w-0 gap-6 xl:grid-cols-[20rem_minmax(0,1fr)]">
-        <Card className="min-w-0 rounded-3xl border-emerald-500/25 bg-card/95">
+        <Card className="min-w-0 rounded-xl border-emerald-500/25 bg-card/95">
           <CardHeader className="flex flex-row items-center justify-between gap-3">
             <div>
               <CardTitle>Configurations</CardTitle>
@@ -497,7 +497,7 @@ function FunnelsPage() {
             {loading ? (
               <p className="text-sm text-muted-foreground">Loading funnel configurations…</p>
             ) : funnels.length === 0 ? (
-              <div className="space-y-4 rounded-2xl border border-dashed p-4">
+              <div className="space-y-4 rounded-xl border border-dashed p-4">
                 <div>
                   <p className="text-sm font-semibold">No saved funnel configurations yet.</p>
                   <p className="mt-1 text-xs leading-5 text-muted-foreground">
@@ -539,7 +539,7 @@ function FunnelsPage() {
                     key={funnel.id}
                     type="button"
                     onClick={() => selectFunnel(funnel)}
-                    className={`w-full rounded-2xl border p-3 text-left transition ${selectedId === funnel.id ? "border-emerald-500 bg-emerald-500/10 shadow-sm" : "hover:border-emerald-500/40 hover:bg-emerald-500/[0.04]"}`}
+                    className={`w-full rounded-xl border p-3 text-left transition ${selectedId === funnel.id ? "border-emerald-500 bg-emerald-500/10 shadow-sm" : "hover:border-emerald-500/40 hover:bg-emerald-500/[0.04]"}`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <span className="min-w-0 truncate text-sm font-semibold">{funnel.name}</span>
@@ -557,7 +557,7 @@ function FunnelsPage() {
           </CardContent>
         </Card>
 
-        <Card className="min-w-0 rounded-3xl border-emerald-500/25 bg-card/95">
+        <Card className="min-w-0 rounded-xl border-emerald-500/25 bg-card/95">
           <CardHeader className="flex flex-row items-start justify-between gap-3">
             <div>
               <CardTitle>{selectedId ? "Edit funnel" : "Create funnel"}</CardTitle>
@@ -628,7 +628,7 @@ function FunnelsPage() {
                   </p>
                 ) : null}
               </div>
-              <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-4 sm:col-span-2">
+              <div className="rounded-xl border border-primary/20 bg-primary/[0.04] p-4 sm:col-span-2">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm font-semibold">Public landing-page link</p>
@@ -690,7 +690,7 @@ function FunnelsPage() {
             </div>
 
             {form.productId ? (
-              <section className="space-y-4 rounded-2xl border bg-muted/25 p-4">
+              <section className="space-y-4 rounded-xl border bg-muted/25 p-4">
                 <div>
                   <h3 className="text-sm font-semibold">Canonical product variants</h3>
                   <p className="mt-1 text-xs text-muted-foreground">
@@ -704,7 +704,7 @@ function FunnelsPage() {
                     return (
                       <div
                         key={variant.id}
-                        className="grid gap-3 rounded-2xl border bg-card p-3 sm:grid-cols-2 lg:grid-cols-4"
+                        className="grid gap-3 rounded-xl border bg-card p-3 sm:grid-cols-2 lg:grid-cols-4"
                       >
                         <Input
                           value={String(draft.name ?? "")}
@@ -800,7 +800,7 @@ function FunnelsPage() {
               </section>
             ) : null}
 
-            <section className="space-y-4 rounded-2xl border bg-muted/25 p-4">
+            <section className="space-y-4 rounded-xl border bg-muted/25 p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <h3 className="text-sm font-semibold">Landing page content</h3>
@@ -869,7 +869,7 @@ function FunnelsPage() {
                 {landing.benefits.map((benefit, index) => (
                   <div
                     key={`landing-benefit-${index}`}
-                    className="space-y-2 rounded-2xl border bg-card p-3"
+                    className="space-y-2 rounded-xl border bg-card p-3"
                   >
                     <Label htmlFor={`landing-benefit-title-${index}`}>Benefit {index + 1}</Label>
                     <Input
@@ -921,7 +921,7 @@ function FunnelsPage() {
               </div>
             </section>
 
-            <section className="space-y-3 rounded-2xl border bg-muted/25 p-4">
+            <section className="space-y-3 rounded-xl border bg-muted/25 p-4">
               <div>
                 <h3 className="text-sm font-semibold">Journey flow</h3>
                 <p className="mt-1 text-xs text-muted-foreground">
@@ -933,7 +933,7 @@ function FunnelsPage() {
                 {activeFlow.map((stepType, index) => (
                   <div
                     key={stepType}
-                    className="flex items-center gap-2 rounded-2xl border bg-card p-3"
+                    className="flex items-center gap-2 rounded-xl border bg-card p-3"
                   >
                     <span className="grid h-7 w-7 shrink-0 place-items-center rounded-xl bg-primary/10 text-xs font-bold text-primary">
                       {index + 1}
@@ -970,7 +970,7 @@ function FunnelsPage() {
               </div>
             </section>
 
-            <section className="space-y-3 rounded-2xl border bg-muted/25 p-4">
+            <section className="space-y-3 rounded-xl border bg-muted/25 p-4">
               <div className="flex items-center gap-2">
                 <Zap className="h-4 w-4 text-primary" />
                 <div>
@@ -1042,7 +1042,7 @@ function FunnelsPage() {
               </div>
             </div>
 
-            <div className="flex flex-col justify-between gap-3 rounded-2xl border bg-card p-4 sm:flex-row sm:items-center">
+            <div className="flex flex-col justify-between gap-3 rounded-xl border bg-card p-4 sm:flex-row sm:items-center">
               <div>
                 <p className="text-sm font-semibold">Ready to save the journey?</p>
                 <p className="mt-1 text-xs text-muted-foreground">
@@ -1063,7 +1063,7 @@ function FunnelsPage() {
       </div>
 
       {selectedId ? (
-        <div className="flex flex-col gap-3 rounded-2xl border bg-muted/25 p-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-xl border bg-muted/25 p-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>
             Public path:{" "}
             <code className="rounded bg-muted px-1.5 py-0.5">
@@ -1110,7 +1110,7 @@ function OfferSelector({
   onProductChange: (productId: string) => void;
 }) {
   return (
-    <div className="rounded-2xl border bg-card p-3">
+    <div className="rounded-xl border bg-card p-3">
       <div className="flex items-start gap-3">
         <input
           id={`offer-${label}`}

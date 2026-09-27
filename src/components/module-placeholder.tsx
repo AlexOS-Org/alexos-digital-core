@@ -11,7 +11,7 @@ interface Props {
 export function ModulePlaceholder({ title, description, icon: Icon }: Props) {
   return (
     <div className="alexos-module-shell mx-auto max-w-5xl space-y-8 rounded-[2rem] p-1 sm:p-2 animate-in fade-in duration-500">
-      <div className="dashboard-feature-surface relative overflow-hidden rounded-[1.85rem] p-6 sm:p-8">
+      <div className="dashboard-feature-surface relative overflow-hidden rounded-xl p-6 sm:p-8">
         <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
         <div className="relative flex items-start gap-5">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10 text-primary">
@@ -26,7 +26,7 @@ export function ModulePlaceholder({ title, description, icon: Icon }: Props) {
         </div>
       </div>
 
-      <Card className="dashboard-surface alexos-module-card rounded-3xl">
+      <Card className="dashboard-surface alexos-module-card rounded-xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-3">
             <Brain className="h-6 w-6 text-primary" />
@@ -41,7 +41,7 @@ export function ModulePlaceholder({ title, description, icon: Icon }: Props) {
           </p>
 
           <div className="grid gap-4 md:grid-cols-3">
-            <Card className="alexos-data-metric alexos-module-card rounded-[1.35rem]">
+            <Card className="alexos-data-metric alexos-module-card rounded-xl">
               <CardContent className="relative z-[1] space-y-3 p-5">
                 <Rocket className="h-6 w-6 text-primary" />
                 <h3 className="font-semibold">Automation</h3>
@@ -51,7 +51,7 @@ export function ModulePlaceholder({ title, description, icon: Icon }: Props) {
               </CardContent>
             </Card>
 
-            <Card className="alexos-data-metric alexos-module-card rounded-[1.35rem]">
+            <Card className="alexos-data-metric alexos-module-card rounded-xl">
               <CardContent className="relative z-[1] space-y-3 p-5">
                 <Brain className="h-6 w-6 text-primary" />
                 <h3 className="font-semibold">AI Intelligence</h3>
@@ -62,7 +62,7 @@ export function ModulePlaceholder({ title, description, icon: Icon }: Props) {
               </CardContent>
             </Card>
 
-            <Card className="alexos-data-metric alexos-module-card rounded-[1.35rem]">
+            <Card className="alexos-data-metric alexos-module-card rounded-xl">
               <CardContent className="relative z-[1] space-y-3 p-5">
                 <Clock className="h-6 w-6 text-primary" />
                 <h3 className="font-semibold">Roadmap preview</h3>

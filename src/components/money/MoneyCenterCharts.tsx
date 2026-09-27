@@ -14,18 +14,28 @@ import {
   YAxis,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlexOSEmptyState } from "@/components/alexos/states";
 
-const CHART_COLORS = [
-  "hsl(220 70% 50%)",
-  "hsl(150 60% 45%)",
-  "hsl(35 90% 55%)",
-  "hsl(280 60% 55%)",
-  "hsl(0 70% 55%)",
-  "hsl(200 60% 50%)",
-  "hsl(320 60% 55%)",
-  "hsl(90 50% 45%)",
-  "hsl(20 80% 55%)",
-  "hsl(260 50% 55%)",
+/** Semantic series colours: the same meaning keeps the same colour across
+ *  every chart, and the categorical ramp is only used for slices. */
+const SERIES = {
+  income: "hsl(150 55% 42%)",
+  expense: "hsl(2 66% 52%)",
+  neutral: "hsl(220 55% 48%)",
+  expected: "hsl(35 85% 50%)",
+} as const;
+
+const CATEGORICAL = [
+  "hsl(220 55% 48%)",
+  "hsl(150 55% 42%)",
+  "hsl(35 85% 50%)",
+  "hsl(262 48% 54%)",
+  "hsl(2 66% 52%)",
+  "hsl(199 62% 46%)",
+  "hsl(322 52% 52%)",
+  "hsl(96 38% 40%)",
+  "hsl(20 72% 50%)",
+  "hsl(240 40% 55%)",
 ];
 
 type ChartRow = { month: string; income: number; expense: number; cashflow: number };
@@ -67,8 +77,8 @@ export function MoneyCenterCharts({
             <YAxis fontSize={11} />
             <Tooltip formatter={(v: number) => money(v)} />
             <Legend />
-            <Bar dataKey="income" fill={CHART_COLORS[1]} radius={[6, 6, 0, 0]} />
-            <Bar dataKey="expense" fill={CHART_COLORS[4]} radius={[6, 6, 0, 0]} />
+            <Bar dataKey="income" fill={SERIES.income} radius={[6, 6, 0, 0]} />
+            <Bar dataKey="expense" fill={SERIES.expense} radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </ChartCard>
@@ -83,7 +93,7 @@ export function MoneyCenterCharts({
             <Line
               type="monotone"
               dataKey="cashflow"
-              stroke={CHART_COLORS[0]}
+              stroke={SERIES.neutral}
               strokeWidth={2}
               dot={false}
             />
@@ -114,8 +124,8 @@ export function MoneyCenterCharts({
               <YAxis fontSize={11} />
               <Tooltip formatter={(v: number) => money(v)} />
               <Legend />
-              <Bar dataKey="budget" fill={CHART_COLORS[0]} radius={[6, 6, 0, 0]} />
-              <Bar dataKey="actual" fill={CHART_COLORS[4]} radius={[6, 6, 0, 0]} />
+              <Bar dataKey="budget" fill={SERIES.neutral} radius={[6, 6, 0, 0]} />
+              <Bar dataKey="actual" fill={SERIES.expense} radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -131,7 +141,7 @@ export function MoneyCenterCharts({
               <XAxis type="number" fontSize={11} />
               <YAxis type="category" dataKey="name" fontSize={11} width={80} />
               <Tooltip formatter={(v: number) => money(v)} />
-              <Bar dataKey="balance" fill={CHART_COLORS[0]} radius={[0, 6, 6, 0]} />
+              <Bar dataKey="balance" fill={SERIES.neutral} radius={[0, 6, 6, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -150,7 +160,7 @@ export function MoneyCenterCharts({
               <Line
                 type="monotone"
                 dataKey="value"
-                stroke={CHART_COLORS[1]}
+                stroke={SERIES.income}
                 strokeWidth={2}
                 dot={false}
               />
@@ -169,7 +179,7 @@ export function MoneyCenterCharts({
               <XAxis dataKey="name" fontSize={11} />
               <YAxis fontSize={11} />
               <Tooltip formatter={(v: number) => money(v)} />
-              <Bar dataKey="value" fill={CHART_COLORS[2]} radius={[6, 6, 0, 0]} />
+              <Bar dataKey="value" fill={SERIES.expected} radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -192,7 +202,7 @@ function PiePanel({
       <PieChart>
         <Pie data={data} dataKey="value" nameKey="name" outerRadius={95}>
           {data.map((_, index) => (
-            <Cell key={index} fill={CHART_COLORS[(index + offset) % CHART_COLORS.length]} />
+            <Cell key={index} fill={CATEGORICAL[(index + offset) % CATEGORICAL.length]} />
           ))}
         </Pie>
         <Tooltip formatter={(v: number) => money(v)} />
@@ -203,10 +213,13 @@ function PiePanel({
 }
 
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
+  const headingId = `chart-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   return (
-    <Card className="rounded-2xl">
+    <Card aria-labelledby={headingId}>
       <CardHeader>
-        <CardTitle className="text-base">{title}</CardTitle>
+        <CardTitle id={headingId} className="text-base">
+          {title}
+        </CardTitle>
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>
@@ -215,8 +228,8 @@ function ChartCard({ title, children }: { title: string; children: React.ReactNo
 
 function Empty({ label = "No data yet" }: { label?: string }) {
   return (
-    <div className="grid h-[260px] place-items-center rounded-xl border border-dashed text-sm text-muted-foreground">
-      {label}
+    <div className="h-[260px]">
+      <AlexOSEmptyState title={label} description="Data will appear here once recorded." compact />
     </div>
   );
 }

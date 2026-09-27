@@ -40,7 +40,7 @@ function ChartShell({
   className?: string;
 }) {
   return (
-    <Card className={cn("h-full rounded-3xl border-border/60 soft-shadow", className)}>
+    <Card className={cn("h-full rounded-xl border-border/60 soft-shadow", className)}>
       <CardHeader className="flex flex-row items-center justify-between gap-3 pb-2">
         <CardTitle className="flex min-w-0 items-center gap-2 text-sm font-semibold">
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary/10 text-primary ring-1 ring-inset ring-primary/10">
@@ -87,7 +87,7 @@ export function RevenueAnalytics({
   loading?: boolean;
   height?: number;
 }) {
-  if (loading) return <Skeleton className="h-full min-h-56 w-full rounded-3xl" />;
+  if (loading) return <Skeleton className="h-full min-h-56 w-full rounded-xl" />;
 
   return (
     <ChartShell title="Revenue & profit" icon={BarChart3} badge="Last 6 months" height={height}>
@@ -153,11 +153,11 @@ export function MarketingAnalytics({
     return [...map.entries()].map(([name, value]) => ({ name, value }));
   }, [orders]);
 
-  if (loading) return <Skeleton className="h-full min-h-56 w-full rounded-3xl" />;
+  if (loading) return <Skeleton className="h-full min-h-56 w-full rounded-xl" />;
 
   if (!data.length) {
     return (
-      <Card className="h-full rounded-3xl border-dashed">
+      <Card className="h-full rounded-xl border-dashed">
         <CardContent className="grid h-full min-h-56 place-items-center p-6 text-center text-xs text-muted-foreground">
           Channel revenue appears once orders are attributed to a sales channel.
         </CardContent>
@@ -197,7 +197,7 @@ export function OrderVolumeChart({
   loading?: boolean;
   height?: number;
 }) {
-  if (loading) return <Skeleton className="h-full min-h-48 w-full rounded-3xl" />;
+  if (loading) return <Skeleton className="h-full min-h-48 w-full rounded-xl" />;
 
   return (
     <ChartShell title="Order volume" icon={BarChart3} height={height}>
@@ -223,7 +223,7 @@ export function MetaAnalyticsPanel() {
   ];
 
   return (
-    <Card className="h-full rounded-3xl border-border/60 soft-shadow">
+    <Card className="h-full rounded-xl border-border/60 soft-shadow">
       <CardHeader className="flex flex-row items-center justify-between gap-3 pb-3">
         <CardTitle className="flex items-center gap-2 text-sm font-semibold">
           <span className="grid h-8 w-8 place-items-center rounded-full bg-chart-2/10 text-chart-2 ring-1 ring-inset ring-chart-2/10">

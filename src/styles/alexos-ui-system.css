@@ -1,0 +1,658 @@
+/* ───────────────────────────────────────────────────────────────────────────
+   AlexOS UI System
+   ───────────────────────────────────────────────────────────────────────────
+   The single source of truth for semantic colour, radius, elevation, density
+   and numeric presentation across the authenticated admin.
+
+   Everything here is derived from the existing AlexOS foundations
+   (--alexos-blue / --alexos-green / --alexos-amber / --alexos-coral /
+   --alexos-purple / --destructive / --card / --foreground) so it automatically
+   follows the user-selected visual themes instead of fighting them.
+
+   Three rules govern this file:
+     1. No hard-coded palette colours (no emerald-500, no #071329).
+     2. Colour is expressed as a *role* (income, expense, pending, ...), never
+        per page.
+     3. Tints are mixed against the surface they sit on, so contrast holds in
+        light and dark without a second set of values.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── Typography ──────────────────────────────────────────────────────────── */
+
+:root {
+  --alexos-font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans", sans-serif;
+  --alexos-font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* Type scale. Kept small and deliberate so headings never out-shout the
+     numbers a financial operator is actually reading. */
+  --alexos-text-eyebrow: 0.6875rem;
+  --alexos-text-label: 0.8125rem;
+  --alexos-text-body: 0.875rem;
+  --alexos-text-value: 1.5rem;
+  --alexos-text-display: 2.25rem;
+}
+
+/* ── Radius scale ─────────────────────────────────────────────────────────
+   Four steps only. The audit found nine arbitrary radii in active use
+   (1.35rem … 3rem); collapsing them to a scale is the single biggest
+   consistency win in this pass. */
+
+:root {
+  --alexos-radius-control: 0.5rem;
+  --alexos-radius-card: 0.75rem;
+  --alexos-radius-panel: 1rem;
+  --alexos-radius-hero: 1.25rem;
+}
+
+/* ── Spacing / density ────────────────────────────────────────────────────── */
+
+:root {
+  --alexos-space-card: 1.25rem;
+  --alexos-space-panel: 1.5rem;
+  --alexos-row-y: 0.875rem;
+  --alexos-row-y-compact: 0.625rem;
+  --alexos-head-h: 2.75rem;
+}
+
+/* ── Elevation ───────────────────────────────────────────────────────────── */
+
+:root {
+  --alexos-shadow-card:
+    0 1px 2px color-mix(in oklch, var(--foreground) 5%, transparent),
+    0 10px 28px -20px color-mix(in oklch, var(--foreground) 24%, transparent);
+  --alexos-shadow-raised:
+    0 2px 4px color-mix(in oklch, var(--foreground) 5%, transparent),
+    0 18px 40px -24px color-mix(in oklch, var(--foreground) 30%, transparent);
+}
+
+/* ── Semantic tone anchors ────────────────────────────────────────────────
+   Financial direction first (income / expense / debt), then state
+   (pending / paid / overdue / cancelled), then the generic UI roles. */
+
+:root {
+  --alexos-tone-income: var(--alexos-green);
+  --alexos-tone-expense: var(--alexos-coral);
+  --alexos-tone-debt: var(--alexos-purple);
+  --alexos-tone-success: var(--alexos-green);
+  --alexos-tone-warning: var(--alexos-amber);
+  --alexos-tone-danger: var(--destructive);
+  --alexos-tone-info: var(--alexos-blue);
+  --alexos-tone-neutral: var(--muted-foreground);
+  --alexos-tone-pending: var(--alexos-amber);
+  --alexos-tone-active: var(--alexos-green);
+  --alexos-tone-inactive: var(--muted-foreground);
+}
+
+/* Dark mode needs the destructive anchor lifted so it stays legible on the
+   dark card surface. Everything else inverts automatically via color-mix. */
+.dark {
+  --alexos-tone-danger: oklch(0.68 0.19 27);
+  --alexos-tone-income: var(--alexos-green);
+  --alexos-tone-expense: var(--alexos-coral);
+}
+
+/* ── Tone derivation ─────────────────────────────────────────────────────── */
+
+@layer utilities {
+  [data-tone] {
+    --alexos-tone-anchor: var(--alexos-tone-neutral);
+  }
+  [data-tone="income"],
+  [data-tone="success"],
+  [data-tone="active"],
+  [data-tone="paid"] {
+    --alexos-tone-anchor: var(--alexos-tone-income);
+  }
+  [data-tone="expense"],
+  [data-tone="danger"] {
+    --alexos-tone-anchor: var(--alexos-tone-danger);
+  }
+  [data-tone="debt"] {
+    --alexos-tone-anchor: var(--alexos-tone-debt);
+  }
+  [data-tone="warning"],
+  [data-tone="pending"],
+  [data-tone="overdue"],
+  [data-tone="partial"] {
+    --alexos-tone-anchor: var(--alexos-tone-warning);
+  }
+  [data-tone="info"],
+  [data-tone="processing"] {
+    --alexos-tone-anchor: var(--alexos-tone-info);
+  }
+  [data-tone="neutral"],
+  [data-tone="inactive"],
+  [data-tone="cancelled"],
+  [data-tone="draft"],
+  [data-tone="failed"] {
+    --alexos-tone-anchor: var(--alexos-tone-neutral);
+  }
+  [data-tone="failed"] {
+    --alexos-tone-anchor: var(--alexos-tone-danger);
+  }
+
+  /* Mixed toward the surface text colour, so the tint darkens in light mode
+     and lightens in dark mode from one declaration. */
+  [data-tone] {
+    --alexos-tone-fg: color-mix(in oklch, var(--alexos-tone-anchor) 74%, var(--color-foreground));
+    --alexos-tone-bg: color-mix(in oklch, var(--alexos-tone-anchor) 12%, var(--color-card));
+    --alexos-tone-bg-strong: color-mix(in oklch, var(--alexos-tone-anchor) 18%, var(--color-card));
+    --alexos-tone-border: color-mix(in oklch, var(--alexos-tone-anchor) 32%, var(--color-border));
+    --alexos-tone-on: var(--color-primary-foreground);
+  }
+
+  .alexos-tone-text {
+    color: var(--alexos-tone-fg);
+  }
+  .alexos-tone-bg {
+    background-color: var(--alexos-tone-bg);
+  }
+  .alexos-tone-border {
+    border-color: var(--alexos-tone-border);
+  }
+
+  /* A container that declares a tone adopts that tone for its own surface, so
+     callers do not have to repeat the utility classes on every wrapper. */
+  [data-tone].alexos-card,
+  [data-tone].alexos-panel {
+    border-color: var(--alexos-tone-border);
+  }
+  [data-tone].alexos-card > [data-tone],
+  [data-tone].alexos-panel > [data-tone] {
+    border-color: transparent;
+  }
+  .alexos-tone-rule {
+    background-color: var(--alexos-tone-anchor);
+  }
+}
+
+/* ── Surfaces ─────────────────────────────────────────────────────────────
+   One card recipe, one panel recipe. Both are flat, opaque and border-led:
+   the brief is a business operating system, not a glass showcase. */
+
+@layer components {
+  .alexos-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--alexos-radius-card);
+    box-shadow: var(--alexos-shadow-card);
+    color: var(--color-card-foreground);
+  }
+
+  .alexos-card-interactive {
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .alexos-card-interactive:hover {
+    border-color: color-mix(in oklch, var(--primary) 34%, var(--color-border));
+    box-shadow: var(--alexos-shadow-raised);
+  }
+
+  .alexos-panel {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--alexos-radius-panel);
+    box-shadow: var(--alexos-shadow-card);
+    color: var(--color-card-foreground);
+  }
+
+  .alexos-panel-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: var(--alexos-space-panel) var(--alexos-space-panel) 0.75rem;
+  }
+
+  .alexos-panel-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  .alexos-panel-subtitle {
+    color: var(--color-muted-foreground);
+    font-size: var(--alexos-text-label);
+    line-height: 1.45;
+  }
+
+  .alexos-panel-body {
+    padding: 0 var(--alexos-space-panel) var(--alexos-space-panel);
+  }
+
+  /* Tone-accented metric card: a 2px rule instead of a gradient wash, so a
+     screen full of KPIs stays calm. */
+  .alexos-metric {
+    position: relative;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--alexos-radius-card);
+    box-shadow: var(--alexos-shadow-card);
+  }
+
+  .alexos-metric::before {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    border-radius: var(--alexos-radius-card) var(--alexos-radius-card) 0 0;
+    background: var(--alexos-tone-anchor, var(--primary));
+    content: "";
+  }
+
+  .alexos-metric-body {
+    padding: var(--alexos-space-card);
+  }
+
+  .alexos-metric-label {
+    color: var(--color-muted-foreground);
+    font-size: var(--alexos-text-eyebrow);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  /* Section eyebrow above a panel or page title. Replaces ad-hoc
+     `text-xs uppercase tracking-[0.16em]` combinations. */
+  .alexos-eyebrow {
+    color: var(--color-muted-foreground);
+    font-size: var(--alexos-text-eyebrow);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .alexos-eyebrow-accent {
+    color: var(--color-primary);
+  }
+
+  .alexos-metric-value {
+    font-size: var(--alexos-text-value);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  .alexos-metric-value-lg {
+    font-size: var(--alexos-text-display);
+  }
+
+  .alexos-metric-meta {
+    color: var(--color-muted-foreground);
+    font-size: var(--alexos-text-label);
+  }
+}
+
+/* ── Status badge ─────────────────────────────────────────────────────────── */
+
+@layer components {
+  .alexos-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: calc(var(--alexos-radius-control) - 0.125rem);
+    border: 1px solid var(--alexos-tone-border, var(--color-border));
+    background-color: var(--alexos-tone-bg, var(--color-muted));
+    color: var(--alexos-tone-fg, var(--color-muted-foreground));
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1.4;
+    padding-block: 0.1875rem;
+    padding-inline: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .alexos-badge-solid {
+    background-color: var(--alexos-tone-anchor, var(--primary));
+    border-color: transparent;
+    color: var(--alexos-tone-on, var(--color-primary-foreground));
+  }
+
+  .alexos-badge-outline {
+    background-color: transparent;
+  }
+
+  .alexos-badge-lg {
+    font-size: 0.8125rem;
+    padding-block: 0.25rem;
+    padding-inline: 0.625rem;
+  }
+
+  .alexos-badge-dot {
+    height: 0.375rem;
+    width: 0.375rem;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    background-color: currentColor;
+  }
+}
+
+/* ── Numbers ─────────────────────────────────────────────────────────────── */
+
+@layer utilities {
+  /* Every monetary figure in AlexOS uses this. Prevents the digit-shifting
+     jitter that makes financial tables hard to compare down a column. */
+  .alexos-num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  .alexos-amount {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  .alexos-amount-lg {
+    font-size: 1.75rem;
+    line-height: 1.1;
+  }
+
+  .alexos-money-in {
+    color: var(--alexos-tone-income);
+  }
+
+  .alexos-money-out {
+    color: var(--alexos-tone-danger);
+  }
+}
+
+/* ── Tables ───────────────────────────────────────────────────────────────── */
+
+@layer components {
+  .alexos-table-shell {
+    border: 1px solid var(--color-border);
+    border-radius: var(--alexos-radius-card);
+    background: var(--color-card);
+    overflow: hidden;
+  }
+
+  .alexos-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .alexos-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: var(--alexos-text-body);
+  }
+
+  .alexos-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    height: var(--alexos-head-h);
+    background: var(--color-muted);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-muted-foreground);
+    font-size: var(--alexos-text-eyebrow);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding-inline: 1rem;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .alexos-table tbody td {
+    border-bottom: 1px solid color-mix(in oklch, var(--color-border) 70%, transparent);
+    padding-block: var(--alexos-row-y);
+    padding-inline: 1rem;
+    vertical-align: middle;
+  }
+
+  .alexos-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .alexos-table tbody tr {
+    transition: background-color 120ms ease;
+  }
+
+  .alexos-table tbody tr:hover {
+    background: color-mix(in oklch, var(--primary) 5%, transparent);
+  }
+
+  .alexos-table[data-density="compact"] tbody td {
+    padding-block: var(--alexos-row-y-compact);
+  }
+
+  .alexos-table[data-density="compact"] thead th {
+    height: 2.25rem;
+  }
+
+  .alexos-table .alexos-cell-numeric {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    white-space: nowrap;
+  }
+
+  .alexos-table .alexos-cell-actions {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .alexos-table .alexos-cell-id {
+    font-family: var(--alexos-font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: -0.01em;
+  }
+
+  .alexos-table tfoot td {
+    background: var(--color-muted);
+    border-top: 1px solid var(--color-border);
+    color: var(--color-muted-foreground);
+    font-size: var(--alexos-text-label);
+    padding-block: 0.75rem;
+    padding-inline: 1rem;
+  }
+}
+
+/* ── Forms ────────────────────────────────────────────────────────────────── */
+
+@layer components {
+  .alexos-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    min-width: 0;
+  }
+
+  .alexos-label {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--color-foreground);
+    font-size: var(--alexos-text-label);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .alexos-label-optional {
+    color: var(--color-muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .alexos-required {
+    color: var(--alexos-tone-danger);
+    font-weight: 700;
+  }
+
+  .alexos-hint {
+    color: var(--color-muted-foreground);
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .alexos-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.25rem;
+    color: var(--alexos-tone-danger);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .alexos-form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--alexos-radius-card);
+    background: color-mix(in oklch, var(--color-muted) 40%, transparent);
+    padding: 1rem;
+  }
+
+  .alexos-form-section-title {
+    font-size: var(--alexos-text-label);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted-foreground);
+  }
+
+  /* One visible, consistent keyboard focus treatment across the product. */
+  .alexos-focusable:focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+}
+
+/* ── Page header ──────────────────────────────────────────────────────────── */
+
+@layer components {
+  .alexos-page-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .alexos-page-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .alexos-page-description {
+    margin-top: 0.25rem;
+    max-width: 68ch;
+    color: var(--color-muted-foreground);
+    font-size: var(--alexos-text-body);
+    line-height: 1.55;
+  }
+
+  .alexos-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--color-muted-foreground);
+    font-size: var(--alexos-text-label);
+    font-weight: 500;
+  }
+
+  .alexos-breadcrumb a {
+    border-radius: 0.25rem;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .alexos-breadcrumb a:hover {
+    color: var(--color-foreground);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .alexos-breadcrumb-separator {
+    color: color-mix(in oklch, var(--color-muted-foreground) 55%, transparent);
+  }
+
+  @media (min-width: 640px) {
+    .alexos-page-header {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+  }
+}
+
+/* ── States ───────────────────────────────────────────────────────────────── */
+
+@layer components {
+  .alexos-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    border: 1px dashed color-mix(in oklch, var(--color-border) 90%, transparent);
+    border-radius: var(--alexos-radius-card);
+    background: color-mix(in oklch, var(--color-muted) 26%, transparent);
+    padding: 2.25rem 1.5rem;
+    text-align: center;
+  }
+
+  .alexos-state-compact {
+    padding: 1.25rem 1rem;
+  }
+
+  .alexos-state-icon {
+    display: grid;
+    height: 2.5rem;
+    width: 2.5rem;
+    place-items: center;
+    border-radius: var(--alexos-radius-control);
+    border: 1px solid var(--alexos-tone-border, var(--color-border));
+    background-color: var(--alexos-tone-bg, var(--color-muted));
+    color: var(--alexos-tone-fg, var(--color-muted-foreground));
+  }
+
+  .alexos-state-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .alexos-state-description {
+    max-width: 44ch;
+    color: var(--color-muted-foreground);
+    font-size: var(--alexos-text-label);
+    line-height: 1.6;
+  }
+}
+
+/* ── Focus visibility ────────────────────────────────────────────────────── */
+
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+}
+
+/* Interactive targets never go below 32px on pointer devices, and 44px on
+   touch. Declared once so it propagates to every screen. */
+@media (pointer: coarse) {
+  button:not([data-keep-size]),
+  [role="button"]:not([data-keep-size]),
+  a[href]:not(.alexos-link-plain) {
+    min-height: 2.75rem;
+  }
+}

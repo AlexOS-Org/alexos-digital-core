@@ -2,10 +2,17 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * AlexOS data table primitives.
+ *
+ * Standardised as part of the admin UI pass: one header treatment, one row
+ * rhythm, one hover behaviour, and first-class numeric and action cells so
+ * financial columns stay scannable down the page.
+ */
 const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
-    <div className="relative w-full overflow-auto">
-      <table ref={ref} className={cn("w-full caption-bottom text-sm", className)} {...props} />
+    <div className="alexos-table-scroll">
+      <table ref={ref} className={cn("alexos-table", className)} {...props} />
     </div>
   ),
 );
@@ -14,42 +21,23 @@ Table.displayName = "Table";
 const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
-));
+>(({ className, ...props }, ref) => <thead ref={ref} className={className} {...props} />);
 TableHeader.displayName = "TableHeader";
 
 const TableBody = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <tbody ref={ref} className={cn("[&_tr:last-child]:border-0", className)} {...props} />
-));
+>(({ className, ...props }, ref) => <tbody ref={ref} className={className} {...props} />);
 TableBody.displayName = "TableBody";
 
 const TableFooter = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <tfoot
-    ref={ref}
-    className={cn("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", className)}
-    {...props}
-  />
-));
+>(({ className, ...props }, ref) => <tfoot ref={ref} className={className} {...props} />);
 TableFooter.displayName = "TableFooter";
 
 const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
-  ({ className, ...props }, ref) => (
-    <tr
-      ref={ref}
-      className={cn(
-        "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
-        className,
-      )}
-      {...props}
-    />
-  ),
+  ({ className, ...props }, ref) => <tr ref={ref} className={className} {...props} />,
 );
 TableRow.displayName = "TableRow";
 
@@ -57,31 +45,51 @@ const TableHead = React.forwardRef<
   HTMLTableCellElement,
   React.ThHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
-  <th
-    ref={ref}
-    className={cn(
-      "h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-      className,
-    )}
-    {...props}
-  />
+  <th ref={ref} scope="col" className={cn(className)} {...props} />
 ));
 TableHead.displayName = "TableHead";
 
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
   React.TdHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
-  <td
-    ref={ref}
-    className={cn(
-      "p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-      className,
-    )}
-    {...props}
-  />
-));
+>(({ className, ...props }, ref) => <td ref={ref} className={cn(className)} {...props} />);
 TableCell.displayName = "TableCell";
+
+/** Currency, quantity, percentage — always right-aligned with tabular figures. */
+const TableNumericCell = React.forwardRef<
+  HTMLTableCellElement,
+  React.TdHTMLAttributes<HTMLTableCellElement>
+>(({ className, ...props }, ref) => (
+  <td ref={ref} className={cn("alexos-cell-numeric", className)} {...props} />
+));
+TableNumericCell.displayName = "TableNumericCell";
+
+/** Right-aligned column header that matches {@link TableNumericCell}. */
+const TableNumericHead = React.forwardRef<
+  HTMLTableCellElement,
+  React.ThHTMLAttributes<HTMLTableCellElement>
+>(({ className, ...props }, ref) => (
+  <th ref={ref} scope="col" className={cn("alexos-cell-numeric", className)} {...props} />
+));
+TableNumericHead.displayName = "TableNumericHead";
+
+/** Trailing column holding row actions. */
+const TableActionsCell = React.forwardRef<
+  HTMLTableCellElement,
+  React.TdHTMLAttributes<HTMLTableCellElement>
+>(({ className, ...props }, ref) => (
+  <td ref={ref} className={cn("alexos-cell-actions", className)} {...props} />
+));
+TableActionsCell.displayName = "TableActionsCell";
+
+/** Monospace identifier column — order numbers, references, SKUs. */
+const TableIdCell = React.forwardRef<
+  HTMLTableCellElement,
+  React.TdHTMLAttributes<HTMLTableCellElement>
+>(({ className, ...props }, ref) => (
+  <td ref={ref} className={cn("alexos-cell-id", className)} {...props} />
+));
+TableIdCell.displayName = "TableIdCell";
 
 const TableCaption = React.forwardRef<
   HTMLTableCaptionElement,
@@ -91,4 +99,17 @@ const TableCaption = React.forwardRef<
 ));
 TableCaption.displayName = "TableCaption";
 
-export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption };
+export {
+  Table,
+  TableActionsCell,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableIdCell,
+  TableNumericCell,
+  TableNumericHead,
+  TableRow,
+};

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { AlexOSEmptyState } from "@/components/alexos/states";
+import { AlexOSFormField } from "@/components/alexos/form";
 import {
   Select,
   SelectContent,
@@ -154,40 +155,48 @@ export function MoneyAllocationPanel() {
   const savingsApproved = savingsAlreadyPosted || approvedSavingsKeys.includes(savingsKey);
 
   return (
-    <Card className="rounded-[1.5rem] border-border/60 shadow-sm">
+    <Card className="border-border/60">
       <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
         <div>
           <CardTitle className="flex items-center gap-2 text-base">
-            <BellRing className="h-4 w-4 text-amber-500" /> Daily allocation review
+            <span data-tone="warning" className="alexos-tone-text">
+              <BellRing aria-hidden="true" className="size-4" />
+            </span>
+            Daily allocation review
           </CardTitle>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <CardDescription>
             Suggestions are calculated from posted transactions today. Nothing moves until you
             approve it.
-          </p>
+          </CardDescription>
         </div>
-        <ShieldCheck className="h-5 w-5 text-emerald-600" aria-label="Approval required" />
+        <span data-tone="income" className="alexos-tone-text shrink-0">
+          <ShieldCheck aria-label="Approval required" className="size-5" />
+        </span>
       </CardHeader>
       <CardContent className="grid gap-4 lg:grid-cols-2">
-        <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/20 p-4">
-          <div className="flex items-center justify-between gap-3">
+        <section data-tone="debt" className="alexos-tone-bg space-y-3 rounded-xl border p-4">
+          <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                Tithe due
-              </p>
-              <p className="mt-1 text-2xl font-semibold">
+              <p className="alexos-metric-label">Tithe due</p>
+              <p className="alexos-amount mt-1 text-2xl">
                 {titheUnavailable
                   ? "Unavailable"
                   : formatMoney(titheTotal, metrics.titheCalculation.currency ?? undefined)}
               </p>
             </div>
-            <HeartHandshake className="h-6 w-6 text-rose-500" />
+            <span className="alexos-tone-text shrink-0">
+              <HeartHandshake aria-hidden="true" className="size-6" />
+            </span>
           </div>
           <p className="text-xs text-muted-foreground">
             10% of today’s posted non-gift income receipts. Gifts, loans, and transfers are
             excluded; nothing moves until you approve it.
           </p>
           {titheUnavailable ? (
-            <p className="text-xs text-amber-700 dark:text-amber-300">
+            <p
+              data-tone="warning"
+              className="alexos-tone-bg alexos-tone-border alexos-tone-text rounded-lg border px-3 py-2 text-xs"
+            >
               Tithe is unavailable because eligible receipts have{" "}
               {metrics.titheCalculation.unavailableReason === "mixed_currency"
                 ? "multiple currencies"
@@ -197,96 +206,119 @@ export function MoneyAllocationPanel() {
           ) : null}
           {titheTotal > 0 && !titheUnavailable && !titheApproved ? (
             <>
-              <div className="space-y-1.5">
-                <Label>Pay tithe from</Label>
-                <Select value={titheAccountId} onValueChange={setTitheAccountId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select personal or business account" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableAccounts.map((account) => (
-                      <SelectItem key={account.id} value={account.id}>
-                        {account.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <AlexOSFormField label="Pay tithe from" required>
+                {({ id, describedBy }) => (
+                  <Select value={titheAccountId} onValueChange={setTitheAccountId}>
+                    <SelectTrigger id={id} aria-describedby={describedBy}>
+                      <SelectValue placeholder="Select personal or business account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableAccounts.map((account) => (
+                        <SelectItem key={account.id} value={account.id}>
+                          {account.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </AlexOSFormField>
               <Button
                 className="w-full"
                 onClick={approveTithe}
                 disabled={save.isPending || !titheAccountId}
               >
-                <CheckCircle2 className="mr-2 h-4 w-4" /> Approve tithe payment
+                <CheckCircle2 aria-hidden="true" /> Approve tithe payment
               </Button>
             </>
           ) : titheApproved ? (
-            <p className="flex items-center gap-2 text-sm font-medium text-emerald-600">
-              <CheckCircle2 className="h-4 w-4" /> Approved and posted once.
+            <p
+              data-tone="income"
+              className="alexos-tone-bg alexos-tone-text flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium"
+            >
+              <CheckCircle2 aria-hidden="true" className="size-4" /> Approved and posted once.
             </p>
           ) : (
-            <p className="text-sm text-muted-foreground">No tithe suggestion is due today.</p>
+            <AlexOSEmptyState
+              compact
+              title="No tithe suggestion due today"
+              description="Nothing eligible was posted today. The 10% suggestion appears as soon as qualifying income lands."
+            />
           )}
-        </div>
+        </section>
 
-        <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/20 p-4">
-          <div className="flex items-center justify-between gap-3">
+        <section data-tone="income" className="alexos-tone-bg space-y-3 rounded-xl border p-4">
+          <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                Emergency Fund suggestion
-              </p>
-              <p className="mt-1 text-2xl font-semibold">
+              <p className="alexos-metric-label">Emergency Fund suggestion</p>
+              <p className="alexos-amount mt-1 text-2xl">
                 {formatMoney(metrics.savingsSuggestion)}
               </p>
             </div>
-            <PiggyBank className="h-6 w-6 text-emerald-600" />
+            <span className="alexos-tone-text shrink-0">
+              <PiggyBank aria-hidden="true" className="size-6" />
+            </span>
           </div>
           <p className="text-xs text-muted-foreground">
             Starter rule: 10% of today’s confirmed personal receipts. Current reserve balance:{" "}
-            {formatMoney(emergencyBalance)}.
+            <span className="alexos-num">{formatMoney(emergencyBalance)}</span>
           </p>
           {!emergencyAccount ? (
-            <Button asChild variant="outline" className="w-full">
-              <Link to="/money-center/accounts">
-                <ArrowDownToLine className="mr-2 h-4 w-4" /> Create Emergency Fund account
-              </Link>
-            </Button>
+            <AlexOSEmptyState
+              compact
+              variant="not-configured"
+              title="No Emergency Fund account"
+              description="Create an account named “Emergency Fund” and AlexOS can suggest transfers into it from your daily receipts."
+              action={
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/money-center/accounts">
+                    <ArrowDownToLine aria-hidden="true" /> Create Emergency Fund account
+                  </Link>
+                </Button>
+              }
+            />
           ) : metrics.savingsSuggestion > 0 && !savingsApproved ? (
             <>
-              <div className="space-y-1.5">
-                <Label>Save from</Label>
-                <Select value={savingsAccountId} onValueChange={setSavingsAccountId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select personal account" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {personalSavingsAccounts.map((account) => (
-                      <SelectItem key={account.id} value={account.id}>
-                        {account.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <AlexOSFormField label="Save from" required>
+                {({ id, describedBy }) => (
+                  <Select value={savingsAccountId} onValueChange={setSavingsAccountId}>
+                    <SelectTrigger id={id} aria-describedby={describedBy}>
+                      <SelectValue placeholder="Select personal account" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {personalSavingsAccounts.map((account) => (
+                        <SelectItem key={account.id} value={account.id}>
+                          {account.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </AlexOSFormField>
               <Button
                 className="w-full"
                 variant="secondary"
                 onClick={approveSavings}
                 disabled={save.isPending || !savingsAccountId}
               >
-                <PiggyBank className="mr-2 h-4 w-4" /> Approve transfer to Emergency Fund
+                <PiggyBank aria-hidden="true" /> Approve transfer to Emergency Fund
               </Button>
             </>
           ) : savingsApproved ? (
-            <p className="flex items-center gap-2 text-sm font-medium text-emerald-600">
-              <CheckCircle2 className="h-4 w-4" /> Transfer approved and posted once.
+            <p
+              data-tone="income"
+              className="alexos-tone-bg alexos-tone-text flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium"
+            >
+              <CheckCircle2 aria-hidden="true" className="size-4" /> Transfer approved and posted
+              once.
             </p>
           ) : (
-            <p className="text-sm text-muted-foreground">
-              No personal receipt has been posted today.
-            </p>
+            <AlexOSEmptyState
+              compact
+              title="No personal receipt posted today"
+              description="Once you post a confirmed personal receipt, AlexOS suggests 10% into your Emergency Fund."
+            />
           )}
-        </div>
+        </section>
       </CardContent>
     </Card>
   );

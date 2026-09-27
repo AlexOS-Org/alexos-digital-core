@@ -315,10 +315,10 @@ function ProductsPage() {
         </div>
       ) : null}
 
-      {isLoading && <Skeleton className="h-64 w-full rounded-2xl" />}
+      {isLoading && <Skeleton className="h-64 w-full rounded-xl" />}
 
       {!isLoading && filtered.length === 0 && (
-        <Card className="relative overflow-hidden rounded-[1.75rem] border-primary/20 bg-gradient-to-br from-card via-card to-primary/[0.07] shadow-[0_22px_60px_-36px_var(--alexos-glow)]">
+        <Card className="relative overflow-hidden rounded-xl border-primary/20 bg-gradient-to-br from-card via-card to-primary/[0.07] shadow-[0_22px_60px_-36px_var(--alexos-glow)]">
           <div className="alexos-visual-strip absolute inset-x-0 top-0 h-1 opacity-90" />
           <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
           <CardContent className="relative p-5 sm:p-8">
@@ -331,7 +331,7 @@ function ProductsPage() {
               <div className="space-y-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex items-start gap-3">
-                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary ring-1 ring-inset ring-primary/15">
+                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-inset ring-primary/15">
                       <Package className="h-5 w-5" />
                     </span>
                     <div>
@@ -377,7 +377,7 @@ function ProductsPage() {
                   />
                 </div>
 
-                <div className="flex flex-col gap-2 rounded-2xl border border-amber-500/20 bg-amber-500/[0.06] p-4 text-sm sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-2 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-4 text-sm sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-amber-800 dark:text-amber-200">
                     Keep new items as drafts until every publication gate passes.
                   </p>
@@ -395,7 +395,7 @@ function ProductsPage() {
       )}
 
       {!isLoading && filtered.length > 0 && (
-        <Card className="overflow-hidden rounded-2xl">
+        <Card className="overflow-hidden rounded-xl">
           <div className="overflow-x-auto">
             <table className="min-w-[760px] w-full text-sm">
               <thead className="bg-muted/50 text-left text-xs uppercase text-muted-foreground">
@@ -569,7 +569,7 @@ function SetupStep({
   detail: string;
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-2xl border border-border/60 bg-background/45 p-3.5">
+    <div className="flex items-start gap-3 rounded-xl border border-border/60 bg-background/45 p-3.5">
       <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
         <Icon className="h-4 w-4" />
       </span>

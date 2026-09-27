@@ -58,11 +58,10 @@ export function BalanceVisibilityToggle({ compact = false }: { compact?: boolean
       size={compact ? "icon" : "sm"}
       onClick={toggleBalances}
       aria-label={label}
-      aria-pressed={!balancesVisible}
       title={label}
-      className={compact ? "tap-target h-10 w-10 rounded-xl" : "gap-2 rounded-xl"}
+      className={compact ? "tap-target size-10" : "gap-2"}
     >
-      <Icon className="h-4 w-4" aria-hidden="true" />
+      <Icon className="size-4" aria-hidden="true" />
       {!compact && <span>{label}</span>}
     </Button>
   );

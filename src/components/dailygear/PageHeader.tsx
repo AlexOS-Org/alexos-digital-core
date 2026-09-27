@@ -1,5 +1,12 @@
 import type { ReactNode } from "react";
 
+import { AlexOSPageHeader } from "@/components/alexos/page-header";
+
+/**
+ * DailyGear keeps its own name for the shared page header, but the rendering
+ * lives in `AlexOSPageHeader` so store screens and the rest of the admin agree
+ * on title scale, description rhythm, and action placement.
+ */
 export function PageHeader({
   title,
   description,
@@ -9,13 +16,5 @@ export function PageHeader({
   description: string;
   actions?: ReactNode;
 }) {
-  return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-      </div>
-      {actions && <div className="flex items-center gap-2">{actions}</div>}
-    </div>
-  );
+  return <AlexOSPageHeader title={title} description={description} actions={actions} />;
 }

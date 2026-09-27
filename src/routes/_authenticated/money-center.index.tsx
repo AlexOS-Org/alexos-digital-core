@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AlexOSEmptyState } from "@/components/alexos/states";
 import { QuickActions } from "@/components/money/QuickActions";
 import { MoneyAllocationPanel } from "@/components/money/MoneyAllocationPanel";
 import { useAccountBalances, useAccounts, useExpected, useTransactions } from "@/lib/money/api";
@@ -16,10 +17,10 @@ import {
   Clock,
   PiggyBank,
   Receipt,
-  Sparkles,
   CircleAlert,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { AlexOSTone } from "@/lib/ui/status";
 import { useBalanceVisibility } from "@/components/money/BalanceVisibility";
 import { BINANCE_WITHDRAWAL_MINIMUM_KES, useLiveBinanceBalance } from "@/lib/money/crypto-prices";
 import { WeeklyCashSummary } from "@/components/money/WeeklyCashSummary";
@@ -103,22 +104,28 @@ function MoneyDashboard() {
       label: "Available",
       value: total,
       icon: Wallet,
-      tone: "emerald",
+      tone: "income" as AlexOSTone,
       hint: "Across active accounts",
     },
-    { label: "Income", value: incomeMonth, icon: TrendingUp, tone: "green", hint: "This month" },
+    {
+      label: "Income",
+      value: incomeMonth,
+      icon: TrendingUp,
+      tone: "income" as AlexOSTone,
+      hint: "This month",
+    },
     {
       label: "Expenses",
       value: expenseMonth,
       icon: TrendingDown,
-      tone: "amber",
+      tone: "expense" as AlexOSTone,
       hint: "This month",
     },
     {
-      label: "Cash Flow",
+      label: "Cash flow",
       value: cashFlow,
       icon: PiggyBank,
-      tone: cashFlow !== null && cashFlow >= 0 ? "teal" : "rose",
+      tone: (cashFlow !== null && cashFlow >= 0 ? "income" : "danger") as AlexOSTone,
       hint:
         cashFlow === null
           ? "Multiple currencies"
@@ -130,77 +137,102 @@ function MoneyDashboard() {
       label: "Expected",
       value: expectedTotal,
       icon: Clock,
-      tone: "violet",
+      tone: "debt" as AlexOSTone,
       hint: "Weighted incoming",
     },
     {
       label: "Bills",
       value: unpaidTotal,
       icon: Receipt,
-      tone: "orange",
+      tone: (upcomingBills.length > 0 ? "warning" : "neutral") as AlexOSTone,
       hint: `${upcomingBills.length} due within 7 days`,
+    },
+  ];
+
+  const attention = [
+    {
+      label: "Bills due soon",
+      value: aggregateCurrency ? upcomingBills.reduce((s, b) => s + Number(b.amount), 0) : null,
+      hint: `${upcomingBills.length} due in the next 7 days`,
+      tone: (upcomingBills.length > 0 ? "warning" : "neutral") as AlexOSTone,
+    },
+    {
+      label: "Expected money",
+      value: expectedTotal,
+      hint: "Weighted incoming value",
+      tone: "debt" as AlexOSTone,
+    },
+    {
+      label: "Bills this month",
+      value: aggregateCurrency ? billsThisMonth.reduce((s, b) => s + Number(b.amount), 0) : null,
+      hint: "Unpaid, due before month end",
+      tone: "neutral" as AlexOSTone,
     },
   ];
 
   return (
     <div className="money-center-shell space-y-7">
-      <Card className="money-hero relative overflow-hidden rounded-[2rem] border-0 bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white shadow-[0_24px_70px_-35px_rgba(15,23,42,0.65)]">
-        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-emerald-300/15 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-[-5rem] left-[30%] h-52 w-52 rounded-full bg-cyan-300/10 blur-3xl" />
-        <CardContent className="relative p-6 sm:p-8 lg:p-10">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/75">
-                <Sparkles className="h-3.5 w-3.5" /> Money Center
-              </div>
-              <p className="mt-4 text-sm text-white/65">Your financial picture right now</p>
-              <div className="mt-1 text-4xl font-semibold tracking-tight sm:text-5xl">
+      <Card className="money-hero relative overflow-hidden rounded-xl border-0">
+        <CardContent className="relative p-5 sm:p-7 lg:p-8">
+          <div className="flex flex-wrap items-start justify-between gap-5">
+            <div className="min-w-0">
+              <p className="dashboard-eyebrow">Money Center</p>
+              <p className="mt-3 text-sm text-white/65">Your financial position right now</p>
+              <h1 className="alexos-amount mt-1 text-4xl tracking-tight sm:text-5xl">
                 {displayMoney(total, aggregateCurrency)}
-              </div>
+              </h1>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-black/10 px-4 py-3 backdrop-blur-md">
-              <div className="text-[11px] uppercase tracking-wider text-white/55">This month</div>
-              <div
-                className={cn(
-                  "mt-1 text-lg font-semibold",
-                  cashFlow !== null && cashFlow >= 0 ? "text-emerald-200" : "text-rose-200",
-                )}
+            <div className="rounded-xl border border-white/10 bg-black/15 px-4 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-white/60">
+                This month
+              </p>
+              <p
+                data-tone={cashFlow !== null && cashFlow >= 0 ? "income" : "expense"}
+                className="alexos-amount mt-1 text-lg"
               >
                 {cashFlow !== null && cashFlow >= 0 ? "+" : ""}
                 {displayMoney(cashFlow, aggregateCurrency)}
-              </div>
-              <div className="mt-1 text-xs text-white/50">
+              </p>
+              <p className="mt-1 text-xs text-white/60">
                 {cashFlow === null
                   ? "Choose one currency to view combined totals"
                   : cashFlow >= 0
                     ? "You are ahead of expenses"
                     : "Expenses are ahead of income"}
-              </div>
+              </p>
             </div>
           </div>
-          <div className="mt-8 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-sm">
-              <div className="text-xs text-white/55">Income</div>
-              <div className="mt-1 text-lg font-semibold">
-                {displayMoney(incomeMonth, aggregateCurrency)}
+
+          <dl className="mt-7 grid gap-3 sm:grid-cols-3">
+            {[
+              { label: "Income", value: displayMoney(incomeMonth, aggregateCurrency) },
+              { label: "Expenses", value: displayMoney(expenseMonth, aggregateCurrency) },
+              { label: "Savings rate", value: `${savingsRate.toFixed(0)}%` },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="rounded-lg border border-white/10 bg-white/[0.06] p-3.5"
+              >
+                <dt className="text-xs text-white/60">{item.label}</dt>
+                <dd className="alexos-amount mt-1 text-lg">{item.value}</dd>
               </div>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-sm">
-              <div className="text-xs text-white/55">Expenses</div>
-              <div className="mt-1 text-lg font-semibold">
-                {displayMoney(expenseMonth, aggregateCurrency)}
-              </div>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-sm">
-              <div className="text-xs text-white/55">Savings rate</div>
-              <div className="mt-1 text-lg font-semibold">{savingsRate.toFixed(0)}%</div>
-            </div>
-          </div>
-          <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-white/10">
+            ))}
+          </dl>
+
+          <div className="mt-5">
             <div
-              className="h-full rounded-full bg-emerald-300/80 transition-all"
-              style={{ width: `${savingsRate}%` }}
-            />
+              role="progressbar"
+              aria-label="Savings rate"
+              aria-valuenow={Math.round(savingsRate)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              className="h-1.5 overflow-hidden rounded-full bg-white/10"
+            >
+              <div
+                className="h-full rounded-full bg-alexos-green transition-all"
+                style={{ width: `${savingsRate}%` }}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -211,35 +243,25 @@ function MoneyDashboard() {
 
       <WeeklyCashSummary />
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {kpis.map((k) => {
-          const Icon = k.icon;
-          return (
-            <Card
-              key={k.label}
-              data-tone={k.tone}
-              className="money-kpi-card group relative overflow-hidden rounded-[1.5rem] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <div className="money-kpi-strip absolute inset-x-0 top-0 h-1" />
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                      {k.label}
-                    </p>
-                    <p className="mt-3 text-2xl font-semibold tracking-tight">
-                      {displayMoney(k.value, aggregateCurrency)}
-                    </p>
-                  </div>
-                  <div className="money-kpi-icon grid h-11 w-11 place-items-center rounded-2xl">
-                    <Icon className="h-5 w-5" />
-                  </div>
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {kpis.map((k) => (
+          <Card key={k.label} data-tone={k.tone} className="money-kpi-card">
+            <CardContent className="p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="alexos-metric-label">{k.label}</p>
+                  <p className="alexos-amount mt-3 text-2xl tracking-tight">
+                    {displayMoney(k.value, aggregateCurrency)}
+                  </p>
                 </div>
-                <p className="mt-5 text-xs text-muted-foreground">{k.hint}</p>
-              </CardContent>
-            </Card>
-          );
-        })}
+                <span className="money-kpi-icon grid size-10 shrink-0 place-items-center rounded-lg">
+                  <k.icon aria-hidden="true" className="size-5" />
+                </span>
+              </div>
+              <p className="alexos-metric-meta mt-4">{k.hint}</p>
+            </CardContent>
+          </Card>
+        ))}
       </section>
 
       <section className="space-y-3">
@@ -252,11 +274,12 @@ function MoneyDashboard() {
           </div>
           <span className="text-xs text-muted-foreground">{accounts.length} active</span>
         </div>
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {accLoading &&
-            Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-36 rounded-2xl" />
-            ))}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {accLoading
+            ? Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-36 rounded-xl" />
+              ))
+            : null}
           {accounts.map((a) => {
             const bal = balances.find((b) => b.account_id === a.id);
             const state = getAccountState(a);
@@ -265,9 +288,10 @@ function MoneyDashboard() {
             return (
               <Card
                 key={a.id}
+                data-tone={state.low ? "warning" : "income"}
                 data-status={state.low ? "low" : "healthy"}
                 className={cn(
-                  "money-account-card institution-card relative overflow-hidden rounded-[1.5rem] shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md",
+                  "money-account-card institution-card relative overflow-hidden",
                   `institution-card-${institution.key}`,
                   state.low && "institution-card-low",
                 )}
@@ -284,15 +308,15 @@ function MoneyDashboard() {
                 <div
                   className={cn(
                     "absolute inset-x-0 top-0 z-10 h-1",
-                    state.low ? "bg-red-500" : institution.accentClass,
+                    state.low ? "alexos-tone-rule" : institution.accentClass,
                   )}
                 />
                 <CardContent className="relative z-10 p-5">
                   <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex min-w-0 items-center gap-3">
                       <div
                         className={cn(
-                          "institution-logo-tile grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/35 bg-white/95 shadow-md ring-2 ring-white/10",
+                          "institution-logo-tile grid size-11 shrink-0 place-items-center rounded-xl border border-white/35 bg-white/95 shadow-md ring-2 ring-white/10",
                           !logo && institution.iconClass,
                         )}
                       >
@@ -300,7 +324,7 @@ function MoneyDashboard() {
                           <img
                             src={logo}
                             alt={`${a.name} logo`}
-                            className="h-10 w-10 rounded-lg object-contain drop-shadow-sm"
+                            className="size-9 rounded-lg object-contain drop-shadow-sm"
                             loading="lazy"
                           />
                         ) : (
@@ -316,15 +340,15 @@ function MoneyDashboard() {
                         </div>
                       </div>
                     </div>
-                    {state.low && <CircleAlert className="h-4 w-4 shrink-0 text-red-500/70" />}
+                    {state.low ? (
+                      <CircleAlert
+                        aria-label="Below comfort level"
+                        className="alexos-tone-text size-4 shrink-0"
+                      />
+                    ) : null}
                   </div>
-                  <div
-                    className={cn(
-                      "mt-5 rounded-2xl px-4 py-3",
-                      "money-account-balance institution-card-balance",
-                    )}
-                  >
-                    <div className="money-account-balance-value text-2xl font-semibold tracking-tight">
+                  <div className="money-account-balance institution-card-balance mt-4 rounded-xl px-4 py-3">
+                    <div className="money-account-balance-value alexos-amount text-2xl tracking-tight">
                       {displayMoney(state.balance, a.currency)}
                     </div>
                     {state.low ? (
@@ -335,22 +359,22 @@ function MoneyDashboard() {
                       </div>
                     ) : (
                       <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
-                        <span className="money-inflow flex items-center gap-1">
-                          <ArrowDownRight className="h-3 w-3" />
+                        <span className="money-inflow alexos-num flex items-center gap-1">
+                          <ArrowDownRight aria-hidden="true" className="size-3" />
                           {displayMoney(bal?.money_in ?? 0, a.currency)}
                         </span>
-                        <span className="money-outflow flex items-center gap-1">
-                          <ArrowUpRight className="h-3 w-3" />
+                        <span className="money-outflow alexos-num flex items-center gap-1">
+                          <ArrowUpRight aria-hidden="true" className="size-3" />
                           {displayMoney(bal?.money_out ?? 0, a.currency)}
                         </span>
                       </div>
                     )}
-                    {state.isBinance && !state.low && (
-                      <div className="money-account-status mt-1 text-[11px] text-emerald-700 dark:text-emerald-300">
+                    {state.isBinance && !state.low ? (
+                      <div data-tone="income" className="alexos-tone-text mt-1 text-[11px]">
                         Withdrawable balance · above{" "}
                         {displayMoney(BINANCE_WITHDRAWAL_MINIMUM_KES, "KES")}
                       </div>
-                    )}
+                    ) : null}
                   </div>
                 </CardContent>
               </Card>
@@ -360,26 +384,22 @@ function MoneyDashboard() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
-        <Card className="money-data-card rounded-[1.5rem] border-border/60 shadow-sm">
+        <Card className="money-data-card border-border/60">
           <CardHeader>
             <CardTitle className="text-base">Recent money movement</CardTitle>
           </CardHeader>
           <CardContent>
             {txs.length === 0 ? (
-              <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-                No transactions yet. Use the actions above to record your first entry.
-              </div>
+              <AlexOSEmptyState
+                compact
+                title="No transactions yet"
+                description="Use the actions above to record your first entry. Every transaction you post updates balances, budgets and analytics across Money Center."
+              />
             ) : (
               <ul className="divide-y divide-border/70">
                 {txs.map((t) => {
                   const a = accounts.find((x) => x.id === t.account_id);
                   const sign = t.type === "income" ? "+" : t.type === "expense" ? "-" : "";
-                  const tone =
-                    t.type === "income"
-                      ? "text-emerald-600 dark:text-emerald-400"
-                      : t.type === "expense"
-                        ? "text-rose-600/80 dark:text-rose-400/80"
-                        : "text-violet-600 dark:text-violet-400";
                   return (
                     <li key={t.id} className="flex items-center justify-between gap-3 py-3.5">
                       <div className="min-w-0">
@@ -388,10 +408,13 @@ function MoneyDashboard() {
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {formatDate(t.occurred_at)} · {formatTime(t.occurred_at)} ·{" "}
-                          {a?.name ?? "—"}
+                          {a?.name ?? "Unknown account"}
                         </div>
                       </div>
-                      <div className={cn("whitespace-nowrap text-sm font-semibold", tone)}>
+                      <div
+                        data-tone={t.type}
+                        className="alexos-tone-text alexos-amount whitespace-nowrap text-sm"
+                      >
                         {sign}
                         {displayMoney(t.amount, a?.currency ?? null)}
                       </div>
@@ -402,48 +425,20 @@ function MoneyDashboard() {
             )}
           </CardContent>
         </Card>
-        <Card className="money-data-card rounded-[1.5rem] border-border/60 bg-gradient-to-br from-violet-50/80 to-background shadow-sm">
+        <Card className="money-data-card border-border/60">
           <CardHeader>
             <CardTitle className="text-base">What needs attention</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="rounded-2xl bg-amber-500/8 p-4">
-              <div className="text-xs font-semibold text-amber-700 dark:text-amber-400">Bills</div>
-              <div className="mt-1 text-xl font-semibold">
-                {displayMoney(
-                  aggregateCurrency
-                    ? upcomingBills.reduce((s, b) => s + Number(b.amount), 0)
-                    : null,
-                  aggregateCurrency,
-                )}
+            {attention.map((item) => (
+              <div key={item.label} data-tone={item.tone} className="alexos-tone-bg rounded-xl p-4">
+                <p className="alexos-tone-text text-xs font-semibold">{item.label}</p>
+                <p className="alexos-amount mt-1 text-xl">
+                  {displayMoney(item.value, aggregateCurrency)}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">{item.hint}</p>
               </div>
-              <div className="mt-1 text-xs text-muted-foreground">
-                {upcomingBills.length} due in the next 7 days
-              </div>
-            </div>
-            <div className="rounded-2xl bg-violet-500/8 p-4">
-              <div className="text-xs font-semibold text-violet-700 dark:text-violet-400">
-                Expected money
-              </div>
-              <div className="mt-1 text-xl font-semibold">
-                {displayMoney(expectedTotal, aggregateCurrency)}
-              </div>
-              <div className="mt-1 text-xs text-muted-foreground">Weighted incoming value</div>
-            </div>
-            <div className="rounded-2xl bg-emerald-500/8 p-4">
-              <div className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                This month
-              </div>
-              <div className="mt-1 text-xl font-semibold">
-                {displayMoney(
-                  aggregateCurrency
-                    ? billsThisMonth.reduce((s, b) => s + Number(b.amount), 0)
-                    : null,
-                  aggregateCurrency,
-                )}
-              </div>
-              <div className="mt-1 text-xs text-muted-foreground">Bills due this month</div>
-            </div>
+            ))}
           </CardContent>
         </Card>
       </section>

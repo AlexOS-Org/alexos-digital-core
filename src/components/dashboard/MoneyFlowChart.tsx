@@ -65,10 +65,10 @@ export default function MoneyFlowChart() {
   }, [transactions, rangeMonths]);
 
   return (
-    <Card className="dashboard-surface alexos-data-metric min-w-0 rounded-[1.75rem]">
+    <Card className="dashboard-surface alexos-data-metric min-w-0 rounded-xl">
       <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-2">
         <div className="min-w-0">
-          <p className="dashboard-eyebrow text-primary">Money movement</p>
+          <p className="alexos-eyebrow alexos-eyebrow-accent">Money movement</p>
           <CardTitle className="mt-1 text-lg tracking-tight">Cash flow</CardTitle>
           <p className="mt-1 text-xs text-muted-foreground">
             Posted income and expenses only. Transfers are excluded.
@@ -86,7 +86,7 @@ export default function MoneyFlowChart() {
                 type="button"
                 onClick={() => setRangeMonths(months)}
                 className={cn(
-                  "rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "alexos-focusable rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors",
                   rangeMonths === months
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground",
@@ -97,20 +97,20 @@ export default function MoneyFlowChart() {
               </button>
             ))}
           </div>
-          <div className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/15">
-            <ChartNoAxesCombined className="h-5 w-5" aria-hidden="true" />
+          <div className="grid size-11 place-items-center rounded-lg bg-primary/10 text-primary">
+            <ChartNoAxesCombined className="size-5" aria-hidden="true" />
           </div>
         </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <div
-            className="h-56 animate-pulse rounded-2xl bg-muted/50 3xl:h-72 4k:h-80"
+            className="h-56 animate-pulse rounded-xl bg-muted/50 3xl:h-72 4k:h-80"
             aria-label="Loading cash flow chart"
           />
         ) : isEmpty ? (
           <div
-            className="flex h-56 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border/60 bg-muted/20 px-6 text-center 3xl:h-72 4k:h-80"
+            className="flex h-56 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border/60 bg-muted/20 px-6 text-center 3xl:h-72 4k:h-80"
             role="status"
           >
             <p className="text-sm font-semibold tracking-tight">No posted activity in this range</p>
@@ -121,7 +121,7 @@ export default function MoneyFlowChart() {
           </div>
         ) : (
           <div
-            className="dashboard-chart-grid h-56 min-w-0 w-full rounded-2xl px-1 pt-2 sm:h-60 sm:px-2 lg:h-64 3xl:h-72 4k:h-80"
+            className="dashboard-chart-grid h-56 min-w-0 w-full rounded-xl px-1 pt-2 sm:h-60 sm:px-2 lg:h-64 3xl:h-72 4k:h-80"
             aria-label={`${rangeMonths}-month income, expense, and net chart`}
           >
             <ResponsiveContainer width="100%" height="100%" minWidth={0}>
@@ -155,7 +155,7 @@ export default function MoneyFlowChart() {
                   ]}
                   cursor={{ fill: "var(--color-muted)" }}
                   contentStyle={{
-                    borderRadius: 14,
+                    borderRadius: 10,
                     border: "1px solid var(--color-border)",
                     background: "var(--color-card)",
                   }}
@@ -188,31 +188,43 @@ export default function MoneyFlowChart() {
           </div>
         )}
         <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
-          <div className="flex items-center gap-2 rounded-2xl dashboard-tone-green dashboard-tone-panel p-3">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full dashboard-tone-green dashboard-tone-icon">
-              <ArrowUpRight className="h-4 w-4" />
+          <div
+            data-tone="income"
+            data-role="panel"
+            className="alexos-tone-bg flex items-center gap-2 rounded-xl p-3"
+          >
+            <span className="grid size-8 shrink-0 place-items-center rounded-full dashboard-tone-green dashboard-tone-icon">
+              <ArrowUpRight aria-hidden="true" className="size-4" />
             </span>
             <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Income</p>
-              <p className="truncate text-sm font-bold">{formatMoney(income)}</p>
+              <p className="alexos-eyebrow">Income</p>
+              <p className="truncate text-sm font-bold tabular-nums">{formatMoney(income)}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-2xl dashboard-tone-amber dashboard-tone-panel p-3">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full dashboard-tone-amber dashboard-tone-icon">
-              <ArrowDownRight className="h-4 w-4" />
+          <div
+            data-tone="warning"
+            data-role="panel"
+            className="alexos-tone-bg flex items-center gap-2 rounded-xl p-3"
+          >
+            <span className="grid size-8 shrink-0 place-items-center rounded-full dashboard-tone-amber dashboard-tone-icon">
+              <ArrowDownRight aria-hidden="true" className="size-4" />
             </span>
             <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Expenses</p>
-              <p className="truncate text-sm font-bold">{formatMoney(expenses)}</p>
+              <p className="alexos-eyebrow">Expenses</p>
+              <p className="truncate text-sm font-bold tabular-nums">{formatMoney(expenses)}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-2xl dashboard-tone-blue dashboard-tone-panel p-3">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full dashboard-tone-blue dashboard-tone-icon">
+          <div
+            data-tone="info"
+            data-role="panel"
+            className="alexos-tone-bg flex items-center gap-2 rounded-xl p-3"
+          >
+            <span className="grid size-8 shrink-0 place-items-center rounded-full dashboard-tone-blue dashboard-tone-icon">
               <ChartNoAxesCombined className="h-4 w-4" />
             </span>
             <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Net</p>
-              <p className="truncate text-sm font-bold">{formatMoney(net)}</p>
+              <p className="alexos-eyebrow">Net</p>
+              <p className="truncate text-sm font-bold tabular-nums">{formatMoney(net)}</p>
             </div>
           </div>
         </div>

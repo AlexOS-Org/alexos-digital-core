@@ -177,7 +177,7 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
               : "night"
       }
       data-scene={activeScene}
-      className="dashboard-hero-frame dailygear-workspace-hero rise-in relative overflow-hidden rounded-[1.75rem] p-5 text-white sm:p-7"
+      className="dashboard-hero-frame dailygear-workspace-hero rise-in relative overflow-hidden rounded-lg p-5 text-white sm:p-7"
     >
       {isSceneImage ? (
         <picture className="pointer-events-none absolute inset-0 z-0 block">
@@ -196,9 +196,7 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
       <div className="dailygear-hero-orb pointer-events-none absolute -right-10 -top-12 z-[1] h-40 w-40 rounded-full blur-2xl" />
       <div className="relative z-10 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:flex-wrap sm:justify-between">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-            DailyGear commerce
-          </p>
+          <p className="alexos-eyebrow alexos-eyebrow-accent">DailyGear commerce</p>
           <h1 className="mt-1 truncate text-xl font-black tracking-tight sm:text-3xl">
             {compactMode ? `${greeting}, Alex` : `${greeting}, here is your store`}
           </h1>
@@ -214,10 +212,10 @@ function Hero({ kpis, compactMode }: { kpis: Panels["kpis"]; compactMode?: boole
         </div>
         {!compactMode && (
           <div className="flex shrink-0 gap-2">
-            <Button asChild variant="outline" className="rounded-xl">
+            <Button asChild variant="outline" className="rounded-lg">
               <Link to="/e-commerce/store">Store preview</Link>
             </Button>
-            <Button asChild className="rounded-xl">
+            <Button asChild className="rounded-lg">
               <Link to="/e-commerce/checkout">New order</Link>
             </Button>
           </div>
@@ -251,15 +249,13 @@ function FacebookAdsBalanceCard() {
   return (
     <section
       data-status={isSettled ? "paid" : balances.length === 0 ? "unconfigured" : "outstanding"}
-      className="dailygear-liability-card relative overflow-hidden rounded-[1.35rem] border p-4 sm:p-5"
+      className="dailygear-liability-card relative overflow-hidden rounded-lg border p-4 sm:p-5"
     >
       <span className="dailygear-liability-strip absolute inset-x-0 top-0 h-1" />
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            Facebook advertising balance
-          </p>
-          <h2 className="mt-1 text-lg font-bold tracking-tight">
+          <p className="alexos-eyebrow">Facebook advertising balance</p>
+          <h2 className="mt-1 text-lg font-semibold tracking-tight">
             {isLoading ? "Loading…" : money(remaining)}
           </h2>
           <p className="mt-1 text-xs leading-5 text-muted-foreground">
@@ -270,7 +266,7 @@ function FacebookAdsBalanceCard() {
                 : "Tracked liability only; record payments in Debt Management to reduce the balance."}
           </p>
         </div>
-        <div className="dailygear-liability-icon grid h-10 w-10 shrink-0 place-items-center rounded-xl">
+        <div className="dailygear-liability-icon grid h-10 w-10 shrink-0 place-items-center rounded-lg">
           <WalletCards className="h-5 w-5" />
         </div>
       </div>
@@ -278,7 +274,7 @@ function FacebookAdsBalanceCard() {
         <span className="dailygear-liability-status rounded-full px-2.5 py-1 text-[11px] font-semibold">
           {isSettled ? "Paid" : balances.length === 0 ? "Not configured" : "Outstanding"}
         </span>
-        <Button asChild variant="outline" size="sm" className="rounded-xl">
+        <Button asChild variant="outline" size="sm" className="rounded-lg">
           <Link to="/debt-management">Manage balance</Link>
         </Button>
       </div>
@@ -288,7 +284,7 @@ function FacebookAdsBalanceCard() {
 
 function HeroMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-white/15 bg-white/[0.08] px-3 py-2.5 shadow-inner shadow-white/[0.04] backdrop-blur-md">
+    <div className="rounded-lg border border-white/15 bg-white/[0.08] px-3 py-2.5 shadow-inner shadow-white/[0.04] backdrop-blur-md">
       <p className="truncate text-[9px] font-semibold uppercase tracking-[0.14em] text-white/60">
         {label}
       </p>
@@ -301,7 +297,7 @@ function HeroMetric({ label, value }: { label: string; value: string }) {
 
 function MiniStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.08] px-3.5 py-3 shadow-inner shadow-white/[0.04] backdrop-blur-md">
+    <div className="rounded-lg border border-white/10 bg-white/[0.08] px-3.5 py-3 shadow-inner shadow-white/[0.04] backdrop-blur-md">
       <p className="text-[10px] font-semibold uppercase tracking-wide text-white/60">{label}</p>
       <p className="mt-0.5 text-lg font-bold tabular-nums text-white">{value}</p>
     </div>
@@ -331,39 +327,37 @@ function MobileStoreOverview({ kpis, trend, loading }: Pick<Panels, "kpis" | "tr
       : "No comparable baseline";
 
   return (
-    <section className="relative overflow-hidden rounded-[1.75rem] border border-border/70 bg-card/90 p-4 shadow-[0_18px_48px_-30px_var(--alexos-glow)] sm:p-5">
+    <section className="relative overflow-hidden rounded-lg border border-border/70 bg-card/90 p-4 sm:p-5">
       <span className="alexos-visual-strip absolute inset-x-0 top-0 h-1 opacity-90" />
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
-            Store overview
-          </p>
-          <h2 className="mt-1 text-xl font-bold tracking-tight">Sales you can see.</h2>
+          <p className="alexos-eyebrow alexos-eyebrow-accent">Store overview</p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight">Sales you can see.</h2>
         </div>
         <Link
           to="/e-commerce/reports"
-          className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-primary hover:underline"
+          className="alexos-focusable inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-primary hover:underline"
         >
-          View analytics <ArrowUpRight className="h-3.5 w-3.5" />
+          View analytics <ArrowUpRight aria-hidden="true" className="size-3.5" />
         </Link>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-border/60 bg-background/55 p-3.5">
+      <div className="mt-4 rounded-lg border border-border/60 bg-background/55 p-3.5">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              Total sales · last 30 days
+            <p className="alexos-eyebrow">Total sales · last 30 days</p>
+            <p className="mt-1 text-2xl font-semibold tabular-nums tracking-tight">
+              {money(kpis.revenue)}
             </p>
-            <p className="mt-1 text-2xl font-black tabular-nums">{money(kpis.revenue)}</p>
             <p
-              className={`mt-1 text-xs font-semibold ${kpis.revenueChangePct > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}
+              className={`mt-1 text-xs font-semibold ${kpis.revenueChangePct > 0 ? "alexos-tone-text" : "text-muted-foreground"}`}
             >
               {comparison}
             </p>
           </div>
           <div className="h-16 w-[48%] min-w-32">
             {loading ? (
-              <Skeleton className="h-full w-full rounded-xl" />
+              <Skeleton className="h-full w-full rounded-lg" />
             ) : trend.length > 0 ? (
               <svg
                 viewBox="0 0 100 48"
@@ -390,7 +384,7 @@ function MobileStoreOverview({ kpis, trend, loading }: Pick<Panels, "kpis" | "tr
                 />
               </svg>
             ) : (
-              <div className="grid h-full place-items-center rounded-xl border border-dashed border-border/70 text-[10px] text-muted-foreground">
+              <div className="grid h-full place-items-center rounded-lg border border-dashed border-border/70 text-[11px] text-muted-foreground">
                 No sales trend yet
               </div>
             )}
@@ -437,13 +431,11 @@ function MobileFocus(p: Panels) {
   ].filter((item): item is { title: string; detail: string; to: string } => item !== null);
 
   return (
-    <section className="rounded-[1.75rem] border border-border/70 bg-card/90 p-4 shadow-[0_16px_42px_-30px_var(--alexos-glow)] sm:p-5">
+    <section className="rounded-lg border border-border/70 bg-card/90 p-4 sm:p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
-            Today&apos;s focus
-          </p>
-          <h2 className="mt-1 text-xl font-bold tracking-tight">Move the store forward.</h2>
+          <p className="alexos-eyebrow alexos-eyebrow-accent">Today&apos;s focus</p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight">Move the store forward.</h2>
         </div>
         <span className="text-xs text-muted-foreground">{focus.length} open</span>
       </div>
@@ -455,7 +447,7 @@ function MobileFocus(p: Panels) {
               to={item.to}
               className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
             >
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-primary text-xs font-bold text-primary-foreground">
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
                 {index + 1}
               </span>
               <span className="min-w-0 flex-1">
@@ -616,7 +608,7 @@ function StandardDashboard(p: Panels & { tablet?: boolean }) {
         <BusinessCalendar orders={p.orders} />
       </div>
 
-      <section className="dashboard-surface rounded-[1.75rem] p-5 sm:p-6">
+      <section className="dashboard-surface rounded-lg p-5 sm:p-6">
         <h2 className="mb-3 text-lg font-semibold tracking-tight">Operating signals</h2>
         <IntelligencePanel kind="market" ctx={p.ctx} ready={!p.loading} />
       </section>
@@ -710,7 +702,7 @@ function WideDashboard(p: Panels & { dense?: boolean }) {
         </div>
       )}
 
-      <section className="dashboard-surface rounded-[1.75rem] p-5 sm:p-6">
+      <section className="dashboard-surface rounded-lg p-5 sm:p-6">
         <h2 className="mb-3 text-lg font-semibold tracking-tight">Operating signals</h2>
         <IntelligencePanel kind="market" ctx={p.ctx} ready={!p.loading} />
       </section>

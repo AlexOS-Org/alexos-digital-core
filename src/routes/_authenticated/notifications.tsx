@@ -79,7 +79,7 @@ function NotificationsPage() {
       </header>
 
       {isError ? (
-        <section className="rounded-[1.8rem] border border-destructive/20 bg-destructive/[0.06] p-5 sm:p-7">
+        <section className="rounded-xl border border-destructive/20 bg-destructive/[0.06] p-5 sm:p-7">
           <div className="flex items-start gap-3">
             <TriangleAlert className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
             <div>
@@ -262,7 +262,7 @@ function SignalCalendarCard({ signalCount }: { signalCount: number | null }) {
   }, []);
 
   return (
-    <div className="min-w-0 rounded-[1.6rem] border border-border/70 bg-background/65 p-4 sm:p-5">
+    <div className="min-w-0 rounded-xl border border-border/70 bg-background/65 p-4 sm:p-5">
       <div className="flex flex-col gap-3 min-[380px]:flex-row min-[380px]:items-start min-[380px]:justify-between">
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
