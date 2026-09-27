@@ -25,7 +25,7 @@ a change alters one of them without an explicitly approved exception (see
 | Layer | Technology |
 | --- | --- |
 | Application framework | [TanStack Start](https://tanstack.com/start) (SSR) with React 19, TanStack Router, and TanStack Query |
-| Build tooling | Vite 8 with `@vitejs/plugin-react`, `@tailwindcss/vite`, and `vite-tsconfig-paths` |
+| Build tooling | Vite 8 with `@vitejs/plugin-react`, `@tailwindcss/vite`, and Vite's `resolve.tsconfigPaths` setting |
 | Styling | Tailwind CSS v4 (CSS-first config in `src/styles.css`) |
 | UI components | Radix UI primitives with shadcn-style wrappers, Lucide icons, Recharts, Sonner |
 | Hosting / runtime | [Cloudflare Workers](https://developers.cloudflare.com/workers/) via Wrangler (`alexos-business-os`, entry `src/server.ts`), built with `@cloudflare/vite-plugin` |
