@@ -18,6 +18,8 @@ describe("billMonthlyEquivalent", () => {
   });
 
   it("advances every recurring frequency instead of marking quarterly and yearly bills one-time", () => {
+    expect(nextBillDueDate("2026-01-15", "weekly")).toBe("2026-01-22");
+    expect(nextBillDueDate("2026-01-15", "monthly")).toBe("2026-02-15");
     expect(nextBillDueDate("2026-01-15", "quarterly")).toBe("2026-04-15");
     expect(nextBillDueDate("2026-01-15", "yearly")).toBe("2027-01-15");
     expect(nextBillDueDate("2026-01-15", "one_time")).toBe("2026-01-15");
