@@ -495,3 +495,108 @@
     transition: none;
   }
 }
+
+/* Mobile containment: every authenticated module may shrink, but never push
+   card content beyond the viewport. Tables retain their own touch scroller. */
+@media (max-width: 639px) {
+  .alexos-route-content,
+  .alexos-route-content > *,
+  .alexos-route-content .alexos-card,
+  .alexos-route-content [data-slot="card"],
+  .alexos-route-content [data-slot="card-header"],
+  .alexos-route-content [data-slot="card-content"],
+  .alexos-route-content [data-slot="card-footer"] {
+    min-width: 0;
+  }
+
+  .alexos-route-content {
+    overflow-wrap: anywhere;
+  }
+
+  .alexos-route-content .alexos-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .alexos-route-content img,
+  .alexos-route-content svg {
+    max-width: 100%;
+  }
+}
+
+/* The original Money Center glass treatment was written as a global utility
+   block and therefore also painted light mode with dark-only colours. Keep
+   the rich dark treatment, but give light mode an explicit readable surface. */
+:root:not(.dark) .money-center-shell {
+  color: var(--foreground);
+  background:
+    radial-gradient(
+      circle at 92% 0%,
+      color-mix(in oklch, var(--alexos-lively-blue) 12%, transparent),
+      transparent 22rem
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--background) 94%, var(--alexos-lively-blue) 6%),
+      var(--background)
+    );
+}
+
+:root:not(.dark) .money-center-shell::before {
+  background:
+    radial-gradient(
+      circle at 8% 12%,
+      color-mix(in oklch, var(--alexos-lively-teal) 13%, transparent),
+      transparent 20rem
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--background) 88%, transparent),
+      color-mix(in oklch, var(--background) 96%, transparent)
+    );
+}
+
+:root:not(.dark) .money-center-shell .text-muted-foreground {
+  color: var(--muted-foreground) !important;
+}
+
+:root:not(.dark) .money-center-shell .money-kpi-card,
+:root:not(.dark) .money-center-shell .money-account-card,
+:root:not(.dark) .money-center-shell .money-data-card {
+  border-color: color-mix(in oklch, var(--border) 74%, var(--alexos-visual-accent) 26%);
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklch, var(--card) 94%, var(--alexos-visual-accent) 6%),
+    var(--card)
+  ) !important;
+  color: var(--card-foreground);
+  box-shadow: 0 18px 48px -38px color-mix(in oklch, var(--foreground) 30%, transparent);
+  backdrop-filter: none;
+}
+
+:root:not(.dark) .money-center-shell .money-kpi-icon,
+:root:not(.dark) .money-center-shell .money-account-icon {
+  background: color-mix(in oklch, var(--alexos-visual-accent) 12%, var(--card));
+  color: color-mix(in oklch, var(--alexos-visual-accent) 76%, var(--foreground));
+  border-color: color-mix(in oklch, var(--alexos-visual-accent) 30%, var(--border));
+}
+
+:root:not(.dark) .money-center-shell .money-account-balance {
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--card) 90%, var(--alexos-lively-teal) 10%),
+    var(--card)
+  );
+  border-color: color-mix(in oklch, var(--alexos-lively-teal) 28%, var(--border));
+}
+
+@media (max-width: 479px) {
+  .alexos-route-content .alexos-metric-value-lg {
+    font-size: clamp(1.65rem, 9vw, 2rem);
+    overflow-wrap: anywhere;
+  }
+
+  .alexos-route-content .alexos-metric-body {
+    padding: 1rem;
+  }
+}

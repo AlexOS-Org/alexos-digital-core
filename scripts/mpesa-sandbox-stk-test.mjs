@@ -50,7 +50,9 @@ const requestJson = async (url, options) => {
   });
   const body = await response.json().catch(() => ({}));
   if (!response.ok || body.ok === false) {
-    throw new Error(`Application request failed (${response.status}): ${String(body.error ?? "unknown error")}`);
+    throw new Error(
+      `Application request failed (${response.status}): ${String(body.error ?? "unknown error")}`,
+    );
   }
   return body;
 };
@@ -63,8 +65,11 @@ const initiated = await requestJson(`${baseUrl}/api/mpesa/stk-push`, {
   body: JSON.stringify({ orderNumber, phone }),
 });
 
-if (!initiated.checkoutRequestId) throw new Error("The application did not return a checkout request ID.");
-console.log(`STK request accepted by the application (attempt ${initiated.attemptId ?? "created"}).`);
+if (!initiated.checkoutRequestId)
+  throw new Error("The application did not return a checkout request ID.");
+console.log(
+  `STK request accepted by the application (attempt ${initiated.attemptId ?? "created"}).`,
+);
 console.log(`Customer message: ${initiated.customerMessage ?? "not supplied"}`);
 console.log(`Polling status for up to ${pollSeconds} seconds...`);
 
@@ -80,7 +85,9 @@ while (Date.now() < deadline) {
   }
   if (["success", "failed", "cancelled", "timeout"].includes(status.status)) {
     if (status.status === "success") {
-      console.log(`Sandbox settlement callback received; receipt=${status.receipt ?? "not returned"}.`);
+      console.log(
+        `Sandbox settlement callback received; receipt=${status.receipt ?? "not returned"}.`,
+      );
     } else {
       console.log(`Sandbox STK reached terminal status: ${status.status}.`);
     }
@@ -89,5 +96,7 @@ while (Date.now() < deadline) {
   await new Promise((resolve) => setTimeout(resolve, 5000));
 }
 
-console.log("No terminal callback arrived within the polling window; inspect the attempt by checkout request ID.");
+console.log(
+  "No terminal callback arrived within the polling window; inspect the attempt by checkout request ID.",
+);
 process.exit(2);

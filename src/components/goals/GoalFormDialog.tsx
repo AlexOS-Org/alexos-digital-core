@@ -134,7 +134,7 @@ export function GoalFormDialog({ open, onOpenChange, goal }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label>Icon</Label>
-              <div className="grid grid-cols-9 gap-2">
+              <div className="grid grid-cols-5 gap-2 sm:grid-cols-9">
                 {Object.entries(GOAL_ICONS).map(([key, Icon]) => (
                   <button
                     key={key}
