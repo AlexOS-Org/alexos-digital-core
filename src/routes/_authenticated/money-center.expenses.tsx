@@ -56,7 +56,7 @@ function ExpensesPage() {
         }
       />
 
-      <div className="grid gap-3 grid-cols-2 lg:grid-cols-5">
+      <div className="grid min-w-0 grid-cols-1 gap-3 min-[480px]:grid-cols-2 lg:grid-cols-5">
         <AlexOSMetricCard
           label="This month"
           hint="Expenses since the 1st"
