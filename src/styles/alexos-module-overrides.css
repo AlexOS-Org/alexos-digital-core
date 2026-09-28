@@ -495,3 +495,31 @@
     transition: none;
   }
 }
+
+/* Mobile containment: every authenticated module may shrink, but never push
+   card content beyond the viewport. Tables retain their own touch scroller. */
+@media (max-width: 639px) {
+  .alexos-route-content,
+  .alexos-route-content > *,
+  .alexos-route-content .alexos-card,
+  .alexos-route-content [data-slot="card"],
+  .alexos-route-content [data-slot="card-header"],
+  .alexos-route-content [data-slot="card-content"],
+  .alexos-route-content [data-slot="card-footer"] {
+    min-width: 0;
+  }
+
+  .alexos-route-content {
+    overflow-wrap: anywhere;
+  }
+
+  .alexos-route-content .alexos-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .alexos-route-content img,
+  .alexos-route-content svg {
+    max-width: 100%;
+  }
+}

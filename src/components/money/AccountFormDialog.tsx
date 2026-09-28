@@ -174,7 +174,7 @@ export function AccountFormDialog({ open, onOpenChange, account }: Props) {
 
           <fieldset className="alexos-field">
             <legend className="alexos-label">Icon</legend>
-            <div className="grid grid-cols-6 gap-2">
+            <div className="grid grid-cols-5 gap-2 sm:grid-cols-6">
               {ACCOUNT_ICON_OPTIONS.map((key) => {
                 const Icon = ACCOUNT_ICONS[key];
                 const selected = icon === key;

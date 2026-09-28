@@ -137,7 +137,7 @@ function DebtsPage() {
         </CardContent>
       </Card>
 
-      <section className="grid gap-3 grid-cols-2 lg:grid-cols-6">
+      <section className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 lg:grid-cols-6">
         {[
           {
             label: "Total Debt",
@@ -305,7 +305,7 @@ function DebtsPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-3 text-sm">
+                  <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-3 text-sm">
                     <div>
                       <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
                         Principal

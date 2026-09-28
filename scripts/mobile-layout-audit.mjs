@@ -40,6 +40,18 @@ const requiredShellGuards = [
   ["src/components/app-sidebar.tsx", /!isMobile && state === "collapsed"/],
   ["src/routes/shop.products.tsx", /max-w-\[min\(78vw,24rem\)\]/],
   ["src/components/storefront/ProductCard.tsx", /Order now/],
+  [
+    "src/routes/_authenticated/debt-management.tsx",
+    /grid-cols-1 gap-3 min-\[380px\]:grid-cols-2 lg:grid-cols-6/,
+  ],
+  [
+    "src/routes/_authenticated/debt-management.tsx",
+    /grid-cols-1 gap-3 min-\[380px\]:grid-cols-3 text-sm/,
+  ],
+  ["src/components/goals/GoalFormDialog.tsx", /grid-cols-5 gap-2 sm:grid-cols-9/],
+  ["src/components/money/AccountFormDialog.tsx", /grid-cols-5 gap-2 sm:grid-cols-6/],
+  ["src/components/dashboard/MoneyFlowChart.tsx", /grid-cols-1 gap-2 min-\[420px\]:grid-cols-3/],
+  ["src/styles/alexos-module-overrides.css", /overflow-wrap: anywhere/],
 ];
 const missing = requiredShellGuards
   .filter(([file, re]) => !re.test(fs.readFileSync(path.join(root, file), "utf8")))
