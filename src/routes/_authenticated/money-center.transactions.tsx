@@ -37,6 +37,7 @@ import {
   useVoidTransaction,
   type Transaction,
 } from "@/lib/money/api";
+import { useMoneyCenterScope } from "@/lib/money/scope";
 import { formatDate, formatMoney, formatTime } from "@/lib/money/format";
 import { Download, MoreHorizontal, Printer, Search, Trash2 } from "lucide-react";
 import { TransactionFormDialog } from "@/components/money/TransactionFormDialog";
@@ -54,8 +55,10 @@ function TransactionsPage() {
   const [openEditMode, setOpenEditMode] = useState<"income" | "expense" | "transfer">("income");
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const { data: accounts = [] } = useAccounts(true);
+  const { businessId } = useMoneyCenterScope();
+  const { data: accounts = [] } = useAccounts(true, businessId);
   const { data: txs = [], isLoading } = useTransactions({
+    businessId,
     type: type === "all" ? undefined : (type as Transaction["type"]),
     accountId: account === "all" ? undefined : account,
     search: search || undefined,

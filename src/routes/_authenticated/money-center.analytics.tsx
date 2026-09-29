@@ -10,6 +10,7 @@ import {
   useExpected,
   useTransactions,
 } from "@/lib/money/api";
+import { useMoneyCenterScope } from "@/lib/money/scope";
 import { formatMoney, monthKey } from "@/lib/money/format";
 import { normalizeExpenseCategory } from "@/lib/money/constants";
 import { summarizeCurrencySafety } from "@/lib/money/currency-safety";
@@ -25,11 +26,12 @@ export const Route = createFileRoute("/_authenticated/money-center/analytics")({
 });
 
 function AnalyticsPage() {
-  const { data: txs = [] } = useTransactions({});
-  const { data: accounts = [] } = useAccounts();
+  const { businessId } = useMoneyCenterScope();
+  const { data: txs = [] } = useTransactions({ businessId });
+  const { data: accounts = [] } = useAccounts(false, businessId);
   const { data: balances = [] } = useAccountBalances();
-  const { data: budgets = [] } = useBudgets(monthKey());
-  const { data: expected = [] } = useExpected();
+  const { data: budgets = [] } = useBudgets(monthKey(), businessId);
+  const { data: expected = [] } = useExpected(undefined, businessId);
   const currencySafety = useMemo(() => summarizeCurrencySafety(accounts), [accounts]);
 
   const monthly = useMemo(() => {

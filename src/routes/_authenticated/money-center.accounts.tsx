@@ -8,6 +8,7 @@ import { AlexOSStatusBadge } from "@/components/alexos/status-badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAccountBalances, useAccounts, useArchiveAccount, type Account } from "@/lib/money/api";
+import { useMoneyCenterScope } from "@/lib/money/scope";
 import { ACCOUNT_ICONS } from "@/lib/money/constants";
 import { formatMoney } from "@/lib/money/format";
 import { ensureMpesaFulizaCharges } from "@/lib/money/fuliza-ensure";
@@ -31,8 +32,9 @@ function AccountsPage() {
   const displayMoney = (value: number | string | null | undefined, currency = "KES") =>
     maskBalance(formatMoney(value, currency));
   const qc = useQueryClient();
+  const { businessId } = useMoneyCenterScope();
   const [showArchived, setShowArchived] = useState(false);
-  const { data: accounts = [], isLoading } = useAccounts(showArchived);
+  const { data: accounts = [], isLoading } = useAccounts(showArchived, businessId);
   const { data: balances = [] } = useAccountBalances();
   const liveBinance = useLiveBinanceBalance();
   const archive = useArchiveAccount();

@@ -24,6 +24,7 @@ import {
   useSaveBill,
 } from "@/lib/money/bills";
 import { useAccounts } from "@/lib/money/api";
+import { useMoneyCenterScope } from "@/lib/money/scope";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -66,8 +67,9 @@ function currency(value: number) {
 }
 
 function BillsPage() {
-  const { data: bills = [], isLoading } = useBills();
-  const { data: accounts = [] } = useAccounts();
+  const { businessId } = useMoneyCenterScope();
+  const { data: bills = [], isLoading } = useBills(businessId);
+  const { data: accounts = [] } = useAccounts(false, businessId);
   const accountName = useMemo(() => {
     const map = new Map<string, string>();
     for (const a of accounts) map.set(a.id, a.name);

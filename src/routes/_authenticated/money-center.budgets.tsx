@@ -9,6 +9,7 @@ import { AlexOSEmptyState } from "@/components/alexos/states";
 import { AlexOSPageHeader } from "@/components/alexos/page-header";
 import { AlexOSStatusBadge } from "@/components/alexos/status-badge";
 import { useArchiveBudget, useBudgets, useTransactions, type Budget } from "@/lib/money/api";
+import { useMoneyCenterScope } from "@/lib/money/scope";
 import { formatMoney, monthKey, monthLabel } from "@/lib/money/format";
 import { BudgetFormDialog } from "@/components/money/BudgetFormDialog";
 import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
@@ -30,12 +31,14 @@ function BudgetsPage() {
   const [month, setMonth] = useState<string>(monthKey());
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Budget | null>(null);
-  const { data: budgets = [] } = useBudgets(month);
+  const { businessId } = useMoneyCenterScope();
+  const { data: budgets = [] } = useBudgets(month, businessId);
   const archive = useArchiveBudget();
 
   const monthStart = month;
   const monthEnd = shiftMonth(month, 1);
   const { data: txs = [] } = useTransactions({
+    businessId,
     type: "expense",
     from: monthStart,
     toExclusive: monthEnd,
