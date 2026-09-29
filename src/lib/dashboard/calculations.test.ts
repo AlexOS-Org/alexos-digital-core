@@ -9,6 +9,8 @@ const emptySnapshot = (accounts: DashboardSnapshot["accounts"]): DashboardSnapsh
   expected: [],
   bills: [],
   debts: [],
+  assets: [],
+  cryptoHoldings: [],
   goals: [],
   goalProgress: [],
   contacts: [],

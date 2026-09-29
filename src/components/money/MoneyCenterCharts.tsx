@@ -51,6 +51,11 @@ interface Props {
   budgetActual: BudgetRow[];
   accountBalanceData: AccountRow[];
   netWorthTrend: TrendRow[];
+  currentNetWorth: number;
+  personalNetWorth: number;
+  businessNetWorth: number;
+  netWorthAvailable: boolean;
+  netWorthUnavailableReason: string | null;
   expectedVsReceived: CategoryRow[];
   expectedCount: number;
   money: (value: number) => string;
@@ -63,6 +68,11 @@ export function MoneyCenterCharts({
   budgetActual,
   accountBalanceData,
   netWorthTrend,
+  currentNetWorth,
+  personalNetWorth,
+  businessNetWorth,
+  netWorthAvailable,
+  netWorthUnavailableReason,
   expectedVsReceived,
   expectedCount,
   money,
@@ -147,9 +157,28 @@ export function MoneyCenterCharts({
         )}
       </ChartCard>
 
-      <ChartCard title="Net Worth Trend">
+      <ChartCard title="Current True Net Worth">
+        {netWorthAvailable ? (
+          <div className="grid gap-3 sm:grid-cols-3">
+            {[
+              ["Total", currentNetWorth],
+              ["Personal", personalNetWorth],
+              ["Business", businessNetWorth],
+            ].map(([label, value]) => (
+              <div key={label as string} className="rounded-xl border bg-muted/30 p-4">
+                <p className="text-xs text-muted-foreground">{label}</p>
+                <p className="mt-2 text-xl font-semibold tabular-nums">{money(value as number)}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <Empty label={netWorthUnavailableReason ?? "True net worth unavailable"} />
+        )}
+      </ChartCard>
+
+      <ChartCard title="True Net Worth History">
         {netWorthTrend.length === 0 ? (
-          <Empty />
+          <Empty label="Historical valuation data unavailable" />
         ) : (
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={netWorthTrend}>

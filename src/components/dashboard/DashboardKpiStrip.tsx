@@ -21,7 +21,6 @@ type Kpi = {
 export function DashboardKpiStrip() {
   const { metrics, isLoading } = useDashboardData();
   const { money, business } = metrics;
-  const netWorth = money.cashAvailable - money.outstandingDebt;
   const moneyValue = (value: number) => {
     const guarded = guardAggregateMoneyValue(value, money.currencySafety);
     return guarded === null
@@ -30,9 +29,9 @@ export function DashboardKpiStrip() {
   };
   const kpis: Kpi[] = [
     {
-      label: "Liquid net position",
-      value: moneyValue(netWorth),
-      detail: "Cash available less tracked outstanding debt",
+      label: "Total net worth",
+      value: money.netWorthAvailable ? moneyValue(money.netWorth) : "Data not available",
+      detail: "Cash + owned assets − outstanding principal",
       to: "/money-center",
       tone: "blue",
       icon: Landmark,

@@ -5,6 +5,7 @@ import { carryForwardBudgets } from "./budget-calculations";
 import type { ExpenseScope } from "./constants";
 import { buildReceivedExpectedTransaction } from "./expected-money";
 import { resolveScopedWrite } from "./write-scope";
+import type { Asset, CryptoHolding } from "./net-worth-types";
 
 export interface Account {
   id: string;
@@ -99,6 +100,34 @@ export interface DeliveryPrepayment {
   payment_reference: string;
   due_on_delivery: number;
   paid_at: string;
+}
+
+export function useAssets() {
+  return useQuery({
+    queryKey: ["assets", "net-worth"],
+    queryFn: async (): Promise<Asset[]> => {
+      const { data, error } = await supabase
+        .from("assets")
+        .select("*")
+        .order("valuation_date", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
+export function useCryptoHoldings() {
+  return useQuery({
+    queryKey: ["money_crypto_holdings", "net-worth"],
+    queryFn: async (): Promise<CryptoHolding[]> => {
+      const { data, error } = await supabase
+        .from("money_crypto_holdings")
+        .select("*")
+        .order("valued_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
 }
 
 async function uid() {
