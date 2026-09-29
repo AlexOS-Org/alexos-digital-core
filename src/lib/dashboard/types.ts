@@ -35,7 +35,7 @@ export interface MoneyMetrics {
   unpaidBillsTotal: number;
   billsDueSoon: Bill[];
   overdueBills: Bill[];
-  expectedWeighted: number;
+  expectedWeighted: number | null;
   expectedPendingCount: number;
 }
 

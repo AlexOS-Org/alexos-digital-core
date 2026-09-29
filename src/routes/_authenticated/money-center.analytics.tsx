@@ -13,6 +13,7 @@ import {
 import { formatMoney, monthKey } from "@/lib/money/format";
 import { normalizeExpenseCategory } from "@/lib/money/constants";
 import { summarizeCurrencySafety } from "@/lib/money/currency-safety";
+import { aggregateExpectedMoney } from "@/lib/money/expected-money";
 
 const MoneyCenterCharts = lazy(() =>
   import("@/components/money/MoneyCenterCharts").then((module) => ({
@@ -113,22 +114,30 @@ function AnalyticsPage() {
     return [...map.entries()].slice(-60).map(([date, value]) => ({ date, value }));
   }, [txs, accounts]);
 
-  const expectedVsReceived = useMemo(() => {
-    const pending = expected
-      .filter((e) => e.status === "pending")
-      .reduce((sum, e) => sum + Number(e.amount), 0);
-    const received = expected
-      .filter((e) => e.status === "received")
-      .reduce((sum, e) => sum + Number(e.amount), 0);
-    const cancelled = expected
-      .filter((e) => e.status === "cancelled")
-      .reduce((sum, e) => sum + Number(e.amount), 0);
-    return [
-      { name: "Pending", value: pending },
-      { name: "Received", value: received },
-      { name: "Cancelled", value: cancelled },
-    ];
-  }, [expected]);
+  const expectedSummary = useMemo(() => {
+    const pending = aggregateExpectedMoney(expected, accounts, (item) => item.status === "pending");
+    const received = aggregateExpectedMoney(
+      expected,
+      accounts,
+      (item) => item.status === "received",
+    );
+    const cancelled = aggregateExpectedMoney(
+      expected,
+      accounts,
+      (item) => item.status === "cancelled",
+    );
+    if (pending === null || received === null || cancelled === null) {
+      return { data: [], unavailable: true };
+    }
+    return {
+      data: [
+        { name: "Pending", value: pending },
+        { name: "Received", value: received },
+        { name: "Cancelled", value: cancelled },
+      ],
+      unavailable: false,
+    };
+  }, [expected, accounts]);
 
   const money = (value: number) => formatMoney(value);
 
@@ -160,7 +169,8 @@ function AnalyticsPage() {
             budgetActual={budgetActual}
             accountBalanceData={accountBalanceData}
             netWorthTrend={netWorthTrend}
-            expectedVsReceived={expectedVsReceived}
+            expectedVsReceived={expectedSummary.data}
+            expectedUnavailable={expectedSummary.unavailable}
             expectedCount={expected.length}
             money={money}
           />

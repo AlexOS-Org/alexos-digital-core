@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { carryForwardBudgets } from "./budget-calculations";
 import type { ExpenseScope } from "./constants";
-import { buildReceivedExpectedTransaction } from "./expected-money";
+import type { ExpectedMoneyScope } from "./expected-money";
 
 export interface Account {
   id: string;
@@ -82,7 +82,7 @@ export interface Expected {
   account_id: string | null;
   received_transaction_id: string | null;
   deleted_at: string | null;
-  financial_scope: "personal" | "business" | null;
+  financial_scope: ExpectedMoneyScope | null;
   business_id: string | null;
   business_name: string | null;
 }
@@ -243,17 +243,15 @@ export interface TxFilter {
   toExclusive?: string;
   search?: string;
   limit?: number;
+  includeVoided?: boolean;
 }
 
 export function useTransactions(filter: TxFilter = {}) {
   return useQuery({
     queryKey: ["transactions", filter],
     queryFn: async () => {
-      let q = supabase
-        .from("transactions")
-        .select("*")
-        .is("deleted_at", null)
-        .order("occurred_at", { ascending: false });
+      let q = supabase.from("transactions").select("*").order("occurred_at", { ascending: false });
+      if (!filter.includeVoided) q = q.is("deleted_at", null);
       if (filter.type) q = q.eq("type", filter.type);
       if (filter.accountId)
         q = q.or(`account_id.eq.${filter.accountId},transfer_account_id.eq.${filter.accountId}`);
@@ -432,7 +430,33 @@ export function useSaveExpected() {
   return useMutation({
     mutationFn: async (input: Partial<Expected> & { id?: string }) => {
       const user_id = await uid();
-      const payload = { ...input, user_id };
+      const financial_scope = input.financial_scope ?? "personal";
+      const business_id = input.business_id ?? null;
+      const amount = Number(input.amount);
+      const probability = Number(input.probability ?? 100);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        throw new Error("Expected Money amount must be greater than zero.");
+      }
+      if (!input.expected_date || !input.source?.trim()) {
+        throw new Error("Expected date and source are required.");
+      }
+      if (!Number.isInteger(probability) || probability < 0 || probability > 100) {
+        throw new Error("Expected Money probability must be between 0 and 100.");
+      }
+      if (financial_scope === "business" && !business_id) {
+        throw new Error("Choose a business for business Expected Money.");
+      }
+      const payload = {
+        user_id,
+        expected_date: input.expected_date,
+        source: input.source.trim(),
+        description: input.description ?? null,
+        amount,
+        probability,
+        financial_scope,
+        business_id: financial_scope === "business" ? business_id : null,
+        business_name: financial_scope === "business" ? (input.business_name ?? null) : null,
+      };
       const { error } = input.id
         ? await supabase
             .from("expected_money")
@@ -453,23 +477,14 @@ export function useMarkExpectedReceived() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ expected, accountId }: { expected: Expected; accountId: string }) => {
-      const user_id = await uid();
-      const { data: tx, error: txErr } = await supabase
-        .from("transactions")
-        .insert(
-          buildReceivedExpectedTransaction(expected, user_id, accountId, new Date().toISOString()),
-        )
-        .select("id")
-        .single();
-      if (txErr) throw txErr;
-      const { error } = await supabase
-        .from("expected_money")
-        .update({
-          status: "received",
-          account_id: accountId,
-          received_transaction_id: tx.id,
-        })
-        .eq("id", expected.id);
+      const { error } = await supabase.rpc(
+        "settle_expected_money" as never,
+        {
+          p_expected_id: expected.id,
+          p_account_id: accountId,
+          p_occurred_at: new Date().toISOString(),
+        } as never,
+      );
       if (error) throw error;
     },
     onSuccess: () => {
@@ -489,7 +504,9 @@ export function useCancelExpected() {
       const { error } = await supabase
         .from("expected_money")
         .update({ status: "cancelled" })
-        .eq("id", id);
+        .eq("id", id)
+        .eq("status", "pending")
+        .is("received_transaction_id", null);
       if (error) throw error;
     },
     onSuccess: () => {

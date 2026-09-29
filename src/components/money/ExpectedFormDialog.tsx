@@ -12,7 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EXPECTED_SOURCES } from "@/lib/money/constants";
-import { useSaveExpected, type Expected } from "@/lib/money/api";
+import { useBusinesses, useSaveExpected, type Expected } from "@/lib/money/api";
+import type { ExpectedMoneyScope } from "@/lib/money/expected-money";
 import { Slider } from "@/components/ui/slider";
 
 interface Props {
@@ -23,11 +24,14 @@ interface Props {
 
 export function ExpectedFormDialog({ open, onOpenChange, editing }: Props) {
   const save = useSaveExpected();
+  const { data: businesses = [] } = useBusinesses();
   const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 10));
   const [source, setSource] = useState<string>(EXPECTED_SOURCES[0]);
   const [amount, setAmount] = useState("");
   const [probability, setProbability] = useState(80);
   const [description, setDescription] = useState("");
+  const [scope, setScope] = useState<ExpectedMoneyScope>("personal");
+  const [businessId, setBusinessId] = useState("");
   const [amountError, setAmountError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,12 +43,16 @@ export function ExpectedFormDialog({ open, onOpenChange, editing }: Props) {
       setAmount(String(editing.amount));
       setProbability(editing.probability);
       setDescription(editing.description ?? "");
+      setScope(editing.financial_scope ?? "personal");
+      setBusinessId(editing.business_id ?? "");
     } else {
       setDate(new Date().toISOString().slice(0, 10));
       setSource(EXPECTED_SOURCES[0]);
       setAmount("");
       setProbability(80);
       setDescription("");
+      setScope("personal");
+      setBusinessId("");
     }
   }, [open, editing]);
 
@@ -54,6 +62,7 @@ export function ExpectedFormDialog({ open, onOpenChange, editing }: Props) {
       setAmountError("Enter an amount greater than zero.");
       return;
     }
+    if (scope === "business" && !businessId) return;
     setAmountError(null);
     await save.mutateAsync({
       id: editing?.id,
@@ -62,6 +71,12 @@ export function ExpectedFormDialog({ open, onOpenChange, editing }: Props) {
       amount: amt,
       probability,
       description: description || null,
+      financial_scope: scope,
+      business_id: scope === "business" ? businessId : null,
+      business_name:
+        scope === "business"
+          ? (businesses.find((business) => business.id === businessId)?.name ?? null)
+          : null,
     });
     onOpenChange(false);
   };
@@ -130,6 +145,57 @@ export function ExpectedFormDialog({ open, onOpenChange, editing }: Props) {
               </Select>
             )}
           </AlexOSFormField>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <AlexOSFormField
+              label="Financial scope"
+              required
+              hint={
+                editing
+                  ? "Scope cannot be changed once an item exists."
+                  : "Keep expected money aligned with personal or business activity."
+              }
+            >
+              {({ id, describedBy }) => (
+                <Select
+                  value={scope}
+                  onValueChange={(value) => setScope(value as ExpectedMoneyScope)}
+                  disabled={!!editing}
+                >
+                  <SelectTrigger id={id} aria-describedby={describedBy}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="personal">Personal</SelectItem>
+                    <SelectItem value="business">Business</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            </AlexOSFormField>
+
+            {scope === "business" ? (
+              <AlexOSFormField
+                label="Business"
+                required
+                error={!businessId ? "Choose a business." : undefined}
+              >
+                {({ id, describedBy, invalid }) => (
+                  <Select value={businessId} onValueChange={setBusinessId} disabled={!!editing}>
+                    <SelectTrigger id={id} aria-describedby={describedBy} aria-invalid={invalid}>
+                      <SelectValue placeholder="Choose business" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {businesses.map((business) => (
+                        <SelectItem key={business.id} value={business.id}>
+                          {business.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </AlexOSFormField>
+            ) : null}
+          </div>
 
           <div className="alexos-field">
             <div className="flex items-center justify-between">

@@ -18,6 +18,7 @@ import type {
 import type { Account, AccountBalance, Transaction } from "@/lib/money/api";
 import type { Lead } from "@/lib/crm/types";
 import { summarizeCurrencySafety } from "@/lib/money/currency-safety";
+import { aggregateExpectedMoney } from "@/lib/money/expected-money";
 
 const num = (value: unknown) => {
   const n = typeof value === "string" ? parseFloat(value) : Number(value ?? 0);
@@ -96,6 +97,14 @@ export function computeMoneyMetrics(snapshot: DashboardSnapshot, now = new Date(
   });
 
   const pendingExpected = expected.filter((e) => e.status === "pending");
+  const expectedWeighted = aggregateExpectedMoney(
+    pendingExpected.map((item) => ({
+      ...item,
+      amount: (num(item.amount) * num(item.probability)) / 100,
+    })),
+    accounts,
+    () => true,
+  );
 
   return {
     currencySafety: summarizeCurrencySafety(accounts),
@@ -119,10 +128,7 @@ export function computeMoneyMetrics(snapshot: DashboardSnapshot, now = new Date(
     unpaidBillsTotal: unpaidBills.reduce((sum, b) => sum + num(b.amount), 0),
     billsDueSoon,
     overdueBills,
-    expectedWeighted: pendingExpected.reduce(
-      (sum, e) => sum + (num(e.amount) * num(e.probability)) / 100,
-      0,
-    ),
+    expectedWeighted,
     expectedPendingCount: pendingExpected.length,
   };
 }

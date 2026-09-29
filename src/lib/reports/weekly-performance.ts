@@ -2,6 +2,7 @@ import { formatDate } from "@/lib/money/format";
 import { summarizeCurrencySafety } from "@/lib/money/currency-safety";
 import type { Account, Expected, Transaction } from "@/lib/money/api";
 import type { DailyGearProfitCashFlowResponse } from "@/lib/dailygear/profit-cash-flow.server";
+import { aggregateExpectedMoney } from "@/lib/money/expected-money";
 
 export interface WeekPeriod {
   from: string; // YYYY-MM-DD
@@ -113,10 +114,7 @@ export function computeWeeklyFinancials(
     return day >= from && day <= until;
   });
 
-  const rawExpectedTotal = pendingExpectedInPeriod.reduce(
-    (sum, e) => sum + Number(e.amount || 0),
-    0,
-  );
+  const rawExpectedTotal = aggregateExpectedMoney(pendingExpectedInPeriod, accounts, () => true);
 
   const courierInPeriod = courierPrepayments.filter((payment) => {
     const day = payment.paid_at.slice(0, 10);

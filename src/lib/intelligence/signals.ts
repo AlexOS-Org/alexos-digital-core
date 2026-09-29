@@ -98,7 +98,7 @@ export function generateSignals(metrics: DashboardMetrics, now = new Date()): In
       id: "money-expected",
       category: "money",
       title: "Expected income still pending",
-      description: `${plural(money.expectedPendingCount, "incoming payment")} with a weighted value of ${formatAmount(money.expectedWeighted)}.`,
+      description: `${plural(money.expectedPendingCount, "incoming payment")} with a weighted value of ${money.expectedWeighted === null ? "unavailable" : formatAmount(money.expectedWeighted)}.`,
       recommendation: "Confirm dates with payers so forecasts stay reliable.",
       priority: "medium",
       icon: Clock,
@@ -277,7 +277,11 @@ export function generatePriorities(metrics: DashboardMetrics): Priority[] {
     {
       id: "expected",
       title: "Confirm expected income",
-      detail: money.expectedPendingCount ? formatAmount(money.expectedWeighted) : "Nothing pending",
+      detail: money.expectedPendingCount
+        ? money.expectedWeighted === null
+          ? "Value unavailable"
+          : formatAmount(money.expectedWeighted)
+        : "Nothing pending",
       count: money.expectedPendingCount,
       tone: "blue",
       to: "/money-center/expected",

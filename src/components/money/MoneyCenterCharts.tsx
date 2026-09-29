@@ -52,6 +52,7 @@ interface Props {
   accountBalanceData: AccountRow[];
   netWorthTrend: TrendRow[];
   expectedVsReceived: CategoryRow[];
+  expectedUnavailable: boolean;
   expectedCount: number;
   money: (value: number) => string;
 }
@@ -64,6 +65,7 @@ export function MoneyCenterCharts({
   accountBalanceData,
   netWorthTrend,
   expectedVsReceived,
+  expectedUnavailable,
   expectedCount,
   money,
 }: Props) {
@@ -170,7 +172,15 @@ export function MoneyCenterCharts({
       </ChartCard>
 
       <ChartCard title="Expected vs Received">
-        {expectedCount === 0 ? (
+        {expectedUnavailable ? (
+          <div
+            role="alert"
+            data-tone="warning"
+            className="alexos-tone-bg alexos-tone-border rounded-xl border p-4 text-sm"
+          >
+            Expected Money totals are unavailable until each item has a known destination currency.
+          </div>
+        ) : expectedCount === 0 ? (
           <Empty />
         ) : (
           <ResponsiveContainer width="100%" height={260}>
