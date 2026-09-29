@@ -24,6 +24,7 @@ import type { AlexOSTone } from "@/lib/ui/status";
 import { useBalanceVisibility } from "@/components/money/BalanceVisibility";
 import { BINANCE_WITHDRAWAL_MINIMUM_KES, useLiveBinanceBalance } from "@/lib/money/crypto-prices";
 import { WeeklyCashSummary } from "@/components/money/WeeklyCashSummary";
+import { aggregateExpectedMoney } from "@/lib/money/expected-money";
 
 export const Route = createFileRoute("/_authenticated/money-center/")({
   component: MoneyDashboard,
@@ -62,7 +63,14 @@ function MoneyDashboard() {
   const cashFlow =
     incomeMonth !== null && expenseMonth !== null ? incomeMonth - expenseMonth : null;
   const expectedTotal = aggregateCurrency
-    ? pendingExpected.reduce((s, e) => s + (Number(e.amount) * e.probability) / 100, 0)
+    ? aggregateExpectedMoney(
+        pendingExpected.map((item) => ({
+          ...item,
+          amount: (Number(item.amount) * item.probability) / 100,
+        })),
+        accounts,
+        () => true,
+      )
     : null;
   const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   const unpaidBills = bills.filter((b) => b.status === "pending");
