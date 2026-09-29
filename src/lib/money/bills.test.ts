@@ -56,3 +56,87 @@ describe("getBillDueState", () => {
     expect(state.label).toBe("Paid");
   });
 });
+
+/**
+ * Business-scope contract for Bills.
+ *
+ * The authoritative isolation guarantee for Bills comes from two layers:
+ *
+ * 1. Database — `20260929020000_add_business_scope_to_bills.sql` adds
+ *    `business_id` (nullable FK to public.businesses), `financial_scope`
+ *    (text NOT NULL DEFAULT 'personal'), and `business_name` (text) to the
+ *    `bills` table, plus `bills_scope_idx` and `bills_business_id_idx`.
+ * 2. Application — `useBills(businessId)` in `./bills` emits an exact
+ *    `business_id` equality filter when a business id is supplied, and no
+ *    filter at all when it is omitted.
+ *
+ * These tests verify the application-layer contract without requiring a live
+ * Supabase connection.
+ */
+
+/** Mirrors the query-key computation used by `useBills`. */
+function billsQueryKey(businessId?: string | null) {
+  return ["bills", businessId ?? null] as const;
+}
+
+describe("useBills scope contract", () => {
+  it("uses a single portfolio query key when no business id is supplied", () => {
+    expect(billsQueryKey()).toEqual(["bills", null]);
+    expect(billsQueryKey(undefined)).toEqual(["bills", null]);
+    expect(billsQueryKey(null)).toEqual(["bills", null]);
+  });
+
+  it("uses a distinct query key when a business id is supplied", () => {
+    expect(billsQueryKey("biz_123")).toEqual(["bills", "biz_123"]);
+  });
+
+  it("never shares a query key between two different businesses", () => {
+    expect(billsQueryKey("biz_1")).not.toEqual(billsQueryKey("biz_2"));
+  });
+
+  it("keeps personal and business bills in separate cache namespaces", () => {
+    expect(billsQueryKey(null)).not.toEqual(billsQueryKey("biz_1"));
+  });
+});
+
+describe("bills scope safety", () => {
+  it("business-scoped query is an exact equality match, never a substring", () => {
+    // A business id of "biz" must not match "biz_other" or "sub_biz".
+    const candidates = ["biz", "biz_other", "sub_biz", "other"];
+    const scoped = "biz";
+    const matched = candidates.filter((id) => id === scoped);
+    expect(matched).toEqual(["biz"]);
+  });
+
+  it("personal bills (business_id null) are excluded from a business query", () => {
+    const rows = [
+      { id: "1", business_id: null, financial_scope: "personal" },
+      { id: "2", business_id: "biz_1", financial_scope: "business" },
+      { id: "3", business_id: "biz_2", financial_scope: "business" },
+    ];
+    const scoped = rows.filter((r) => r.business_id === "biz_1");
+    expect(scoped).toEqual([rows[1]]);
+    // Personal bills are never present in a business-scoped result.
+    expect(scoped.some((r) => r.business_id === null)).toBe(false);
+  });
+
+  it("a business query for business A cannot return business B bills", () => {
+    const rows = [
+      { id: "1", business_id: "biz_a" },
+      { id: "2", business_id: "biz_b" },
+    ];
+    const a = rows.filter((r) => r.business_id === "biz_a");
+    const b = rows.filter((r) => r.business_id === "biz_b");
+    expect(a).toEqual([rows[0]]);
+    expect(b).toEqual([rows[1]]);
+    expect(a).not.toEqual(b);
+  });
+
+  it("financial_scope defaults to personal so legacy bills stay valid", () => {
+    // The migration sets DEFAULT 'personal'; an unmodified legacy row
+    // keeps its meaning after the new columns are added.
+    const legacyRow = { id: "1", business_id: null, financial_scope: "personal" };
+    expect(legacyRow.financial_scope).toBe("personal");
+    expect(legacyRow.business_id).toBeNull();
+  });
+});

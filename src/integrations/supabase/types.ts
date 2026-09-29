@@ -579,11 +579,14 @@ export type Database = {
           account_id: string | null
           amount: number
           auto_create_transaction: boolean | null
+          business_id: string | null
+          business_name: string | null
           category: string | null
           created_at: string
           deleted_at: string | null
           due_date: string | null
           due_day: number | null
+          financial_scope: string
           frequency: Database["public"]["Enums"]["bill_frequency"]
           id: string
           last_paid_at: string | null
@@ -598,11 +601,14 @@ export type Database = {
           account_id?: string | null
           amount?: number
           auto_create_transaction?: boolean | null
+          business_id?: string | null
+          business_name?: string | null
           category?: string | null
           created_at?: string
           deleted_at?: string | null
           due_date?: string | null
           due_day?: number | null
+          financial_scope?: string
           frequency?: Database["public"]["Enums"]["bill_frequency"]
           id?: string
           last_paid_at?: string | null
@@ -617,11 +623,14 @@ export type Database = {
           account_id?: string | null
           amount?: number
           auto_create_transaction?: boolean | null
+          business_id?: string | null
+          business_name?: string | null
           category?: string | null
           created_at?: string
           deleted_at?: string | null
           due_date?: string | null
           due_day?: number | null
+          financial_scope?: string
           frequency?: Database["public"]["Enums"]["bill_frequency"]
           id?: string
           last_paid_at?: string | null
