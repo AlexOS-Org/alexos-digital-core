@@ -40,6 +40,10 @@ export interface ModuleDef {
   icon: LucideIcon;
   description: string;
   group: ModuleGroup;
+  /** When set, this module is only visible when the named business is active. */
+  businessSlug?: string;
+  /** Marks roadmap/placeholder modules that lack live data connections. */
+  preview?: boolean;
 }
 
 export const modules: ModuleDef[] = [
@@ -59,6 +63,8 @@ export const modules: ModuleDef[] = [
     icon: Car,
     description: "Roadmap preview — vehicle inventory, financing and sales pipeline.",
     group: "Businesses",
+    businessSlug: "carbaramotion",
+    preview: true,
   },
   {
     title: "DailyGear",
@@ -66,13 +72,16 @@ export const modules: ModuleDef[] = [
     icon: ShoppingBag,
     description: "Products, inventory, orders and online sales.",
     group: "Businesses",
+    businessSlug: "dailygear",
   },
   {
-    title: "Nuvora",
+    title: "Novera",
     url: "/businesses/novera",
     icon: Gem,
-    description: "Roadmap preview — business operations and growth for Nuvora.",
+    description: "Roadmap preview — business operations and growth for Novera.",
     group: "Businesses",
+    businessSlug: "novera",
+    preview: true,
   },
   {
     title: "People",
@@ -103,6 +112,7 @@ export const modules: ModuleDef[] = [
     icon: Landmark,
     description: "Roadmap preview — loans, deposits and banking relationships.",
     group: "Money",
+    preview: true,
   },
 
   // ── Auren ────────────────────────────────────────────
@@ -128,6 +138,7 @@ export const modules: ModuleDef[] = [
     icon: Megaphone,
     description: "Roadmap preview — campaigns, social media and growth automation.",
     group: "Growth",
+    preview: true,
   },
   {
     title: "Reports",
@@ -135,6 +146,7 @@ export const modules: ModuleDef[] = [
     icon: BarChart3,
     description: "Roadmap preview — KPIs, dashboards and executive reporting.",
     group: "Growth",
+    preview: true,
   },
 
   // ── Library ──────────────────────────────────────────
@@ -144,6 +156,7 @@ export const modules: ModuleDef[] = [
     icon: BookOpen,
     description: "Roadmap preview — documents, files, contracts and knowledge base.",
     group: "Library",
+    preview: true,
   },
   {
     title: "Documents",
@@ -151,6 +164,7 @@ export const modules: ModuleDef[] = [
     icon: FileText,
     description: "Roadmap preview — files, contracts and paperwork.",
     group: "Library",
+    preview: true,
   },
   {
     title: "Notes",
@@ -158,6 +172,7 @@ export const modules: ModuleDef[] = [
     icon: StickyNote,
     description: "Roadmap preview — ideas, meeting notes and knowledge.",
     group: "Library",
+    preview: true,
   },
 
   // ── Missions ─────────────────────────────────────────
@@ -167,6 +182,7 @@ export const modules: ModuleDef[] = [
     icon: Rocket,
     description: "Roadmap preview — strategic priorities and mission execution.",
     group: "Missions",
+    preview: true,
   },
   {
     title: "Tasks",
@@ -174,6 +190,7 @@ export const modules: ModuleDef[] = [
     icon: CheckSquare,
     description: "Roadmap preview — actions, priorities and daily execution.",
     group: "Missions",
+    preview: true,
   },
   {
     title: "Calendar",
@@ -181,6 +198,7 @@ export const modules: ModuleDef[] = [
     icon: Calendar,
     description: "Roadmap preview — meetings, events and schedule.",
     group: "Missions",
+    preview: true,
   },
 
   // ── Notifications ────────────────────────────────────
@@ -222,3 +240,18 @@ export const bottomNavItems = [
   { title: "Money", url: "/money-center", icon: Wallet },
   { title: "Library", url: "/library", icon: BookOpen },
 ] as const;
+
+/**
+ * Returns all core modules (Home, Money, Auren, Growth, Library, Missions, etc.)
+ * plus business-scoped modules for the active business.
+ * When no business is active, returns only core modules.
+ */
+export function getModulesForBusiness(businessSlug: string | null): ModuleDef[] {
+  return modules.filter((m) => !m.businessSlug || m.businessSlug === businessSlug);
+}
+
+/** Returns only the business-scoped modules for the given business. */
+export function getBusinessModules(businessSlug: string | null): ModuleDef[] {
+  if (!businessSlug) return modules.filter((m) => m.group === "Businesses");
+  return modules.filter((m) => m.businessSlug === businessSlug);
+}

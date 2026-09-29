@@ -20,11 +20,11 @@ describe("AlexOS product language", () => {
       source("src/components/dashboard/MoneySnapshot.tsx"),
     ].join("\n");
 
-    expect(sources).toContain("Nuvora");
+    expect(sources).toContain("Novera");
     expect(sources).toContain("CarBar Motion");
     expect(sources).toContain("Auren Intelligence");
     expect(sources).not.toContain("built-in intelligence layer");
-    expect(sources).not.toContain("Novera");
+    expect(sources).not.toContain("Nuvora");
     expect(sources).not.toContain("Car-Bar Motion.ke");
     expect(sources).not.toContain("AI assistant");
     expect(sources).not.toContain("Alex OS");

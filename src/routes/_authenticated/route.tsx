@@ -101,7 +101,7 @@ function AuthenticatedLayout() {
     : pathname.startsWith("/vehicle-sales")
       ? "CarBar Motion"
       : pathname.startsWith("/businesses")
-        ? "Nuvora"
+        ? "Novera"
         : null;
   const breadcrumb = ["AlexOS", businessContext, current?.title].filter(
     (label, index, labels): label is string => Boolean(label) && labels.indexOf(label) === index,

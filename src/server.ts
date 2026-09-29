@@ -3,6 +3,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { resolveHostnameFromRequest } from "./lib/businesses/hostname";
 
 const WORKER_ENV_KEYS = [
   "SUPABASE_URL",
@@ -76,6 +77,10 @@ export default {
     try {
       hydrateProcessEnv(env);
       const response = await handler.fetch(request);
+      const businessSlug = resolveHostnameFromRequest(request);
+      if (businessSlug) {
+        response.headers.set("x-business-slug", businessSlug);
+      }
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
       console.error(error);

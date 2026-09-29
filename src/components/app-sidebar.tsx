@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import {
   Sidebar,
@@ -18,7 +18,9 @@ import {
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { modules, moduleGroups } from "@/lib/modules";
-import { DAILYGEAR_SECTIONS } from "@/lib/dailygear/registry";
+import { getBusinessModules, getModulesForBusiness } from "@/lib/modules";
+import { getSectionsForBusiness } from "@/lib/businesses/registry";
+import { useBusinessContext } from "@/lib/businesses/context";
 import { MONEY_CENTER_SECTIONS } from "@/lib/money/registry";
 import { AlexOSLogo } from "@/components/alexos-logo";
 import { DailyGearBrand } from "@/components/dailygear/DailyGearBrand";
@@ -47,6 +49,15 @@ export function AppSidebar() {
 
   const navigate = useNavigate();
 
+  const businessContext = useBusinessContext();
+  const activeBusiness = businessContext.business;
+  const activeBusinessSlug = activeBusiness?.slug ?? null;
+
+  const visibleModules = useMemo(
+    () => getModulesForBusiness(activeBusinessSlug),
+    [activeBusinessSlug],
+  );
+
   const isActive = (path: string) =>
     currentPath === path || (path !== "/dashboard" && currentPath.startsWith(path + "/"));
 
@@ -59,7 +70,7 @@ export function AppSidebar() {
     closeSidebar();
   };
 
-  const businessModules = modules.filter((m) => m.group === BUSINESS_GROUP);
+  const businessModules = getBusinessModules(activeBusinessSlug);
   const isBusinessActive = businessModules.some((m) => isActive(m.url));
 
   // Groups rendered in the scrollable content area (excluding Home and System)
@@ -70,6 +81,8 @@ export function AppSidebar() {
       g !== "System" &&
       !(g === "Money" && isMoneyCenterRoute),
   );
+
+  const businessSections = getSectionsForBusiness(activeBusinessSlug);
 
   return (
     <Sidebar
@@ -104,7 +117,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {modules
+              {visibleModules
                 .filter((m) => m.group === "Home")
                 .map((item) => (
                   <SidebarMenuItem key={item.url}>
@@ -193,32 +206,39 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* ── DailyGear contextual workspace ─────────── */}
-        {currentPath.startsWith("/e-commerce") ? (
+        {/* ── Business contextual workspace ─────────── */}
+        {activeBusinessSlug && businessSections.length > 0 ? (
           <SidebarGroup>
             <div className="px-2 pb-2">
               {collapsed ? (
                 <div
                   className="alexos-sidebar-brand grid h-9 w-9 place-items-center rounded-xl text-xs font-black shadow-lg"
-                  aria-label="DailyGear workspace"
-                  title="DailyGear workspace"
+                  aria-label={`${activeBusiness?.name ?? "Business"} workspace`}
+                  title={`${activeBusiness?.name ?? "Business"} workspace`}
                 >
-                  DG
+                  {activeBusiness?.name?.slice(0, 2).toUpperCase() ??
+                    activeBusinessSlug.slice(0, 2).toUpperCase()}
                 </div>
               ) : (
                 <div className="rounded-2xl border border-sidebar-border/70 bg-sidebar-accent/40 px-3 py-2.5">
-                  <DailyGearBrand compact tone="sidebar" />
+                  {activeBusinessSlug === "dailygear" ? (
+                    <DailyGearBrand compact tone="sidebar" />
+                  ) : (
+                    <span className="text-sm font-semibold text-sidebar-foreground">
+                      {activeBusiness?.name ?? activeBusinessSlug}
+                    </span>
+                  )}
                 </div>
               )}
             </div>
             {!collapsed && (
               <SidebarGroupLabel className="text-sidebar-foreground/55">
-                DailyGear workspace
+                {activeBusiness?.name ?? "Business"} workspace
               </SidebarGroupLabel>
             )}
             <SidebarGroupContent>
               <SidebarMenu>
-                {DAILYGEAR_SECTIONS.map((section) => (
+                {businessSections.map((section) => (
                   <SidebarMenuItem key={section.to}>
                     <SidebarMenuButton
                       asChild
@@ -329,7 +349,7 @@ export function AppSidebar() {
 
         {/* ── Remaining groups ──────────────────────── */}
         {contentGroups.map((group) => {
-          const items = modules.filter((m) => m.group === group);
+          const items = visibleModules.filter((m) => m.group === group);
           if (!items.length) return null;
           return (
             <SidebarGroup key={group}>
@@ -374,7 +394,7 @@ export function AppSidebar() {
           )}
         </div>
         <SidebarMenu>
-          {modules
+          {visibleModules
             .filter((m) => m.group === "System")
             .map((item) => (
               <SidebarMenuItem key={item.url}>

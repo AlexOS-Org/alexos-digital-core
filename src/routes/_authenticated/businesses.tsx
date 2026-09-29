@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/businesses")({
 
 const businessWorkspaces = [
   {
-    name: "Nuvora",
+    name: "Novera",
     description: "Business operations and growth workspace.",
     detail: "Open the workspace when its live operating data is connected.",
     href: "/businesses/novera",
@@ -44,9 +44,9 @@ const businessWorkspaces = [
 
 function BusinessesPage() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const isNuvoraWorkspace = pathname.startsWith("/businesses/novera");
+  const isNoveraWorkspace = pathname.startsWith("/businesses/novera");
 
-  if (isNuvoraWorkspace) {
+  if (isNoveraWorkspace) {
     return (
       <div className="mx-auto w-full max-w-6xl pb-10">
         <Outlet />
