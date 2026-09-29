@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCommerceData } from "@/lib/dailygear/useCommerceData";
+import { useDailyGearScope } from "@/lib/dailygear/scope";
 import { useOrderCart } from "@/lib/dailygear/useOrderCart";
 import {
   useSaveOrderWithItems,
@@ -68,8 +69,9 @@ function getStatusOptions(): Order["status"][] {
 function CheckoutPage() {
   const navigate = useNavigate();
   const { products, isLoading } = useCommerceData();
-  const variants = useVariants();
-  const { data: customers = [] } = useCustomers();
+  const { businessId } = useDailyGearScope();
+  const variants = useVariants(undefined, true, businessId);
+  const { data: customers = [] } = useCustomers(undefined, true, businessId);
   const cart = useOrderCart();
   const saveOrder = useSaveOrderWithItems();
 

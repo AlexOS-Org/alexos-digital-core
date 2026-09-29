@@ -19,6 +19,7 @@ import {
   useProducts,
   useSaveProductEvidence,
 } from "@/lib/dailygear/api";
+import { useDailyGearScope } from "@/lib/dailygear/scope";
 import type { ProductEvidence, ProductEvidenceInsert } from "@/lib/dailygear/types";
 
 const SOURCE_TYPES: Array<{
@@ -55,8 +56,9 @@ function statusLabel(status: ProductEvidence["reconciliation_status"]) {
 }
 
 export function ProductEvidencePanel() {
-  const { data: evidence = [], isLoading } = useProductEvidence();
-  const { data: products = [] } = useProducts();
+  const { businessId } = useDailyGearScope();
+  const { data: evidence = [], isLoading } = useProductEvidence(undefined, businessId);
+  const { data: products = [] } = useProducts(undefined, true, businessId);
   const save = useSaveProductEvidence();
   const remove = useDeleteProductEvidence();
   const [form, setForm] = useState(EMPTY);

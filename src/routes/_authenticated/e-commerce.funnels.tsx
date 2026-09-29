@@ -31,6 +31,7 @@ import {
   useSaveFunnel,
   useSaveFunnelStep,
 } from "@/lib/dailygear/api";
+import { useDailyGearScope } from "@/lib/dailygear/scope";
 import type { Funnel, FunnelStep, ProductVariant } from "@/lib/dailygear/types";
 import {
   defaultFunnelLandingContent,
@@ -131,10 +132,16 @@ function stepLabel(type: FlowStepType) {
 
 function FunnelsPage() {
   const { data: store, isLoading: storeLoading } = useStorefront();
-  const { data: products = [], isLoading: productsLoading } = useProducts();
+  const { businessId } = useDailyGearScope();
+  const { data: products = [], isLoading: productsLoading } = useProducts(
+    undefined,
+    true,
+    businessId,
+  );
   const { data: funnels = [], isLoading: funnelsLoading } = useFunnels(
     store?.id ? { storefront_id: store.id } : undefined,
     Boolean(store?.id),
+    businessId,
   );
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
@@ -142,10 +149,11 @@ function FunnelsPage() {
   const [offers, setOffers] = useState<OfferConfig>(EMPTY_OFFERS);
   const [flowOrder, setFlowOrder] = useState<FlowStepType[]>(DEFAULT_FLOW_ORDER);
   const [variantDrafts, setVariantDrafts] = useState<Record<string, Partial<ProductVariant>>>({});
-  const stepsQuery = useFunnelSteps(selectedId ?? undefined);
+  const stepsQuery = useFunnelSteps(selectedId ?? undefined, businessId);
   const variantsQuery = useVariants(
     form.productId ? { product_id: form.productId } : undefined,
     Boolean(form.productId),
+    businessId,
   );
   const saveFunnel = useSaveFunnel();
   const saveStep = useSaveFunnelStep();

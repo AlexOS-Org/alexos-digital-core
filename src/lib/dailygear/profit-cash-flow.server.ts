@@ -37,6 +37,7 @@ export interface DailyGearProfitCashFlowRequest {
   maxPages?: number;
   forceRefresh?: boolean;
   cashEvents?: DailyGearCashFlowEvent[];
+  businessId?: string | null;
 }
 
 export interface DailyGearProfitCashFlowResponse {
@@ -94,6 +95,8 @@ export function validateDailyGearProfitCashFlowRequest(
     cashEvents: Array.isArray(input.cashEvents)
       ? (input.cashEvents as DailyGearCashFlowEvent[])
       : undefined,
+    businessId:
+      input.businessId === null || typeof input.businessId === "string" ? input.businessId : null,
   };
 }
 
@@ -102,8 +105,10 @@ export async function calculateDailyGearProfitCashFlowForUser(
   context: {
     supabase: SupabaseClient<Database>;
     userId: string;
+    businessId?: string | null;
   },
 ): Promise<DailyGearProfitCashFlowResponse> {
+  const effectiveBusinessId = request.businessId ?? context.businessId ?? null;
   const orderQuery = context.supabase
     .from("dg_orders")
     .select("*")
@@ -129,13 +134,36 @@ export async function calculateDailyGearProfitCashFlowForUser(
     .eq("financial_scope", "business")
     .eq("status", "posted")
     .is("deleted_at", null);
+
+  const safeOrderQuery = effectiveBusinessId
+    ? orderQuery.eq("business_id" as never, effectiveBusinessId)
+    : orderQuery;
+  const safeItemQuery = effectiveBusinessId
+    ? itemQuery.eq("business_id" as never, effectiveBusinessId)
+    : itemQuery;
+  const safeExpenseQuery = effectiveBusinessId
+    ? expenseQuery.eq("business_id" as never, effectiveBusinessId)
+    : expenseQuery;
+  const safePaymentQuery = effectiveBusinessId
+    ? paymentQuery.eq("business_id" as never, effectiveBusinessId)
+    : paymentQuery;
+  const safeBusinessExpenseQuery = effectiveBusinessId
+    ? businessExpenseQuery.eq("business_id" as never, effectiveBusinessId)
+    : businessExpenseQuery;
+
   const [
     { data: orderRows, error: orderError },
     { data: itemRows, error: itemError },
     { data: expenseRows, error: expenseError },
     { data: paymentRows, error: paymentError },
     { data: businessExpenseRows, error: businessExpenseError },
-  ] = await Promise.all([orderQuery, itemQuery, expenseQuery, paymentQuery, businessExpenseQuery]);
+  ] = await Promise.all([
+    safeOrderQuery,
+    safeItemQuery,
+    safeExpenseQuery,
+    safePaymentQuery,
+    safeBusinessExpenseQuery,
+  ]);
   if (orderError) throw orderError;
   if (itemError) throw itemError;
   if (expenseError) throw expenseError;

@@ -10,6 +10,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { getDailyGearProfitCashFlow } from "@/lib/dailygear/profit-cash-flow.functions";
+import { useDailyGearScope } from "@/lib/dailygear/scope";
 import type { DailyGearProfitCashFlowResponse } from "@/lib/dailygear/profit-cash-flow.server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -75,6 +76,7 @@ export function ProfitCashFlowPanel() {
   const [loading, setLoading] = useState(true);
   const [refreshNonce, setRefreshNonce] = useState(0);
   const forceRefreshRef = useRef(false);
+  const { businessId } = useDailyGearScope();
 
   useEffect(() => {
     const forceRefresh = forceRefreshRef.current;
@@ -88,6 +90,7 @@ export function ProfitCashFlowPanel() {
         includeInsights: true,
         maxPages: 10,
         forceRefresh,
+        businessId,
       },
     })
       .then((result) => {
@@ -104,7 +107,7 @@ export function ProfitCashFlowPanel() {
     return () => {
       active = false;
     };
-  }, [period, refreshNonce]);
+  }, [period, refreshNonce, businessId]);
 
   useEffect(() => {
     const interval = window.setInterval(() => {

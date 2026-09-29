@@ -62,15 +62,22 @@ async function requireUserId() {
 interface ResourceOptions {
   orderBy?: { column: string; ascending?: boolean };
   select?: string;
+  businessId?: string | null;
 }
 
 function createResource<Row>(table: DgTable, options: ResourceOptions = {}) {
   const key: QueryKey = ["dailygear", table];
   const softDelete = SOFT_DELETE_TABLES.has(table);
+  const defaultBusinessId = options.businessId ?? null;
 
-  function useList(filters?: Record<string, string | null | undefined>, enabled = true) {
+  function useList(
+    filters?: Record<string, string | null | undefined>,
+    enabled = true,
+    businessId?: string | null,
+  ) {
+    const effectiveBusinessId = businessId ?? defaultBusinessId;
     return useQuery({
-      queryKey: [...key, filters ?? null],
+      queryKey: [...key, filters ?? null, effectiveBusinessId ?? null],
       enabled,
       queryFn: async () => {
         let q = supabase.from(table).select(options.select ?? "*");
@@ -78,6 +85,9 @@ function createResource<Row>(table: DgTable, options: ResourceOptions = {}) {
         for (const [column, value] of Object.entries(filters ?? {})) {
           if (value === undefined || value === null || value === "") continue;
           q = q.eq(column, value);
+        }
+        if (effectiveBusinessId) {
+          q = q.eq("business_id" as never, effectiveBusinessId);
         }
         const ob = options.orderBy ?? { column: "created_at", ascending: false };
         q = q.order(ob.column, { ascending: ob.ascending ?? false });
@@ -106,7 +116,11 @@ function createResource<Row>(table: DgTable, options: ResourceOptions = {}) {
         const user_id = await requireUserId();
         const { data, error } = await supabase
           .from(table)
-          .insert({ ...rest, user_id } as never)
+          .insert({
+            ...rest,
+            user_id,
+            ...(defaultBusinessId && { business_id: defaultBusinessId }),
+          } as never)
           .select()
           .single();
         if (error) throw error;
@@ -292,8 +306,12 @@ export const useOrderEvents = orderEventsResource.useList;
 
 export const useStockMovements = stockMovementsResource.useList;
 export const useSaveStockMovement = () => stockMovementsResource.useSave("Stock movement");
-export const useProductEvidence = (productId?: string) =>
-  productEvidenceResource.useList(productId ? { product_id: productId } : undefined);
+export const useProductEvidence = (productId?: string, businessId?: string | null) =>
+  productEvidenceResource.useList(
+    productId ? { product_id: productId } : undefined,
+    true,
+    businessId,
+  );
 export const useSaveProductEvidence = () => productEvidenceResource.useSave("Evidence record");
 export const useDeleteProductEvidence = () => productEvidenceResource.useRemove("Evidence record");
 export const useVariants = variantsResource.useList;
@@ -301,8 +319,12 @@ export const useSaveVariant = () => variantsResource.useSave("Variant");
 export const useFunnels = funnelsResource.useList;
 export const useSaveFunnel = () => funnelsResource.useSave("Funnel");
 export const useDeleteFunnel = () => funnelsResource.useRemove("Funnel");
-export const useFunnelSteps = (funnelId?: string) =>
-  funnelStepsResource.useList(funnelId ? { funnel_id: funnelId } : undefined, Boolean(funnelId));
+export const useFunnelSteps = (funnelId?: string, businessId?: string | null) =>
+  funnelStepsResource.useList(
+    funnelId ? { funnel_id: funnelId } : undefined,
+    Boolean(funnelId),
+    businessId,
+  );
 export const useSaveFunnelStep = () => funnelStepsResource.useSave("Funnel step");
 export const useDeleteFunnelStep = () => funnelStepsResource.useRemove("Funnel step");
 

@@ -11,30 +11,30 @@ import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase
 
 /* ── Persisted entities ───────────────────────────────────────── */
 
-export type Product = Tables<"dg_products">;
-export type ProductInsert = TablesInsert<"dg_products">;
-export type ProductUpdate = TablesUpdate<"dg_products">;
+export type Product = Tables<"dg_products"> & { business_id?: string | null };
+export type ProductInsert = TablesInsert<"dg_products"> & { business_id?: string | null };
+export type ProductUpdate = TablesUpdate<"dg_products"> & { business_id?: string | null };
 
 export type ProductEvidence = Tables<"dg_product_evidence">;
 export type ProductEvidenceInsert = TablesInsert<"dg_product_evidence">;
 export type ProductEvidenceUpdate = TablesUpdate<"dg_product_evidence">;
 
 export type ProductVariant = Tables<"dg_product_variants">;
-export type Category = Tables<"dg_categories">;
-export type Brand = Tables<"dg_brands">;
-export type Supplier = Tables<"dg_suppliers">;
-export type Warehouse = Tables<"dg_warehouses">;
+export type Category = Tables<"dg_categories"> & { business_id?: string | null };
+export type Brand = Tables<"dg_brands"> & { business_id?: string | null };
+export type Supplier = Tables<"dg_suppliers"> & { business_id?: string | null };
+export type Warehouse = Tables<"dg_warehouses"> & { business_id?: string | null };
 
-export type Customer = Tables<"dg_customers">;
-export type CustomerInsert = TablesInsert<"dg_customers">;
+export type Customer = Tables<"dg_customers"> & { business_id?: string | null };
+export type CustomerInsert = TablesInsert<"dg_customers"> & { business_id?: string | null };
 
-export type Order = Tables<"dg_orders">;
-export type OrderInsert = TablesInsert<"dg_orders">;
-export type OrderItem = Tables<"dg_order_items">;
-export type OrderEvent = Tables<"dg_order_events">;
-export type StockMovement = Tables<"dg_stock_movements">;
-export type Funnel = Tables<"dg_funnels">;
-export type FunnelStep = Tables<"dg_funnel_steps">;
+export type Order = Tables<"dg_orders"> & { business_id?: string | null };
+export type OrderInsert = TablesInsert<"dg_orders"> & { business_id?: string | null };
+export type OrderItem = Tables<"dg_order_items"> & { business_id?: string | null };
+export type OrderEvent = Tables<"dg_order_events"> & { business_id?: string | null };
+export type StockMovement = Tables<"dg_stock_movements"> & { business_id?: string | null };
+export type Funnel = Tables<"dg_funnels"> & { business_id?: string | null };
+export type FunnelStep = Tables<"dg_funnel_steps"> & { business_id?: string | null };
 export type OrderAttribution = Tables<"dg_order_attribution">;
 
 export type FunnelStatus = Funnel["status"];

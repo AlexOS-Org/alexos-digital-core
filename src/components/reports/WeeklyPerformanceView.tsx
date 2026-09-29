@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAccounts, useDeliveryPrepayments, useExpected, useTransactions } from "@/lib/money/api";
+import { useDailyGearScope } from "@/lib/dailygear/scope";
 import { formatMoney } from "@/lib/money/format";
 import { getDailyGearProfitCashFlow } from "@/lib/dailygear/profit-cash-flow.functions";
 import type { DailyGearProfitCashFlowResponse } from "@/lib/dailygear/profit-cash-flow.server";
@@ -40,9 +41,10 @@ export function WeeklyPerformanceView() {
   const period = useMemo(() => getWeekBoundaries(new Date(), offsetWeeks), [offsetWeeks]);
 
   // Financial data hooks
-  const { data: transactions = [], isLoading: txLoading } = useTransactions({});
-  const { data: accounts = [], isLoading: accountsLoading } = useAccounts();
-  const { data: expected = [], isLoading: expectedLoading } = useExpected();
+  const { businessId } = useDailyGearScope();
+  const { data: transactions = [], isLoading: txLoading } = useTransactions({ businessId });
+  const { data: accounts = [], isLoading: accountsLoading } = useAccounts(false, businessId);
+  const { data: expected = [], isLoading: expectedLoading } = useExpected(undefined, businessId);
   const previousPeriod = useMemo(() => getWeekBoundaries(new Date(), -1), []);
   const { data: courierPrepayments = [], isLoading: courierLoading } = useDeliveryPrepayments(
     previousPeriod.from,
@@ -77,6 +79,7 @@ export function WeeklyPerformanceView() {
         until: period.until,
         includeInsights: true,
         maxPages: 10,
+        businessId,
       },
     })
       .then((res) => {
@@ -97,7 +100,7 @@ export function WeeklyPerformanceView() {
     return () => {
       active = false;
     };
-  }, [period.from, period.until, refreshNonce]);
+  }, [period.from, period.until, refreshNonce, businessId]);
 
   // Fetch Web Vitals events for the week
   useEffect(() => {
@@ -129,7 +132,7 @@ export function WeeklyPerformanceView() {
     return () => {
       active = false;
     };
-  }, [period.from, period.until, refreshNonce]);
+  }, [period.from, period.until, refreshNonce, businessId]);
 
   // Derived summaries
   const financialSummary = useMemo(

@@ -28,6 +28,7 @@ import {
   useSuppliers,
   useVariants,
 } from "@/lib/dailygear/api";
+import { useDailyGearScope } from "@/lib/dailygear/scope";
 import {
   canPublishToCatalogue,
   cataloguePublicationBlockers,
@@ -320,10 +321,15 @@ export function ProductFormDialog({
 }) {
   const [form, setForm] = useState(EMPTY);
   const save = useSaveProduct();
-  const { data: categories = [] } = useCategories();
-  const { data: brands = [] } = useBrands();
-  const { data: suppliers = [] } = useSuppliers();
-  const { data: variants = [] } = useVariants(product?.id ? { product_id: product.id } : undefined);
+  const { businessId } = useDailyGearScope();
+  const { data: categories = [] } = useCategories(undefined, true, businessId);
+  const { data: brands = [] } = useBrands(undefined, true, businessId);
+  const { data: suppliers = [] } = useSuppliers(undefined, true, businessId);
+  const { data: variants = [] } = useVariants(
+    product?.id ? { product_id: product.id } : undefined,
+    true,
+    businessId,
+  );
 
   const premiumContent = useMemo(() => {
     if (!product) return EMPTY_PREMIUM_CONTENT;

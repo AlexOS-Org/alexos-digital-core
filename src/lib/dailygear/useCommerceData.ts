@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useCustomers, useOrderItems, useOrders, useProducts, useStockMovements } from "./api";
+import { useDailyGearScope } from "./scope";
 import { DG_CURRENCY } from "./constants";
 import type { IntelligenceContext } from "./types";
 
@@ -10,11 +11,12 @@ import type { IntelligenceContext } from "./types";
  * persistence layer or adding caching happens in exactly one place.
  */
 export function useCommerceData() {
-  const products = useProducts();
-  const orders = useOrders();
-  const orderItems = useOrderItems();
-  const customers = useCustomers();
-  const movements = useStockMovements();
+  const { businessId } = useDailyGearScope();
+  const products = useProducts(undefined, true, businessId);
+  const orders = useOrders(undefined, true, businessId);
+  const orderItems = useOrderItems(undefined, true, businessId);
+  const customers = useCustomers(undefined, true, businessId);
+  const movements = useStockMovements(undefined, true, businessId);
 
   const isLoading =
     products.isLoading || orders.isLoading || orderItems.isLoading || customers.isLoading;

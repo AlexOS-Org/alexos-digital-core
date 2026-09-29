@@ -37,6 +37,7 @@ import {
   useSaveProduct,
   useVariants,
 } from "@/lib/dailygear/api";
+import { useDailyGearScope } from "@/lib/dailygear/scope";
 import { planBulkPublish } from "@/lib/dailygear/bulk-actions";
 import {
   CATALOGUE_FILTER_OPTIONS,
@@ -102,11 +103,12 @@ function ReadinessReasons({ reasons }: { reasons: ProductReadinessReason[] }) {
 }
 
 function ProductsPage() {
-  const { data: products = [], isLoading } = useProducts();
-  const { data: evidence = [] } = useProductEvidence();
-  const { data: categories = [] } = useCategories();
-  const { data: funnels = [] } = useFunnels();
-  const { data: allVariants = [] } = useVariants();
+  const { businessId } = useDailyGearScope();
+  const { data: products = [], isLoading } = useProducts(undefined, true, businessId);
+  const { data: evidence = [] } = useProductEvidence(undefined, businessId);
+  const { data: categories = [] } = useCategories(undefined, true, businessId);
+  const { data: funnels = [] } = useFunnels(undefined, true, businessId);
+  const { data: allVariants = [] } = useVariants(undefined, true, businessId);
   const remove = useDeleteProduct();
   const save = useSaveProduct();
   const [query, setQuery] = useState("");
