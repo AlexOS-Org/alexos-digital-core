@@ -90,7 +90,8 @@ const EMPTY_PREMIUM_CONTENT: PremiumContentDraft = {
 };
 
 function VariantEditor({ variants }: { variants: Array<Record<string, unknown>> }) {
-  const saveVariant = useSaveVariant();
+  const { businessId } = useDailyGearScope();
+  const saveVariant = useSaveVariant(businessId);
   const [drafts, setDrafts] = useState<
     Record<
       string,
@@ -320,8 +321,8 @@ export function ProductFormDialog({
   evidenceCount?: number;
 }) {
   const [form, setForm] = useState(EMPTY);
-  const save = useSaveProduct();
   const { businessId } = useDailyGearScope();
+  const save = useSaveProduct(businessId);
   const { data: categories = [] } = useCategories(undefined, true, businessId);
   const { data: brands = [] } = useBrands(undefined, true, businessId);
   const { data: suppliers = [] } = useSuppliers(undefined, true, businessId);

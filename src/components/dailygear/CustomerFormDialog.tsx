@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useSaveCustomer } from "@/lib/dailygear/api";
+import { useDailyGearScope } from "@/lib/dailygear/scope";
 import type { Customer } from "@/lib/dailygear/types";
 
 const EMPTY = {
@@ -33,7 +34,8 @@ export function CustomerFormDialog({
   customer?: Customer | null;
 }) {
   const [form, setForm] = useState(EMPTY);
-  const save = useSaveCustomer();
+  const { businessId } = useDailyGearScope();
+  const save = useSaveCustomer(businessId);
 
   useEffect(() => {
     if (!open) return;

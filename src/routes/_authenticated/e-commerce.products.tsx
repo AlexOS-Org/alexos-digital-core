@@ -110,7 +110,7 @@ function ProductsPage() {
   const { data: funnels = [] } = useFunnels(undefined, true, businessId);
   const { data: allVariants = [] } = useVariants(undefined, true, businessId);
   const remove = useDeleteProduct();
-  const save = useSaveProduct();
+  const save = useSaveProduct(businessId);
   const [query, setQuery] = useState("");
   const [filterKey, setFilterKey] = useState<CatalogueFilterKey>("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
