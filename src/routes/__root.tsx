@@ -13,6 +13,7 @@ import { reportRuntimeError } from "../lib/error-reporting";
 import { loadRuntimeSupabaseConfig, supabase } from "../integrations/supabase/client";
 import { Toaster } from "../components/ui/sonner";
 import { ThemeProvider } from "../components/theme/ThemeProvider";
+import { BusinessContextProvider } from "../lib/businesses/context";
 
 function NotFoundComponent() {
   return (
@@ -158,8 +159,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <Outlet />
-        <Toaster />
+        <BusinessContextProvider>
+          <Outlet />
+          <Toaster />
+        </BusinessContextProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

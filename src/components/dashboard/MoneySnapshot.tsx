@@ -12,14 +12,19 @@ import {
 } from "lucide-react";
 import { useAccountBalances, useAccounts, useTransactions } from "@/lib/money/api";
 import { useDebts, debtRemaining } from "@/lib/debts/api";
+import { useBusinessContext } from "@/lib/businesses/context";
 import { formatMoney } from "@/lib/money/format";
 import { guardAggregateMoneyValue, summarizeCurrencySafety } from "@/lib/money/currency-safety";
 
-export default function MoneySnapshot() {
+export default function MoneySnapshot({
+  businessId: explicitBusinessId,
+}: { businessId?: string | null } = {}) {
+  const businessContext = useBusinessContext();
+  const businessId = explicitBusinessId ?? businessContext.business?.id ?? null;
   const { data: balances = [] } = useAccountBalances();
-  const { data: accounts = [] } = useAccounts();
-  const { data: transactions = [] } = useTransactions();
-  const { data: debts = [] } = useDebts();
+  const { data: accounts = [] } = useAccounts(false, businessId);
+  const { data: transactions = [] } = useTransactions({ businessId });
+  const { data: debts = [] } = useDebts(false, businessId);
 
   type AccountWithScope = (typeof accounts)[number] & {
     financial_scope?: "personal" | "business";
@@ -63,6 +68,7 @@ export default function MoneySnapshot() {
     .filter((d) => d.status !== "paid" && d.financial_scope === "business")
     .reduce((sum, debt) => sum + debtRemaining(debt), 0);
   const netWorth = cashAvailable - totalDebt;
+  const isBusinessScoped = Boolean(businessId);
 
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
@@ -96,57 +102,95 @@ export default function MoneySnapshot() {
     return count + (threshold !== null && balance < threshold ? 1 : 0);
   }, 0);
 
-  const cards = [
-    {
-      title: "Cash Available",
-      value: moneyValue(cashAvailable),
-      icon: Wallet,
-      subtitle: "All accounts",
-      tone: "green",
-    },
-    {
-      title: "Personal Cash",
-      value: moneyValue(personalCash),
-      icon: UserRound,
-      subtitle: `Debt ${moneyValue(personalDebt)}`,
-      tone: "blue",
-    },
-    {
-      title: "Business Cash",
-      value: moneyValue(businessCash),
-      icon: Briefcase,
-      subtitle: `Debt ${moneyValue(businessDebt)}`,
-      tone: "purple",
-    },
-    {
-      title: "Liquid Net Position",
-      value: moneyValue(netWorth),
-      icon: Landmark,
-      subtitle: "Cash less tracked outstanding debt",
-      tone: netWorth >= 0 ? "purple" : "danger",
-    },
-    {
-      title: "Operating Income",
-      value: moneyValue(operatingIncome),
-      icon: TrendingUp,
-      subtitle: "This month · loans excluded",
-      tone: "green",
-    },
-    {
-      title: "Expenses",
-      value: moneyValue(expenses),
-      icon: TrendingDown,
-      subtitle: "This month",
-      tone: "amber",
-    },
-    {
-      title: "Loan Proceeds",
-      value: moneyValue(loanProceeds),
-      icon: ArrowDownCircle,
-      subtitle: "Cash received · not income",
-      tone: "amber",
-    },
-  ];
+  const cards = isBusinessScoped
+    ? [
+        {
+          title: "Cash Available",
+          value: moneyValue(cashAvailable),
+          icon: Wallet,
+          subtitle: "Business accounts",
+          tone: "green",
+        },
+        {
+          title: "Business Debt",
+          value: moneyValue(businessDebt),
+          icon: Briefcase,
+          subtitle: "Outstanding",
+          tone: "purple",
+        },
+        {
+          title: "Liquid Net Position",
+          value: moneyValue(cashAvailable - businessDebt),
+          icon: Landmark,
+          subtitle: "Cash less business debt",
+          tone: cashAvailable - businessDebt >= 0 ? "purple" : "danger",
+        },
+        {
+          title: "Operating Income",
+          value: moneyValue(operatingIncome),
+          icon: TrendingUp,
+          subtitle: "This month",
+          tone: "green",
+        },
+        {
+          title: "Expenses",
+          value: moneyValue(expenses),
+          icon: TrendingDown,
+          subtitle: "This month",
+          tone: "amber",
+        },
+      ]
+    : [
+        {
+          title: "Cash Available",
+          value: moneyValue(cashAvailable),
+          icon: Wallet,
+          subtitle: "All accounts",
+          tone: "green",
+        },
+        {
+          title: "Personal Cash",
+          value: moneyValue(personalCash),
+          icon: UserRound,
+          subtitle: `Debt ${moneyValue(personalDebt)}`,
+          tone: "blue",
+        },
+        {
+          title: "Business Cash",
+          value: moneyValue(businessCash),
+          icon: Briefcase,
+          subtitle: `Debt ${moneyValue(businessDebt)}`,
+          tone: "purple",
+        },
+        {
+          title: "Liquid Net Position",
+          value: moneyValue(netWorth),
+          icon: Landmark,
+          subtitle: "Cash less tracked outstanding debt",
+          tone: netWorth >= 0 ? "purple" : "danger",
+        },
+        {
+          title: "Operating Income",
+          value: moneyValue(operatingIncome),
+          icon: TrendingUp,
+          subtitle: "This month · loans excluded",
+          tone: "green",
+        },
+        {
+          title: "Expenses",
+          value: moneyValue(expenses),
+          icon: TrendingDown,
+          subtitle: "This month",
+          tone: "amber",
+        },
+        {
+          title: "Loan Proceeds",
+          value: moneyValue(loanProceeds),
+          icon: ArrowDownCircle,
+          subtitle: "Cash received · not income",
+          tone: "amber",
+        },
+      ];
 
   return (
     <div className="space-y-3">

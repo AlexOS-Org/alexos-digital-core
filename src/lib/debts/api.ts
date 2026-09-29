@@ -22,6 +22,7 @@ export interface Debt {
   deleted_at: string | null;
   created_at: string;
   financial_scope: FinancialScope;
+  business_id: string | null;
   business_name: string | null;
   disbursement_account_id: string | null;
 }
@@ -32,9 +33,9 @@ async function uid() {
   return data.user.id;
 }
 
-export function useDebts(includeArchived = false) {
+export function useDebts(includeArchived = false, businessId?: string | null) {
   return useQuery({
-    queryKey: ["debts", includeArchived],
+    queryKey: ["debts", includeArchived, businessId ?? null],
     queryFn: async () => {
       let q = supabase
         .from("debts")
@@ -45,6 +46,7 @@ export function useDebts(includeArchived = false) {
         .order("created_at");
 
       if (!includeArchived) q = q.neq("status", "archived");
+      if (businessId) q = q.eq("business_id", businessId);
 
       const { data, error } = await q;
       if (error) throw error;

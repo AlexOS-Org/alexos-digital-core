@@ -164,9 +164,9 @@ export function useSaveBusiness() {
   });
 }
 
-export function useAccounts(includeArchived = false) {
+export function useAccounts(includeArchived = false, businessId?: string | null) {
   return useQuery({
-    queryKey: ["accounts", includeArchived],
+    queryKey: ["accounts", includeArchived, businessId ?? null],
     queryFn: async () => {
       let q = supabase
         .from("accounts")
@@ -175,6 +175,9 @@ export function useAccounts(includeArchived = false) {
         .order("sort_order")
         .order("created_at");
       if (!includeArchived) q = q.eq("status", "active");
+      if (businessId) {
+        q = q.eq("business_id", businessId);
+      }
       const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as Account[];
@@ -243,6 +246,7 @@ export interface TxFilter {
   toExclusive?: string;
   search?: string;
   limit?: number;
+  businessId?: string | null;
 }
 
 export function useTransactions(filter: TxFilter = {}) {
@@ -264,6 +268,7 @@ export function useTransactions(filter: TxFilter = {}) {
         q = q.or(
           `description.ilike.%${filter.search}%,reference.ilike.%${filter.search}%,category.ilike.%${filter.search}%,source.ilike.%${filter.search}%`,
         );
+      if (filter.businessId) q = q.eq("business_id", filter.businessId);
       if (filter.limit) q = q.limit(filter.limit);
       const { data, error } = await q;
       if (error) throw error;
@@ -344,15 +349,17 @@ export function useVoidTransaction() {
 }
 
 /* ---------------- Budgets ---------------- */
-export function useBudgets(month: string) {
+export function useBudgets(month: string, businessId?: string | null) {
   return useQuery({
-    queryKey: ["budgets", month],
+    queryKey: ["budgets", month, businessId ?? null],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from("budgets")
         .select("*")
         .order("month", { ascending: false })
         .order("category");
+      if (businessId) q = q.eq("business_id", businessId);
+      const { data, error } = await q;
       if (error) throw error;
       return carryForwardBudgets((data ?? []) as Budget[], month);
     },
@@ -410,9 +417,9 @@ export function useArchiveBudget() {
 }
 
 /* ---------------- Expected Money ---------------- */
-export function useExpected(status?: Expected["status"]) {
+export function useExpected(status?: Expected["status"], businessId?: string | null) {
   return useQuery({
-    queryKey: ["expected", status],
+    queryKey: ["expected", status, businessId ?? null],
     queryFn: async () => {
       let q = supabase
         .from("expected_money")
@@ -420,6 +427,7 @@ export function useExpected(status?: Expected["status"]) {
         .is("deleted_at", null)
         .order("expected_date");
       if (status) q = q.eq("status", status);
+      if (businessId) q = q.eq("business_id", businessId);
       const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as Expected[];
