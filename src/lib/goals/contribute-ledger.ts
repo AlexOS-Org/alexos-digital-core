@@ -11,6 +11,7 @@
 
 export type GoalContributeLedgerInput = {
   goalId: string;
+  contributionId: string;
   goalName: string;
   amount: number;
   /** Destination savings account (Equity, NCBA, etc.). */
@@ -59,7 +60,7 @@ export function buildGoalContributionLedger(
 
   const occurred_at = input.occurredAt ?? new Date().toISOString();
   const note = input.note?.trim() || null;
-  const reference = `goal:${input.goalId}`;
+  const reference = `goal-contribution:${input.contributionId}`;
   const description =
     note ??
     (input.fromAccountId

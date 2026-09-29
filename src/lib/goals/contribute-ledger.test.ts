@@ -3,6 +3,7 @@ import { buildGoalContributionLedger } from "./contribute-ledger";
 
 const base = {
   goalId: "goal-1",
+  contributionId: "contribution-1",
   goalName: "Emergency",
   amount: 5_000,
   accountId: "equity-1",
@@ -41,7 +42,7 @@ describe("buildGoalContributionLedger", () => {
     expect(result.transaction.transfer_account_id).toBe("equity-1");
     expect(result.transaction.amount).toBe(5_000);
     expect(result.transaction.status).toBe("posted");
-    expect(result.transaction.reference).toBe("goal:goal-1");
+    expect(result.transaction.reference).toBe("goal-contribution:contribution-1");
   });
 
   it("builds income deposit when no source account is provided", () => {
