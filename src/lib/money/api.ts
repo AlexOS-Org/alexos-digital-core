@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { carryForwardBudgets } from "./budget-calculations";
+import { carryForwardBudgets, type BudgetScope } from "./budget-calculations";
 import type { ExpenseScope } from "./constants";
 import { buildReceivedExpectedTransaction } from "./expected-money";
 
@@ -68,6 +68,9 @@ export interface Budget {
   month: string;
   amount: number;
   deleted_at: string | null;
+  financial_scope: BudgetScope;
+  business_id: string | null;
+  business_name: string | null;
 }
 
 export interface Expected {
@@ -362,8 +365,21 @@ export function useBudgets(month: string) {
 export function useSaveBudget() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { id?: string; category: string; month: string; amount: number }) => {
+    mutationFn: async (input: {
+      id?: string;
+      category: string;
+      month: string;
+      amount: number;
+      financial_scope?: BudgetScope;
+      business_id?: string | null;
+      business_name?: string | null;
+    }) => {
       const user_id = await uid();
+      const financial_scope = input.financial_scope ?? "personal";
+      const businessId = input.business_id ?? null;
+      if (financial_scope === "business" && !businessId) {
+        throw new Error("Choose a business for a business budget.");
+      }
       if (input.id) {
         const { error } = await supabase
           .from("budgets")
@@ -371,15 +387,32 @@ export function useSaveBudget() {
           .eq("id", input.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("budgets").upsert(
-          {
-            user_id,
-            category: input.category,
-            month: input.month,
-            amount: input.amount,
-          },
-          { onConflict: "user_id,category,month" },
-        );
+        let existingQuery = supabase
+          .from("budgets")
+          .select("id")
+          .eq("user_id", user_id)
+          .eq("category", input.category)
+          .eq("month", input.month)
+          .eq("financial_scope", financial_scope);
+        existingQuery =
+          financial_scope === "business"
+            ? existingQuery.eq("business_id", businessId!)
+            : existingQuery.is("business_id", null);
+        const { data: existing, error: lookupError } = await existingQuery.maybeSingle();
+        if (lookupError) throw lookupError;
+
+        const payload = {
+          user_id,
+          category: input.category,
+          month: input.month,
+          amount: input.amount,
+          financial_scope,
+          business_id: financial_scope === "business" ? businessId : null,
+          business_name: financial_scope === "business" ? (input.business_name ?? null) : null,
+        };
+        const { error } = existing
+          ? await supabase.from("budgets").update(payload).eq("id", existing.id)
+          : await supabase.from("budgets").insert(payload);
         if (error) throw error;
       }
     },

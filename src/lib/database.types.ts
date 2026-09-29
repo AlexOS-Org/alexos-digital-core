@@ -246,9 +246,12 @@ export type Database = {
       budgets: {
         Row: {
           amount: number;
+          business_id: string | null;
+          business_name: string | null;
           category: string;
           created_at: string;
           deleted_at: string | null;
+          financial_scope: string;
           id: string;
           month: string;
           updated_at: string;
@@ -256,9 +259,12 @@ export type Database = {
         };
         Insert: {
           amount: number;
+          business_id?: string | null;
+          business_name?: string | null;
           category: string;
           created_at?: string;
           deleted_at?: string | null;
+          financial_scope?: string;
           id?: string;
           month: string;
           updated_at?: string;
@@ -266,15 +272,26 @@ export type Database = {
         };
         Update: {
           amount?: number;
+          business_id?: string | null;
+          business_name?: string | null;
           category?: string;
           created_at?: string;
           deleted_at?: string | null;
+          financial_scope?: string;
           id?: string;
           month?: string;
           updated_at?: string;
           user_id?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "budgets_business_id_fkey";
+            columns: ["business_id"];
+            isOneToOne: false;
+            referencedRelation: "businesses";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       contacts: {
         Row: {
