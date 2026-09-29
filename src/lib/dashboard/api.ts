@@ -1,5 +1,12 @@
 import { useMemo } from "react";
-import { useAccountBalances, useAccounts, useExpected, useTransactions } from "@/lib/money/api";
+import {
+  useAccountBalances,
+  useAccounts,
+  useAssets,
+  useCryptoHoldings,
+  useExpected,
+  useTransactions,
+} from "@/lib/money/api";
 import { useBills } from "@/lib/money/bills";
 import { useDebts } from "@/lib/debts/api";
 import { useGoalProgress, useGoals } from "@/lib/goals/api";
@@ -26,6 +33,8 @@ export function useDashboardData(): DashboardQueryResult {
   const expected = useExpected();
   const bills = useBills();
   const debts = useDebts();
+  const assets = useAssets();
+  const cryptoHoldings = useCryptoHoldings();
   const goals = useGoals();
   const goalProgress = useGoalProgress();
   const contacts = useContacts();
@@ -38,6 +47,8 @@ export function useDashboardData(): DashboardQueryResult {
     expected,
     bills,
     debts,
+    assets,
+    cryptoHoldings,
     goals,
     goalProgress,
     contacts,
@@ -54,6 +65,8 @@ export function useDashboardData(): DashboardQueryResult {
       expected: expected.data ?? [],
       bills: bills.data ?? [],
       debts: debts.data ?? [],
+      assets: assets.data ?? [],
+      cryptoHoldings: cryptoHoldings.data ?? [],
       goals: goals.data ?? [],
       goalProgress: goalProgress.data ?? [],
       contacts: contacts.data ?? [],
@@ -66,6 +79,8 @@ export function useDashboardData(): DashboardQueryResult {
       expected.data,
       bills.data,
       debts.data,
+      assets.data,
+      cryptoHoldings.data,
       goals.data,
       goalProgress.data,
       contacts.data,
