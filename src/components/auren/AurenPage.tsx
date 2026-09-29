@@ -11,6 +11,7 @@ import type {
 } from "@/lib/auren/advisor.server";
 import type { AurenAdvisoryResponse } from "@/lib/auren/advisor.server";
 import { buildAurenDataReadiness, summarizeReadiness } from "@/lib/auren/data-readiness";
+import { useBusinessContextOptional } from "@/lib/businesses/context";
 import { AurenReadinessPanel } from "@/components/auren/AurenReadinessPanel";
 
 const PERIODS: Array<{ value: AurenAdvisorPeriod; label: string }> = [
@@ -27,7 +28,8 @@ const SCOPES: Array<{ value: AurenAdvisorScope; label: string }> = [
 export function AurenPage() {
   const [period, setPeriod] = useState<AurenAdvisorPeriod>("last_30d");
   const [scope, setScope] = useState<AurenAdvisorScope>("portfolio");
-  const [businessId, setBusinessId] = useState<string | null>(null);
+  const activeBusinessId = useBusinessContextOptional()?.business?.id ?? null;
+  const businessId = scope === "businesses" ? activeBusinessId : null;
   const [horizonDays, setHorizonDays] = useState<AurenForecastHorizon>(30);
   const [response, setResponse] = useState<AurenAdvisoryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -114,7 +116,6 @@ export function AurenPage() {
                 value={scope}
                 onChange={(event) => {
                   setScope(event.target.value as AurenAdvisorScope);
-                  if (event.target.value !== "businesses") setBusinessId(null);
                 }}
                 className="mt-3 w-full rounded-xl border border-white/15 bg-[#0d1b3c] px-3 py-2.5 text-sm text-white outline-none focus-visible:ring-2 focus-visible:ring-violet-300/40"
                 aria-label="Auren advisory scope"

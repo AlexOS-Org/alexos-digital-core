@@ -4,6 +4,7 @@ import type { Database, Json } from "@/integrations/supabase/types";
 import type { DashboardSnapshot } from "@/lib/dashboard/types";
 import { computeDashboardMetrics } from "@/lib/dashboard/calculations";
 import { generateSignals } from "@/lib/intelligence/signals";
+import { BUSINESS_MODULE_MAP, businessTypeFromSlug } from "@/lib/businesses/types";
 import { listReadOnlyCapabilities, type AurenCapability } from "./capability-gateway";
 import { getAurenPublicContext, type AurenPublicContextRecord } from "./public-context";
 import {
@@ -684,6 +685,7 @@ export async function getAurenAdvisoryForUser(
   context: { supabase: SupabaseClient<Database>; userId: string },
 ): Promise<AurenAdvisoryResponse> {
   const userId = context.userId;
+  const selectedBusinessId = request.businessId ?? null;
   const scoped = (table: string) =>
     context.supabase
       .from(table as never)
@@ -721,8 +723,23 @@ export async function getAurenAdvisoryForUser(
     context.supabase.from("goal_progress").select("*").eq("user_id", userId).limit(MAX_ROWS),
     scoped("contacts"),
     scoped("leads"),
-    scoped("dg_products"),
-    context.supabase.from("dg_orders").select("*").eq("user_id", userId).limit(MAX_ROWS),
+    selectedBusinessId
+      ? context.supabase
+          .from("dg_products" as never)
+          .select("*")
+          .eq("user_id", userId)
+          .eq("business_id" as never, selectedBusinessId)
+          .limit(MAX_ROWS)
+      : scoped("dg_products"),
+    selectedBusinessId
+      ? context.supabase
+          .from("dg_orders" as never)
+          .select("*")
+          .eq("user_id", userId)
+          .eq("business_id" as never, selectedBusinessId)
+          .is("deleted_at", null)
+          .limit(MAX_ROWS)
+      : context.supabase.from("dg_orders").select("*").eq("user_id", userId).limit(MAX_ROWS),
     context.supabase
       .from("auren_evidence_snapshots" as never)
       .select("source_type,source_key,source_url,observed_at,status,confidence,summary,payload")
@@ -761,7 +778,6 @@ export async function getAurenAdvisoryForUser(
     }),
   );
   const businesses = (businessesResult.data ?? []) as AurenBusinessRecord[];
-  const selectedBusinessId = request.businessId ?? null;
   const selectedBusiness = selectedBusinessId
     ? businesses.find((business) => business.id === selectedBusinessId)
     : null;
@@ -778,7 +794,7 @@ export async function getAurenAdvisoryForUser(
     ? allExpected.filter((row) => row.business_id === selectedBusinessId)
     : allExpected;
   const isDailyGear = selectedBusiness
-    ? `${selectedBusiness.slug} ${selectedBusiness.name}`.toLowerCase().includes("dailygear")
+    ? businessTypeFromSlug(selectedBusiness.slug) === "ecommerce"
     : true;
   const firstPartyFunnel = isDailyGear
     ? funnelEventsFromEvidence(liveEvidence)

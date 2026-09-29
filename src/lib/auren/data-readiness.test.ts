@@ -50,7 +50,7 @@ function emptyAdvisory(): AurenAdvisorySnapshot {
     recommendations: [],
     externalContext: [
       {
-        business: "Nuvora",
+        business: "Novera",
         status: "source_missing",
         sourceUrl: null,
         sourceTitle: "No entity-verified first-party public source found",
