@@ -13,5 +13,6 @@ export const getAurenKpiSummary = createServerFn({ method: "POST" })
     getDailyGearAurenKpiSummary(data, {
       supabase: context.supabase,
       userId: context.userId,
+      businessId: data.businessId ?? null,
     }),
   );

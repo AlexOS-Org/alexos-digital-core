@@ -16,6 +16,7 @@ type OrderKpiRow = Pick<
 
 export interface AurenKpiRequest {
   period?: AurenKpiPeriod;
+  businessId?: string | null;
 }
 
 export interface DailyGearKpiSnapshot {
@@ -110,17 +111,24 @@ function aiPrompt(snapshot: DailyGearKpiSnapshot): string {
 export function validateAurenKpiRequest(raw: unknown): AurenKpiRequest {
   const input = (raw ?? {}) as Record<string, unknown>;
   const period = input.period;
-  if (period === undefined) return { period: "last_30d" };
+  if (period === undefined) {
+    return { period: "last_30d", businessId: null };
+  }
   if (period !== "last_7d" && period !== "last_30d" && period !== "this_month") {
     throw new Error("period must be last_7d, last_30d, or this_month.");
   }
-  return { period };
+  return {
+    period,
+    businessId:
+      input.businessId === null || typeof input.businessId === "string" ? input.businessId : null,
+  };
 }
 
 export async function getDailyGearAurenKpiSummary(
   request: AurenKpiRequest,
-  context: { supabase: SupabaseClient<Database>; userId: string },
+  context: { supabase: SupabaseClient<Database>; userId: string; businessId?: string | null },
 ): Promise<AurenKpiResponse> {
+  const effectiveBusinessId = request.businessId ?? context.businessId ?? null;
   const range = dateRange(request.period ?? "last_30d");
   const [productsResult, ordersResult, customersResult] = await Promise.all([
     context.supabase
@@ -128,12 +136,14 @@ export async function getDailyGearAurenKpiSummary(
       .select("id, stock_quantity, low_stock_threshold, status")
       .eq("user_id", context.userId)
       .is("deleted_at", null)
+      .eq("business_id" as never, effectiveBusinessId ?? "")
       .limit(MAX_ROWS),
     context.supabase
       .from("dg_orders")
       .select("id, status, payment_status, total, currency, placed_at")
       .eq("user_id", context.userId)
       .is("deleted_at", null)
+      .eq("business_id" as never, effectiveBusinessId ?? "")
       .limit(MAX_ROWS),
     context.supabase
       .from("dg_customers")
