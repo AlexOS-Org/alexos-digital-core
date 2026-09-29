@@ -42,6 +42,11 @@ export interface BillInput {
   account_id?: string | null;
   notes?: string | null;
   auto_create_transaction?: boolean;
+  /** personal | business. Defaults to "personal" when omitted. */
+  financial_scope?: "personal" | "business";
+  /** Required when financial_scope is "business". */
+  business_id?: string | null;
+  business_name?: string | null;
 }
 
 export type BillDueKind = "no_date" | "due_today" | "upcoming" | "overdue" | "paid";
@@ -107,15 +112,34 @@ export function getBillDueState(
 
 const BILLS_KEY = ["bills"] as const;
 
-export function useBills() {
+/**
+ * Fetch Bills for the active user.
+ *
+ * Scope behaviour follows the established AlexOS convention used by
+ * `useAccounts`, `useDebts`, `useBudgets` and `useExpected`:
+ *
+ * - `useBills()` — returns ALL bills (personal + business). This is the
+ *   existing portfolio view and is unchanged for current callers.
+ * - `useBills(businessId)` — returns ONLY bills scoped to that business.
+ * - `useBills(null)` — same as `useBills()` (no business filter).
+ *
+ * A business-scoped query can never return another business's bills, and
+ * it can never silently include personal bills, because the filter is an
+ * exact `business_id` equality match.
+ */
+export function useBills(businessId?: string | null) {
   return useQuery({
-    queryKey: BILLS_KEY,
+    queryKey: [...BILLS_KEY, businessId ?? null],
     queryFn: async (): Promise<Bill[]> => {
-      const { data, error } = await supabase
+      let q = supabase
         .from("bills")
         .select("*")
         .is("deleted_at", null)
         .order("due_date", { ascending: true });
+
+      if (businessId) q = q.eq("business_id", businessId);
+
+      const { data, error } = await q;
 
       if (error) throw error;
 
@@ -173,6 +197,9 @@ export function useSaveBill() {
         account_id: input.account_id ?? null,
         notes: input.notes ?? null,
         auto_create_transaction: input.auto_create_transaction ?? true,
+        financial_scope: input.financial_scope ?? "personal",
+        business_id: input.financial_scope === "business" ? (input.business_id ?? null) : null,
+        business_name: input.financial_scope === "business" ? (input.business_name ?? null) : null,
       };
 
       if (input.id) {
@@ -236,6 +263,11 @@ export type MarkBillPaidInput = {
  * 1) Post one expense on the selected account (ledger).
  * 2) Record last_paid_at + account_id on the bill.
  * 3) Recurring → advance due_date, keep pending; one-time → status paid.
+ *
+ * The bill's own scope (financial_scope / business_id / business_name) is
+ * carried onto the authoritative expense transaction so the planning layer
+ * and the ledger stay consistent. This does not create new money; it only
+ * records where an existing obligation was settled.
  */
 export function useMarkBillPaid() {
   const qc = useQueryClient();
@@ -262,6 +294,10 @@ export function useMarkBillPaid() {
 
       const now = new Date().toISOString();
       const category = bill.category ?? "Other";
+      const billScope = expenseScope;
+      const billBusinessId =
+        billScope === "business" ? (businessId ?? bill.business_id ?? null) : null;
+      const billBusinessName = billScope === "business" ? (bill.business_name ?? null) : null;
 
       const { error: txError } = await supabase.from("transactions").insert({
         user_id: user.id,
@@ -271,8 +307,9 @@ export function useMarkBillPaid() {
         amount: Number(bill.amount ?? 0),
         category,
         expense_type: expenseTypeForCategory(category),
-        expense_scope: expenseScope,
-        business_id: expenseScope === "business" ? (businessId ?? null) : null,
+        financial_scope: billScope,
+        business_id: billBusinessId,
+        business_name: billBusinessName,
         description: `Bill: ${bill.name}`,
         reference: `bill:${bill.id}`,
         occurred_at: now,
@@ -289,6 +326,9 @@ export function useMarkBillPaid() {
             account_id: accountId,
             auto_create_transaction: true,
             due_date: bill.due_date ? nextBillDueDate(bill.due_date, bill.frequency) : null,
+            financial_scope: billScope,
+            business_id: billBusinessId,
+            business_name: billBusinessName,
           })
           .eq("id", bill.id);
 
@@ -301,6 +341,9 @@ export function useMarkBillPaid() {
             last_paid_at: now,
             account_id: accountId,
             auto_create_transaction: true,
+            financial_scope: billScope,
+            business_id: billBusinessId,
+            business_name: billBusinessName,
           })
           .eq("id", bill.id);
 
