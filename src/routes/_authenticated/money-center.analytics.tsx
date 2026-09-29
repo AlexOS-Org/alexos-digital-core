@@ -18,6 +18,7 @@ import { formatMoney, monthKey } from "@/lib/money/format";
 import { normalizeExpenseCategory } from "@/lib/money/constants";
 import { summarizeCurrencySafety } from "@/lib/money/currency-safety";
 import { calculateNetWorth } from "@/lib/money/net-worth";
+import { calculateBudget, type BudgetExpense } from "@/lib/money/budget-calculations";
 
 const MoneyCenterCharts = lazy(() =>
   import("@/components/money/MoneyCenterCharts").then((module) => ({
@@ -101,20 +102,33 @@ function AnalyticsPage() {
   }, [txs]);
 
   const budgetActual = useMemo(() => {
-    const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const spent: Record<string, number> = {};
-    for (const t of txs) {
-      if (t.type !== "expense" || new Date(t.occurred_at) < monthStart) continue;
-      const key = normalizeExpenseCategory(t.category);
-      spent[key] = (spent[key] ?? 0) + Number(t.amount);
-    }
-    return budgets.map((b) => ({
-      name: b.category,
-      budget: Number(b.amount),
-      actual: spent[b.category] ?? 0,
+    const selectedMonth = monthKey();
+    const monthEnd = new Date(`${selectedMonth}T00:00:00.000Z`);
+    monthEnd.setUTCMonth(monthEnd.getUTCMonth() + 1);
+    const period = {
+      from: `${selectedMonth}T00:00:00.000Z`,
+      toExclusive: monthEnd.toISOString(),
+    };
+    const expenses = txs.map((transaction) => ({
+      ...transaction,
+      category: normalizeExpenseCategory(transaction.category),
+    })) satisfies BudgetExpense[];
+    const accountCurrencies = accounts.map((account) => ({
+      id: account.id,
+      currency: account.currency,
+      status: account.status,
+      financial_scope: account.financial_scope,
+      business_id: account.business_id,
     }));
-  }, [txs, budgets]);
+    return budgets.map((budget) => {
+      const calculation = calculateBudget({ budget, expenses, period, accountCurrencies });
+      return {
+        name: `${budget.category} · ${budget.financial_scope === "business" ? `Business${budget.business_name ? ` · ${budget.business_name}` : ""}` : "Personal"}`,
+        budget: Number(budget.amount),
+        actual: calculation.actual,
+      };
+    });
+  }, [txs, budgets, accounts]);
 
   const accountBalanceData = balances.map((b) => ({
     name: accounts.find((a) => a.id === b.account_id)?.name ?? "?",

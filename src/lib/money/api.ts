@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { carryForwardBudgets } from "./budget-calculations";
+import { carryForwardBudgets, type BudgetScope } from "./budget-calculations";
 import type { ExpenseScope } from "./constants";
 import { buildReceivedExpectedTransaction } from "./expected-money";
 import { resolveScopedWrite } from "./write-scope";
@@ -70,7 +70,9 @@ export interface Budget {
   month: string;
   amount: number;
   deleted_at: string | null;
-  business_id?: string | null;
+  financial_scope: BudgetScope;
+  business_id: string | null;
+  business_name: string | null;
 }
 
 export interface Expected {
@@ -445,9 +447,16 @@ export function useSaveBudget() {
       category: string;
       month: string;
       amount: number;
+      financial_scope?: BudgetScope;
       business_id?: string | null;
+      business_name?: string | null;
     }) => {
       const user_id = await uid();
+      const financial_scope = input.financial_scope ?? "personal";
+      const businessId = input.business_id ?? null;
+      if (financial_scope === "business" && !businessId) {
+        throw new Error("Choose a business for a business budget.");
+      }
       if (input.id) {
         // Editing an existing budget changes only its amount. Its business
         // dimension is part of the row's identity, so it is deliberately not
@@ -467,6 +476,7 @@ export function useSaveBudget() {
             amount: input.amount,
             business_id,
             financial_scope,
+            business_name: financial_scope === "business" ? (input.business_name ?? null) : null,
           },
           { onConflict: BUDGET_UPSERT_CONFLICT },
         );
