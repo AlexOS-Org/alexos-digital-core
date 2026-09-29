@@ -6,6 +6,7 @@ import { AlexOSMetricCard } from "@/components/alexos/metric-card";
 import { AlexOSEmptyState } from "@/components/alexos/states";
 import { AlexOSPageHeader } from "@/components/alexos/page-header";
 import { useAccounts, useTransactions } from "@/lib/money/api";
+import { useMoneyCenterScope } from "@/lib/money/scope";
 import { formatDate, formatMoney, formatTime } from "@/lib/money/format";
 import { Hash, Plus, Repeat } from "lucide-react";
 import { TransactionFormDialog } from "@/components/money/TransactionFormDialog";
@@ -16,8 +17,9 @@ export const Route = createFileRoute("/_authenticated/money-center/transfers")({
 
 function TransfersPage() {
   const [open, setOpen] = useState(false);
-  const { data: txs = [] } = useTransactions({ type: "transfer" });
-  const { data: accounts = [] } = useAccounts(true);
+  const { businessId } = useMoneyCenterScope();
+  const { data: txs = [] } = useTransactions({ businessId, type: "transfer" });
+  const { data: accounts = [] } = useAccounts(true, businessId);
   const accName: Record<string, string> = Object.fromEntries(accounts.map((a) => [a.id, a.name]));
 
   const total = txs.reduce((s, t) => s + Number(t.amount), 0);

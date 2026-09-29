@@ -40,6 +40,7 @@ import {
   useMarkExpectedReceived,
   type Expected,
 } from "@/lib/money/api";
+import { useMoneyCenterScope } from "@/lib/money/scope";
 import { ExpectedFormDialog } from "@/components/money/ExpectedFormDialog";
 import { formatDate, formatMoney } from "@/lib/money/format";
 import { Check, Pencil, Plus, Scale, X } from "lucide-react";
@@ -49,10 +50,14 @@ export const Route = createFileRoute("/_authenticated/money-center/expected")({
 });
 
 function ExpectedPage() {
-  const { data: pending = [], isLoading: pendingLoading } = useExpected("pending");
-  const { data: received = [], isLoading: receivedLoading } = useExpected("received");
-  const { data: cancelled = [], isLoading: cancelledLoading } = useExpected("cancelled");
-  const { data: accounts = [] } = useAccounts();
+  const { businessId } = useMoneyCenterScope();
+  const { data: pending = [], isLoading: pendingLoading } = useExpected("pending", businessId);
+  const { data: received = [], isLoading: receivedLoading } = useExpected("received", businessId);
+  const { data: cancelled = [], isLoading: cancelledLoading } = useExpected(
+    "cancelled",
+    businessId,
+  );
+  const { data: accounts = [] } = useAccounts(undefined, businessId);
   const markReceived = useMarkExpectedReceived();
   const cancel = useCancelExpected();
 
