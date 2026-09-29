@@ -243,17 +243,15 @@ export interface TxFilter {
   toExclusive?: string;
   search?: string;
   limit?: number;
+  includeVoided?: boolean;
 }
 
 export function useTransactions(filter: TxFilter = {}) {
   return useQuery({
     queryKey: ["transactions", filter],
     queryFn: async () => {
-      let q = supabase
-        .from("transactions")
-        .select("*")
-        .is("deleted_at", null)
-        .order("occurred_at", { ascending: false });
+      let q = supabase.from("transactions").select("*").order("occurred_at", { ascending: false });
+      if (!filter.includeVoided) q = q.is("deleted_at", null);
       if (filter.type) q = q.eq("type", filter.type);
       if (filter.accountId)
         q = q.or(`account_id.eq.${filter.accountId},transfer_account_id.eq.${filter.accountId}`);

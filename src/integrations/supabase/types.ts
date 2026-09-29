@@ -2741,6 +2741,7 @@ export type Database = {
           id: string
           note: string | null
           occurred_at: string
+          transaction_id: string | null
           user_id: string
         }
         Insert: {
@@ -2752,6 +2753,7 @@ export type Database = {
           id?: string
           note?: string | null
           occurred_at?: string
+          transaction_id?: string | null
           user_id: string
         }
         Update: {
@@ -2763,6 +2765,7 @@ export type Database = {
           id?: string
           note?: string | null
           occurred_at?: string
+          transaction_id?: string | null
           user_id?: string
         }
         Relationships: [
@@ -2778,6 +2781,13 @@ export type Database = {
             columns: ["goal_id"]
             isOneToOne: false
             referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goal_contributions_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
             referencedColumns: ["id"]
           },
         ]

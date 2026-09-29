@@ -6,24 +6,77 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Pencil, Archive, Target, TrendingUp, CheckCircle2, Wallet } from "lucide-react";
-import { useGoals, useGoalProgress, useArchiveGoal, type Goal } from "@/lib/goals/api";
-import { useAccounts, useAccountBalances } from "@/lib/money/api";
+import {
+  Plus,
+  Pencil,
+  Archive,
+  Target,
+  TrendingUp,
+  CheckCircle2,
+  Wallet,
+  AlertCircle,
+} from "lucide-react";
+import {
+  useGoals,
+  useGoalProgress,
+  useAllGoalContributions,
+  useArchiveGoal,
+  type Goal,
+} from "@/lib/goals/api";
+import { useAccounts, useAccountBalances, useTransactions } from "@/lib/money/api";
 import { formatMoney, formatDate } from "@/lib/money/format";
 import { getAccountLogo, getInstitutionStyle } from "@/lib/money/institution-branding";
 import { GoalFormDialog, GOAL_ICONS } from "@/components/goals/GoalFormDialog";
 import { GoalContributeDialog } from "@/components/goals/GoalContributeDialog";
 import { buildGoalProgressMap, resolveGoalProgress } from "@/lib/goals/progress";
+import {
+  summarizeGoalReconciliation,
+  type GoalReconciliationStatus,
+} from "@/lib/goals/reconciliation";
 
 export const Route = createFileRoute("/_authenticated/goals")({
   component: GoalsPage,
 });
+
+function ReconciliationBadge({ status }: { status: GoalReconciliationStatus }) {
+  const config = {
+    verified: {
+      label: "Verified against account",
+      className: "text-emerald-700 dark:text-emerald-400",
+    },
+    unlinked: {
+      label: "Unlinked · planning only",
+      className: "text-amber-700 dark:text-amber-400",
+    },
+    needs_reconciliation: {
+      label: "Needs reconciliation",
+      className: "text-amber-700 dark:text-amber-400",
+    },
+    voided: {
+      label: "Ledger movement voided",
+      className: "text-rose-700 dark:text-rose-400",
+    },
+  }[status];
+
+  return (
+    <div className={cn("flex items-center gap-1.5 text-xs font-medium", config.className)}>
+      {status === "verified" ? (
+        <CheckCircle2 className="h-3.5 w-3.5" />
+      ) : (
+        <AlertCircle className="h-3.5 w-3.5" />
+      )}
+      {config.label}
+    </div>
+  );
+}
 
 function GoalsPage() {
   const { data: goals = [], isLoading } = useGoals();
   const { data: progress = [] } = useGoalProgress();
   const { data: accounts = [] } = useAccounts();
   const { data: accountBalances = [] } = useAccountBalances();
+  const { data: contributions = [] } = useAllGoalContributions();
+  const { data: transactions = [] } = useTransactions({ includeVoided: true });
   const archive = useArchiveGoal();
   const [formOpen, setFormOpen] = useState(false);
   const [contribOpen, setContribOpen] = useState(false);
@@ -32,10 +85,28 @@ function GoalsPage() {
 
   const contributionProgressMap = buildGoalProgressMap(progress);
   const accountMap = new Map(accounts.map((a) => [a.id, a.name]));
+  const contributionsByGoal = new Map<string, typeof contributions>();
+  for (const contribution of contributions) {
+    const current = contributionsByGoal.get(contribution.goal_id) ?? [];
+    current.push(contribution);
+    contributionsByGoal.set(contribution.goal_id, current);
+  }
+  const balanceIds = new Set(accountBalances.map((balance) => balance.account_id));
   const goalProgressMap = new Map(
     goals.map((goal) => [
       goal.id,
       resolveGoalProgress(goal, contributionProgressMap.get(goal.id) ?? 0, accountBalances),
+    ]),
+  );
+  const reconciliationMap = new Map(
+    goals.map((goal) => [
+      goal.id,
+      summarizeGoalReconciliation(
+        goal,
+        contributionsByGoal.get(goal.id) ?? [],
+        transactions,
+        !!goal.account_id && balanceIds.has(goal.account_id),
+      ),
     ]),
   );
 
@@ -84,7 +155,9 @@ function GoalsPage() {
         </Card>
         <Card className="rounded-2xl">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Saved</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Goal progress
+            </CardTitle>
           </CardHeader>
           <CardContent className="text-2xl font-semibold">{formatMoney(totalSaved)}</CardContent>
         </Card>
@@ -126,6 +199,7 @@ function GoalsPage() {
             const remaining = Math.max(0, target - current);
             const Icon = GOAL_ICONS[g.icon] ?? Target;
             const linkedAccount = g.account_id ? accountMap.get(g.account_id) : null;
+            const reconciliation = reconciliationMap.get(g.id);
             return (
               <Card key={g.id} className="rounded-2xl transition-shadow hover:shadow-md">
                 <CardContent className="p-5 space-y-4">
@@ -223,6 +297,8 @@ function GoalsPage() {
                       Link a savings account
                     </button>
                   )}
+
+                  <ReconciliationBadge status={reconciliation?.status ?? "needs_reconciliation"} />
 
                   {g.target_date && (
                     <div className="text-xs text-muted-foreground">
