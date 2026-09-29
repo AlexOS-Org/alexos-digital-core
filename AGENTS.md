@@ -18,3 +18,6 @@ GitHub is the source of truth for the application code. Production infrastructur
 
 ## Supabase
 The controlled production Supabase project is `goafwbrayepaihxbqsse`. Client code may use the publishable key; service-role credentials are server-only.
+
+## Verification
+Run `npm run verify` before committing. This executes: tests, lint, typecheck, build, and public-storefront immutability guards (`scripts/assert-public-storefront-untouched.mjs`, `scripts/assert-cloudflare-workers-only.mjs`).
