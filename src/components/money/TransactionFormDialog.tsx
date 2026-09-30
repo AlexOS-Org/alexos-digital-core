@@ -19,6 +19,7 @@ import {
   useSaveTransaction,
   type Transaction,
 } from "@/lib/money/api";
+import { useMoneyCenterScope } from "@/lib/money/scope";
 import { toast } from "sonner";
 import {
   EXPENSE_CATEGORIES,
@@ -41,6 +42,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
   const { data: businesses = [] } = useBusinesses();
   const save = useSaveTransaction();
   const saveBusiness = useSaveBusiness();
+  const { businessId: activeBusinessId } = useMoneyCenterScope();
 
   const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 16));
   const [amount, setAmount] = useState("");
@@ -102,11 +104,11 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       setSource(INCOME_SOURCES[0]);
       setDescription("");
       setReference("");
-      setScope("personal");
-      setBusinessId(businesses[0]?.id ?? "");
+      setScope(activeBusinessId ? "business" : "personal");
+      setBusinessId(activeBusinessId ?? businesses[0]?.id ?? "");
       setNewBusinessName("");
     }
-  }, [open, editing, accounts, businesses]);
+  }, [open, editing, accounts, businesses, activeBusinessId]);
 
   const createBusiness = async () => {
     const name = newBusinessName.trim();
@@ -168,6 +170,11 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
 
     const financialScope = selectedAccount?.financial_scope ?? scope;
     const expenseScope = mode === "expense" ? scope : "personal";
+    const accountBusinessId = selectedAccount?.business_id ?? null;
+    const txBusinessId =
+      mode === "expense" && scope === "business"
+        ? businessId || accountBusinessId
+        : accountBusinessId;
 
     await save.mutateAsync({
       id: editing?.id,
@@ -180,7 +187,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
       source: mode === "income" ? source : null,
       description: description || null,
       reference: reference || null,
-      business_id: mode === "expense" && scope === "business" ? businessId : null,
+      business_id: txBusinessId,
       financial_scope: financialScope,
       expense_type: mode === "expense" ? expenseTypeForCategory(category) : null,
       expense_scope: expenseScope,

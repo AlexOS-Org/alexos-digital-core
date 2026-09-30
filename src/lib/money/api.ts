@@ -68,6 +68,7 @@ export interface Budget {
   month: string;
   amount: number;
   deleted_at: string | null;
+  business_id?: string | null;
 }
 
 export interface Expected {
@@ -369,7 +370,13 @@ export function useBudgets(month: string, businessId?: string | null) {
 export function useSaveBudget() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { id?: string; category: string; month: string; amount: number }) => {
+    mutationFn: async (input: {
+      id?: string;
+      category: string;
+      month: string;
+      amount: number;
+      business_id?: string | null;
+    }) => {
       const user_id = await uid();
       if (input.id) {
         const { error } = await supabase
@@ -384,6 +391,7 @@ export function useSaveBudget() {
             category: input.category,
             month: input.month,
             amount: input.amount,
+            business_id: input.business_id ?? null,
           },
           { onConflict: "user_id,category,month" },
         );
