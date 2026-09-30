@@ -155,11 +155,11 @@ function FunnelsPage() {
     Boolean(form.productId),
     businessId,
   );
-  const saveFunnel = useSaveFunnel();
-  const saveStep = useSaveFunnelStep();
+  const saveFunnel = useSaveFunnel(businessId);
+  const saveStep = useSaveFunnelStep(businessId);
   const deleteStep = useDeleteFunnelStep();
   const deleteFunnel = useDeleteFunnel();
-  const saveVariantMutation = useSaveVariant();
+  const saveVariantMutation = useSaveVariant(businessId);
 
   const selectedProduct = products.find((product) => product.id === form.productId) ?? null;
   const offerProducts = useMemo(

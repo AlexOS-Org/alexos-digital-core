@@ -59,7 +59,7 @@ export function ProductEvidencePanel() {
   const { businessId } = useDailyGearScope();
   const { data: evidence = [], isLoading } = useProductEvidence(undefined, businessId);
   const { data: products = [] } = useProducts(undefined, true, businessId);
-  const save = useSaveProductEvidence();
+  const save = useSaveProductEvidence(businessId);
   const remove = useDeleteProductEvidence();
   const [form, setForm] = useState(EMPTY);
 

@@ -65,6 +65,27 @@ interface ResourceOptions {
   businessId?: string | null;
 }
 
+/**
+ * Build the insert payload for a DailyGear resource.
+ *
+ * - `user_id` is always attached (required ownership).
+ * - `business_id` is attached only when a business is in scope: the per-call
+ *   value takes precedence over the factory default. This is the single place
+ *   that decides whether a created row is business-scoped, so it is extracted as
+ *   pure logic for testing (see dailygear/api.test.ts).
+ */
+export function buildResourceInsertPayload(
+  rest: Record<string, unknown>,
+  userId: string,
+  businessId?: string | null,
+  defaultBusinessId: string | null = null,
+): Record<string, unknown> & { user_id: string } {
+  const payload: Record<string, unknown> & { user_id: string } = { ...rest, user_id: userId };
+  const effectiveBusinessId = businessId ?? defaultBusinessId ?? null;
+  if (effectiveBusinessId) payload.business_id = effectiveBusinessId;
+  return payload;
+}
+
 function createResource<Row>(table: DgTable, options: ResourceOptions = {}) {
   const key: QueryKey = ["dailygear", table];
   const softDelete = SOFT_DELETE_TABLES.has(table);
@@ -98,7 +119,7 @@ function createResource<Row>(table: DgTable, options: ResourceOptions = {}) {
     });
   }
 
-  function useSave(label: string) {
+  function useSave(label: string, businessId?: string | null) {
     const qc = useQueryClient();
     return useMutation({
       mutationFn: async (values: Record<string, unknown> & { id?: string }) => {
@@ -114,13 +135,15 @@ function createResource<Row>(table: DgTable, options: ResourceOptions = {}) {
           return data as unknown as Row;
         }
         const user_id = await requireUserId();
+        const insertPayload = buildResourceInsertPayload(
+          rest,
+          user_id,
+          businessId,
+          defaultBusinessId,
+        );
         const { data, error } = await supabase
           .from(table)
-          .insert({
-            ...rest,
-            user_id,
-            ...(defaultBusinessId && { business_id: defaultBusinessId }),
-          } as never)
+          .insert(insertPayload as never)
           .select()
           .single();
         if (error) throw error;
@@ -204,7 +227,8 @@ export const funnelStepsResource = createResource<FunnelStep>("dg_funnel_steps",
 /* ── Convenience hooks ────────────────────────────────────────── */
 
 export const useProducts = productsResource.useList;
-export const useSaveProduct = () => productsResource.useSave("Product");
+export const useSaveProduct = (businessId?: string | null) =>
+  productsResource.useSave("Product", businessId);
 export const useDeleteProduct = () => productsResource.useRemove("Product");
 
 export const useCategories = categoriesResource.useList;
@@ -213,11 +237,13 @@ export const useSuppliers = suppliersResource.useList;
 export const useWarehouses = warehousesResource.useList;
 
 export const useCustomers = customersResource.useList;
-export const useSaveCustomer = () => customersResource.useSave("Customer");
+export const useSaveCustomer = (businessId?: string | null) =>
+  customersResource.useSave("Customer", businessId);
 export const useDeleteCustomer = () => customersResource.useRemove("Customer");
 
 export const useOrders = ordersResource.useList;
-export const useSaveOrder = () => ordersResource.useSave("Order");
+export const useSaveOrder = (businessId?: string | null) =>
+  ordersResource.useSave("Order", businessId);
 
 /** Orders in Trash are intentionally queried separately from active orders. */
 export function useTrashedOrders() {
@@ -305,19 +331,23 @@ export const useOrderItems = orderItemsResource.useList;
 export const useOrderEvents = orderEventsResource.useList;
 
 export const useStockMovements = stockMovementsResource.useList;
-export const useSaveStockMovement = () => stockMovementsResource.useSave("Stock movement");
+export const useSaveStockMovement = (businessId?: string | null) =>
+  stockMovementsResource.useSave("Stock movement", businessId);
 export const useProductEvidence = (productId?: string, businessId?: string | null) =>
   productEvidenceResource.useList(
     productId ? { product_id: productId } : undefined,
     true,
     businessId,
   );
-export const useSaveProductEvidence = () => productEvidenceResource.useSave("Evidence record");
+export const useSaveProductEvidence = (businessId?: string | null) =>
+  productEvidenceResource.useSave("Evidence record", businessId);
 export const useDeleteProductEvidence = () => productEvidenceResource.useRemove("Evidence record");
 export const useVariants = variantsResource.useList;
-export const useSaveVariant = () => variantsResource.useSave("Variant");
+export const useSaveVariant = (businessId?: string | null) =>
+  variantsResource.useSave("Variant", businessId);
 export const useFunnels = funnelsResource.useList;
-export const useSaveFunnel = () => funnelsResource.useSave("Funnel");
+export const useSaveFunnel = (businessId?: string | null) =>
+  funnelsResource.useSave("Funnel", businessId);
 export const useDeleteFunnel = () => funnelsResource.useRemove("Funnel");
 export const useFunnelSteps = (funnelId?: string, businessId?: string | null) =>
   funnelStepsResource.useList(
@@ -325,7 +355,8 @@ export const useFunnelSteps = (funnelId?: string, businessId?: string | null) =>
     Boolean(funnelId),
     businessId,
   );
-export const useSaveFunnelStep = () => funnelStepsResource.useSave("Funnel step");
+export const useSaveFunnelStep = (businessId?: string | null) =>
+  funnelStepsResource.useSave("Funnel step", businessId);
 export const useDeleteFunnelStep = () => funnelStepsResource.useRemove("Funnel step");
 
 /** Order status change + timeline entry, kept out of the components. */
@@ -602,7 +633,7 @@ function orderNumber() {
  * and stock movements. Keeping this in one mutation guarantees the order,
  * its items and inventory never drift apart.
  */
-export function useSaveOrderWithItems() {
+export function useSaveOrderWithItems(businessId?: string | null) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (draft: DraftOrder) => {
@@ -626,7 +657,8 @@ export function useSaveOrderWithItems() {
             county: draft.customer.county?.trim() || null,
             town: draft.customer.town?.trim() || null,
             notes: draft.customer.notes?.trim() || null,
-          })
+            ...(businessId && { business_id: businessId }),
+          } as never)
           .select("id")
           .single();
         if (customerError) throw customerError;
@@ -665,7 +697,11 @@ export function useSaveOrderWithItems() {
       } else {
         const { data, error } = await supabase
           .from("dg_orders")
-          .insert({ ...payload, order_number: orderNumber() })
+          .insert({
+            ...payload,
+            order_number: orderNumber(),
+            ...(businessId && { business_id: businessId }),
+          } as never)
           .select("id, order_number")
           .single();
         if (error) throw error;
@@ -692,7 +728,8 @@ export function useSaveOrderWithItems() {
             unit_price: i.unit_price,
             unit_cost: i.unit_cost,
             total: i.unit_price * i.quantity,
-          })),
+            ...(businessId && { business_id: businessId }),
+          })) as never,
         );
         if (error) throw error;
       }
