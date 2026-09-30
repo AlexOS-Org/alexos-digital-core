@@ -18,10 +18,31 @@
  * It deliberately does NOT invent a business selector UI. Business
  * context is owned globally by `BusinessContextProvider` (set via the
  * sidebar or hostname) and read here.
+ *
+ * The pure resolvers that turn an active business into the columns written on a
+ * financial row live in `./write-scope`, which imports neither React nor
+ * Supabase so it can be tested directly. They are re-exported here for the
+ * convenience of the write-path components.
  */
 
 import { useBusinessContextOptional } from "@/lib/businesses/context";
 import type { Business } from "@/lib/businesses/types";
+
+export {
+  normalizeBusinessId,
+  resolveAccountOwnership,
+  resolveExpenseScope,
+  resolveScopedWrite,
+  resolveTransactionBusinessId,
+  resolveTransactionScope,
+  transactionScopeIssue,
+} from "./write-scope";
+export type {
+  FinancialScope,
+  ScopedWriteFields,
+  TransactionMode,
+  TransactionScopeIssue,
+} from "./write-scope";
 
 export type MoneyCenterScope = {
   /** Resolved business id, or null for the portfolio view. */

@@ -17,7 +17,7 @@ import {
   CURRENCIES,
 } from "@/lib/money/constants";
 import { useSaveAccount, type Account } from "@/lib/money/api";
-import { useMoneyCenterScope } from "@/lib/money/scope";
+import { resolveAccountOwnership, useMoneyCenterScope } from "@/lib/money/scope";
 import { cn } from "@/lib/utils";
 
 type FinancialScope = "personal" | "business";
@@ -84,6 +84,8 @@ export function AccountFormDialog({ open, onOpenChange, account }: Props) {
     setNameError(null);
     setBusinessError(null);
 
+    const ownership = resolveAccountOwnership({ scope, activeBusinessId: businessId });
+
     await save.mutateAsync({
       id: account?.id,
       name: name.trim(),
@@ -91,10 +93,10 @@ export function AccountFormDialog({ open, onOpenChange, account }: Props) {
       type,
       currency,
       opening_balance: Number(opening) || 0,
-      financial_scope: scope,
-      business_id: scope === "business" ? (businessId ?? null) : null,
+      financial_scope: ownership.financial_scope,
+      business_id: ownership.business_id,
       business_name: scope === "business" ? businessName.trim() : null,
-    } as never);
+    });
     onOpenChange(false);
   };
 

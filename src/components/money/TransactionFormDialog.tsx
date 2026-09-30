@@ -19,7 +19,13 @@ import {
   useSaveTransaction,
   type Transaction,
 } from "@/lib/money/api";
-import { useMoneyCenterScope } from "@/lib/money/scope";
+import {
+  resolveExpenseScope,
+  resolveTransactionBusinessId,
+  resolveTransactionScope,
+  transactionScopeIssue,
+  useMoneyCenterScope,
+} from "@/lib/money/scope";
 import { toast } from "sonner";
 import {
   EXPENSE_CATEGORIES,
@@ -146,19 +152,20 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
     if (mode === "expense" && scope === "business" && !businessId) {
       next.business = "Select the business this expense belongs to.";
     }
-    if (mode === "expense" && accountId && !selectedAccount) {
+
+    const scopeIssue = transactionScopeIssue({
+      mode,
+      scope,
+      selectedBusinessId: businessId,
+      accountId,
+      accountScope: selectedAccount?.financial_scope,
+      accountBusinessId: selectedAccount?.business_id ?? null,
+    });
+    if (scopeIssue === "missingAccount") {
       next.account = "Select the account that paid this expense.";
-    }
-    if (mode === "expense" && selectedAccount && selectedAccount.financial_scope !== scope) {
+    } else if (scopeIssue === "scopeMismatch") {
       next.account = `Choose a ${scope} account for this expense.`;
-    }
-    if (
-      mode === "expense" &&
-      scope === "business" &&
-      businessId &&
-      selectedAccount &&
-      selectedAccount.business_id !== businessId
-    ) {
+    } else if (scopeIssue === "businessMismatch") {
       next.account = "Choose an account owned by the selected business.";
     }
 
@@ -168,13 +175,18 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
     }
     setErrors({});
 
-    const financialScope = selectedAccount?.financial_scope ?? scope;
-    const expenseScope = mode === "expense" ? scope : "personal";
     const accountBusinessId = selectedAccount?.business_id ?? null;
-    const txBusinessId =
-      mode === "expense" && scope === "business"
-        ? businessId || accountBusinessId
-        : accountBusinessId;
+    const financialScope = resolveTransactionScope({
+      scope,
+      accountScope: selectedAccount?.financial_scope,
+    });
+    const expenseScope = resolveExpenseScope({ mode, scope });
+    const txBusinessId = resolveTransactionBusinessId({
+      mode,
+      scope,
+      selectedBusinessId: businessId,
+      accountBusinessId,
+    });
 
     await save.mutateAsync({
       id: editing?.id,

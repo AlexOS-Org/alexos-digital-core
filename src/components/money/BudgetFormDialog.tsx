@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { EXPENSE_CATEGORIES } from "@/lib/money/constants";
 import { useSaveBudget, type Budget } from "@/lib/money/api";
-import { useMoneyCenterScope } from "@/lib/money/scope";
+import { resolveScopedWrite, useMoneyCenterScope } from "@/lib/money/scope";
 import { monthKey, monthLabel } from "@/lib/money/format";
 
 interface Props {
@@ -52,12 +52,14 @@ export function BudgetFormDialog({ open, onOpenChange, month, editing }: Props) 
     }
     setAmountError(null);
 
+    const scoped = resolveScopedWrite(businessId);
+
     await save.mutateAsync({
       id: editing?.id,
       category,
       month: month || monthKey(),
       amount: value,
-      business_id: businessId ?? null,
+      business_id: scoped.business_id,
     });
 
     onOpenChange(false);
