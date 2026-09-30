@@ -35,7 +35,7 @@ function AccountsPage() {
   const { businessId } = useMoneyCenterScope();
   const [showArchived, setShowArchived] = useState(false);
   const { data: accounts = [], isLoading } = useAccounts(showArchived, businessId);
-  const { data: balances = [] } = useAccountBalances();
+  const { data: balances = [] } = useAccountBalances(businessId);
   const liveBinance = useLiveBinanceBalance();
   const archive = useArchiveAccount();
   const [open, setOpen] = useState(false);

@@ -186,15 +186,32 @@ export function useAccounts(includeArchived = false, businessId?: string | null)
   });
 }
 
-export function useAccountBalances() {
+export function useAccountBalances(businessId?: string | null) {
   return useQuery({
-    queryKey: ["account_balances"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("account_balances").select("*");
+    queryKey: ["account_balances", businessId ?? null],
+    queryFn: async (): Promise<AccountBalance[]> => {
+      let q = supabase.from("account_balances").select("*");
+
+      if (businessId) {
+        const { data: accountRows, error: accountError } = await supabase
+          .from("accounts")
+          .select("id")
+          .eq("business_id", businessId)
+          .is("deleted_at", null);
+        if (accountError) throw accountError;
+        const accountIds = (accountRows ?? []).map((a) => a.id);
+        q = q.in("account_id", accountIds);
+      }
+
+      const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as AccountBalance[];
     },
   });
+}
+
+export function useAccountBalancesKey(businessId?: string | null) {
+  return ["account_balances", businessId ?? null] as const;
 }
 
 export function useSaveAccount() {

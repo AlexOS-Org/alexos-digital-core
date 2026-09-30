@@ -29,7 +29,7 @@ function AnalyticsPage() {
   const { businessId } = useMoneyCenterScope();
   const { data: txs = [] } = useTransactions({ businessId });
   const { data: accounts = [] } = useAccounts(false, businessId);
-  const { data: balances = [] } = useAccountBalances();
+  const { data: balances = [] } = useAccountBalances(businessId);
   const { data: budgets = [] } = useBudgets(monthKey(), businessId);
   const { data: expected = [] } = useExpected(undefined, businessId);
   const currencySafety = useMemo(() => summarizeCurrencySafety(accounts), [accounts]);
