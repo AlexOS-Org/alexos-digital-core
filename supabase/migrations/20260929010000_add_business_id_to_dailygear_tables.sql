@@ -9,6 +9,7 @@ declare
   has_slug boolean;
   tbl text;
   col_exists boolean;
+  user_col_exists boolean;
 begin
   -- Detect whether businesses table is post-reconciliation (has 'slug' column)
   select exists (
@@ -40,13 +41,20 @@ begin
       where table_schema = 'public' and table_name = tbl and column_name = 'business_id'
     ) into col_exists;
 
+    select exists (
+      select 1 from information_schema.columns
+      where table_schema = 'public' and table_name = tbl and column_name = 'user_id'
+    ) into user_col_exists;
+
     if not col_exists then
       execute format('alter table public.%I add column business_id text', tbl);
       execute format('comment on column public.%I.business_id is ''Links this record to public.businesses.id (UUID or legacy text slug)''', tbl);
     end if;
 
-    -- Backfill existing records by joining on user_id
-    if has_slug then
+    -- Backfill existing records by joining on user_id when the table has one.
+    -- Anonymous cart sessions intentionally have no user_id, so their
+    -- business_id remains null until an authenticated ownership relation exists.
+    if user_col_exists and has_slug then
       -- Post-reconciliation: businesses have slug column
       execute format(
         $sql$
@@ -64,7 +72,7 @@ begin
         )
         $sql$, tbl
       );
-    else
+    elsif user_col_exists then
       -- Pre-reconciliation: businesses.id is a legacy text slug
       execute format(
         $sql$
