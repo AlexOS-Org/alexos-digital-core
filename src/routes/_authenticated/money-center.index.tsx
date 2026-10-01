@@ -4,8 +4,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AlexOSEmptyState } from "@/components/alexos/states";
 import { QuickActions } from "@/components/money/QuickActions";
 import { MoneyAllocationPanel } from "@/components/money/MoneyAllocationPanel";
-import { useAccountBalances, useAccounts, useExpected, useTransactions } from "@/lib/money/api";
+import {
+  useAccountBalances,
+  useAccounts,
+  useAssets,
+  useCryptoHoldings,
+  useExpected,
+  useTransactions,
+} from "@/lib/money/api";
 import { useBills } from "@/lib/money/bills";
+import { useDebts } from "@/lib/debts/api";
 import { getAccountLogo, getInstitutionStyle } from "@/lib/money/institution-branding";
 import { formatDate, formatMoney, formatTime } from "@/lib/money/format";
 import {
@@ -24,6 +32,7 @@ import type { AlexOSTone } from "@/lib/ui/status";
 import { useBalanceVisibility } from "@/components/money/BalanceVisibility";
 import { BINANCE_WITHDRAWAL_MINIMUM_KES, useLiveBinanceBalance } from "@/lib/money/crypto-prices";
 import { WeeklyCashSummary } from "@/components/money/WeeklyCashSummary";
+import { calculateNetWorth } from "@/lib/money/net-worth";
 
 export const Route = createFileRoute("/_authenticated/money-center/")({
   component: MoneyDashboard,
@@ -40,6 +49,9 @@ function MoneyDashboard() {
   };
   const { data: accounts = [], isLoading: accLoading } = useAccounts();
   const { data: balances = [] } = useAccountBalances();
+  const { data: assets = [] } = useAssets();
+  const { data: cryptoHoldings = [] } = useCryptoHoldings();
+  const { data: debts = [] } = useDebts();
   const liveBinance = useLiveBinanceBalance();
   const { data: txs = [] } = useTransactions({ limit: 8 });
   const { data: pendingExpected = [] } = useExpected("pending");
@@ -47,12 +59,21 @@ function MoneyDashboard() {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   const { data: monthTx = [] } = useTransactions({ from: monthStart });
+  const netWorth = calculateNetWorth({
+    accounts,
+    balances,
+    assets,
+    cryptoHoldings,
+    debts,
+    expected: pendingExpected,
+  });
 
   const accountCurrencies = [
     ...new Set(accounts.map((account) => account.currency).filter(Boolean)),
   ];
   const aggregateCurrency = accountCurrencies.length === 1 ? accountCurrencies[0] : null;
   const total = aggregateCurrency ? balances.reduce((s, b) => s + Number(b.balance), 0) : null;
+  const netWorthTotal = netWorth.displayable ? netWorth.total.netWorth : null;
   const incomeMonth = aggregateCurrency
     ? monthTx.filter((t) => t.type === "income").reduce((s, t) => s + Number(t.amount), 0)
     : null;
@@ -177,9 +198,9 @@ function MoneyDashboard() {
           <div className="flex flex-wrap items-start justify-between gap-5">
             <div className="min-w-0">
               <p className="dashboard-eyebrow">Money Center</p>
-              <p className="mt-3 text-sm text-white/65">Your financial position right now</p>
+              <p className="mt-3 text-sm text-white/65">Your true financial position right now</p>
               <h1 className="alexos-amount mt-1 text-4xl tracking-tight sm:text-5xl">
-                {displayMoney(total, aggregateCurrency)}
+                {netWorthTotal === null ? "Data not available" : displayMoney(netWorthTotal, "KES")}
               </h1>
             </div>
             <div className="rounded-xl border border-white/10 bg-black/15 px-4 py-3">
@@ -218,6 +239,46 @@ function MoneyDashboard() {
               </div>
             ))}
           </dl>
+
+          <dl className="mt-3 grid gap-3 sm:grid-cols-4">
+            {[
+              {
+                label: "Personal net worth",
+                value: netWorth.displayable
+                  ? displayMoney(netWorth.personal.netWorth, "KES")
+                  : "Data not available",
+              },
+              {
+                label: "Business net worth",
+                value: netWorth.displayable
+                  ? displayMoney(netWorth.business.netWorth, "KES")
+                  : "Data not available",
+              },
+              {
+                label: "Owned assets",
+                value: netWorth.displayable
+                  ? displayMoney(netWorth.total.assets, "KES")
+                  : "Data not available",
+              },
+              {
+                label: "Outstanding principal",
+                value: netWorth.displayable
+                  ? displayMoney(netWorth.total.liabilities, "KES")
+                  : "Data not available",
+              },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="rounded-lg border border-white/10 bg-white/[0.06] p-3.5"
+              >
+                <dt className="text-xs text-white/60">{item.label}</dt>
+                <dd className="alexos-amount mt-1 text-lg">{item.value}</dd>
+              </div>
+            ))}
+          </dl>
+          {!netWorth.displayable ? (
+            <p className="mt-3 text-xs text-white/60">{netWorth.unavailableReason}</p>
+          ) : null}
 
           <div className="mt-5">
             <div

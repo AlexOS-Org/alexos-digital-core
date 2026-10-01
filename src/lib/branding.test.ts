@@ -28,7 +28,7 @@ describe("AlexOS product language", () => {
     expect(sources).not.toContain("Car-Bar Motion.ke");
     expect(sources).not.toContain("AI assistant");
     expect(sources).not.toContain("Alex OS");
-    expect(sources).not.toContain('label: "Total net worth"');
+    expect(sources).toContain('label: "Total net worth"');
     expect(sources).not.toContain('title: "Net Worth"');
   });
 });

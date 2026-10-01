@@ -18,6 +18,7 @@ import type {
 import type { Account, AccountBalance, Transaction } from "@/lib/money/api";
 import type { Lead } from "@/lib/crm/types";
 import { summarizeCurrencySafety } from "@/lib/money/currency-safety";
+import { calculateNetWorth } from "@/lib/money/net-worth";
 
 const num = (value: unknown) => {
   const n = typeof value === "string" ? parseFloat(value) : Number(value ?? 0);
@@ -47,6 +48,14 @@ function inMonth(date: Date, year: number, month: number) {
 
 export function computeMoneyMetrics(snapshot: DashboardSnapshot, now = new Date()): MoneyMetrics {
   const { accounts, balances, transactions, expected, bills, debts } = snapshot;
+  const netWorth = calculateNetWorth({
+    accounts,
+    balances,
+    assets: snapshot.assets,
+    cryptoHoldings: snapshot.cryptoHoldings,
+    debts,
+    expected,
+  });
 
   const cashAvailable = balances.reduce((sum, b: AccountBalance) => sum + num(b.balance), 0);
 
@@ -124,6 +133,13 @@ export function computeMoneyMetrics(snapshot: DashboardSnapshot, now = new Date(
       0,
     ),
     expectedPendingCount: pendingExpected.length,
+    netWorth: netWorth.total.netWorth,
+    personalNetWorth: netWorth.personal.netWorth,
+    businessNetWorth: netWorth.business.netWorth,
+    totalAssets: netWorth.total.assets,
+    expectedPosition: netWorth.expectedPosition,
+    netWorthAvailable: netWorth.displayable,
+    netWorthUnavailableReason: netWorth.unavailableReason,
   };
 }
 

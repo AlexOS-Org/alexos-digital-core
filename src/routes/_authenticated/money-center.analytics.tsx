@@ -6,14 +6,18 @@ import { AlexOSPageHeader } from "@/components/alexos/page-header";
 import {
   useAccountBalances,
   useAccounts,
+  useAssets,
+  useCryptoHoldings,
   useBudgets,
   useExpected,
   useTransactions,
 } from "@/lib/money/api";
 import { useMoneyCenterScope } from "@/lib/money/scope";
+import { useDebts } from "@/lib/debts/api";
 import { formatMoney, monthKey } from "@/lib/money/format";
 import { normalizeExpenseCategory } from "@/lib/money/constants";
 import { summarizeCurrencySafety } from "@/lib/money/currency-safety";
+import { calculateNetWorth } from "@/lib/money/net-worth";
 
 const MoneyCenterCharts = lazy(() =>
   import("@/components/money/MoneyCenterCharts").then((module) => ({
@@ -32,7 +36,26 @@ function AnalyticsPage() {
   const { data: balances = [] } = useAccountBalances(businessId);
   const { data: budgets = [] } = useBudgets(monthKey(), businessId);
   const { data: expected = [] } = useExpected(undefined, businessId);
+  const { data: assets = [] } = useAssets();
+  const { data: cryptoHoldings = [] } = useCryptoHoldings();
+  const { data: debts = [] } = useDebts(false, businessId);
+  const scopedAssets = businessId
+    ? assets.filter((asset) => asset.business_id === businessId)
+    : assets;
+  const scopedCryptoHoldings = businessId ? [] : cryptoHoldings;
   const currencySafety = useMemo(() => summarizeCurrencySafety(accounts), [accounts]);
+  const netWorth = useMemo(
+    () =>
+      calculateNetWorth({
+        accounts,
+        balances,
+        assets: scopedAssets,
+        cryptoHoldings: scopedCryptoHoldings,
+        debts,
+        expected,
+      }),
+    [accounts, balances, scopedAssets, scopedCryptoHoldings, debts, expected],
+  );
 
   const monthly = useMemo(() => {
     const map = new Map<string, { month: string; income: number; expense: number }>();
@@ -98,22 +121,8 @@ function AnalyticsPage() {
     balance: Number(b.balance),
   }));
 
-  const netWorthTrend = useMemo(() => {
-    const sorted = [...txs]
-      .filter((t) => t.status === "posted")
-      .sort((a, b) => new Date(a.occurred_at).getTime() - new Date(b.occurred_at).getTime());
-    const opening = accounts.reduce((sum, account) => sum + Number(account.opening_balance), 0);
-    let running = opening;
-    const map = new Map<string, number>();
-    for (const t of sorted) {
-      const key = t.occurred_at.slice(0, 10);
-      if (t.type === "income") running += Number(t.amount);
-      else if (t.type === "expense") running -= Number(t.amount);
-      else if (t.type === "adjustment") running += Number(t.amount);
-      map.set(key, running);
-    }
-    return [...map.entries()].slice(-60).map(([date, value]) => ({ date, value }));
-  }, [txs, accounts]);
+  // No valuation-history table exists yet. Do not present a cashflow-derived line as true net worth.
+  const netWorthTrend: { date: string; value: number }[] = [];
 
   const expectedVsReceived = useMemo(() => {
     const pending = expected
@@ -162,6 +171,11 @@ function AnalyticsPage() {
             budgetActual={budgetActual}
             accountBalanceData={accountBalanceData}
             netWorthTrend={netWorthTrend}
+            currentNetWorth={netWorth.total.netWorth}
+            personalNetWorth={netWorth.personal.netWorth}
+            businessNetWorth={netWorth.business.netWorth}
+            netWorthAvailable={netWorth.displayable}
+            netWorthUnavailableReason={netWorth.unavailableReason}
             expectedVsReceived={expectedVsReceived}
             expectedCount={expected.length}
             money={money}

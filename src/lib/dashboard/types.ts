@@ -4,6 +4,7 @@ import type { Debt } from "@/lib/debts/api";
 import type { Goal, GoalProgress } from "@/lib/goals/api";
 import type { Contact, Lead } from "@/lib/crm/types";
 import type { CurrencySafetySummary } from "@/lib/money/currency-safety";
+import type { Asset, CryptoHolding } from "@/lib/money/net-worth-types";
 
 export interface DashboardSnapshot {
   accounts: Account[];
@@ -12,6 +13,8 @@ export interface DashboardSnapshot {
   expected: Expected[];
   bills: Bill[];
   debts: Debt[];
+  assets: Asset[];
+  cryptoHoldings: CryptoHolding[];
   goals: Goal[];
   goalProgress: GoalProgress[];
   contacts: Contact[];
@@ -37,6 +40,13 @@ export interface MoneyMetrics {
   overdueBills: Bill[];
   expectedWeighted: number;
   expectedPendingCount: number;
+  netWorth: number;
+  personalNetWorth: number;
+  businessNetWorth: number;
+  totalAssets: number;
+  expectedPosition: number;
+  netWorthAvailable: boolean;
+  netWorthUnavailableReason: string | null;
 }
 
 export interface BusinessMetrics {

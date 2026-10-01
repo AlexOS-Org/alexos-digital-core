@@ -133,9 +133,9 @@ export function MobileMetricTiles() {
     metrics.business.staleLeads.length;
   const tiles = [
     {
-      label: "Money",
-      value: moneyValue(metrics.money.cashAvailable),
-      detail: "Cash available",
+      label: "Net worth",
+      value: metrics.money.netWorthAvailable ? moneyValue(metrics.money.netWorth) : "Data n/a",
+      detail: "Cash + assets − debt",
       icon: WalletCards,
       tone: "dashboard-tone-green dashboard-tone-icon",
       to: "/money-center",
