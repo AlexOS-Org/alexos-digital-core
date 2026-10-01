@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { carryForwardBudgets } from "./budget-calculations";
 import type { ExpenseScope } from "./constants";
 import { buildReceivedExpectedTransaction } from "./expected-money";
+import { resolveScopedWrite } from "./write-scope";
 
 export interface Account {
   id: string;
@@ -68,6 +69,7 @@ export interface Budget {
   month: string;
   amount: number;
   deleted_at: string | null;
+  business_id?: string | null;
 }
 
 export interface Expected {
@@ -185,11 +187,36 @@ export function useAccounts(includeArchived = false, businessId?: string | null)
   });
 }
 
-export function useAccountBalances() {
+/**
+ * Cache key for account balances.
+ *
+ * `account_balances` is a view with no `business_id` column, so a
+ * business-scoped balance read is scoped by resolving the business's accounts
+ * first and filtering on exact `account_id` membership. The business id is part
+ * of the key so two businesses never share a cached balance set.
+ */
+export function accountBalancesQueryKey(businessId?: string | null) {
+  return ["account_balances", businessId ?? null] as const;
+}
+
+export function useAccountBalances(businessId?: string | null) {
   return useQuery({
-    queryKey: ["account_balances"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("account_balances").select("*");
+    queryKey: accountBalancesQueryKey(businessId),
+    queryFn: async (): Promise<AccountBalance[]> => {
+      let q = supabase.from("account_balances").select("*");
+
+      if (businessId) {
+        const { data: accountRows, error: accountError } = await supabase
+          .from("accounts")
+          .select("id")
+          .eq("business_id", businessId)
+          .is("deleted_at", null);
+        if (accountError) throw accountError;
+        const accountIds = (accountRows ?? []).map((a) => a.id);
+        q = q.in("account_id", accountIds);
+      }
+
+      const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as AccountBalance[];
     },
@@ -366,26 +393,55 @@ export function useBudgets(month: string, businessId?: string | null) {
   });
 }
 
+/**
+ * Upsert conflict target for budgets.
+ *
+ * This MUST match `budgets_user_business_category_month_unique`, added by
+ * 20260930090000_business_aware_budget_uniqueness.sql as
+ * `unique nulls not distinct (user_id, business_id, category, month)`.
+ *
+ * The previous target, `user_id,category,month`, matched the original
+ * three-column constraint and had no business dimension at all. Because a
+ * budget is now written with a business_id, that key let a second business
+ * silently overwrite the first business's row -- both its amount and its
+ * business_id. Including business_id is what keeps each business's budget
+ * independent; NULLS NOT DISTINCT on the database side is what keeps exactly
+ * one personal budget in that same position.
+ */
+export const BUDGET_UPSERT_CONFLICT = "user_id,business_id,category,month";
+
 export function useSaveBudget() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { id?: string; category: string; month: string; amount: number }) => {
+    mutationFn: async (input: {
+      id?: string;
+      category: string;
+      month: string;
+      amount: number;
+      business_id?: string | null;
+    }) => {
       const user_id = await uid();
       if (input.id) {
+        // Editing an existing budget changes only its amount. Its business
+        // dimension is part of the row's identity, so it is deliberately not
+        // rewritten here; moving a budget between businesses is not an edit.
         const { error } = await supabase
           .from("budgets")
           .update({ amount: input.amount })
           .eq("id", input.id);
         if (error) throw error;
       } else {
+        const { business_id, financial_scope } = resolveScopedWrite(input.business_id ?? null);
         const { error } = await supabase.from("budgets").upsert(
           {
             user_id,
             category: input.category,
             month: input.month,
             amount: input.amount,
+            business_id,
+            financial_scope,
           },
-          { onConflict: "user_id,category,month" },
+          { onConflict: BUDGET_UPSERT_CONFLICT },
         );
         if (error) throw error;
       }

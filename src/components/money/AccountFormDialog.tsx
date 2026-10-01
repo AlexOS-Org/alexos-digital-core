@@ -17,6 +17,7 @@ import {
   CURRENCIES,
 } from "@/lib/money/constants";
 import { useSaveAccount, type Account } from "@/lib/money/api";
+import { resolveAccountOwnership, useMoneyCenterScope } from "@/lib/money/scope";
 import { cn } from "@/lib/utils";
 
 type FinancialScope = "personal" | "business";
@@ -33,6 +34,7 @@ interface Props {
 
 export function AccountFormDialog({ open, onOpenChange, account }: Props) {
   const save = useSaveAccount();
+  const { businessId, business } = useMoneyCenterScope();
   const existing = account as AccountOwnership | null | undefined;
   const [name, setName] = useState("");
   const [icon, setIcon] = useState("wallet");
@@ -58,10 +60,17 @@ export function AccountFormDialog({ open, onOpenChange, account }: Props) {
       setType(account?.type ?? "bank");
       setCurrency(account?.currency ?? "KES");
       setOpening(String(account?.opening_balance ?? 0));
-      setScope(existing?.financial_scope ?? "personal");
-      setBusinessName(existing?.business_name ?? "");
+      setScope(existing?.financial_scope ?? (businessId ? "business" : "personal"));
+      setBusinessName(existing?.business_name ?? business?.name ?? "");
     }
-  }, [open, account, existing?.business_name, existing?.financial_scope]);
+  }, [
+    open,
+    account,
+    existing?.business_name,
+    existing?.financial_scope,
+    businessId,
+    business?.name,
+  ]);
 
   const submit = async () => {
     if (!name.trim()) {
@@ -75,6 +84,8 @@ export function AccountFormDialog({ open, onOpenChange, account }: Props) {
     setNameError(null);
     setBusinessError(null);
 
+    const ownership = resolveAccountOwnership({ scope, activeBusinessId: businessId });
+
     await save.mutateAsync({
       id: account?.id,
       name: name.trim(),
@@ -82,9 +93,10 @@ export function AccountFormDialog({ open, onOpenChange, account }: Props) {
       type,
       currency,
       opening_balance: Number(opening) || 0,
-      financial_scope: scope,
+      financial_scope: ownership.financial_scope,
+      business_id: ownership.business_id,
       business_name: scope === "business" ? businessName.trim() : null,
-    } as never);
+    });
     onOpenChange(false);
   };
 

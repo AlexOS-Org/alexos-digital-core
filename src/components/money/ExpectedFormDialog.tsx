@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { EXPECTED_SOURCES } from "@/lib/money/constants";
 import { useSaveExpected, type Expected } from "@/lib/money/api";
+import { resolveScopedWrite, useMoneyCenterScope } from "@/lib/money/scope";
 import { Slider } from "@/components/ui/slider";
 
 interface Props {
@@ -23,6 +24,7 @@ interface Props {
 
 export function ExpectedFormDialog({ open, onOpenChange, editing }: Props) {
   const save = useSaveExpected();
+  const { businessId } = useMoneyCenterScope();
   const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 10));
   const [source, setSource] = useState<string>(EXPECTED_SOURCES[0]);
   const [amount, setAmount] = useState("");
@@ -55,6 +57,7 @@ export function ExpectedFormDialog({ open, onOpenChange, editing }: Props) {
       return;
     }
     setAmountError(null);
+    const scoped = resolveScopedWrite(businessId);
     await save.mutateAsync({
       id: editing?.id,
       expected_date: date,
@@ -62,6 +65,7 @@ export function ExpectedFormDialog({ open, onOpenChange, editing }: Props) {
       amount: amt,
       probability,
       description: description || null,
+      business_id: scoped.business_id,
     });
     onOpenChange(false);
   };
