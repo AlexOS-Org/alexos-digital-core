@@ -24,7 +24,7 @@ import {
   debtProgress,
   type Debt,
 } from "@/lib/debts/api";
-
+import { useMoneyCenterScope } from "@/lib/money/scope";
 import { formatMoney, formatDate } from "@/lib/money/format";
 import { DebtFormDialog } from "@/components/debts/DebtFormDialog";
 import { DebtPaymentDialog } from "@/components/debts/DebtPaymentDialog";
@@ -41,7 +41,8 @@ const priorityTone: Record<Debt["priority"], string> = {
 };
 
 function DebtsPage() {
-  const { data: debts = [], isLoading } = useDebts();
+  const { businessId } = useMoneyCenterScope();
+  const { data: debts = [], isLoading } = useDebts(false, businessId);
 
   const archive = useArchiveDebt();
 

@@ -112,6 +112,7 @@ export function useSaveDebt() {
           flow_type: "loan_received",
           financial_scope: input.financial_scope ?? "personal",
           business_name: input.business_name || null,
+          business_id: input.business_id ?? null,
         } as never);
 
         if (txError) throw txError;
@@ -192,6 +193,7 @@ export function useRecordDebtPayment() {
           interest_amount: 0,
           financial_scope: scope,
           business_name: debt.business_name,
+          business_id: debt.business_id,
         } as never);
 
         if (principalError) throw principalError;
@@ -213,6 +215,7 @@ export function useRecordDebtPayment() {
           interest_amount: interest,
           financial_scope: scope,
           business_name: debt.business_name,
+          business_id: debt.business_id,
         } as never);
 
         if (interestError) throw interestError;

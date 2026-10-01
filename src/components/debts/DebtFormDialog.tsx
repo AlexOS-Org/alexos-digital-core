@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { useSaveDebt, type Debt, type FinancialScope } from "@/lib/debts/api";
 import { useAccounts } from "@/lib/money/api";
+import { useMoneyCenterScope } from "@/lib/money/scope";
 
 interface Props {
   open: boolean;
@@ -30,6 +31,7 @@ const CATEGORIES = ["Loan", "Credit Card", "Mortgage", "Family", "Business", "Ot
 
 export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
   const save = useSaveDebt();
+  const { businessId, business } = useMoneyCenterScope();
   const { data: accounts = [] } = useAccounts();
   const [name, setName] = useState("");
   const [category, setCategory] = useState<string>("Loan");
@@ -57,11 +59,11 @@ export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
       setPriority(debt?.priority ?? "medium");
       setStatus(debt?.status ?? "active");
       setNotes(debt?.notes ?? "");
-      setScope(debt?.financial_scope ?? "personal");
-      setBusinessName(debt?.business_name ?? "");
+      setScope(debt?.financial_scope ?? (businessId ? "business" : "personal"));
+      setBusinessName(debt?.business_name ?? business?.name ?? "");
       setDisbursementAccountId(debt?.disbursement_account_id ?? "");
     }
-  }, [open, debt]);
+  }, [open, debt, businessId, business?.name]);
 
   const submit = async () => {
     if (!name.trim()) return;
@@ -82,6 +84,7 @@ export function DebtFormDialog({ open, onOpenChange, debt }: Props) {
       notes: notes.trim() || null,
       financial_scope: scope,
       business_name: scope === "business" ? businessName.trim() : null,
+      business_id: scope === "business" ? (businessId ?? null) : null,
       disbursement_account_id: disbursementAccountId || null,
       disbursementAccountId: disbursementAccountId || null,
     });
