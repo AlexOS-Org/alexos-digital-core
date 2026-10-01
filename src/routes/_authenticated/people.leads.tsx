@@ -25,6 +25,7 @@ import {
   Target,
   Trophy,
   GripVertical,
+  Search,
 } from "lucide-react";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
@@ -33,9 +34,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useContacts, useLeads, useUpdateLeadStage } from "@/lib/crm/api";
 import { LEAD_STAGES } from "@/lib/crm/constants";
+import { filterLeads } from "@/lib/crm/lead-filters";
 import { contactDisplayName, formatCurrency } from "@/lib/crm/utils";
 import { LeadFormDialog } from "@/components/crm/LeadFormDialog";
 import type { Lead, LeadStage } from "@/lib/crm/types";
+import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/_authenticated/people/leads")({
   component: LeadsPipelinePage,
@@ -57,10 +60,15 @@ function LeadsPipelinePage() {
   const updateStage = useUpdateLeadStage();
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const [defaultStage, setDefaultStage] = useState<LeadStage | undefined>();
   const [activeLead, setActiveLead] = useState<Lead | null>(null);
 
   const contactMap = useMemo(() => new Map(contacts.map((c) => [c.id, c])), [contacts]);
+  const visibleLeads = useMemo(
+    () => filterLeads(leads, contactMap, search),
+    [leads, contactMap, search],
+  );
   const byStage = useMemo(() => {
     const groups: Record<LeadStage, Lead[]> = {
       new: [],
@@ -71,9 +79,9 @@ function LeadsPipelinePage() {
       won: [],
       lost: [],
     };
-    leads.forEach((l) => groups[l.stage ?? "new"].push(l));
+    visibleLeads.forEach((l) => groups[l.stage ?? "new"].push(l));
     return groups;
-  }, [leads]);
+  }, [visibleLeads]);
 
   const totals = useMemo(() => {
     const t: Record<LeadStage, number> = {
@@ -85,15 +93,17 @@ function LeadsPipelinePage() {
       won: 0,
       lost: 0,
     };
-    leads.forEach((l) => {
+    visibleLeads.forEach((l) => {
       t[l.stage ?? "new"] += Number(l.value ?? 0);
     });
     return t;
-  }, [leads]);
+  }, [visibleLeads]);
 
   const pipelineSummary = useMemo(() => {
     const openStages: LeadStage[] = ["new", "contacted", "qualified", "proposal", "negotiation"];
-    const openLeads = leads.filter((lead) => lead.stage != null && openStages.includes(lead.stage));
+    const openLeads = visibleLeads.filter(
+      (lead) => lead.stage != null && openStages.includes(lead.stage),
+    );
     const openValue = openLeads.reduce((sum, lead) => sum + Number(lead.value ?? 0), 0);
     const weightedValue = openLeads.reduce(
       (sum, lead) => sum + (Number(lead.value ?? 0) * Number(lead.probability ?? 0)) / 100,
@@ -105,7 +115,7 @@ function LeadsPipelinePage() {
       weightedValue,
       wonValue: totals.won,
     };
-  }, [leads, totals.won]);
+  }, [visibleLeads, totals.won]);
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
@@ -146,6 +156,17 @@ function LeadsPipelinePage() {
         </Button>
       </div>
 
+      <div className="relative max-w-xl">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search opportunities, contacts, companies..."
+          aria-label="Search opportunities"
+          className="pl-9"
+        />
+      </div>
+
       {isLoading ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -183,22 +204,28 @@ function LeadsPipelinePage() {
             <Skeleton key={s.value} className="h-64 w-full" />
           ))}
         </div>
-      ) : leads.length === 0 ? (
+      ) : visibleLeads.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center">
             <KanbanSquare className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h2 className="text-lg font-semibold">No opportunities yet</h2>
+            <h2 className="text-lg font-semibold">
+              {search.trim() ? "No matching opportunities" : "No opportunities yet"}
+            </h2>
             <p className="text-muted-foreground mt-1 mb-4">
-              Track revenue opportunities from first touch to close.
+              {search.trim()
+                ? "Try a different opportunity, contact, or company search."
+                : "Track revenue opportunities from first touch to close."}
             </p>
-            <Button
-              onClick={() => {
-                setDefaultStage("new");
-                setDialogOpen(true);
-              }}
-            >
-              <Plus className="mr-2 h-4 w-4" /> Create your first opportunity
-            </Button>
+            {!search.trim() ? (
+              <Button
+                onClick={() => {
+                  setDefaultStage("new");
+                  setDialogOpen(true);
+                }}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Create your first opportunity
+              </Button>
+            ) : null}
           </CardContent>
         </Card>
       ) : (
