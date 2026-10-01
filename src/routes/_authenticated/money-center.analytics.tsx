@@ -39,7 +39,9 @@ function AnalyticsPage() {
   const { data: assets = [] } = useAssets();
   const { data: cryptoHoldings = [] } = useCryptoHoldings();
   const { data: debts = [] } = useDebts(false, businessId);
-  const scopedAssets = businessId ? assets.filter((asset) => asset.business_id === businessId) : assets;
+  const scopedAssets = businessId
+    ? assets.filter((asset) => asset.business_id === businessId)
+    : assets;
   const scopedCryptoHoldings = businessId ? [] : cryptoHoldings;
   const currencySafety = useMemo(() => summarizeCurrencySafety(accounts), [accounts]);
   const netWorth = useMemo(

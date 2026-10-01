@@ -24,7 +24,6 @@ export interface Debt {
   financial_scope: FinancialScope;
   business_id: string | null;
   business_name: string | null;
-  business_id: string | null;
   disbursement_account_id: string | null;
 }
 
