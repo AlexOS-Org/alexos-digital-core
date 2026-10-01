@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -8,14 +8,24 @@ import { AlexOSMetricCard } from "@/components/alexos/metric-card";
 import { AlexOSEmptyState } from "@/components/alexos/states";
 import { AlexOSPageHeader } from "@/components/alexos/page-header";
 import { AlexOSStatusBadge } from "@/components/alexos/status-badge";
-import { useArchiveBudget, useBudgets, useTransactions, type Budget } from "@/lib/money/api";
+import {
+  useAccounts,
+  useArchiveBudget,
+  useBudgets,
+  useTransactions,
+  type Budget,
+} from "@/lib/money/api";
 import { useMoneyCenterScope } from "@/lib/money/scope";
 import { formatMoney, monthKey, monthLabel } from "@/lib/money/format";
 import { BudgetFormDialog } from "@/components/money/BudgetFormDialog";
 import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { normalizeExpenseCategory } from "@/lib/money/constants";
-import { spentForBudgetCategory } from "@/lib/money/budget-calculations";
+import {
+  calculateBudget,
+  calculateConsolidatedBudgets,
+  type BudgetExpense,
+} from "@/lib/money/budget-calculations";
 
 export const Route = createFileRoute("/_authenticated/money-center/budgets")({
   component: BudgetsPage,
@@ -33,6 +43,7 @@ function BudgetsPage() {
   const [editing, setEditing] = useState<Budget | null>(null);
   const { businessId } = useMoneyCenterScope();
   const { data: budgets = [] } = useBudgets(month, businessId);
+  const { data: accounts = [] } = useAccounts(false, businessId);
   const archive = useArchiveBudget();
 
   const monthStart = month;
@@ -44,20 +55,20 @@ function BudgetsPage() {
     toExclusive: monthEnd,
   });
 
-  const spentByCat = useMemo(() => {
-    const map: Record<string, number> = {};
-    for (const t of txs) {
-      const k = normalizeExpenseCategory(t.category);
-      map[k] = (map[k] ?? 0) + Number(t.amount);
-    }
-    return map;
-  }, [txs]);
+  const period = { from: `${month}T00:00:00.000Z`, toExclusive: `${monthEnd}T00:00:00.000Z` };
+  const accountCurrencies = accounts.map((account) => ({
+    id: account.id,
+    currency: account.currency,
+    status: account.status,
+    financial_scope: account.financial_scope,
+    business_id: account.business_id,
+  }));
+  const expenses = txs.map((transaction) => ({
+    ...transaction,
+    category: normalizeExpenseCategory(transaction.category),
+  })) satisfies BudgetExpense[];
 
-  const totals = useMemo(() => {
-    const budget = budgets.reduce((s, b) => s + Number(b.amount), 0);
-    const spent = budgets.reduce((s, b) => s + spentForBudgetCategory(spentByCat, b.category), 0);
-    return { budget, spent, remaining: budget - spent };
-  }, [budgets, spentByCat]);
+  const totals = calculateConsolidatedBudgets(budgets, expenses, period, accountCurrencies);
 
   const openNew = () => {
     setEditing(null);
@@ -121,21 +132,45 @@ function BudgetsPage() {
         <AlexOSMetricCard
           label="Budgeted"
           hint="Total of all limits this month"
-          value={formatMoney(totals.budget)}
+          value={
+            budgets.length === 0
+              ? "No data"
+              : totals.budgeted === null
+                ? "Unavailable"
+                : formatMoney(totals.budgeted)
+          }
           tone="neutral"
           emphasis
         />
         <AlexOSMetricCard
           label="Spent"
           hint="Against budgeted categories"
-          value={formatMoney(totals.spent)}
+          value={
+            budgets.length === 0
+              ? "No data"
+              : totals.actual === null
+                ? "Unavailable"
+                : formatMoney(totals.actual)
+          }
           tone="expense"
         />
         <AlexOSMetricCard
           label="Remaining"
-          hint={totals.remaining >= 0 ? "Still available" : "Over the combined limit"}
-          value={formatMoney(totals.remaining)}
-          tone={totals.remaining >= 0 ? "income" : "expense"}
+          hint={
+            totals.state === "no_activity"
+              ? "No qualifying expenses this month"
+              : totals.remaining !== null && totals.remaining >= 0
+                ? "Still available"
+                : "Over the combined limit"
+          }
+          value={
+            budgets.length === 0
+              ? "No data"
+              : totals.remaining === null
+                ? "Unavailable"
+                : formatMoney(totals.remaining)
+          }
+          tone={totals.remaining !== null && totals.remaining >= 0 ? "income" : "expense"}
         />
       </div>
 
@@ -154,22 +189,46 @@ function BudgetsPage() {
           </div>
         ) : null}
         {budgets.map((b) => {
-          const spent = spentForBudgetCategory(spentByCat, b.category);
-          const remaining = Number(b.amount) - spent;
-          const pct = b.amount > 0 ? Math.min(100, (spent / Number(b.amount)) * 100) : 0;
-          const over = spent > Number(b.amount);
+          const calculation = calculateBudget({
+            budget: b,
+            expenses,
+            period,
+            accountCurrencies,
+          });
+          const spent = calculation.actual ?? 0;
+          const remaining = calculation.remaining ?? 0;
+          const pct =
+            calculation.utilizationPct === null ? 0 : Math.min(100, calculation.utilizationPct);
+          const over = calculation.overBudget;
           const state = over ? "over" : pct > 80 ? "overdue" : "active";
           return (
             <Card
               key={b.id}
-              data-tone={state === "over" ? "danger" : state === "overdue" ? "warning" : "success"}
+              data-tone={
+                calculation.state === "unsupported_currency"
+                  ? "neutral"
+                  : state === "over"
+                    ? "danger"
+                    : state === "overdue"
+                      ? "warning"
+                      : "success"
+              }
             >
               <CardContent className="space-y-3 p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="font-medium">{b.category}</div>
+                    <div className="flex flex-wrap items-center gap-2 font-medium">
+                      <span>{b.category}</span>
+                      <span className="rounded-full border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                        {b.financial_scope === "business"
+                          ? `Business${b.business_name ? ` · ${b.business_name}` : ""}`
+                          : "Personal"}
+                      </span>
+                    </div>
                     <div className="alexos-num text-xs text-muted-foreground">
-                      {formatMoney(spent)} of {formatMoney(b.amount)} this month
+                      {calculation.state === "unsupported_currency"
+                        ? "Unavailable: unsupported currency comparison"
+                        : `${formatMoney(spent)} of ${formatMoney(Number(b.amount))} this month`}
                     </div>
                     <div className="text-[11px] text-muted-foreground/80">
                       {b.month === month
@@ -182,7 +241,15 @@ function BudgetsPage() {
                   </div>
                   <AlexOSStatusBadge
                     tone={state === "over" ? "danger" : state === "overdue" ? "warning" : "income"}
-                    label={state === "over" ? "Over budget" : `${Math.round(pct)}% used`}
+                    label={
+                      calculation.state === "unsupported_currency"
+                        ? "Unavailable"
+                        : state === "over"
+                          ? "Over budget"
+                          : calculation.state === "no_activity"
+                            ? "No activity"
+                            : `${Math.round(pct)}% used`
+                    }
                     showDot
                   />
                 </div>
@@ -196,7 +263,9 @@ function BudgetsPage() {
                     data-tone={remaining >= 0 ? "income" : "expense"}
                     className="alexos-tone-text text-sm font-medium"
                   >
-                    {remaining >= 0 ? "Remaining" : "Over"}: {formatMoney(Math.abs(remaining))}
+                    {calculation.state === "unsupported_currency"
+                      ? "Actuals unavailable"
+                      : `${remaining >= 0 ? "Remaining" : "Over"}: ${formatMoney(Math.abs(remaining))}`}
                   </div>
                   <div className="flex gap-1">
                     <Button

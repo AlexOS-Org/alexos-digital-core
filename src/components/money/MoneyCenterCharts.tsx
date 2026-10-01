@@ -41,7 +41,7 @@ const CATEGORICAL = [
 type ChartRow = { month: string; income: number; expense: number; cashflow: number };
 type CategoryRow = { name: string; value: number };
 type AccountRow = { name: string; balance: number };
-type BudgetRow = { name: string; budget: number; actual: number };
+type BudgetRow = { name: string; budget: number; actual: number | null };
 type TrendRow = { date: string; value: number };
 
 interface Props {

@@ -11,7 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EXPENSE_CATEGORIES } from "@/lib/money/constants";
-import { useSaveBudget, type Budget } from "@/lib/money/api";
+import { useBusinesses, useSaveBudget, type Budget } from "@/lib/money/api";
+import type { BudgetScope } from "@/lib/money/budget-calculations";
 import { resolveScopedWrite, useMoneyCenterScope } from "@/lib/money/scope";
 import { monthKey, monthLabel } from "@/lib/money/format";
 
@@ -24,10 +25,13 @@ interface Props {
 
 export function BudgetFormDialog({ open, onOpenChange, month, editing }: Props) {
   const save = useSaveBudget();
-  const { businessId } = useMoneyCenterScope();
+  const { data: businesses = [] } = useBusinesses();
+  useMoneyCenterScope();
 
   const [category, setCategory] = useState<string>(EXPENSE_CATEGORIES[0]);
   const [amount, setAmount] = useState("");
+  const [scope, setScope] = useState<BudgetScope>("personal");
+  const [businessId, setBusinessId] = useState("");
   const [amountError, setAmountError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -37,9 +41,13 @@ export function BudgetFormDialog({ open, onOpenChange, month, editing }: Props) 
     if (editing) {
       setCategory(editing.category);
       setAmount(String(editing.amount));
+      setScope(editing.financial_scope);
+      setBusinessId(editing.business_id ?? "");
     } else {
       setCategory(EXPENSE_CATEGORIES[0]);
       setAmount("");
+      setScope("personal");
+      setBusinessId("");
     }
   }, [open, editing]);
 
@@ -50,6 +58,7 @@ export function BudgetFormDialog({ open, onOpenChange, month, editing }: Props) 
       setAmountError("Enter a monthly limit greater than zero.");
       return;
     }
+    if (scope === "business" && !businessId) return;
     setAmountError(null);
 
     const scoped = resolveScopedWrite(businessId);
@@ -59,7 +68,12 @@ export function BudgetFormDialog({ open, onOpenChange, month, editing }: Props) 
       category,
       month: month || monthKey(),
       amount: value,
+      financial_scope: scoped.financial_scope,
       business_id: scoped.business_id,
+      business_name:
+        scoped.financial_scope === "business"
+          ? (businesses.find((business) => business.id === businessId)?.name ?? null)
+          : null,
     });
 
     onOpenChange(false);
@@ -89,6 +103,55 @@ export function BudgetFormDialog({ open, onOpenChange, month, editing }: Props) 
           </AlexOSFormField>
 
           <div className="grid gap-4 sm:grid-cols-2">
+            <AlexOSFormField
+              label="Budget scope"
+              required
+              hint={
+                editing
+                  ? "Scope cannot be changed once a budget exists."
+                  : "Choose which financial activity this limit measures."
+              }
+            >
+              {({ id, describedBy }) => (
+                <Select
+                  value={scope}
+                  onValueChange={(value) => setScope(value as BudgetScope)}
+                  disabled={!!editing}
+                >
+                  <SelectTrigger id={id} aria-describedby={describedBy}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="personal">Personal</SelectItem>
+                    <SelectItem value="business">Business</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            </AlexOSFormField>
+
+            {scope === "business" ? (
+              <AlexOSFormField
+                label="Business"
+                required
+                error={!businessId ? "Choose a business." : undefined}
+              >
+                {({ id, describedBy, invalid }) => (
+                  <Select value={businessId} onValueChange={setBusinessId} disabled={!!editing}>
+                    <SelectTrigger id={id} aria-describedby={describedBy} aria-invalid={invalid}>
+                      <SelectValue placeholder="Choose business" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {businesses.map((business) => (
+                        <SelectItem key={business.id} value={business.id}>
+                          {business.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </AlexOSFormField>
+            ) : null}
+
             <AlexOSFormField
               label="Expense category"
               required
