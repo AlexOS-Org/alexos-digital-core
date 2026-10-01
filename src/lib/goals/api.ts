@@ -31,6 +31,7 @@ export interface GoalContribution {
   user_id: string;
   goal_id: string;
   account_id: string | null;
+  transaction_id: string | null;
   amount: number;
   occurred_at: string;
   note: string | null;
@@ -90,6 +91,21 @@ export function useGoalContributions(goalId?: string) {
   });
 }
 
+export function useAllGoalContributions() {
+  return useQuery({
+    queryKey: ["goal_contributions", "all"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("goal_contributions")
+        .select("*")
+        .is("deleted_at", null)
+        .order("occurred_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as GoalContribution[];
+    },
+  });
+}
+
 export function useSaveGoal() {
   const qc = useQueryClient();
   return useMutation({
@@ -140,43 +156,95 @@ export function useContribute() {
 
       const destination = input.account_id ?? null;
       const from = input.from_account_id ?? null;
+      const contributionId = crypto.randomUUID();
+      const occurredAt = input.occurred_at ?? new Date().toISOString();
+      let ledger: ReturnType<typeof buildGoalContributionLedger> | null = null;
 
       if (destination) {
-        const ledger = buildGoalContributionLedger({
+        ledger = buildGoalContributionLedger({
           goalId: input.goal_id,
+          contributionId,
           goalName: input.goal_name?.trim() || "Goal",
           amount,
           accountId: destination,
           fromAccountId: from,
           note: input.note,
-          occurredAt: input.occurred_at,
+          occurredAt,
           userId: user_id,
         });
-        if (ledger.kind === "none") {
-          throw new Error(ledger.reason);
-        }
-        const { error: txError } = await supabase
-          .from("transactions")
-          .insert(ledger.transaction as never);
-        if (txError) throw txError;
+        if (ledger.kind === "none") throw new Error(ledger.reason);
       }
 
-      const { error } = await supabase.from("goal_contributions").insert({
+      const { error: contributionError } = await supabase.from("goal_contributions").insert({
+        id: contributionId,
         user_id,
         goal_id: input.goal_id,
         amount,
         account_id: destination,
+        transaction_id: null,
         note: input.note ?? null,
-        occurred_at: input.occurred_at ?? new Date().toISOString(),
+        occurred_at: occurredAt,
       } as never);
+      if (contributionError) throw contributionError;
+
+      if (ledger) {
+        const { data: transaction, error: txError } = await supabase
+          .from("transactions")
+          .insert(ledger.transaction as never)
+          .select("id")
+          .single();
+        if (txError) throw txError;
+
+        const { error: linkError } = await supabase
+          .from("goal_contributions")
+          .update({ transaction_id: transaction.id })
+          .eq("id", contributionId);
+        if (linkError) {
+          await supabase
+            .from("transactions")
+            .update({ status: "void", deleted_at: new Date().toISOString() })
+            .eq("id", transaction.id);
+          throw linkError;
+        }
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["goal_progress"] });
+      qc.invalidateQueries({ queryKey: ["goal_contributions"] });
+      qc.invalidateQueries({ queryKey: ["goal_contributions", "all"] });
+      qc.invalidateQueries({ queryKey: ["transactions"] });
+      qc.invalidateQueries({ queryKey: ["account_balances"] });
+      toast.success("Contribution recorded");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useVoidGoalContribution() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { id: string; transaction_id: string | null }) => {
+      const deletedAt = new Date().toISOString();
+      if (input.transaction_id) {
+        const { error: txError } = await supabase
+          .from("transactions")
+          .update({ status: "void", deleted_at: deletedAt })
+          .eq("id", input.transaction_id);
+        if (txError) throw txError;
+      }
+      const { error } = await supabase
+        .from("goal_contributions")
+        .update({ deleted_at: deletedAt })
+        .eq("id", input.id);
       if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["goal_progress"] });
       qc.invalidateQueries({ queryKey: ["goal_contributions"] });
+      qc.invalidateQueries({ queryKey: ["goal_contributions", "all"] });
       qc.invalidateQueries({ queryKey: ["transactions"] });
       qc.invalidateQueries({ queryKey: ["account_balances"] });
-      toast.success("Contribution recorded");
+      toast.success("Contribution voided");
     },
     onError: (e: Error) => toast.error(e.message),
   });

@@ -48,7 +48,6 @@ export function GoalContributeDialog({ open, onOpenChange, goal }: Props) {
     if (!goal) return;
     const n = Number(amount);
     if (!n || n <= 0) return;
-    if (!accountId) return;
     await contribute.mutateAsync({
       goal_id: goal.id,
       goal_name: goal.name,
@@ -77,9 +76,8 @@ export function GoalContributeDialog({ open, onOpenChange, goal }: Props) {
               <div className="text-muted-foreground text-xs">{goal.category ?? "—"}</div>
             </div>
             <p className="text-xs text-muted-foreground">
-              This records the contribution and posts a Money Center movement so the linked account
-              balance stays accurate. Prefer a transfer from another account when you are moving
-              existing cash; use deposit only for money that is not already on the ledger.
+              Link an account to reconcile this contribution against Money Center. Without an
+              account, it remains a planning record and is not presented as verified savings.
             </p>
             <div className="space-y-1.5">
               <Label>Amount</Label>
@@ -96,6 +94,7 @@ export function GoalContributeDialog({ open, onOpenChange, goal }: Props) {
               <Select
                 value={fromAccountId || "__none__"}
                 onValueChange={(v) => setFromAccountId(v === "__none__" ? "" : v)}
+                disabled={!accountId}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="None — external deposit" />
@@ -111,12 +110,16 @@ export function GoalContributeDialog({ open, onOpenChange, goal }: Props) {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Into savings account</Label>
-              <Select value={accountId} onValueChange={setAccountId}>
+              <Label>Into savings account (optional)</Label>
+              <Select
+                value={accountId || "__none__"}
+                onValueChange={(v) => setAccountId(v === "__none__" ? "" : v)}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Choose account" />
+                  <SelectValue placeholder="Not linked — planning only" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="__none__">Not linked — planning only</SelectItem>
                   {accounts.map((a) => (
                     <SelectItem key={a.id} value={a.id}>
                       {a.name}
@@ -140,7 +143,7 @@ export function GoalContributeDialog({ open, onOpenChange, goal }: Props) {
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={submit} disabled={contribute.isPending || !amount || !accountId}>
+          <Button onClick={submit} disabled={contribute.isPending || !amount}>
             {contribute.isPending ? "Saving..." : "Add Contribution"}
           </Button>
         </DialogFooter>
