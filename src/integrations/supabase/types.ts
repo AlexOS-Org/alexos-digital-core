@@ -3633,6 +3633,8 @@ export type Database = {
           p_provider: string
           p_provider_reference: string | null
           p_transaction_type: string
+          p_classification_confirmed: boolean
+          p_transfer_account_id?: string | null
         }
         Returns: Json
       }
