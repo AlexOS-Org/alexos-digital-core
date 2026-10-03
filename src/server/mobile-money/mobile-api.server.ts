@@ -16,15 +16,21 @@ const transactionSchema = z
       .regex(/^[A-Za-z0-9_-]{1,100}$/)
       .optional(),
     direction: z.enum(["CREDIT", "DEBIT"]),
-    transactionType: z.enum(["income", "expense"]),
+    transactionType: z.enum(["income", "expense", "transfer"]),
+    transferAccountId: z.string().uuid().optional(),
     classificationConfirmed: z.literal(true),
   })
   .strict()
   .superRefine((value, context) => {
-    if (value.direction === "CREDIT" && value.transactionType !== "income") {
+    if (value.transactionType === "transfer") {
+      if (!value.transferAccountId || value.transferAccountId === value.accountId) {
+        context.addIssue({ code: "custom", message: "Transfers require a different destination/source account." });
+      }
+    } else if (value.transferAccountId) {
+      context.addIssue({ code: "custom", message: "Only transfers may specify a transfer account." });
+    } else if (value.direction === "CREDIT" && value.transactionType !== "income") {
       context.addIssue({ code: "custom", message: "Classification does not match direction." });
-    }
-    if (value.direction === "DEBIT" && value.transactionType !== "expense") {
+    } else if (value.direction === "DEBIT" && value.transactionType !== "expense") {
       context.addIssue({ code: "custom", message: "Classification does not match direction." });
     }
     if (Math.round(value.amount * 100) / 100 !== value.amount) {
@@ -101,6 +107,7 @@ function fingerprint(userId: string, transaction: NormalizedMobileTransaction): 
     provider: transaction.provider,
     direction: transaction.direction,
     transactionType: transaction.transactionType,
+    transferAccountId: transaction.transferAccountId ?? null,
   });
   return createHash("sha256").update(canonical, "utf8").digest("hex");
 }
