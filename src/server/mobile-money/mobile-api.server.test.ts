@@ -8,6 +8,8 @@ import {
 const USER_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const DEVICE_ID = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
 const ACCOUNT_ID = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+const DESTINATION_ID = "dddddddd-dddd-4ddd-8ddd-dddddddddddd";
+const SECOND_DESTINATION_ID = "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee";
 
 function transaction(overrides: Record<string, unknown> = {}) {
   return {
@@ -63,6 +65,7 @@ function memoryStore(overrides: Partial<MobileStore> = {}) {
         id: transactionId,
         user_id: userId,
         account_id: tx.accountId,
+        transfer_account_id: tx.transferAccountId ?? null,
         type: tx.transactionType,
         amount: tx.amount,
         occurred_at: new Date(tx.occurredAt).toISOString(),
@@ -205,6 +208,127 @@ describe("mobile money sync API", () => {
     const second = vi.mocked(store.ingest).mock.calls[1]?.[0].fingerprint;
     expect(first).toMatch(/^[a-f0-9]{64}$/);
     expect(second).toBe(first);
+  });
+
+  it("accepts a confirmed transfer with a distinct destination account", async () => {
+    const { store, ledger } = memoryStore();
+    const response = await makeApi(store).sync(
+      request({
+        deviceId: DEVICE_ID,
+        transactions: [
+          transaction({
+            direction: "DEBIT",
+            transactionType: "transfer",
+            transferAccountId: DESTINATION_ID,
+          }),
+        ],
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect((await response.json()).results).toEqual([
+      { status: "inserted", transactionId: "ledger-1" },
+    ]);
+    expect(ledger[0]).toMatchObject({
+      type: "transfer",
+      transfer_account_id: DESTINATION_ID,
+    });
+  });
+
+  it("requires a destination account for transfers", async () => {
+    const { store } = memoryStore();
+    const response = await makeApi(store).sync(
+      request({
+        deviceId: DEVICE_ID,
+        transactions: [transaction({ transactionType: "transfer", transferAccountId: undefined })],
+      }),
+    );
+    expect(response.status).toBe(400);
+    expect(store.ingest).not.toHaveBeenCalled();
+  });
+
+  it("rejects transfers to the same source account", async () => {
+    const { store } = memoryStore();
+    const response = await makeApi(store).sync(
+      request({
+        deviceId: DEVICE_ID,
+        transactions: [
+          transaction({ transactionType: "transfer", transferAccountId: ACCOUNT_ID }),
+        ],
+      }),
+    );
+    expect(response.status).toBe(400);
+    expect(store.ingest).not.toHaveBeenCalled();
+  });
+
+  it("rejects transfer accounts on income and expense transactions", async () => {
+    const { store } = memoryStore();
+    const response = await makeApi(store).sync(
+      request({
+        deviceId: DEVICE_ID,
+        transactions: [transaction({ transferAccountId: DESTINATION_ID })],
+      }),
+    );
+    expect(response.status).toBe(400);
+    expect(store.ingest).not.toHaveBeenCalled();
+  });
+
+  it("rejects an unauthorized transfer destination", async () => {
+    const { store } = memoryStore({
+      ingest: vi.fn(async () => ({ status: "invalid_transfer_account" })),
+    });
+    const response = await makeApi(store).sync(
+      request({
+        deviceId: DEVICE_ID,
+        transactions: [
+          transaction({
+            direction: "DEBIT",
+            transactionType: "transfer",
+            transferAccountId: DESTINATION_ID,
+          }),
+        ],
+      }),
+    );
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({
+      ok: false,
+      error: "unauthorized_transfer_account",
+    });
+  });
+
+  it("includes the transfer destination in the idempotency fingerprint", async () => {
+    const { store } = memoryStore();
+    const api = makeApi(store);
+    await api.sync(
+      request({
+        deviceId: DEVICE_ID,
+        transactions: [
+          transaction({
+            providerReference: undefined,
+            direction: "DEBIT",
+            transactionType: "transfer",
+            transferAccountId: DESTINATION_ID,
+          }),
+        ],
+      }),
+    );
+    await api.sync(
+      request({
+        deviceId: DEVICE_ID,
+        transactions: [
+          transaction({
+            providerReference: undefined,
+            direction: "DEBIT",
+            transactionType: "transfer",
+            transferAccountId: SECOND_DESTINATION_ID,
+          }),
+        ],
+      }),
+    );
+    const first = vi.mocked(store.ingest).mock.calls[0]?.[0].fingerprint;
+    const second = vi.mocked(store.ingest).mock.calls[1]?.[0].fingerprint;
+    expect(first).toMatch(/^[a-f0-9]{64}$/);
+    expect(second).toMatch(/^[a-f0-9]{64}$/);
+    expect(second).not.toBe(first);
   });
 
   it("requires direction and explicit classification to agree", async () => {
