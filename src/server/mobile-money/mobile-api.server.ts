@@ -24,10 +24,16 @@ const transactionSchema = z
   .superRefine((value, context) => {
     if (value.transactionType === "transfer") {
       if (!value.transferAccountId || value.transferAccountId === value.accountId) {
-        context.addIssue({ code: "custom", message: "Transfers require a different destination/source account." });
+        context.addIssue({
+          code: "custom",
+          message: "Transfers require a different destination/source account.",
+        });
       }
     } else if (value.transferAccountId) {
-      context.addIssue({ code: "custom", message: "Only transfers may specify a transfer account." });
+      context.addIssue({
+        code: "custom",
+        message: "Only transfers may specify a transfer account.",
+      });
     } else if (value.direction === "CREDIT" && value.transactionType !== "income") {
       context.addIssue({ code: "custom", message: "Classification does not match direction." });
     } else if (value.direction === "DEBIT" && value.transactionType !== "expense") {
