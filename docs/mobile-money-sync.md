@@ -37,7 +37,22 @@ The request allows at most 20 normalized entries and 64 KiB. Unknown keys are re
 }
 ```
 
-`providerReference` is optional and restricted to an identifier-shaped string. The API accepts no free-text message, description, or category fields. `transactionType` must be explicitly confirmed and must agree with direction (`CREDIT` + `income`, or `DEBIT` + `expense`). The API never derives ledger type from direction. Transfers and ambiguous messages must be classified in the client before submission; the API does not create transfer, income, or expense rows from an unconfirmed SMS guess.
+For an explicitly classified transfer, the payload instead uses `transactionType: "transfer"` and must include a different owned `transferAccountId`:
+
+```json
+{
+  "accountId": "<owned-source-account-uuid>",
+  "amount": 500,
+  "occurredAt": "2026-09-30T10:11:12+03:00",
+  "provider": "mpesa",
+  "direction": "DEBIT",
+  "transactionType": "transfer",
+  "transferAccountId": "<owned-destination-account-uuid>",
+  "classificationConfirmed": true
+}
+```
+
+`providerReference` is optional and restricted to an identifier-shaped string. The API accepts no free-text message, description, or category fields. `income` must use `CREDIT`, `expense` must use `DEBIT`, while transfers may use either message direction because SMS direction describes the provider message rather than the destination account's ledger classification. Transfer destinations are validated server-side as active accounts owned by the authenticated user and must differ from the source account. The API never derives ledger type from direction; every ledger classification must be explicitly confirmed by the client.
 
 ## Scope, ledger, and idempotency
 
