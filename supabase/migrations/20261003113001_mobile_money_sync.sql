@@ -105,6 +105,7 @@ create or replace function public.mobile_ingest_transaction(
   p_occurred_at timestamptz,
   p_direction text,
   p_transaction_type text,
+  p_transfer_account_id uuid default null,
   p_classification_confirmed boolean
 )
 returns jsonb
@@ -116,6 +117,7 @@ declare
   v_user_id uuid := (select auth.uid());
   v_device public.mobile_sync_devices%rowtype;
   v_account public.accounts%rowtype;
+  v_transfer_account public.accounts%rowtype;
   v_business public.businesses%rowtype;
   v_transaction_id uuid;
   v_existing public.transactions%rowtype;
@@ -166,10 +168,12 @@ begin
     or p_direction is null
     or p_direction not in ('CREDIT', 'DEBIT')
     or p_transaction_type is null
-    or p_transaction_type not in ('income', 'expense')
+    or p_transaction_type not in ('income', 'expense', 'transfer')
     or p_classification_confirmed is distinct from true
-    or (p_direction = 'CREDIT' and p_transaction_type <> 'income')
-    or (p_direction = 'DEBIT' and p_transaction_type <> 'expense')
+    or (p_transaction_type = 'income' and p_direction <> 'CREDIT')
+    or (p_transaction_type = 'expense' and p_direction <> 'DEBIT')
+    or (p_transaction_type <> 'transfer' and p_transfer_account_id is not null)
+    or (p_transaction_type = 'transfer' and p_transfer_account_id is null)
     or p_amount is null
     or p_amount <= 0
     or p_amount > 9999999999999999.99
@@ -185,13 +189,26 @@ begin
     return jsonb_build_object('status', 'invalid_payload');
   end if;
 
+  if p_transaction_type = 'transfer' then
+    select * into v_transfer_account
+    from public.accounts
+    where id = p_transfer_account_id
+      and user_id = v_user_id
+      and status = 'active'
+      and deleted_at is null;
+
+    if not found or v_transfer_account.id = v_account.id then
+      return jsonb_build_object('status', 'invalid_transfer_account');
+    end if;
+  end if;
+
   insert into public.transactions (
-    user_id, account_id, business_id, business_name, financial_scope,
+    user_id, account_id, transfer_account_id, business_id, business_name, financial_scope,
     expense_scope, type, amount, occurred_at, description, category,
     source, reference, status, mobile_device_id, mobile_provider,
     mobile_provider_reference, mobile_fingerprint
   ) values (
-    v_user_id, v_account.id, v_business_id, v_business_name,
+    v_user_id, v_account.id, p_transfer_account_id, v_business_id, v_business_name,
     v_account.financial_scope,
     case when p_transaction_type = 'expense' then v_account.financial_scope else 'personal' end,
     p_transaction_type::public.transaction_type, p_amount, p_occurred_at,
@@ -237,7 +254,7 @@ end;
 $$;
 
 revoke all on function public.mobile_ingest_transaction(
-  uuid, uuid, text, text, text, numeric, timestamptz, text, text, boolean
+  uuid, uuid, text, text, text, numeric, timestamptz, text, text, uuid, boolean
 ) from public, anon;
 grant execute on function public.mobile_ingest_transaction(
   uuid, uuid, text, text, text, numeric, timestamptz, text, text, boolean
