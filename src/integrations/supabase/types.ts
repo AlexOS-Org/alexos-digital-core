@@ -3102,6 +3102,33 @@ export type Database = {
         }
         Relationships: []
       }
+      mobile_sync_devices: {
+        Row: {
+          created_at: string
+          device_label: string
+          id: string
+          platform: string
+          revoked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_label: string
+          id?: string
+          platform: string
+          revoked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_label?: string
+          id?: string
+          platform?: string
+          revoked_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       money_salary_runs: {
         Row: {
           created_at: string
@@ -3372,6 +3399,10 @@ export type Database = {
           income_type: string | null
           interest_amount: number
           marketing_campaign_id: string | null
+          mobile_device_id: string | null
+          mobile_fingerprint: string | null
+          mobile_provider: string | null
+          mobile_provider_reference: string | null
           occurred_at: string
           principal_amount: number
           reference: string | null
@@ -3401,6 +3432,10 @@ export type Database = {
           income_type?: string | null
           interest_amount?: number
           marketing_campaign_id?: string | null
+          mobile_device_id?: string | null
+          mobile_fingerprint?: string | null
+          mobile_provider?: string | null
+          mobile_provider_reference?: string | null
           occurred_at?: string
           principal_amount?: number
           reference?: string | null
@@ -3430,6 +3465,10 @@ export type Database = {
           income_type?: string | null
           interest_amount?: number
           marketing_campaign_id?: string | null
+          mobile_device_id?: string | null
+          mobile_fingerprint?: string | null
+          mobile_provider?: string | null
+          mobile_provider_reference?: string | null
           occurred_at?: string
           principal_amount?: number
           reference?: string | null
@@ -3475,6 +3514,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "marketing_campaigns"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_mobile_device_owner_fkey"
+            columns: ["user_id", "mobile_device_id"]
+            isOneToOne: false
+            referencedRelation: "mobile_sync_devices"
+            referencedColumns: ["user_id", "id"]
           },
           {
             foreignKeyName: "transactions_transfer_account_id_fkey"
@@ -3575,6 +3621,22 @@ export type Database = {
       }
     }
     Functions: {
+      mobile_ingest_transaction: {
+        Args: {
+          p_account_id: string
+          p_amount: number
+          p_classification_confirmed: boolean
+          p_device_id: string
+          p_direction: string
+          p_fingerprint: string
+          p_occurred_at: string
+          p_provider: string
+          p_provider_reference: string | null
+          p_transaction_type: string
+        }
+        Returns: Json
+      }
+      mobile_revoke_device: { Args: { p_device_id: string }; Returns: boolean }
       claim_money_weekly_summary_send: {
         Args: { p_claim_token: string; p_period: string; p_user_id: string }
         Returns: boolean
