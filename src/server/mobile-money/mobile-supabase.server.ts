@@ -45,6 +45,7 @@ function createStore(client: MobileDatabase): MobileStore {
         p_occurred_at: tx.occurredAt,
         p_direction: tx.direction,
         p_transaction_type: tx.transactionType,
+        p_transfer_account_id: tx.transferAccountId ?? null,
         p_classification_confirmed: tx.classificationConfirmed,
       });
       if (error || !data || typeof data !== "object" || Array.isArray(data)) {
