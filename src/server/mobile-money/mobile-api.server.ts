@@ -191,6 +191,12 @@ export function createMobileApi(dependencies: MobileApiDependencies) {
       if (invalidAccount) return json({ ok: false, error: "unauthorized_account" }, 403);
       const invalidScope = results.some((result) => result.status === "invalid_scope");
       if (invalidScope) return json({ ok: false, error: "unauthorized_business_scope" }, 403);
+      const invalidTransferAccount = results.some(
+        (result) => result.status === "invalid_transfer_account",
+      );
+      if (invalidTransferAccount) {
+        return json({ ok: false, error: "unauthorized_transfer_account" }, 403);
+      }
       if (results.some((result) => result.status === "invalid_payload")) {
         return json({ ok: false, error: "invalid_request" }, 400);
       }
