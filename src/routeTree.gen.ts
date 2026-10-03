@@ -87,6 +87,9 @@ import { Route as ShopPoliciesSlugRouteImport } from './routes/shop.policies.$sl
 import { Route as ShopProductIdRouteImport } from './routes/shop.product.$id'
 import { Route as AuthenticatedPeopleContactsIdRouteImport } from './routes/_authenticated/people.contacts.$id'
 import { Route as AuthenticatedPeopleLeadsIdRouteImport } from './routes/_authenticated/people.leads.$id'
+import { Route as ApiMobileDevicesIndexRouteImport } from './routes/api/mobile/devices/index'
+import { Route as ApiMobileDevicesDeviceIdRouteImport } from './routes/api/mobile/devices/$deviceId'
+import { Route as ApiMobileTransactionsSyncRouteImport } from './routes/api/mobile/transactions/sync'
 import { Route as ShopCategorySlugSubcategoryRouteImport } from './routes/shop.category.$slug.$subcategory'
 
 const IndexRoute = IndexRouteImport.update({
@@ -517,6 +520,23 @@ const AuthenticatedPeopleLeadsIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedPeopleLeadsRoute,
   } as any)
+const ApiMobileDevicesIndexRoute = ApiMobileDevicesIndexRouteImport.update({
+  id: '/api/mobile/devices/',
+  path: '/api/mobile/devices/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMobileDevicesDeviceIdRoute =
+  ApiMobileDevicesDeviceIdRouteImport.update({
+    id: '/api/mobile/devices/$deviceId',
+    path: '/api/mobile/devices/$deviceId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiMobileTransactionsSyncRoute =
+  ApiMobileTransactionsSyncRouteImport.update({
+    id: '/api/mobile/transactions/sync',
+    path: '/api/mobile/transactions/sync',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ShopCategorySlugSubcategoryRoute =
   ShopCategorySlugSubcategoryRouteImport.update({
     id: '/$subcategory',
@@ -602,7 +622,10 @@ export interface FileRoutesByFullPath {
   '/people/': typeof AuthenticatedPeopleIndexRoute
   '/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
   '/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
+  '/api/mobile/devices/$deviceId': typeof ApiMobileDevicesDeviceIdRoute
+  '/api/mobile/transactions/sync': typeof ApiMobileTransactionsSyncRoute
   '/shop/category/$slug/$subcategory': typeof ShopCategorySlugSubcategoryRoute
+  '/api/mobile/devices/': typeof ApiMobileDevicesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -678,7 +701,10 @@ export interface FileRoutesByTo {
   '/people': typeof AuthenticatedPeopleIndexRoute
   '/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
   '/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
+  '/api/mobile/devices/$deviceId': typeof ApiMobileDevicesDeviceIdRoute
+  '/api/mobile/transactions/sync': typeof ApiMobileTransactionsSyncRoute
   '/shop/category/$slug/$subcategory': typeof ShopCategorySlugSubcategoryRoute
+  '/api/mobile/devices': typeof ApiMobileDevicesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -760,7 +786,10 @@ export interface FileRoutesById {
   '/_authenticated/people/': typeof AuthenticatedPeopleIndexRoute
   '/_authenticated/people/contacts/$id': typeof AuthenticatedPeopleContactsIdRoute
   '/_authenticated/people/leads/$id': typeof AuthenticatedPeopleLeadsIdRoute
+  '/api/mobile/devices/$deviceId': typeof ApiMobileDevicesDeviceIdRoute
+  '/api/mobile/transactions/sync': typeof ApiMobileTransactionsSyncRoute
   '/shop/category/$slug/$subcategory': typeof ShopCategorySlugSubcategoryRoute
+  '/api/mobile/devices/': typeof ApiMobileDevicesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -842,7 +871,10 @@ export interface FileRouteTypes {
     | '/people/'
     | '/people/contacts/$id'
     | '/people/leads/$id'
+    | '/api/mobile/devices/$deviceId'
+    | '/api/mobile/transactions/sync'
     | '/shop/category/$slug/$subcategory'
+    | '/api/mobile/devices/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -918,7 +950,10 @@ export interface FileRouteTypes {
     | '/people'
     | '/people/contacts/$id'
     | '/people/leads/$id'
+    | '/api/mobile/devices/$deviceId'
+    | '/api/mobile/transactions/sync'
     | '/shop/category/$slug/$subcategory'
+    | '/api/mobile/devices'
   id:
     | '__root__'
     | '/'
@@ -999,7 +1034,10 @@ export interface FileRouteTypes {
     | '/_authenticated/people/'
     | '/_authenticated/people/contacts/$id'
     | '/_authenticated/people/leads/$id'
+    | '/api/mobile/devices/$deviceId'
+    | '/api/mobile/transactions/sync'
     | '/shop/category/$slug/$subcategory'
+    | '/api/mobile/devices/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1015,6 +1053,9 @@ export interface RootRouteChildren {
   ApiMpesaStatusRoute: typeof ApiMpesaStatusRoute
   ApiMpesaStkPushRoute: typeof ApiMpesaStkPushRoute
   ApiScheduledAbandonedCartRoute: typeof ApiScheduledAbandonedCartRoute
+  ApiMobileDevicesDeviceIdRoute: typeof ApiMobileDevicesDeviceIdRoute
+  ApiMobileTransactionsSyncRoute: typeof ApiMobileTransactionsSyncRoute
+  ApiMobileDevicesIndexRoute: typeof ApiMobileDevicesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1565,6 +1606,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPeopleLeadsIdRouteImport
       parentRoute: typeof AuthenticatedPeopleLeadsRoute
     }
+    '/api/mobile/devices/': {
+      id: '/api/mobile/devices/'
+      path: '/api/mobile/devices'
+      fullPath: '/api/mobile/devices/'
+      preLoaderRoute: typeof ApiMobileDevicesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/devices/$deviceId': {
+      id: '/api/mobile/devices/$deviceId'
+      path: '/api/mobile/devices/$deviceId'
+      fullPath: '/api/mobile/devices/$deviceId'
+      preLoaderRoute: typeof ApiMobileDevicesDeviceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/transactions/sync': {
+      id: '/api/mobile/transactions/sync'
+      path: '/api/mobile/transactions/sync'
+      fullPath: '/api/mobile/transactions/sync'
+      preLoaderRoute: typeof ApiMobileTransactionsSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/category/$slug/$subcategory': {
       id: '/shop/category/$slug/$subcategory'
       path: '/$subcategory'
@@ -1822,6 +1884,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiMpesaStatusRoute: ApiMpesaStatusRoute,
   ApiMpesaStkPushRoute: ApiMpesaStkPushRoute,
   ApiScheduledAbandonedCartRoute: ApiScheduledAbandonedCartRoute,
+  ApiMobileDevicesDeviceIdRoute: ApiMobileDevicesDeviceIdRoute,
+  ApiMobileTransactionsSyncRoute: ApiMobileTransactionsSyncRoute,
+  ApiMobileDevicesIndexRoute: ApiMobileDevicesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
