@@ -105,8 +105,8 @@ create or replace function public.mobile_ingest_transaction(
   p_occurred_at timestamptz,
   p_direction text,
   p_transaction_type text,
-  p_transfer_account_id uuid default null,
-  p_classification_confirmed boolean
+  p_classification_confirmed boolean,
+  p_transfer_account_id uuid default null
 )
 returns jsonb
 language plpgsql
