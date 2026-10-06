@@ -1,8 +1,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { computeWeeklyFinancials, getWeekBoundaries } from "@/lib/reports/weekly-performance";
 import type { Account, DeliveryPrepayment, Expected, Transaction } from "@/lib/money/api";
-
-const CRON = "0 17 * * 6";
+import { WEEKLY_MONEY_SUMMARY_CRON } from "@/lib/schedules";
 
 type WeeklyPreference = { user_id: string; last_sent_period: string | null };
 
@@ -267,4 +266,4 @@ export async function sendWeeklyMoneySummaries() {
   return { sent, skipped, period: period.from } as const;
 }
 
-export { CRON as WEEKLY_MONEY_SUMMARY_CRON };
+export { WEEKLY_MONEY_SUMMARY_CRON };

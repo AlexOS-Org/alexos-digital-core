@@ -4,6 +4,7 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 import { resolveHostnameFromRequest } from "./lib/businesses/hostname";
+import { WEEKLY_MONEY_SUMMARY_CRON } from "./lib/schedules";
 
 const WORKER_ENV_KEYS = [
   "SUPABASE_URL",
@@ -99,7 +100,7 @@ export default {
         console.info("Scheduled Auren evidence refresh completed", refresh);
       }
 
-      if (controller.cron === "0 17 * * 6") {
+      if (controller.cron === WEEKLY_MONEY_SUMMARY_CRON) {
         const { sendWeeklyMoneySummaries } =
           await import("@/server/notifications/weekly-money-summary-email");
         const weekly = await sendWeeklyMoneySummaries();
