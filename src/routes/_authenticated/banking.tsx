@@ -182,6 +182,25 @@ function BankingGrowthPage() {
       </div>
 
       <Card className="dashboard-surface rounded-xl">
+        <CardHeader>
+          <CardTitle className="text-base">KPI & Performance</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm leading-6 text-muted-foreground">
+              Configure contractual and internal targets, record monthly actuals, and track weighted achievement.
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Performance snapshots are structured for future commission workflows without hard-coded commission rules.
+            </p>
+          </div>
+          <Button asChild>
+            <Link to="/banking/performance">Open performance workspace</Link>
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="dashboard-surface rounded-xl">
         <CardHeader className="flex flex-row items-center justify-between gap-3">
           <div>
             <CardTitle className="text-base">Product catalog</CardTitle>
