@@ -251,9 +251,7 @@ describe("mobile money sync API", () => {
     const response = await makeApi(store).sync(
       request({
         deviceId: DEVICE_ID,
-        transactions: [
-          transaction({ transactionType: "transfer", transferAccountId: ACCOUNT_ID }),
-        ],
+        transactions: [transaction({ transactionType: "transfer", transferAccountId: ACCOUNT_ID })],
       }),
     );
     expect(response.status).toBe(400);
