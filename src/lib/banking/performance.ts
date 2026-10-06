@@ -37,6 +37,7 @@ export type BankingPerformancePeriod = {
   business_id: string;
   period_start: string;
   period_end: string;
+  target_scope: "contractual" | "internal";
   status: "open" | "submitted" | "approved";
   overall_achievement_percent: number;
   notes: string | null;
@@ -255,7 +256,7 @@ export async function applyContractKpiTemplate(businessId: string) {
   return { inserted: definitions.length, targeted: targets.length };
 }
 
-export async function ensurePerformancePeriod(businessId: string, month: string) {
+export async function ensurePerformancePeriod(businessId: string, month: string, targetScope: "contractual" | "internal") {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("Not authenticated");
 
@@ -270,6 +271,7 @@ export async function ensurePerformancePeriod(businessId: string, month: string)
     .select("*")
     .eq("business_id", businessId)
     .eq("period_start", periodStart)
+    .eq("target_scope", targetScope)
     .maybeSingle();
   if (findError) throw findError;
   if (existing) return existing as BankingPerformancePeriod;
@@ -281,6 +283,7 @@ export async function ensurePerformancePeriod(businessId: string, month: string)
       business_id: businessId,
       period_start: periodStart,
       period_end: periodEnd,
+      target_scope: targetScope,
       status: "open",
       overall_achievement_percent: 0,
     })
