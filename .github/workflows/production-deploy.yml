@@ -87,7 +87,9 @@ jobs:
       - name: Set up Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pin the CLI so deployment does not depend on resolving the latest
+          # GitHub release and getting rate-limited during production deploys.
+          version: 2.119.0
 
       - name: Set up PostgreSQL client
         run: |
