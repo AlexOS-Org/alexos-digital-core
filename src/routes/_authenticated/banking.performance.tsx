@@ -36,7 +36,7 @@ function BankingPerformancePage() {
   const [targetScope, setTargetScope] = useState<"contractual" | "internal">("contractual");
   const [period, setPeriod] = useState<BankingPerformancePeriod | null>(null);
   const [actuals, setActuals] = useState<Record<string, number>>({});
-  const [targetDrafts, setTargetDrafts] = useState<Record<string, number>>({});
+  const [targetDrafts, setTargetDrafts] = useState<Record<string, number | null>>({});
   const [working, setWorking] = useState(false);
   const [templateWorking, setTemplateWorking] = useState(false);
 
@@ -62,10 +62,10 @@ function BankingPerformancePage() {
   }, [existingPeriod]);
 
   useEffect(() => {
-    const next: Record<string, number> = {};
+    const next: Record<string, number | null> = {};
     for (const definition of definitions.data ?? []) {
       const target = targetByDefinition.get(definition.id);
-      next[definition.id] = target?.target_value ?? 0;
+      next[definition.id] = target?.target_value ?? null;
     }
     setTargetDrafts(next);
   }, [definitions.data, targetByDefinition]);
@@ -89,8 +89,8 @@ function BankingPerformancePage() {
     [definitions.data, targetDrafts, actuals, targetByDefinition],
   );
 
-  const configuredRows = rows.filter((row) => row.target > 0);
-  const missingTargets = rows.filter((row) => row.target <= 0);
+  const configuredRows = rows.filter((row) => row.target !== null && row.target > 0);
+  const missingTargets = rows.filter((row) => row.target === null || row.target <= 0);
   const totalWeight = rows.reduce((sum, row) => sum + row.definition.weight_percent, 0);
   const liveOverall = calculateOverallAchievement(
     configuredRows.map((row) => ({
@@ -306,11 +306,11 @@ function BankingPerformancePage() {
                           type="number"
                           min="0"
                           step="any"
-                          value={targetDrafts[row.definition.id] ?? 0}
+                          value={targetDrafts[row.definition.id] ?? ""}
                           onChange={(event) =>
                             setTargetDrafts((current) => ({
                               ...current,
-                              [row.definition.id]: Number(event.target.value) || 0,
+                              [row.definition.id]: event.target.value === "" ? null : Number(event.target.value),
                             }))
                           }
                           className="w-32 rounded-lg border bg-background px-2 py-1.5"
@@ -333,7 +333,7 @@ function BankingPerformancePage() {
                         />
                       </td>
                       <td className="p-3">
-                        {row.target > 0 ? (
+                        {row.target !== null && row.target > 0 ? (
                           <span className="font-medium">{achievement.toFixed(1)}%</span>
                         ) : (
                           <span className="text-amber-600">Target required</span>
