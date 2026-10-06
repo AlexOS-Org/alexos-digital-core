@@ -31,14 +31,14 @@ create table if not exists public.banking_kpi_targets (
   kpi_definition_id uuid not null,
   target_scope text not null,
   period_start date,
-  target_value numeric(18,4) not null,
+  target_value numeric(18,4),
   source_reference text,
   notes text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique (business_id, kpi_definition_id, target_scope, period_start),
   check (target_scope in ('contractual','internal')),
-  check (target_value >= 0),
+  check (target_value is null or target_value >= 0),
   foreign key (kpi_definition_id)
     references public.banking_kpi_definitions(id)
     on delete cascade
