@@ -344,3 +344,55 @@ export async function savePerformanceSnapshot(
   if (error) throw error;
   return data as BankingPerformancePeriod;
 }
+
+export async function saveKpiTarget(input: {
+  business_id: string;
+  kpi_definition_id: string;
+  target_scope: "contractual" | "internal";
+  target_value: number;
+  source_reference?: string | null;
+  notes?: string | null;
+}) {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("Not authenticated");
+  const { data: existing, error: findError } = await db
+    .from("banking_kpi_targets")
+    .select("*")
+    .eq("business_id", input.business_id)
+    .eq("kpi_definition_id", input.kpi_definition_id)
+    .eq("target_scope", input.target_scope)
+    .is("period_start", null)
+    .maybeSingle();
+  if (findError) throw findError;
+
+  const payload = {
+    user_id: auth.user.id,
+    business_id: input.business_id,
+    kpi_definition_id: input.kpi_definition_id,
+    target_scope: input.target_scope,
+    period_start: null,
+    target_value: Math.max(0, input.target_value),
+    source_reference: input.source_reference ?? null,
+    notes: input.notes ?? null,
+  };
+
+  if (existing) {
+    const { data, error } = await db
+      .from("banking_kpi_targets")
+      .update(payload)
+      .eq("id", existing.id)
+      .eq("business_id", input.business_id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data as BankingKpiTarget;
+  }
+
+  const { data, error } = await db
+    .from("banking_kpi_targets")
+    .insert(payload)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as BankingKpiTarget;
+}
