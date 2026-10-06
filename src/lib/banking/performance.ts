@@ -24,7 +24,7 @@ export type BankingKpiTarget = {
   kpi_definition_id: string;
   target_scope: "contractual" | "internal";
   period_start: string | null;
-  target_value: number;
+  target_value: number | null;
   source_reference: string | null;
   notes: string | null;
   created_at: string;
@@ -73,7 +73,7 @@ export type BankingKpiTemplate = {
   category: string;
   unit: string;
   weight_percent: number;
-  target_value: number;
+  target_value: number | null;
   notes?: string;
 };
 
@@ -83,7 +83,7 @@ export const CONTRACT_KPI_TEMPLATE: BankingKpiTemplate[] = [
 { code: "OTHER_RETAIL_ACCOUNTS", name: "Other Retail Accounts", category: "Accounts", unit: "count", weight_percent: 5, target_value: 15 },
 { code: "DEPOSITS", name: "Deposits", category: "Liabilities", unit: "KES", weight_percent: 40, target_value: 1_000_000 },
 { code: "MOBI", name: "Mobi", category: "Digital", unit: "count", weight_percent: 5, target_value: 9.6, notes: "Configured as 80% of the specified 12-account monthly target." },
-{ code: "CREDIT_CARDS", name: "Credit Cards", category: "Cards", unit: "count", weight_percent: 5, target_value: 0, notes: "Target was not specified in the supplied KPI schedule; configure before use." },
+{ code: "CREDIT_CARDS", name: "Credit Cards", category: "Cards", unit: "count", weight_percent: 5, target_value: null, notes: "Contract states a qualifying-new-customer basis, but the numeric target was not specified; configure the contractual number before scoring." },
 { code: "INSURANCE", name: "Insurance", category: "Insurance", unit: "KES", weight_percent: 5, target_value: 25_000 },
 { code: "VOOMA", name: "Vooma", category: "Digital", unit: "count", weight_percent: 5, target_value: 10, notes: "Merchants/agents." },
 ];
@@ -95,8 +95,8 @@ export const bankingKpiKeys = {
   performance: (periodId: string | null) => ["banking-performance", "performance", periodId] as const,
 };
 
-export function calculateKpiAchievement(actual: number, target: number) {
-  if (target <= 0) return 0;
+export function calculateKpiAchievement(actual: number, target: number | null) {
+  if (target === null || target <= 0) return 0;
   return (Math.max(0, actual) / target) * 100;
 }
 
@@ -105,7 +105,7 @@ export function calculateWeightedContribution(achievement: number, weight: numbe
 }
 
 export function calculateOverallAchievement(
-  rows: Array<{ actual_value: number; target_value: number; weight_percent: number }>,
+  rows: Array<{ actual_value: number; target_value: number | null; weight_percent: number }>,
 ) {
   return rows.reduce(
     (sum, row) =>
