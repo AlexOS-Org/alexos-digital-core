@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Building2, Landmark, Plus, Settings2, Users } from "lucide-react";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -51,7 +51,7 @@ function BankingGrowthPage() {
     );
   }
 
-  const handleProfile = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     try {
@@ -69,7 +69,7 @@ function BankingGrowthPage() {
     }
   };
 
-  const handleProduct = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleProduct = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     try {
