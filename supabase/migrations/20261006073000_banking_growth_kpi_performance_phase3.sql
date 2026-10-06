@@ -46,6 +46,48 @@ create table if not exists public.banking_kpi_targets (
     on delete cascade
 );
 
+-- Preserve business ownership across KPI relationships, not only row-level access.
+alter table public.banking_kpi_definitions
+  add constraint banking_kpi_definitions_id_business_unique unique (id, business_id);
+
+alter table public.banking_kpi_targets
+  add constraint banking_kpi_targets_definition_business_fkey
+  foreign key (kpi_definition_id, business_id)
+  references public.banking_kpi_definitions (id, business_id)
+  on delete cascade;
+
+alter table public.banking_kpi_targets
+  add constraint banking_kpi_targets_id_business_unique unique (id, business_id);
+
+alter table public.banking_performance_periods
+  add constraint banking_performance_periods_id_business_unique unique (id, business_id);
+
+alter table public.banking_kpi_performance
+  add constraint banking_kpi_performance_period_business_fkey
+  foreign key (performance_period_id, business_id)
+  references public.banking_performance_periods (id, business_id)
+  on delete cascade;
+
+alter table public.banking_kpi_performance
+  add constraint banking_kpi_performance_definition_business_fkey
+  foreign key (kpi_definition_id, business_id)
+  references public.banking_kpi_definitions (id, business_id)
+  on delete restrict;
+
+alter table public.banking_kpi_performance
+  add constraint banking_kpi_performance_target_business_fkey
+  foreign key (target_id, business_id)
+  references public.banking_kpi_targets (id, business_id)
+  on delete set null;
+
+create unique index if not exists banking_kpi_targets_baseline_unique_idx
+  on public.banking_kpi_targets (
+    business_id,
+    kpi_definition_id,
+    target_scope,
+    coalesce(period_start, date '0001-01-01')
+  );
+
 create index if not exists banking_kpi_targets_business_period_idx
   on public.banking_kpi_targets (business_id, period_start, target_scope);
 
