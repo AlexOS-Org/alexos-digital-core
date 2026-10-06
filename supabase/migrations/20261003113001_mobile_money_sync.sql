@@ -257,5 +257,5 @@ revoke all on function public.mobile_ingest_transaction(
   uuid, uuid, text, text, text, numeric, timestamptz, text, text, boolean, uuid
 ) from public, anon;
 grant execute on function public.mobile_ingest_transaction(
-  uuid, uuid, text, text, text, numeric, timestamptz, text, text, boolean
+  uuid, uuid, text, text, text, numeric, timestamptz, text, text, boolean, uuid
 ) to authenticated;
