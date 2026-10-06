@@ -129,6 +129,7 @@ function BankingGrowthPage() {
 
   const handleActivity = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const form = event.currentTarget;
     const data = new FormData(event.currentTarget);
     try {
       const followUp = String(data.get("follow_up_at") ?? "").trim();
@@ -144,7 +145,7 @@ function BankingGrowthPage() {
         follow_up_at: followUp ? new Date(followUp).toISOString() : null,
       });
       toast.success("Activity recorded");
-      event.currentTarget.reset();
+      form.reset();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not record activity");
     }
