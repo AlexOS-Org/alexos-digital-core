@@ -16,7 +16,7 @@ export type BankingActivityStatus = "planned" | "completed" | "cancelled";
 export type BankingActivity = {
   id: string;
   user_id: string;
-  business_id: string;
+  business_id: string | null;
   prospect_id: string | null;
   activity_type: BankingActivityType;
   status: BankingActivityStatus;
@@ -33,19 +33,18 @@ export type BankingActivity = {
 // These tables are delivered by the migration in this branch before generated types are refreshed.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
-export const bankingActivitiesKey = (businessId: string | null) =>
-  ["banking-personal", "activities", businessId] as const;
+export const bankingActivitiesKey = ["banking-personal", "activities"] as const;
 
-export function useBankingActivities(businessId: string | null) {
+export function useBankingActivities() {
   return useQuery({
-    queryKey: bankingActivitiesKey(businessId),
-    enabled: Boolean(businessId),
+    queryKey: bankingActivitiesKey,
     queryFn: async (): Promise<BankingActivity[]> => {
-      if (!businessId) return [];
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) return [];
       const { data, error } = await db
         .from("banking_activity_log")
         .select("*")
-        .eq("business_id", businessId)
+        .eq("user_id", auth.user.id)
         .order("activity_date", { ascending: false })
         .order("created_at", { ascending: false })
         .limit(250);
@@ -71,8 +70,7 @@ export function useCreateBankingActivity() {
       if (error) throw error;
       return data as BankingActivity;
     },
-    onSuccess: (activity) =>
-      void queryClient.invalidateQueries({ queryKey: bankingActivitiesKey(activity.business_id) }),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: bankingActivitiesKey }),
   });
 }
 
