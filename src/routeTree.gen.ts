@@ -44,6 +44,7 @@ import { Route as ShopFaqRouteImport } from './routes/shop.faq'
 import { Route as ShopProductsRouteImport } from './routes/shop.products'
 import { Route as ShopThankYouRouteImport } from './routes/shop.thank-you'
 import { Route as ShopTrackRouteImport } from './routes/shop.track'
+import { Route as AuthenticatedBankingIndexRouteImport } from './routes/_authenticated/banking.index'
 import { Route as AuthenticatedBankingAcquisitionRouteImport } from './routes/_authenticated/banking.acquisition'
 import { Route as AuthenticatedBankingPerformanceRouteImport } from './routes/_authenticated/banking.performance'
 import { Route as AuthenticatedBusinessesNoveraRouteImport } from './routes/_authenticated/businesses.novera'
@@ -270,6 +271,12 @@ const ShopTrackRoute = ShopTrackRouteImport.update({
   path: '/track',
   getParentRoute: () => ShopRoute,
 } as any)
+const AuthenticatedBankingIndexRoute =
+  AuthenticatedBankingIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedBankingRoute,
+  } as any)
 const AuthenticatedBankingAcquisitionRoute =
   AuthenticatedBankingAcquisitionRouteImport.update({
     id: '/acquisition',
@@ -617,6 +624,7 @@ export interface FileRoutesByFullPath {
   '/shop/category/$slug': typeof ShopCategorySlugRouteWithChildren
   '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
   '/shop/product/$id': typeof ShopProductIdRoute
+  '/banking/': typeof AuthenticatedBankingIndexRoute
   '/e-commerce/': typeof AuthenticatedECommerceIndexRoute
   '/money-center/': typeof AuthenticatedMoneyCenterIndexRoute
   '/people/': typeof AuthenticatedPeopleIndexRoute
@@ -631,7 +639,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/auren': typeof AuthenticatedAurenRoute
-  '/banking': typeof AuthenticatedBankingRouteWithChildren
   '/businesses': typeof AuthenticatedBusinessesRouteWithChildren
   '/calendar': typeof AuthenticatedCalendarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -696,6 +703,7 @@ export interface FileRoutesByTo {
   '/shop/category/$slug': typeof ShopCategorySlugRouteWithChildren
   '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
   '/shop/product/$id': typeof ShopProductIdRoute
+  '/banking': typeof AuthenticatedBankingIndexRoute
   '/e-commerce': typeof AuthenticatedECommerceIndexRoute
   '/money-center': typeof AuthenticatedMoneyCenterIndexRoute
   '/people': typeof AuthenticatedPeopleIndexRoute
@@ -781,6 +789,7 @@ export interface FileRoutesById {
   '/shop/category/$slug': typeof ShopCategorySlugRouteWithChildren
   '/shop/policies/$slug': typeof ShopPoliciesSlugRoute
   '/shop/product/$id': typeof ShopProductIdRoute
+  '/_authenticated/banking/': typeof AuthenticatedBankingIndexRoute
   '/_authenticated/e-commerce/': typeof AuthenticatedECommerceIndexRoute
   '/_authenticated/money-center/': typeof AuthenticatedMoneyCenterIndexRoute
   '/_authenticated/people/': typeof AuthenticatedPeopleIndexRoute
@@ -866,6 +875,7 @@ export interface FileRouteTypes {
     | '/shop/category/$slug'
     | '/shop/policies/$slug'
     | '/shop/product/$id'
+    | '/banking/'
     | '/e-commerce/'
     | '/money-center/'
     | '/people/'
@@ -880,7 +890,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/auren'
-    | '/banking'
     | '/businesses'
     | '/calendar'
     | '/dashboard'
@@ -945,6 +954,7 @@ export interface FileRouteTypes {
     | '/shop/category/$slug'
     | '/shop/policies/$slug'
     | '/shop/product/$id'
+    | '/banking'
     | '/e-commerce'
     | '/money-center'
     | '/people'
@@ -1029,6 +1039,7 @@ export interface FileRouteTypes {
     | '/shop/category/$slug'
     | '/shop/policies/$slug'
     | '/shop/product/$id'
+    | '/_authenticated/banking/'
     | '/_authenticated/e-commerce/'
     | '/_authenticated/money-center/'
     | '/_authenticated/people/'
@@ -1304,6 +1315,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/shop/track'
       preLoaderRoute: typeof ShopTrackRouteImport
       parentRoute: typeof ShopRoute
+    }
+    '/_authenticated/banking/': {
+      id: '/_authenticated/banking/'
+      path: '/'
+      fullPath: '/banking/'
+      preLoaderRoute: typeof AuthenticatedBankingIndexRouteImport
+      parentRoute: typeof AuthenticatedBankingRoute
     }
     '/_authenticated/banking/acquisition': {
       id: '/_authenticated/banking/acquisition'
@@ -1640,11 +1658,13 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedBankingRouteChildren {
   AuthenticatedBankingAcquisitionRoute: typeof AuthenticatedBankingAcquisitionRoute
   AuthenticatedBankingPerformanceRoute: typeof AuthenticatedBankingPerformanceRoute
+  AuthenticatedBankingIndexRoute: typeof AuthenticatedBankingIndexRoute
 }
 
 const AuthenticatedBankingRouteChildren: AuthenticatedBankingRouteChildren = {
   AuthenticatedBankingAcquisitionRoute: AuthenticatedBankingAcquisitionRoute,
   AuthenticatedBankingPerformanceRoute: AuthenticatedBankingPerformanceRoute,
+  AuthenticatedBankingIndexRoute: AuthenticatedBankingIndexRoute,
 }
 
 const AuthenticatedBankingRouteWithChildren =
