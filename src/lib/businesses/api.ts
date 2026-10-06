@@ -20,6 +20,42 @@ export function useBusinesses() {
   });
 }
 
+export function useCreateBusiness() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { name: string; business_type?: string | null }) => {
+      const name = input.name.trim();
+      if (!name) throw new Error("Enter a business name.");
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) throw new Error("You must be signed in to create a business workspace.");
+      const slug =
+        name
+          .toLowerCase()
+          .normalize("NFKD")
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/[\s-]+/g, "-")
+          .replace(/^-+|-+$/g, "") || "business";
+      const { data, error } = await supabase
+        .from("businesses")
+        .insert({
+          user_id: auth.user.id,
+          name,
+          slug,
+          business_type: input.business_type ?? "service",
+          status: "active",
+          currency: "KES",
+        })
+        .select(BUSINESS_COLUMNS)
+        .single();
+      if (error) throw error;
+      return data as unknown as Business;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: BUSINESSES_KEY });
+    },
+  });
+}
+
 export function useBusiness(slug: string | undefined) {
   return useQuery({
     queryKey: BUSINESS_KEY(slug ?? "none"),

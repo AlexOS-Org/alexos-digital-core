@@ -13,19 +13,37 @@ import {
   useCreateBankingProduct,
   useSaveBankingProfile,
 } from "@/lib/banking/growth";
+import { useCreateBusiness } from "@/lib/businesses/api";
 
 export const Route = createFileRoute("/_authenticated/banking")({
   component: BankingGrowthPage,
 });
 
 function BankingGrowthPage() {
-  const { business } = useBusinessContext();
+  const { business, setBusiness } = useBusinessContext();
   const businessId = business?.id ?? null;
   const profile = useBankingProfile(businessId);
   const products = useBankingProducts(businessId, true);
   const saveProfile = useSaveBankingProfile();
   const createProduct = useCreateBankingProduct();
+  const createBusiness = useCreateBusiness();
   const [showProductForm, setShowProductForm] = useState(false);
+  const [businessName, setBusinessName] = useState("");
+
+  const handleCreateBusiness = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      const created = await createBusiness.mutateAsync({
+        name: businessName,
+        business_type: "service",
+      });
+      setBusiness(created);
+      setBusinessName("");
+      toast.success(`${created.name} workspace created`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not create business workspace");
+    }
+  };
 
   if (!businessId) {
     return (
@@ -43,6 +61,26 @@ function BankingGrowthPage() {
               <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
                 Banking configuration is business-scoped. Select a business first so products,
                 acquisition activity and future financing records stay isolated correctly.
+              </p>
+              <form
+                onSubmit={handleCreateBusiness}
+                className="mt-6 flex max-w-xl flex-col gap-2 sm:flex-row"
+              >
+                <Input
+                  required
+                  value={businessName}
+                  onChange={(event) => setBusinessName(event.target.value)}
+                  placeholder="Enter your business name"
+                  aria-label="Business name"
+                />
+                <Button type="submit" disabled={createBusiness.isPending} className="shrink-0">
+                  <Plus className="mr-2 h-4 w-4" />
+                  {createBusiness.isPending ? "Creating…" : "Create workspace"}
+                </Button>
+              </form>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Your workspace is private to your account and will become the active Banking Growth
+                workspace immediately.
               </p>
             </div>
           </div>
