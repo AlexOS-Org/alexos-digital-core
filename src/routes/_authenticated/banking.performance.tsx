@@ -29,10 +29,9 @@ function currentMonth() {
 
 function BankingPerformancePage() {
   const { business } = useBusinessContext();
-  const businessId = business?.id ?? null;
-  const definitions = useBankingKpiDefinitions(businessId);
-  const targets = useBankingKpiTargets(businessId);
-  const periods = useBankingPerformancePeriods(businessId);
+  const definitions = useBankingKpiDefinitions();
+  const targets = useBankingKpiTargets();
+  const periods = useBankingPerformancePeriods();
   const [month, setMonth] = useState(currentMonth);
   const [targetScope, setTargetScope] = useState<"contractual" | "internal">("contractual");
   const [period, setPeriod] = useState<BankingPerformancePeriod | null>(null);
@@ -105,14 +104,13 @@ function BankingPerformancePage() {
   );
 
   const loadTemplate = async () => {
-    if (!businessId) return;
     setTemplateWorking(true);
     try {
-      const result = await applyContractKpiTemplate(businessId);
+      const result = await applyContractKpiTemplate();
       toast.success(
         result.inserted
           ? `Loaded ${result.inserted} contractual KPIs and targets.`
-          : "KPI template already exists for this business.",
+          : "Your personal KPI template already exists.",
       );
       await Promise.all([definitions.refetch(), targets.refetch()]);
     } catch (error) {
@@ -123,12 +121,11 @@ function BankingPerformancePage() {
   };
 
   const saveTargets = async () => {
-    if (!businessId) return;
     setWorking(true);
     try {
       for (const row of rows) {
         await saveKpiTarget({
-          business_id: businessId,
+          business_id: null,
           kpi_definition_id: row.definition.id,
           target_scope: targetScope,
           target_value: targetDrafts[row.definition.id] ?? 0,
@@ -147,7 +144,6 @@ function BankingPerformancePage() {
   };
 
   const saveMonth = async () => {
-    if (!businessId) return;
     if (!rows.length) {
       toast.error("Load or configure the KPI template first.");
       return;
@@ -163,9 +159,8 @@ function BankingPerformancePage() {
 
     setWorking(true);
     try {
-      const ensured = await ensurePerformancePeriod(businessId, month, targetScope);
+      const ensured = await ensurePerformancePeriod(month, targetScope);
       await savePerformanceSnapshot(
-        businessId,
         ensured,
         rows.map((row) => ({
           kpi_definition_id: row.definition.id,
@@ -188,17 +183,6 @@ function BankingPerformancePage() {
     }
   };
 
-  if (!businessId) {
-    return (
-      <div className="mx-auto max-w-5xl rounded-2xl border border-dashed p-8 text-center">
-        <h1 className="text-xl font-semibold">Select a business workspace</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Banking Performance is business-scoped.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -207,8 +191,8 @@ function BankingPerformancePage() {
           <h1 className="mt-1 text-3xl font-semibold tracking-tight">KPI & Performance</h1>
           <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
             Measure contractual targets, actual delivery and weighted achievement for{" "}
-            {business?.name}. Monthly snapshots are retained separately from the current KPI
-            configuration.
+            {business?.name ?? "your personal KCB workspace"}. Monthly snapshots are retained
+            separately from the current KPI configuration.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

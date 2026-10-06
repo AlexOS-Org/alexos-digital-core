@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 export type BankingKpiDefinition = {
   id: string;
   user_id: string;
-  business_id: string;
+  business_id: string | null;
   code: string;
   name: string;
   category: string;
@@ -20,7 +20,7 @@ export type BankingKpiDefinition = {
 export type BankingKpiTarget = {
   id: string;
   user_id: string;
-  business_id: string;
+  business_id?: string | null;
   kpi_definition_id: string;
   target_scope: "contractual" | "internal";
   period_start: string | null;
@@ -34,7 +34,7 @@ export type BankingKpiTarget = {
 export type BankingPerformancePeriod = {
   id: string;
   user_id: string;
-  business_id: string;
+  business_id: string | null;
   period_start: string;
   period_end: string;
   target_scope: "contractual" | "internal";
@@ -48,7 +48,7 @@ export type BankingPerformancePeriod = {
 export type BankingKpiPerformance = {
   id: string;
   user_id: string;
-  business_id: string;
+  business_id: string | null;
   performance_period_id: string;
   kpi_definition_id: string;
   target_id: string | null;
@@ -149,10 +149,9 @@ export const CONTRACT_KPI_TEMPLATE: BankingKpiTemplate[] = [
 ];
 
 export const bankingKpiKeys = {
-  definitions: (businessId: string | null) =>
-    ["banking-performance", "definitions", businessId] as const,
-  targets: (businessId: string | null) => ["banking-performance", "targets", businessId] as const,
-  periods: (businessId: string | null) => ["banking-performance", "periods", businessId] as const,
+  definitions: ["banking-performance", "definitions"] as const,
+  targets: ["banking-performance", "targets"] as const,
+  periods: ["banking-performance", "periods"] as const,
   performance: (periodId: string | null) =>
     ["banking-performance", "performance", periodId] as const,
 };
@@ -180,16 +179,16 @@ export function calculateOverallAchievement(
   );
 }
 
-export function useBankingKpiDefinitions(businessId: string | null) {
+export function useBankingKpiDefinitions() {
   return useQuery({
-    queryKey: bankingKpiKeys.definitions(businessId),
-    enabled: Boolean(businessId),
+    queryKey: bankingKpiKeys.definitions,
     queryFn: async (): Promise<BankingKpiDefinition[]> => {
-      if (!businessId) return [];
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) return [];
       const { data, error } = await db
         .from("banking_kpi_definitions")
         .select("*")
-        .eq("business_id", businessId)
+        .eq("user_id", auth.user.id)
         .order("sort_order", { ascending: true })
         .order("name", { ascending: true });
       if (error) throw error;
@@ -198,16 +197,16 @@ export function useBankingKpiDefinitions(businessId: string | null) {
   });
 }
 
-export function useBankingKpiTargets(businessId: string | null) {
+export function useBankingKpiTargets() {
   return useQuery({
-    queryKey: bankingKpiKeys.targets(businessId),
-    enabled: Boolean(businessId),
+    queryKey: bankingKpiKeys.targets,
     queryFn: async (): Promise<BankingKpiTarget[]> => {
-      if (!businessId) return [];
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) return [];
       const { data, error } = await db
         .from("banking_kpi_targets")
         .select("*")
-        .eq("business_id", businessId)
+        .eq("user_id", auth.user.id)
         .order("period_start", { ascending: false, nullsFirst: true });
       if (error) throw error;
       return data ?? [];
@@ -215,16 +214,16 @@ export function useBankingKpiTargets(businessId: string | null) {
   });
 }
 
-export function useBankingPerformancePeriods(businessId: string | null) {
+export function useBankingPerformancePeriods() {
   return useQuery({
-    queryKey: bankingKpiKeys.periods(businessId),
-    enabled: Boolean(businessId),
+    queryKey: bankingKpiKeys.periods,
     queryFn: async (): Promise<BankingPerformancePeriod[]> => {
-      if (!businessId) return [];
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) return [];
       const { data, error } = await db
         .from("banking_performance_periods")
         .select("*")
-        .eq("business_id", businessId)
+        .eq("user_id", auth.user.id)
         .order("period_start", { ascending: false });
       if (error) throw error;
       return data ?? [];
@@ -265,26 +264,25 @@ export function useCreateKpiDefinition() {
       if (error) throw error;
       return data as BankingKpiDefinition;
     },
-    onSuccess: (row) =>
-      void qc.invalidateQueries({ queryKey: bankingKpiKeys.definitions(row.business_id) }),
+    onSuccess: (row) => void qc.invalidateQueries({ queryKey: bankingKpiKeys.definitions }),
   });
 }
 
-export async function applyContractKpiTemplate(businessId: string) {
+export async function applyContractKpiTemplate() {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("Not authenticated");
 
   const { data: existing, error: existingError } = await db
     .from("banking_kpi_definitions")
     .select("code")
-    .eq("business_id", businessId);
+    .eq("user_id", auth.user.id);
   if (existingError) throw existingError;
 
   const existingCodes = new Set((existing ?? []).map((row: { code: string }) => row.code));
   const definitions = CONTRACT_KPI_TEMPLATE.filter((row) => !existingCodes.has(row.code)).map(
     (row, index) => ({
       user_id: auth.user.id,
-      business_id: businessId,
+      business_id: null,
       code: row.code,
       name: row.name,
       category: row.category,
@@ -309,7 +307,7 @@ export async function applyContractKpiTemplate(businessId: string) {
   );
   const targets = CONTRACT_KPI_TEMPLATE.filter((row) => createdByCode.has(row.code)).map((row) => ({
     user_id: auth.user.id,
-    business_id: businessId,
+    business_id: null,
     kpi_definition_id: createdByCode.get(row.code),
     target_scope: "contractual",
     period_start: null,
@@ -325,7 +323,6 @@ export async function applyContractKpiTemplate(businessId: string) {
 }
 
 export async function ensurePerformancePeriod(
-  businessId: string,
   month: string,
   targetScope: "contractual" | "internal",
 ) {
@@ -341,7 +338,7 @@ export async function ensurePerformancePeriod(
   const { data: existing, error: findError } = await db
     .from("banking_performance_periods")
     .select("*")
-    .eq("business_id", businessId)
+    .eq("user_id", auth.user.id)
     .eq("period_start", periodStart)
     .eq("target_scope", targetScope)
     .maybeSingle();
@@ -352,7 +349,7 @@ export async function ensurePerformancePeriod(
     .from("banking_performance_periods")
     .insert({
       user_id: auth.user.id,
-      business_id: businessId,
+      business_id: null,
       period_start: periodStart,
       period_end: periodEnd,
       target_scope: targetScope,
@@ -366,7 +363,6 @@ export async function ensurePerformancePeriod(
 }
 
 export async function savePerformanceSnapshot(
-  businessId: string,
   period: BankingPerformancePeriod,
   rows: Array<{
     kpi_definition_id: string;
@@ -387,7 +383,7 @@ export async function savePerformanceSnapshot(
     const achievement = calculateKpiAchievement(row.actual_value, row.target_value);
     return {
       user_id: auth.user.id,
-      business_id: businessId,
+      business_id: null,
       performance_period_id: period.id,
       kpi_definition_id: row.kpi_definition_id,
       target_id: row.target_id ?? null,
@@ -411,7 +407,7 @@ export async function savePerformanceSnapshot(
     .from("banking_performance_periods")
     .update({ overall_achievement_percent: overall })
     .eq("id", period.id)
-    .eq("business_id", businessId)
+    .eq("user_id", auth.user.id)
     .select()
     .single();
   if (error) throw error;
@@ -419,7 +415,7 @@ export async function savePerformanceSnapshot(
 }
 
 export async function saveKpiTarget(input: {
-  business_id: string;
+  business_id?: string | null;
   kpi_definition_id: string;
   target_scope: "contractual" | "internal";
   target_value: number | null;
@@ -431,7 +427,7 @@ export async function saveKpiTarget(input: {
   const { data: existing, error: findError } = await db
     .from("banking_kpi_targets")
     .select("*")
-    .eq("business_id", input.business_id)
+    .eq("user_id", auth.user.id)
     .eq("kpi_definition_id", input.kpi_definition_id)
     .eq("target_scope", input.target_scope)
     .is("period_start", null)
@@ -440,7 +436,7 @@ export async function saveKpiTarget(input: {
 
   const payload = {
     user_id: auth.user.id,
-    business_id: input.business_id,
+    business_id: input.business_id ?? null,
     kpi_definition_id: input.kpi_definition_id,
     target_scope: input.target_scope,
     period_start: null,
@@ -454,7 +450,7 @@ export async function saveKpiTarget(input: {
       .from("banking_kpi_targets")
       .update(payload)
       .eq("id", existing.id)
-      .eq("business_id", input.business_id)
+      .eq("user_id", auth.user.id)
       .select()
       .single();
     if (error) throw error;

@@ -41,7 +41,7 @@ function BankingGrowthPage() {
   const businessId = business?.id ?? null;
   const profile = useBankingProfile(businessId);
   const products = useBankingProducts(businessId, true);
-  const activities = useBankingActivities(businessId);
+  const activities = useBankingActivities();
   const prospects = useBankingProspects(businessId);
   const saveProfile = useSaveBankingProfile();
   const createProduct = useCreateBankingProduct();
@@ -66,52 +66,12 @@ function BankingGrowthPage() {
     }
   };
 
-  if (!businessId) {
-    return (
-      <div className="mx-auto max-w-5xl space-y-6">
-        <div className="dashboard-feature-surface rounded-xl p-6 sm:p-8">
-          <div className="flex gap-4">
-            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-primary/15 bg-background/80 text-primary">
-              <Landmark className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="dashboard-eyebrow mb-1">Banking Growth</p>
-              <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                Select a business workspace
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Banking configuration is business-scoped. Select a business first so products,
-                acquisition activity and future financing records stay isolated correctly.
-              </p>
-              <form
-                onSubmit={handleCreateBusiness}
-                className="mt-6 flex max-w-xl flex-col gap-2 sm:flex-row"
-              >
-                <Input
-                  required
-                  value={businessName}
-                  onChange={(event) => setBusinessName(event.target.value)}
-                  placeholder="Enter your business name"
-                  aria-label="Business name"
-                />
-                <Button type="submit" disabled={createBusiness.isPending} className="shrink-0">
-                  <Plus className="mr-2 h-4 w-4" />
-                  {createBusiness.isPending ? "Creating…" : "Create workspace"}
-                </Button>
-              </form>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Your workspace is private to your account and will become the active Banking Growth
-                workspace immediately.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const handleProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!businessId) {
+      toast.error("Create or select a workspace before saving institution settings.");
+      return;
+    }
     const data = new FormData(event.currentTarget);
     try {
       await saveProfile.mutateAsync({
@@ -133,6 +93,10 @@ function BankingGrowthPage() {
 
   const handleProduct = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!businessId) {
+      toast.error("Create or select a workspace before adding products.");
+      return;
+    }
     const data = new FormData(event.currentTarget);
     try {
       await createProduct.mutateAsync({
@@ -200,6 +164,33 @@ function BankingGrowthPage() {
         <Badge variant="outline">{business?.name ?? "Business"}</Badge>
       </header>
 
+      {!businessId ? (
+        <Card className="border-primary/25 bg-primary/5">
+          <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-semibold">KCB personal dashboard is ready</p>
+              <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
+                Your KCB activities and performance are personal to your account and can be used
+                immediately. Select or create a business workspace only when you want to configure
+                institution details, products, prospects, or acquisition records.
+              </p>
+            </div>
+            <form onSubmit={handleCreateBusiness} className="flex shrink-0 gap-2">
+              <Input
+                required
+                value={businessName}
+                onChange={(event) => setBusinessName(event.target.value)}
+                placeholder="Workspace name"
+                aria-label="Workspace name"
+              />
+              <Button type="submit" disabled={createBusiness.isPending}>
+                {createBusiness.isPending ? "Creating…" : "Create workspace"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      ) : null}
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Metric
           icon={Landmark}
@@ -220,7 +211,7 @@ function BankingGrowthPage() {
             </CardTitle>
             <p className="mt-1 text-sm text-muted-foreground">
               Record calls, visits, meetings, follow-ups and customer conversations. Metrics are
-              derived only from your recorded activity and stay inside this business workspace.
+              derived only from your recorded activity and stay private to your user account.
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -378,7 +369,11 @@ function BankingGrowthPage() {
                 placeholder="Profile notes"
                 className="sm:col-span-2"
               />
-              <Button type="submit" disabled={saveProfile.isPending} className="sm:col-span-2">
+              <Button
+                type="submit"
+                disabled={!businessId || saveProfile.isPending}
+                className="sm:col-span-2"
+              >
                 <Settings2 className="mr-2 h-4 w-4" />
                 {saveProfile.isPending ? "Saving…" : "Save profile"}
               </Button>
@@ -432,10 +427,14 @@ function BankingGrowthPage() {
           <div>
             <CardTitle className="text-base">Product catalog</CardTitle>
             <p className="mt-1 text-xs text-muted-foreground">
-              Configurable catalog for the current institution and business.
+              Workspace-scoped catalog for the current institution and business.
             </p>
           </div>
-          <Button variant="outline" onClick={() => setShowProductForm((value) => !value)}>
+          <Button
+            variant="outline"
+            disabled={!businessId}
+            onClick={() => setShowProductForm((value) => !value)}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add product
           </Button>
