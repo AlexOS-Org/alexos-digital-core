@@ -329,7 +329,7 @@ function BankingGrowthPage() {
                 <ScoreRow label="Follow-ups due" value={activityMetrics.followUpsDue} />
               </div>
               <Button asChild variant="outline" className="mt-5 w-full">
-                <Link to="/banking/performance">Open KCB performance dashboard</Link>
+                <a href="/banking/performance">Open KCB performance dashboard</a>
               </Button>
             </div>
           </div>
@@ -418,7 +418,7 @@ function BankingGrowthPage() {
             </p>
           </div>
           <Button asChild>
-            <Link to="/banking/performance">Open performance workspace</Link>
+            <a href="/banking/performance">Open performance workspace</a>
           </Button>
         </CardContent>
       </Card>
