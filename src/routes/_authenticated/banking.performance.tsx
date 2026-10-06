@@ -4,7 +4,6 @@ import { CheckCircle2, Gauge, RefreshCw, Settings2, Target } from "lucide-react"
 import { toast } from "sonner";
 import { useBusinessContext } from "@/lib/businesses/context";
 import {
-  CONTRACT_KPI_TEMPLATE,
   applyContractKpiTemplate,
   calculateKpiAchievement,
   calculateOverallAchievement,
@@ -16,7 +15,6 @@ import {
   useBankingKpiPerformance,
   useBankingKpiTargets,
   useBankingPerformancePeriods,
-  type BankingKpiDefinition,
   type BankingPerformancePeriod,
 } from "@/lib/banking/performance";
 
