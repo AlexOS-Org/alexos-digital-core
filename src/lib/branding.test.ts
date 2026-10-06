@@ -51,6 +51,9 @@ describe("truthful roadmap labels", () => {
     expect(placeholder).toContain("Persistence and integrations pending");
     expect(placeholder).not.toContain("Coming Soon");
     expect(placeholder).not.toContain("Build in Progress");
-    expect(modules.match(/description: "Roadmap preview/g)?.length).toBeGreaterThanOrEqual(10);
+    expect(modules).toContain(
+      'description: "Owner-scoped actions, priorities and daily execution."',
+    );
+    expect(modules.match(/description: "Roadmap preview/g)?.length).toBe(9);
   });
 });

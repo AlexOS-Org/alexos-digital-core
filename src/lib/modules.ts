@@ -187,9 +187,8 @@ export const modules: ModuleDef[] = [
     title: "Tasks",
     url: "/tasks",
     icon: CheckSquare,
-    description: "Roadmap preview — actions, priorities and daily execution.",
+    description: "Owner-scoped actions, priorities and daily execution.",
     group: "Missions",
-    preview: true,
   },
   {
     title: "Calendar",
