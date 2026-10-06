@@ -10,7 +10,6 @@ export type BankingKpiDefinition = {
   category: string;
   unit: string;
   weight_percent: number;
-  target_scope: "contractual" | "internal";
   active: boolean;
   sort_order: number;
   notes: string | null;
@@ -73,20 +72,19 @@ export type BankingKpiTemplate = {
   category: string;
   unit: string;
   weight_percent: number;
-  target_scope: "contractual" | "internal";
   target_value: number;
   notes?: string;
 };
 
 export const CONTRACT_KPI_TEMPLATE: BankingKpiTemplate[] = [
-  { code: "LOANS", name: "Loans", category: "Lending", unit: "KES", weight_percent: 30, target_scope: "contractual", target_value: 2_000_000 },
-  { code: "SALARY_ACCOUNTS", name: "Salary Accounts", category: "Accounts", unit: "count", weight_percent: 5, target_scope: "contractual", target_value: 10 },
-  { code: "OTHER_RETAIL_ACCOUNTS", name: "Other Retail Accounts", category: "Accounts", unit: "count", weight_percent: 5, target_scope: "contractual", target_value: 15 },
-  { code: "DEPOSITS", name: "Deposits", category: "Liabilities", unit: "KES", weight_percent: 40, target_scope: "contractual", target_value: 1_000_000 },
-  { code: "MOBI", name: "Mobi", category: "Digital", unit: "count", weight_percent: 5, target_scope: "contractual", target_value: 9.6, notes: "Configured as 80% of the specified 12-account monthly target." },
-  { code: "CREDIT_CARDS", name: "Credit Cards", category: "Cards", unit: "count", weight_percent: 5, target_scope: "contractual", target_value: 0, notes: "Target was not specified in the supplied KPI schedule; configure before use." },
-  { code: "INSURANCE", name: "Insurance", category: "Insurance", unit: "KES", weight_percent: 5, target_scope: "contractual", target_value: 25_000 },
-  { code: "VOOMA", name: "Vooma", category: "Digital", unit: "count", weight_percent: 5, target_scope: "contractual", target_value: 10, notes: "Merchants/agents." },
+{ code: "LOANS", name: "Loans", category: "Lending", unit: "KES", weight_percent: 30, target_value: 2_000_000 },
+{ code: "SALARY_ACCOUNTS", name: "Salary Accounts", category: "Accounts", unit: "count", weight_percent: 5, target_value: 10 },
+{ code: "OTHER_RETAIL_ACCOUNTS", name: "Other Retail Accounts", category: "Accounts", unit: "count", weight_percent: 5, target_value: 15 },
+{ code: "DEPOSITS", name: "Deposits", category: "Liabilities", unit: "KES", weight_percent: 40, target_value: 1_000_000 },
+{ code: "MOBI", name: "Mobi", category: "Digital", unit: "count", weight_percent: 5, target_value: 9.6, notes: "Configured as 80% of the specified 12-account monthly target." },
+{ code: "CREDIT_CARDS", name: "Credit Cards", category: "Cards", unit: "count", weight_percent: 5, target_value: 0, notes: "Target was not specified in the supplied KPI schedule; configure before use." },
+{ code: "INSURANCE", name: "Insurance", category: "Insurance", unit: "KES", weight_percent: 5, target_value: 25_000 },
+{ code: "VOOMA", name: "Vooma", category: "Digital", unit: "count", weight_percent: 5, target_value: 10, notes: "Merchants/agents." },
 ];
 
 export const bankingKpiKeys = {
@@ -224,7 +222,6 @@ export async function applyContractKpiTemplate(businessId: string) {
     category: row.category,
     unit: row.unit,
     weight_percent: row.weight_percent,
-    target_scope: row.target_scope,
     active: true,
     sort_order: index,
     notes: row.notes ?? null,
@@ -245,7 +242,7 @@ export async function applyContractKpiTemplate(businessId: string) {
       user_id: auth.user.id,
       business_id: businessId,
       kpi_definition_id: createdByCode.get(row.code),
-      target_scope: row.target_scope,
+      target_scope: "contractual",
       period_start: null,
       target_value: row.target_value,
       source_reference: "Approved Banking Growth KPI schedule",
