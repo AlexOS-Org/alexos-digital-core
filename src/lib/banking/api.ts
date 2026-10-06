@@ -23,6 +23,7 @@ export type BankingEmployer = {
 
 export type BankingSignal = {
   id: string;
+  user_id: string;
   business_id: string;
   employer_id: string;
   signal_type: string;
@@ -37,6 +38,7 @@ export type BankingSignal = {
 
 export type BankingProspect = {
   id: string;
+  user_id: string;
   business_id: string;
   employer_id: string;
   crm_contact_id: string | null;
