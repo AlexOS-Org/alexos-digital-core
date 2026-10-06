@@ -13,6 +13,11 @@ import {
   type ContractKpi,
   type WeeklyPerformance,
 } from "@/lib/banking/contract-performance";
+import {
+  useCustomerSalesActions,
+  type CustomerSaleStatus,
+  type QualificationStatus,
+} from "@/lib/banking/customer-sales";
 
 export const Route = createFileRoute("/_authenticated/banking/performance")({
   component: BankingPerformancePage,
@@ -23,6 +28,7 @@ function BankingPerformancePage() {
   const framework = useContractFramework();
   const kpis = framework.data?.kpis ?? [];
   const contract = framework.data?.contract;
+  const salesActions = useCustomerSalesActions(contract, kpis);
   const weekStart = weekStartFor();
   const [actuals, setActuals] = useState<Record<string, number>>({});
   const [qualified, setQualified] = useState<Record<string, number>>({});
@@ -34,6 +40,7 @@ function BankingPerformancePage() {
   const [planFocus, setPlanFocus] = useState("");
   const [planActions, setPlanActions] = useState("");
   const [planMeasure, setPlanMeasure] = useState("");
+  const [saleKpi, setSaleKpi] = useState("");
 
   const latestByKpi = useMemo(() => {
     const map = new Map<string, WeeklyPerformance>();
@@ -139,6 +146,44 @@ function BankingPerformancePage() {
       toast.success("Improvement plan added");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not add improvement plan");
+    }
+  };
+  const addCustomerSale = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!contract || !saleKpi) return;
+    const data = new FormData(event.currentTarget);
+    const kpi = kpis.find((item) => item.id === saleKpi);
+    if (!kpi) return;
+    const scoreValue = Number(data.get("score_value")) || 0;
+    const qualifiedValue = Number(data.get("qualified_value")) || 0;
+    if (qualifiedValue > scoreValue) {
+      toast.error("Qualified value cannot be greater than the scorecard value.");
+      return;
+    }
+    try {
+      await salesActions.addSale.mutateAsync({
+        contract_id: contract.id,
+        kpi_id: kpi.id,
+        sale_date: String(data.get("sale_date") || new Date().toISOString().slice(0, 10)),
+        customer_name: String(data.get("customer_name") || "").trim(),
+        customer_reference: String(data.get("customer_reference") || "").trim() || null,
+        product_name: String(data.get("product_name") || "").trim(),
+        product_status: String(data.get("product_status") || "sold") as CustomerSaleStatus,
+        amount: Number(data.get("amount")) || 0,
+        quantity: Number(data.get("quantity")) || 1,
+        actual_value: scoreValue,
+        qualified_value: qualifiedValue,
+        qualification_status: String(
+          data.get("qualification_status") || "pending",
+        ) as QualificationStatus,
+        evidence_reference: String(data.get("evidence_reference") || "").trim() || null,
+        notes: String(data.get("notes") || "").trim() || null,
+      });
+      event.currentTarget.reset();
+      setSaleKpi("");
+      toast.success("Customer sale recorded and weekly scorecard synced");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not record customer sale");
     }
   };
   const downloadReport = () => {
@@ -333,6 +378,198 @@ function BankingPerformancePage() {
               })}
             </tbody>
           </table>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border bg-card p-5">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="font-semibold">Record a customer product sale</h2>
+            <p className="mt-1 max-w-3xl text-xs leading-5 text-muted-foreground">
+              Enter what you sold to each customer. The record is linked to one contract area,
+              creates a validation record, and automatically recalculates this week&apos;s
+              scorecard. Do not enter PINs, account numbers, national ID numbers, or other
+              unnecessary sensitive data.
+            </p>
+          </div>
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
+            Customer-level source of truth
+          </span>
+        </div>
+        <form
+          onSubmit={addCustomerSale}
+          className="mt-4 grid gap-3 rounded-xl border p-4 md:grid-cols-2 lg:grid-cols-4"
+        >
+          <select
+            required
+            value={saleKpi}
+            onChange={(event) => setSaleKpi(event.target.value)}
+            className="rounded-lg border bg-background px-3 py-2 text-sm"
+          >
+            <option value="">Contract area</option>
+            {kpis.map((kpi) => (
+              <option key={kpi.id} value={kpi.id}>
+                {kpi.name}
+              </option>
+            ))}
+          </select>
+          <input
+            name="customer_name"
+            required
+            placeholder="Customer name"
+            className="rounded-lg border bg-background px-3 py-2 text-sm"
+          />
+          <input
+            name="customer_reference"
+            placeholder="Safe customer reference (optional)"
+            className="rounded-lg border bg-background px-3 py-2 text-sm"
+          />
+          <input
+            name="product_name"
+            required
+            placeholder="Product sold e.g. Personal Loan"
+            className="rounded-lg border bg-background px-3 py-2 text-sm"
+          />
+          <input
+            name="sale_date"
+            type="date"
+            defaultValue={new Date().toISOString().slice(0, 10)}
+            required
+            className="rounded-lg border bg-background px-3 py-2 text-sm"
+          />
+          <select
+            name="product_status"
+            defaultValue="sold"
+            className="rounded-lg border bg-background px-3 py-2 text-sm"
+          >
+            <option value="lead">Lead</option>
+            <option value="application">Application</option>
+            <option value="approved">Approved</option>
+            <option value="sold">Sold</option>
+            <option value="activated">Activated</option>
+            <option value="funded">Funded</option>
+            <option value="paid">Paid</option>
+          </select>
+          <input
+            name="amount"
+            type="number"
+            min="0"
+            step="any"
+            placeholder="Amount (KES), if applicable"
+            className="rounded-lg border bg-background px-3 py-2 text-sm"
+          />
+          <input
+            name="quantity"
+            type="number"
+            min="0"
+            step="any"
+            defaultValue="1"
+            placeholder="Quantity"
+            className="rounded-lg border bg-background px-3 py-2 text-sm"
+          />
+          <input
+            name="score_value"
+            required
+            type="number"
+            min="0"
+            step="any"
+            placeholder="Scorecard value: KES / count / %"
+            className="rounded-lg border bg-background px-3 py-2 text-sm"
+          />
+          <input
+            name="qualified_value"
+            required
+            type="number"
+            min="0"
+            step="any"
+            defaultValue="0"
+            placeholder="Qualified value"
+            className="rounded-lg border bg-background px-3 py-2 text-sm"
+          />
+          <select
+            name="qualification_status"
+            defaultValue="pending"
+            className="rounded-lg border bg-background px-3 py-2 text-sm"
+          >
+            <option value="pending">Pending validation</option>
+            <option value="verified">Verified</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <input
+            name="evidence_reference"
+            placeholder="Evidence reference e.g. receipt / application ID"
+            className="rounded-lg border bg-background px-3 py-2 text-sm"
+          />
+          <input
+            name="notes"
+            placeholder="Notes / next step"
+            className="rounded-lg border bg-background px-3 py-2 text-sm md:col-span-2"
+          />
+          <button
+            type="submit"
+            disabled={salesActions.addSale.isPending}
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          >
+            {salesActions.addSale.isPending ? "Saving…" : "Save customer sale"}
+          </button>
+        </form>
+        <p className="mt-3 text-xs text-muted-foreground">
+          For KES areas, enter the monetary amount as the scorecard value. For accounts, Mobi, and
+          Vooma enter the qualified count. For credit cards enter the eligible-customer conversion
+          percentage when verified.
+        </p>
+        <div className="mt-5 overflow-x-auto rounded-xl border">
+          <table className="w-full min-w-[900px] text-sm">
+            <thead className="border-b bg-muted/30 text-left text-xs text-muted-foreground">
+              <tr>
+                <th className="p-3">Date</th>
+                <th className="p-3">Customer</th>
+                <th className="p-3">Area / product</th>
+                <th className="p-3">Scorecard value</th>
+                <th className="p-3">Validation</th>
+                <th className="p-3">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {(salesActions.sales.data ?? []).slice(0, 12).map((sale) => (
+                <tr key={sale.id}>
+                  <td className="p-3 text-xs text-muted-foreground">{sale.sale_date}</td>
+                  <td className="p-3 font-medium">{sale.customer_name}</td>
+                  <td className="p-3">
+                    {kpis.find((kpi) => kpi.id === sale.kpi_id)?.name} · {sale.product_name}
+                  </td>
+                  <td className="p-3">
+                    {sale.actual_value} / {sale.qualified_value}
+                  </td>
+                  <td className="p-3 capitalize">{sale.qualification_status}</td>
+                  <td className="p-3">
+                    {sale.qualification_status === "pending" ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void salesActions.updateQualification.mutateAsync({
+                            id: sale.id,
+                            qualification_status: "verified",
+                            qualified_value: sale.actual_value,
+                          })
+                        }
+                        className="rounded border px-2 py-1 text-xs"
+                      >
+                        Mark verified
+                      </button>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {!salesActions.sales.data?.length ? (
+            <p className="p-6 text-center text-sm text-muted-foreground">
+              No customer sales recorded yet.
+            </p>
+          ) : null}
         </div>
       </section>
 
