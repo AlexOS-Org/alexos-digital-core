@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 export type BankingEmployer = {
   id: string;
   user_id: string;
+  business_id: string;
   company_name: string;
   industry: string | null;
   location: string | null;
@@ -22,6 +23,7 @@ export type BankingEmployer = {
 
 export type BankingSignal = {
   id: string;
+  business_id: string;
   employer_id: string;
   signal_type: string;
   title: string;
@@ -35,6 +37,7 @@ export type BankingSignal = {
 
 export type BankingProspect = {
   id: string;
+  business_id: string;
   employer_id: string;
   crm_contact_id: string | null;
   first_name: string;
@@ -70,13 +73,16 @@ export const bankingEmployersKey = ["banking", "employers"] as const;
 export const bankingSignalsKey = ["banking", "signals"] as const;
 export const bankingProspectsKey = ["banking", "prospects"] as const;
 
-export function useBankingEmployers() {
+export function useBankingEmployers(businessId: string | null) {
   return useQuery({
-    queryKey: bankingEmployersKey,
+    queryKey: [...bankingEmployersKey, businessId],
+    enabled: Boolean(businessId),
     queryFn: async (): Promise<BankingEmployer[]> => {
+      if (!businessId) return [];
       const { data, error } = await db
         .from("banking_employers")
         .select("*")
+        .eq("business_id", businessId)
         .order("hiring_momentum_score", { ascending: false })
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -85,13 +91,16 @@ export function useBankingEmployers() {
   });
 }
 
-export function useBankingSignals() {
+export function useBankingSignals(businessId: string | null) {
   return useQuery({
-    queryKey: bankingSignalsKey,
+    queryKey: [...bankingSignalsKey, businessId],
+    enabled: Boolean(businessId),
     queryFn: async (): Promise<BankingSignal[]> => {
+      if (!businessId) return [];
       const { data, error } = await db
         .from("banking_recruitment_signals")
         .select("*")
+        .eq("business_id", businessId)
         .neq("status", "dismissed")
         .order("detected_at", { ascending: false })
         .limit(50);
@@ -101,13 +110,16 @@ export function useBankingSignals() {
   });
 }
 
-export function useBankingProspects() {
+export function useBankingProspects(businessId: string | null) {
   return useQuery({
-    queryKey: bankingProspectsKey,
+    queryKey: [...bankingProspectsKey, businessId],
+    enabled: Boolean(businessId),
     queryFn: async (): Promise<BankingProspect[]> => {
+      if (!businessId) return [];
       const { data, error } = await db
         .from("banking_employee_prospects")
         .select("*")
+        .eq("business_id", businessId)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
@@ -121,6 +133,7 @@ export function useCreateBankingEmployer() {
     mutationFn: async (
       input: Pick<
         BankingEmployer,
+        | "business_id"
         | "company_name"
         | "industry"
         | "location"
@@ -144,7 +157,7 @@ export function useCreateBankingEmployer() {
       if (error) throw error;
       return data as BankingEmployer;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: bankingEmployersKey }),
+    onSuccess: (employer) => qc.invalidateQueries({ queryKey: [...bankingEmployersKey, employer.business_id] }),
   });
 }
 
@@ -164,7 +177,7 @@ export function useCreateBankingProspect() {
       if (error) throw error;
       return data as BankingProspect;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: bankingProspectsKey }),
+    onSuccess: (prospect) => qc.invalidateQueries({ queryKey: [...bankingProspectsKey, prospect.business_id] }),
   });
 }
 
@@ -193,7 +206,8 @@ export async function createCrmContactFromBankingProspect(prospect: BankingProsp
   const { error: linkError } = await db
     .from("banking_employee_prospects")
     .update({ crm_contact_id: data.id })
-    .eq("id", prospect.id);
+    .eq("id", prospect.id)
+    .eq("business_id", prospect.business_id);
   if (linkError) throw linkError;
   return data;
 }
