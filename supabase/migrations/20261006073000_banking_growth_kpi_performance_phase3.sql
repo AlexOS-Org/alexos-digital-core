@@ -12,15 +12,13 @@ create table if not exists public.banking_kpi_definitions (
   category text not null,
   unit text not null default 'count',
   weight_percent numeric(7,3) not null,
-  target_scope text not null default 'contractual',
   active boolean not null default true,
   sort_order integer not null default 0,
   notes text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique (business_id, code),
-  check (weight_percent >= 0 and weight_percent <= 100),
-  check (target_scope in ('contractual','internal'))
+  check (weight_percent >= 0 and weight_percent <= 100)
 );
 
 create index if not exists banking_kpi_definitions_business_active_idx
