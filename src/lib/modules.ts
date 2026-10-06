@@ -110,9 +110,8 @@ export const modules: ModuleDef[] = [
     title: "Banking",
     url: "/banking",
     icon: Landmark,
-    description: "Roadmap preview — loans, deposits and banking relationships.",
+    description: "Banking growth, products, relationships and financing pipeline.",
     group: "Money",
-    preview: true,
   },
 
   // ── Auren ────────────────────────────────────────────
