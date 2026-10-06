@@ -1,434 +1,564 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, Gauge, RefreshCw, Settings2, Target } from "lucide-react";
 import { toast } from "sonner";
 import { useBusinessContext } from "@/lib/businesses/context";
 import {
-  applyContractKpiTemplate,
-  calculateKpiAchievement,
-  calculateOverallAchievement,
-  calculateWeightedContribution,
-  ensurePerformancePeriod,
-  saveKpiTarget,
-  savePerformanceSnapshot,
-  useBankingKpiDefinitions,
-  useBankingKpiPerformance,
-  useBankingKpiTargets,
-  useBankingPerformancePeriods,
-  type BankingKpiTarget,
-  type BankingPerformancePeriod,
-} from "@/lib/banking/performance";
+  CONTRACT_VERSION,
+  scoreBand,
+  scoreAchievement,
+  weightedScore,
+  weeklyTarget,
+  weekStartFor,
+  useContractFramework,
+  type ContractKpi,
+  type WeeklyPerformance,
+} from "@/lib/banking/contract-performance";
 
 export const Route = createFileRoute("/_authenticated/banking/performance")({
   component: BankingPerformancePage,
 });
 
-function currentMonth() {
-  return new Date().toISOString().slice(0, 7);
-}
-
 function BankingPerformancePage() {
   const { business } = useBusinessContext();
-  const definitions = useBankingKpiDefinitions();
-  const targets = useBankingKpiTargets();
-  const periods = useBankingPerformancePeriods();
-  const [month, setMonth] = useState(currentMonth);
-  const [targetScope, setTargetScope] = useState<"contractual" | "internal">("contractual");
-  const [period, setPeriod] = useState<BankingPerformancePeriod | null>(null);
+  const framework = useContractFramework();
+  const kpis = framework.data?.kpis ?? [];
+  const contract = framework.data?.contract;
+  const weekStart = weekStartFor();
   const [actuals, setActuals] = useState<Record<string, number>>({});
-  const [targetDrafts, setTargetDrafts] = useState<Record<string, number | null>>({});
-  const [working, setWorking] = useState(false);
-  const [templateWorking, setTemplateWorking] = useState(false);
+  const [qualified, setQualified] = useState<Record<string, number>>({});
+  const [blockers, setBlockers] = useState<Record<string, string>>({});
+  const [nextActions, setNextActions] = useState<Record<string, string>>({});
+  const [evidenceKpi, setEvidenceKpi] = useState("");
+  const [evidenceRef, setEvidenceRef] = useState("");
+  const [evidenceType, setEvidenceType] = useState("system record");
+  const [planFocus, setPlanFocus] = useState("");
+  const [planActions, setPlanActions] = useState("");
+  const [planMeasure, setPlanMeasure] = useState("");
 
-  const existingPeriod = useMemo(
-    () =>
-      (periods.data ?? []).find(
-        (item) => item.period_start.startsWith(month) && item.target_scope === targetScope,
-      ),
-    [periods.data, month, targetScope],
-  );
-  const performance = useBankingKpiPerformance(period?.id ?? existingPeriod?.id ?? null);
-
-  const targetByDefinition = useMemo(() => {
-    const map = new Map<string, BankingKpiTarget>();
-    for (const target of targets.data ?? []) {
-      if (target.period_start === null && target.target_scope === targetScope) {
-        map.set(target.kpi_definition_id, target);
-      }
-    }
+  const latestByKpi = useMemo(() => {
+    const map = new Map<string, WeeklyPerformance>();
+    for (const row of framework.weekly.data ?? [])
+      if (!map.has(row.kpi_id)) map.set(row.kpi_id, row);
     return map;
-  }, [targets.data, targetScope]);
-
-  useEffect(() => {
-    if (existingPeriod) setPeriod(existingPeriod);
-    else setPeriod(null);
-  }, [existingPeriod]);
-
-  useEffect(() => {
-    const next: Record<string, number | null> = {};
-    for (const definition of definitions.data ?? []) {
-      const target = targetByDefinition.get(definition.id);
-      next[definition.id] = target?.target_value ?? null;
-    }
-    setTargetDrafts(next);
-  }, [definitions.data, targetByDefinition]);
-
-  useEffect(() => {
-    const next: Record<string, number> = {};
-    for (const row of performance.data ?? []) next[row.kpi_definition_id] = row.actual_value;
-    setActuals(next);
-  }, [performance.data]);
-
-  const rows = useMemo(
-    () =>
-      (definitions.data ?? [])
-        .filter((definition) => definition.active)
-        .map((definition) => ({
-          definition,
-          target: targetDrafts[definition.id] ?? 0,
-          actual: actuals[definition.id] ?? 0,
-          targetRecord: targetByDefinition.get(definition.id),
-        })),
-    [definitions.data, targetDrafts, actuals, targetByDefinition],
+  }, [framework.weekly.data]);
+  const currentRows = kpis.map((kpi) => ({
+    kpi,
+    actual: actuals[kpi.id] ?? latestByKpi.get(kpi.id)?.actual_value ?? 0,
+    qualified: qualified[kpi.id] ?? latestByKpi.get(kpi.id)?.qualified_value ?? 0,
+    target: weeklyTarget(kpi),
+  }));
+  const score = weightedScore(
+    currentRows.map((row) => ({
+      actual: row.qualified,
+      target: row.target,
+      weight: row.kpi.weight_percent,
+    })),
   );
-
-  const configuredRows = rows.filter((row) => row.target !== null && row.target > 0);
-  const missingTargets = rows.filter((row) => row.target === null || row.target <= 0);
-  const totalWeight = rows.reduce((sum, row) => sum + row.definition.weight_percent, 0);
-  const liveOverall = calculateOverallAchievement(
-    configuredRows.map((row) => ({
-      actual_value: row.actual,
-      target_value: row.target,
-      weight_percent: row.definition.weight_percent,
+  const band = scoreBand(score);
+  const rollingWeeks = new Set(
+    (framework.weekly.data ?? []).slice(0, 13).map((row) => row.week_start),
+  );
+  const rollingRows = kpis.map((kpi) => {
+    const rows = (framework.weekly.data ?? []).filter(
+      (row) => row.kpi_id === kpi.id && rollingWeeks.has(row.week_start),
+    );
+    const target =
+      kpi.target_period === "rolling_3_month" ? kpi.target_value : kpi.target_value * 3;
+    return { kpi, actual: rows.reduce((sum, row) => sum + row.qualified_value, 0), target };
+  });
+  const rollingScore = weightedScore(
+    rollingRows.map((row) => ({
+      actual: row.actual,
+      target: row.target,
+      weight: row.kpi.weight_percent,
     })),
   );
 
-  const loadTemplate = async () => {
-    setTemplateWorking(true);
+  const saveWeekly = async () => {
+    if (!contract) return;
     try {
-      const result = await applyContractKpiTemplate();
-      toast.success(
-        result.inserted
-          ? `Loaded ${result.inserted} contractual KPIs and targets.`
-          : "Your personal KPI template already exists.",
+      await Promise.all(
+        currentRows.map((row) =>
+          framework.recordWeekly.mutateAsync({
+            contract_id: contract.id,
+            kpi_id: row.kpi.id,
+            week_start: weekStart,
+            actual_value: row.actual,
+            qualified_value: row.qualified,
+            target_value: row.target,
+            blockers: blockers[row.kpi.id] || null,
+            next_action: nextActions[row.kpi.id] || row.kpi.improvement_action,
+            manager_note: null,
+          }),
+        ),
       );
-      await Promise.all([definitions.refetch(), targets.refetch()]);
+      toast.success("Weekly contract performance saved");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not load KPI template");
-    } finally {
-      setTemplateWorking(false);
+      toast.error(error instanceof Error ? error.message : "Could not save weekly performance");
     }
   };
-
-  const saveTargets = async () => {
-    setWorking(true);
+  const addEvidence = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!contract || !evidenceKpi || !evidenceRef.trim()) return;
     try {
-      for (const row of rows) {
-        await saveKpiTarget({
-          business_id: null,
-          kpi_definition_id: row.definition.id,
-          target_scope: targetScope,
-          target_value: targetDrafts[row.definition.id] ?? 0,
-          source_reference:
-            row.targetRecord?.source_reference ?? "Banking Growth KPI configuration",
-          notes: row.targetRecord?.notes ?? null,
-        });
-      }
-      await targets.refetch();
-      toast.success("KPI targets saved");
+      await framework.addEvidence.mutateAsync({
+        contract_id: contract.id,
+        kpi_id: evidenceKpi,
+        evidence_date: new Date().toISOString().slice(0, 10),
+        evidence_type: evidenceType,
+        reference_text: evidenceRef.trim(),
+        amount: null,
+        status: "pending",
+        notes: null,
+      });
+      setEvidenceRef("");
+      toast.success("Evidence added for validation");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not save targets");
-    } finally {
-      setWorking(false);
+      toast.error(error instanceof Error ? error.message : "Could not add evidence");
     }
   };
-
-  const saveMonth = async () => {
-    if (!rows.length) {
-      toast.error("Load or configure the KPI template first.");
-      return;
-    }
-    if (missingTargets.length) {
-      toast.error("Every active KPI needs a target before monthly performance can be saved.");
-      return;
-    }
-    if (Math.abs(totalWeight - 100) > 0.001) {
-      toast.error(`Active KPI weights must total 100%. Current total: ${totalWeight.toFixed(1)}%.`);
-      return;
-    }
-
-    setWorking(true);
+  const addPlan = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!contract || !planFocus.trim() || !planActions.trim() || !planMeasure.trim()) return;
     try {
-      const ensured = await ensurePerformancePeriod(month, targetScope);
-      await savePerformanceSnapshot(
-        ensured,
-        rows.map((row) => ({
-          kpi_definition_id: row.definition.id,
-          target_id: row.targetRecord?.id ?? null,
-          target_scope: targetScope,
-          target_value: row.target,
-          actual_value: actuals[row.definition.id] ?? 0,
-          weight_percent: row.definition.weight_percent,
-        })),
-      );
-      setPeriod(ensured);
-      await Promise.all([periods.refetch(), performance.refetch()]);
-      toast.success(
-        `${month} performance saved — ${liveOverall.toFixed(1)}% weighted achievement.`,
-      );
+      const end = new Date();
+      end.setDate(end.getDate() + 60);
+      await framework.addPlan.mutateAsync({
+        contract_id: contract.id,
+        start_date: new Date().toISOString().slice(0, 10),
+        end_date: end.toISOString().slice(0, 10),
+        status: "active",
+        focus_area: planFocus.trim(),
+        actions: planActions.trim(),
+        success_measure: planMeasure.trim(),
+        manager_notes: null,
+      });
+      setPlanFocus("");
+      setPlanActions("");
+      setPlanMeasure("");
+      toast.success("Improvement plan added");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not save monthly performance");
-    } finally {
-      setWorking(false);
+      toast.error(error instanceof Error ? error.message : "Could not add improvement plan");
     }
   };
+  const downloadReport = () => {
+    const report = `# Promotion Readiness Report\n\n**Employee:** ____________________  \n**Contract:** ${contract?.title ?? "KCB Retail Direct Sales Representative"}  \n**Contract version:** ${CONTRACT_VERSION}  \n**Reporting week:** ${weekStart}  \n**Business context:** ${business?.name ?? "Personal KCB performance workspace"}\n\n## Executive score\n\n- Weekly weighted pace: **${score.toFixed(1)}%** — ${band.label}\n- Three-month rolling score: **${rollingScore.toFixed(1)}%**\n- Full-performance threshold: **90%**\n- Target exceeded threshold: **100%**\n\n## Eight-area scorecard\n\n| Area | Weight | Weekly qualified | Weekly target | Achievement | Gap / next action |\n|---|---:|---:|---:|---:|---|\n${currentRows.map((row) => `| ${row.kpi.name} | ${row.kpi.weight_percent}% | ${row.qualified} ${row.kpi.unit} | ${row.target.toFixed(1)} | ${scoreAchievement(row.qualified, row.target).toFixed(1)}% | ${nextActions[row.kpi.id] || row.kpi.improvement_action} |`).join("\n")}\n\n## Evidence submitted\n\n${(framework.evidence.data ?? []).map((item) => `- ${item.evidence_date} — ${item.evidence_type}: ${item.reference_text} (${item.status})`).join("\n") || "- No evidence submitted yet."}\n\n## Strengths\n\n- ______________________________________________\n- ______________________________________________\n\n## Improvement priorities\n\n${
+      currentRows
+        .filter((row) => row.qualified < row.target)
+        .map((row) => `- **${row.kpi.name}:** ${row.kpi.improvement_action}`)
+        .join("\n") || "- Maintain target performance and build above-target evidence."
+    }\n\n## Promotion discussion\n\n**Promotion case:** ______________________________________________\n\n**Manager comments:** _____________________________________________\n\n**Employee reflection:** ___________________________________________\n`;
+    const url = URL.createObjectURL(new Blob([report], { type: "text/markdown" }));
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `promotion-readiness-${weekStart}.md`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
+  if (framework.isLoading)
+    return (
+      <div className="mx-auto max-w-7xl p-8 text-sm text-muted-foreground">
+        Loading contract framework…
+      </div>
+    );
+  if (framework.error)
+    return (
+      <div className="mx-auto max-w-7xl rounded-xl border border-destructive/30 p-8 text-sm">
+        Could not load the contract framework: {framework.error.message}
+      </div>
+    );
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="text-sm font-medium text-primary">Banking Growth · Phase 3</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight">KPI & Performance</h1>
-          <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-            Measure contractual targets, actual delivery and weighted achievement for{" "}
-            {business?.name ?? "your personal KCB workspace"}. Monthly snapshots are retained
-            separately from the current KPI configuration.
+          <p className="text-sm font-medium text-primary">
+            KCB Performance · Contract {CONTRACT_VERSION}
+          </p>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight">
+            Promotion Readiness Dashboard
+          </h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+            Track the eight contract areas weekly, validate qualifying results, see your three-month
+            rolling position, and build evidence for your promotion conversation.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2">
           <button
             type="button"
-            onClick={() => void loadTemplate()}
-            disabled={templateWorking}
-            className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm hover:bg-accent disabled:opacity-50"
+            onClick={() => framework.refresh()}
+            className="rounded-lg border px-3 py-2 text-sm"
           >
-            <Settings2 className="h-4 w-4" />{" "}
-            {templateWorking ? "Loading…" : "Load contract KPI template"}
+            Refresh
           </button>
           <button
             type="button"
-            onClick={() => {
-              void definitions.refetch();
-              void targets.refetch();
-              void periods.refetch();
-            }}
-            className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm hover:bg-accent"
+            onClick={downloadReport}
+            className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground"
           >
-            <RefreshCw className="h-4 w-4" /> Refresh
+            Download promotion report
           </button>
         </div>
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Metric icon={Gauge} label="Weighted achievement" value={`${liveOverall.toFixed(1)}%`} />
-        <Metric icon={Target} label="Active KPIs" value={rows.length} />
-        <Metric icon={CheckCircle2} label="Configured targets" value={configuredRows.length} />
-        <Metric icon={Gauge} label="Weight coverage" value={`${totalWeight.toFixed(1)}%`} />
-      </div>
-
-      <section className="rounded-2xl border bg-card">
-        <div className="flex flex-col gap-3 border-b p-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h2 className="font-semibold">Monthly performance</h2>
-            <p className="text-xs text-muted-foreground">
-              Achievement = actual ÷ target × 100. Weighted contribution = achievement × weight ÷
-              100.
-            </p>
-            <div className="mt-2 flex items-center gap-2 text-xs">
-              <span className="text-muted-foreground">Target profile:</span>
-              <select
-                value={targetScope}
-                onChange={(event) =>
-                  setTargetScope(event.target.value as "contractual" | "internal")
-                }
-                className="rounded-lg border bg-background px-2 py-1"
-              >
-                <option value="contractual">Contractual</option>
-                <option value="internal">Internal</option>
-              </select>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <input
-              type="month"
-              value={month}
-              onChange={(event) => setMonth(event.target.value)}
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
-            />
-            <button
-              type="button"
-              onClick={() => void saveMonth()}
-              disabled={working || !rows.length}
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
-            >
-              {working ? "Saving…" : "Save month"}
-            </button>
-          </div>
+      <section className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
+        <Speedometer score={score} band={band.label} />
+        <div className="grid gap-3 sm:grid-cols-3">
+          <SummaryCard
+            label="Weekly weighted pace"
+            value={`${score.toFixed(1)}%`}
+            hint="90% is the contract full-performance threshold"
+          />
+          <SummaryCard
+            label="3-month rolling score"
+            value={`${rollingScore.toFixed(1)}%`}
+            hint="Use this for promotion evidence and trend review"
+          />
+          <SummaryCard
+            label="Active improvement plans"
+            value={(framework.plans.data ?? []).filter((plan) => plan.status === "active").length}
+            hint="Keep actions specific and measurable"
+          />
         </div>
-
-        {!rows.length ? (
-          <div className="p-10 text-center">
-            <p className="font-medium">No KPI configuration yet</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Load the supplied contract KPI template, then adjust targets where the contract or
-              your internal target requires it.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] text-sm">
-              <thead className="border-b bg-muted/30 text-left text-xs text-muted-foreground">
-                <tr>
-                  <th className="p-3">KPI</th>
-                  <th className="p-3">Scope</th>
-                  <th className="p-3">Weight</th>
-                  <th className="p-3">Target</th>
-                  <th className="p-3">Actual ({month})</th>
-                  <th className="p-3">Achievement</th>
-                  <th className="p-3">Weighted</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {rows.map((row) => {
-                  const achievement = calculateKpiAchievement(row.actual, row.target);
-                  const weighted = calculateWeightedContribution(
-                    achievement,
-                    row.definition.weight_percent,
-                  );
-                  return (
-                    <tr key={row.definition.id}>
-                      <td className="p-3">
-                        <p className="font-medium">{row.definition.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {row.definition.category} · {row.definition.code}
-                        </p>
-                      </td>
-                      <td className="p-3 capitalize">{targetScope}</td>
-                      <td className="p-3">{row.definition.weight_percent}%</td>
-                      <td className="p-3">
-                        <input
-                          type="number"
-                          min="0"
-                          step="any"
-                          value={targetDrafts[row.definition.id] ?? ""}
-                          onChange={(event) =>
-                            setTargetDrafts((current) => ({
-                              ...current,
-                              [row.definition.id]:
-                                event.target.value === "" ? null : Number(event.target.value),
-                            }))
-                          }
-                          className="w-32 rounded-lg border bg-background px-2 py-1.5"
-                        />
-                        <span className="ml-2 text-xs text-muted-foreground">
-                          {row.definition.unit}
-                        </span>
-                      </td>
-                      <td className="p-3">
-                        <input
-                          type="number"
-                          min="0"
-                          step="any"
-                          value={actuals[row.definition.id] ?? 0}
-                          onChange={(event) =>
-                            setActuals((current) => ({
-                              ...current,
-                              [row.definition.id]: Number(event.target.value) || 0,
-                            }))
-                          }
-                          className="w-32 rounded-lg border bg-background px-2 py-1.5"
-                        />
-                      </td>
-                      <td className="p-3">
-                        {row.target !== null && row.target > 0 ? (
-                          <span className="font-medium">{achievement.toFixed(1)}%</span>
-                        ) : (
-                          <span className="text-amber-600">Target required</span>
-                        )}
-                      </td>
-                      <td className="p-3 font-medium">{weighted.toFixed(1)}%</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-              <tfoot className="border-t bg-muted/20">
-                <tr>
-                  <td className="p-3 font-semibold" colSpan={2}>
-                    Overall
-                  </td>
-                  <td className="p-3 font-semibold">{totalWeight.toFixed(1)}%</td>
-                  <td className="p-3" colSpan={2}>
-                    <button
-                      type="button"
-                      onClick={() => void saveTargets()}
-                      disabled={working}
-                      className="rounded-lg border px-3 py-1.5 text-xs hover:bg-accent disabled:opacity-50"
-                    >
-                      Save KPI targets
-                    </button>
-                  </td>
-                  <td className="p-3 font-semibold">{liveOverall.toFixed(1)}%</td>
-                  <td className="p-3 font-semibold">{liveOverall.toFixed(1)}%</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        )}
       </section>
 
-      {period ? (
-        <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="font-medium">Saved period: {period.period_start.slice(0, 7)}</p>
-              <p className="text-xs text-muted-foreground">
-                Status: {period.status} · Stored weighted achievement:{" "}
-                {period.overall_achievement_percent.toFixed(1)}%
-              </p>
-            </div>
-            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs text-primary">
-              Commission-ready data foundation
-            </span>
+      <section className="rounded-2xl border bg-card">
+        <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-semibold">Eight-area weekly scorecard</h2>
+            <p className="text-xs text-muted-foreground">
+              Week beginning {weekStart}. Enter actual and qualified values separately; only
+              qualified values earn weighted performance.
+            </p>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">
-            This phase stores verified KPI performance and weighted achievement for downstream
-            commission logic. It does not invent or calculate commission rates.
-          </p>
+          <button
+            type="button"
+            onClick={() => void saveWeekly()}
+            disabled={framework.recordWeekly.isPending}
+            className="rounded-lg bg-primary px-3 py-2 text-sm text-primary-foreground"
+          >
+            {framework.recordWeekly.isPending ? "Saving…" : "Save weekly snapshot"}
+          </button>
         </div>
-      ) : null}
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[1120px] text-sm">
+            <thead className="border-b bg-muted/30 text-left text-xs text-muted-foreground">
+              <tr>
+                <th className="p-3">Area</th>
+                <th className="p-3">Weight</th>
+                <th className="p-3">Target</th>
+                <th className="p-3">Actual</th>
+                <th className="p-3">Qualified</th>
+                <th className="p-3">Achievement</th>
+                <th className="p-3">Gap / next action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {currentRows.map((row) => {
+                const achievement = scoreAchievement(row.qualified, row.target);
+                return (
+                  <tr
+                    key={row.kpi.id}
+                    className={row.qualified < row.target ? "bg-amber-500/5" : ""}
+                  >
+                    <td className="p-3">
+                      <p className="font-medium">{row.kpi.name}</p>
+                      <p className="max-w-[330px] text-xs text-muted-foreground">
+                        {row.kpi.qualification_rule}
+                      </p>
+                    </td>
+                    <td className="p-3 font-medium">{row.kpi.weight_percent}%</td>
+                    <td className="p-3">
+                      {row.target.toFixed(1)}
+                      <span className="ml-1 text-xs text-muted-foreground">{row.kpi.unit}/wk</span>
+                    </td>
+                    <td className="p-3">
+                      <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        value={row.actual || ""}
+                        onChange={(event) =>
+                          setActuals((current) => ({
+                            ...current,
+                            [row.kpi.id]: Number(event.target.value) || 0,
+                          }))
+                        }
+                        className="w-28 rounded border bg-background px-2 py-1.5"
+                      />
+                    </td>
+                    <td className="p-3">
+                      <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        value={row.qualified || ""}
+                        onChange={(event) =>
+                          setQualified((current) => ({
+                            ...current,
+                            [row.kpi.id]: Number(event.target.value) || 0,
+                          }))
+                        }
+                        className="w-28 rounded border bg-background px-2 py-1.5"
+                      />
+                    </td>
+                    <td className="p-3 font-semibold">{achievement.toFixed(1)}%</td>
+                    <td className="p-3">
+                      <input
+                        placeholder={row.kpi.improvement_action}
+                        value={nextActions[row.kpi.id] ?? ""}
+                        onChange={(event) =>
+                          setNextActions((current) => ({
+                            ...current,
+                            [row.kpi.id]: event.target.value,
+                          }))
+                        }
+                        className="mb-1 w-full rounded border bg-background px-2 py-1.5"
+                      />
+                      <input
+                        placeholder="Blocker / validation note"
+                        value={blockers[row.kpi.id] ?? ""}
+                        onChange={(event) =>
+                          setBlockers((current) => ({
+                            ...current,
+                            [row.kpi.id]: event.target.value,
+                          }))
+                        }
+                        className="w-full rounded border bg-background px-2 py-1.5 text-xs"
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-      <div className="rounded-xl border p-4 text-xs text-muted-foreground">
-        <p className="font-medium text-foreground">Current contract template</p>
-        <p className="mt-1">
-          Loans 30% · Salary Accounts 5% · Other Retail Accounts 5% · Deposits 40% · Mobi 5% ·
-          Credit Cards 5% · Insurance 5% · Vooma 5%.
-        </p>
-        <p className="mt-1">
-          Contractual and internal targets are stored separately per KPI, so internal goals can be
-          changed without overwriting the contractual baseline. No commission caps, rates or
-          eligibility rules are hard-coded.
+      <section className="grid gap-6 lg:grid-cols-2">
+        <div className="rounded-2xl border bg-card p-5">
+          <h2 className="font-semibold">Product qualification rules</h2>
+          <div className="mt-4 space-y-3">
+            {kpis.map((kpi) => (
+              <div key={kpi.id} className="border-b pb-3 last:border-0">
+                <p className="font-medium">
+                  {kpi.name}{" "}
+                  <span className="text-xs text-muted-foreground">
+                    ({kpi.target_value.toLocaleString()} {kpi.unit}, {kpi.weight_percent}%)
+                  </span>
+                </p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  {kpi.evidence_required}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-2xl border bg-card p-5">
+          <h2 className="font-semibold">Three-month rolling view</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Rolling score: {rollingScore.toFixed(1)}%. Weekly snapshots become the evidence trail
+            for your review.
+          </p>
+          <div className="mt-4 space-y-3">
+            {rollingRows.map((row) => (
+              <div key={row.kpi.id}>
+                <div className="flex justify-between text-xs">
+                  <span>{row.kpi.name}</span>
+                  <span>
+                    {row.actual.toLocaleString()} / {row.target.toLocaleString()} ·{" "}
+                    {scoreAchievement(row.actual, row.target).toFixed(1)}%
+                  </span>
+                </div>
+                <div className="mt-1 h-2 rounded-full bg-muted">
+                  <div
+                    className="h-2 rounded-full bg-primary"
+                    style={{ width: `${Math.min(100, scoreAchievement(row.actual, row.target))}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <div className="rounded-2xl border bg-card p-5">
+          <h2 className="font-semibold">Evidence and validation</h2>
+          <form onSubmit={addEvidence} className="mt-4 grid gap-2 sm:grid-cols-3">
+            <select
+              required
+              value={evidenceKpi}
+              onChange={(event) => setEvidenceKpi(event.target.value)}
+              className="rounded border bg-background px-2 py-2 text-sm"
+            >
+              <option value="">Select area</option>
+              {kpis.map((kpi) => (
+                <option key={kpi.id} value={kpi.id}>
+                  {kpi.name}
+                </option>
+              ))}
+            </select>
+            <select
+              value={evidenceType}
+              onChange={(event) => setEvidenceType(event.target.value)}
+              className="rounded border bg-background px-2 py-2 text-sm"
+            >
+              <option>system record</option>
+              <option>customer confirmation</option>
+              <option>manager validation</option>
+              <option>payment confirmation</option>
+            </select>
+            <input
+              required
+              value={evidenceRef}
+              onChange={(event) => setEvidenceRef(event.target.value)}
+              placeholder="Reference / evidence note"
+              className="rounded border bg-background px-2 py-2 text-sm sm:col-span-3"
+            />
+            <button
+              type="submit"
+              disabled={framework.addEvidence.isPending}
+              className="rounded-lg border px-3 py-2 text-sm sm:col-span-3"
+            >
+              Add evidence for validation
+            </button>
+          </form>
+          <div className="mt-4 space-y-2 text-xs">
+            {(framework.evidence.data ?? []).slice(0, 5).map((item) => (
+              <div key={item.id} className="rounded border p-2">
+                <span className="font-medium">
+                  {kpis.find((kpi) => kpi.id === item.kpi_id)?.name}
+                </span>{" "}
+                · {item.reference_text} · <span className="capitalize">{item.status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-2xl border bg-card p-5">
+          <h2 className="font-semibold">Improvement-plan tracker</h2>
+          <form onSubmit={addPlan} className="mt-4 space-y-2">
+            <input
+              required
+              value={planFocus}
+              onChange={(event) => setPlanFocus(event.target.value)}
+              placeholder="Focus area e.g. deposits"
+              className="w-full rounded border bg-background px-2 py-2 text-sm"
+            />
+            <textarea
+              required
+              value={planActions}
+              onChange={(event) => setPlanActions(event.target.value)}
+              placeholder="Actions and weekly cadence"
+              className="min-h-20 w-full rounded border bg-background px-2 py-2 text-sm"
+            />
+            <input
+              required
+              value={planMeasure}
+              onChange={(event) => setPlanMeasure(event.target.value)}
+              placeholder="Success measure"
+              className="w-full rounded border bg-background px-2 py-2 text-sm"
+            />
+            <button
+              type="submit"
+              disabled={framework.addPlan.isPending}
+              className="rounded-lg border px-3 py-2 text-sm"
+            >
+              Create 60-day improvement plan
+            </button>
+          </form>
+          <div className="mt-4 space-y-2 text-xs">
+            {(framework.plans.data ?? []).map((plan) => (
+              <div key={plan.id} className="rounded border p-2">
+                <p className="font-medium">
+                  {plan.focus_area} · {plan.status}
+                </p>
+                <p className="mt-1 text-muted-foreground">{plan.success_measure}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 text-sm">
+        <p className="font-semibold">Promotion-readiness guidance</p>
+        <p className="mt-1 text-muted-foreground">
+          Use the downloadable report after each weekly review. A strong case combines a sustained
+          score at or above 90%, verified evidence, clear improvement actions for gaps, and
+          manager-visible outcomes—not just activity volume.
         </p>
       </div>
     </div>
   );
 }
 
-function Metric({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof Gauge;
-  label: string;
-  value: string | number;
-}) {
+function Speedometer({ score, band }: { score: number; band: string }) {
+  const bounded = Math.max(0, Math.min(100, score));
+  const angle = -135 + bounded * 2.7;
   return (
     <div className="rounded-2xl border bg-card p-4">
-      <div className="flex items-center justify-between text-muted-foreground">
-        <span className="text-xs uppercase tracking-wide">{label}</span>
-        <Icon className="h-4 w-4" />
+      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+        Weighted performance speedometer
+      </p>
+      <svg
+        viewBox="0 0 240 150"
+        className="mt-2 w-full"
+        role="img"
+        aria-label={`${score.toFixed(1)} percent weighted performance`}
+      >
+        <path
+          d="M35 125 A85 85 0 0 1 205 125"
+          fill="none"
+          stroke="currentColor"
+          strokeOpacity=".12"
+          strokeWidth="18"
+          strokeLinecap="round"
+        />
+        <path
+          d="M35 125 A85 85 0 0 1 205 125"
+          fill="none"
+          stroke="hsl(var(--primary))"
+          strokeWidth="18"
+          strokeLinecap="round"
+          pathLength="100"
+          strokeDasharray={`${bounded} 100`}
+        />
+        <line
+          x1="120"
+          y1="125"
+          x2="120"
+          y2="55"
+          stroke="currentColor"
+          strokeWidth="3"
+          transform={`rotate(${angle} 120 125)`}
+        />
+        <circle cx="120" cy="125" r="7" fill="currentColor" />
+      </svg>
+      <div className="text-center">
+        <p className="text-4xl font-bold">{score.toFixed(1)}%</p>
+        <p className="mt-1 text-sm text-muted-foreground">{band}</p>
+        <p className="mt-3 text-[11px] text-muted-foreground">
+          0 critical · 75 improving · 90 full-performance · 100 target
+        </p>
       </div>
-      <p className="mt-2 text-2xl font-semibold">{value}</p>
+    </div>
+  );
+}
+function SummaryCard({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: string | number;
+  hint: string;
+}) {
+  return (
+    <div className="rounded-2xl border bg-card p-5">
+      <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="mt-3 text-3xl font-semibold">{value}</p>
+      <p className="mt-2 text-xs leading-5 text-muted-foreground">{hint}</p>
     </div>
   );
 }
