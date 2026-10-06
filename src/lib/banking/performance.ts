@@ -349,7 +349,7 @@ export async function saveKpiTarget(input: {
   business_id: string;
   kpi_definition_id: string;
   target_scope: "contractual" | "internal";
-  target_value: number;
+  target_value: number | null;
   source_reference?: string | null;
   notes?: string | null;
 }) {
@@ -371,7 +371,7 @@ export async function saveKpiTarget(input: {
     kpi_definition_id: input.kpi_definition_id,
     target_scope: input.target_scope,
     period_start: null,
-    target_value: Math.max(0, input.target_value),
+    target_value: input.target_value === null ? null : Math.max(0, input.target_value),
     source_reference: input.source_reference ?? null,
     notes: input.notes ?? null,
   };
