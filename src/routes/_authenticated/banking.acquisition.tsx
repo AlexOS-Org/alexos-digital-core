@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Building2, Plus, RefreshCw, Users, Zap } from "lucide-react";
 import { toast } from "sonner";
+import { useBusinessContext } from "@/lib/businesses/context";
 import {
   createCrmContactFromBankingProspect,
   useBankingEmployers,
@@ -43,9 +44,11 @@ function parseEmployerPriority(value: FormDataEntryValue | null): EmployerPriori
 }
 
 function BankingAcquisitionPage() {
-  const employers = useBankingEmployers();
-  const signals = useBankingSignals();
-  const prospects = useBankingProspects();
+  const { business } = useBusinessContext();
+  const businessId = business?.id ?? null;
+  const employers = useBankingEmployers(businessId);
+  const signals = useBankingSignals(businessId);
+  const prospects = useBankingProspects(businessId);
   const createEmployer = useCreateBankingEmployer();
   const [openForm, setOpenForm] = useState(false);
   const [linkingId, setLinkingId] = useState<string | null>(null);
@@ -76,6 +79,18 @@ function BankingAcquisitionPage() {
     }
   };
 
+  if (!businessId) {
+    return (
+      <div className="mx-auto max-w-5xl rounded-2xl border border-dashed p-8 text-center">
+        <h1 className="text-xl font-semibold">Select a business workspace</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Banking Acquisition is now business-scoped. Select a business before creating or reviewing
+          acquisition records.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -85,8 +100,9 @@ function BankingAcquisitionPage() {
             Employer → Employee → Relationship
           </h1>
           <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-            Find employers with recurring recruitment in Nairobi, prioritise hiring signals, and
-            move employee prospects into the existing CRM only when you choose to link them.
+            Find employers with recurring recruitment, prioritise hiring signals, and move employee
+            prospects into the existing CRM only when you choose to link them. Workspace:{" "}
+            {business?.name}.
           </p>
         </div>
         <div className="flex gap-2">
@@ -121,6 +137,7 @@ function BankingAcquisitionPage() {
             const data = new FormData(event.currentTarget);
             try {
               await createEmployer.mutateAsync({
+                business_id: businessId,
                 company_name: String(data.get("company_name") ?? "").trim(),
                 industry: String(data.get("industry") ?? "").trim() || null,
                 location: String(data.get("location") ?? "Nairobi").trim() || "Nairobi",
