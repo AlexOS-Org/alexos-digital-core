@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ModuleWorkbench } from "@/components/modules/ModuleWorkbench";
+import { TasksWorkspace } from "@/components/tasks/TasksWorkspace";
 
 export const Route = createFileRoute("/_authenticated/tasks")({
-  component: () => <ModuleWorkbench mode="tasks" />,
+  component: TasksWorkspace,
 });
