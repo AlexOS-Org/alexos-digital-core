@@ -60,7 +60,10 @@ function BankingGrowthPage() {
         institution_name: String(data.get("institution_name") ?? "").trim(),
         institution_code: String(data.get("institution_code") ?? "").trim() || null,
         role_title: String(data.get("role_title") ?? "").trim() || null,
-        currency: String(data.get("currency") ?? "KES").trim().toUpperCase() || "KES",
+        currency:
+          String(data.get("currency") ?? "KES")
+            .trim()
+            .toUpperCase() || "KES",
         notes: String(data.get("notes") ?? "").trim() || null,
       });
       toast.success("Banking profile saved");
@@ -75,7 +78,9 @@ function BankingGrowthPage() {
     try {
       await createProduct.mutateAsync({
         business_id: businessId,
-        code: String(data.get("code") ?? "").trim().toLowerCase(),
+        code: String(data.get("code") ?? "")
+          .trim()
+          .toLowerCase(),
         name: String(data.get("name") ?? "").trim(),
         category: String(data.get("category") ?? "").trim(),
         description: String(data.get("description") ?? "").trim() || null,
@@ -110,11 +115,15 @@ function BankingGrowthPage() {
             products without hard-coding institution terms into AlexOS.
           </p>
         </div>
-        <Badge variant="outline">{business.name}</Badge>
+        <Badge variant="outline">{business?.name ?? "Business"}</Badge>
       </header>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <Metric icon={Landmark} label="Institution" value={profile.data?.institution_name ?? "Not configured"} />
+        <Metric
+          icon={Landmark}
+          label="Institution"
+          value={profile.data?.institution_name ?? "Not configured"}
+        />
         <Metric icon={Building2} label="Active products" value={products.data?.length ?? 0} />
         <Metric icon={Users} label="Acquisition workspace" value="Ready" />
       </div>
@@ -159,8 +168,8 @@ function BankingGrowthPage() {
               </Button>
             </form>
             <p className="mt-3 text-xs text-muted-foreground">
-              Product rates, eligibility and financing limits remain configurable data. Do not
-              enter assumptions as contractual bank terms.
+              Product rates, eligibility and financing limits remain configurable data. Do not enter
+              assumptions as contractual bank terms.
             </p>
           </CardContent>
         </Card>
@@ -171,8 +180,8 @@ function BankingGrowthPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm leading-6 text-muted-foreground">
-              Continue using the existing employer → employee acquisition workflow, now isolated
-              to the active business.
+              Continue using the existing employer → employee acquisition workflow, now isolated to
+              the active business.
             </p>
             <Button asChild className="w-full">
               <Link to="/banking/acquisition">Open acquisition workspace</Link>
@@ -188,10 +197,12 @@ function BankingGrowthPage() {
         <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm leading-6 text-muted-foreground">
-              Configure contractual and internal targets, record monthly actuals, and track weighted achievement.
+              Configure contractual and internal targets, record monthly actuals, and track weighted
+              achievement.
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Performance snapshots are structured for future commission workflows without hard-coded commission rules.
+              Performance snapshots are structured for future commission workflows without
+              hard-coded commission rules.
             </p>
           </div>
           <Button asChild>
@@ -215,7 +226,10 @@ function BankingGrowthPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {showProductForm ? (
-            <form onSubmit={handleProduct} className="grid gap-3 rounded-2xl border p-4 sm:grid-cols-2 lg:grid-cols-3">
+            <form
+              onSubmit={handleProduct}
+              className="grid gap-3 rounded-2xl border p-4 sm:grid-cols-2 lg:grid-cols-3"
+            >
               <Input required name="code" placeholder="Product code" />
               <Input required name="name" placeholder="Product name" />
               <Input required name="category" placeholder="Category e.g. Lending" />
@@ -226,9 +240,19 @@ function BankingGrowthPage() {
               <Input name="max_amount" type="number" min="0" placeholder="Maximum amount" />
               <Input name="min_term" type="number" min="0" placeholder="Minimum term (months)" />
               <Input name="max_term" type="number" min="0" placeholder="Maximum term (months)" />
-              <Input name="max_financing" type="number" min="0" max="100" placeholder="Max financing %" />
+              <Input
+                name="max_financing"
+                type="number"
+                min="0"
+                max="100"
+                placeholder="Max financing %"
+              />
               <Input name="source_url" type="url" placeholder="Official source URL (optional)" />
-              <Input name="description" placeholder="Description" className="sm:col-span-2 lg:col-span-3" />
+              <Input
+                name="description"
+                placeholder="Description"
+                className="sm:col-span-2 lg:col-span-3"
+              />
               <div className="flex gap-2 sm:col-span-2 lg:col-span-3">
                 <Button type="submit" disabled={createProduct.isPending}>
                   {createProduct.isPending ? "Adding…" : "Add product"}
@@ -249,7 +273,9 @@ function BankingGrowthPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-medium">{product.name}</p>
-                      <p className="text-xs text-muted-foreground">{product.code} · {product.category}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {product.code} · {product.category}
+                      </p>
                     </div>
                     <Badge variant="secondary">Active</Badge>
                   </div>
@@ -259,7 +285,9 @@ function BankingGrowthPage() {
                     </p>
                   ) : null}
                   {product.description ? (
-                    <p className="mt-2 text-sm leading-5 text-muted-foreground">{product.description}</p>
+                    <p className="mt-2 text-sm leading-5 text-muted-foreground">
+                      {product.description}
+                    </p>
                   ) : null}
                 </div>
               ))}

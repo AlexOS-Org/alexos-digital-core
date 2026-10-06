@@ -78,21 +78,83 @@ export type BankingKpiTemplate = {
 };
 
 export const CONTRACT_KPI_TEMPLATE: BankingKpiTemplate[] = [
-{ code: "LOANS", name: "Loans", category: "Lending", unit: "KES", weight_percent: 30, target_value: 2_000_000 },
-{ code: "SALARY_ACCOUNTS", name: "Salary Accounts", category: "Accounts", unit: "count", weight_percent: 5, target_value: 10 },
-{ code: "OTHER_RETAIL_ACCOUNTS", name: "Other Retail Accounts", category: "Accounts", unit: "count", weight_percent: 5, target_value: 15 },
-{ code: "DEPOSITS", name: "Deposits", category: "Liabilities", unit: "KES", weight_percent: 40, target_value: 1_000_000 },
-{ code: "MOBI", name: "Mobi", category: "Digital", unit: "count", weight_percent: 5, target_value: 9.6, notes: "Configured as 80% of the specified 12-account monthly target." },
-{ code: "CREDIT_CARDS", name: "Credit Cards", category: "Cards", unit: "count", weight_percent: 5, target_value: null, notes: "Contract states a qualifying-new-customer basis, but the numeric target was not specified; configure the contractual number before scoring." },
-{ code: "INSURANCE", name: "Insurance", category: "Insurance", unit: "KES", weight_percent: 5, target_value: 25_000 },
-{ code: "VOOMA", name: "Vooma", category: "Digital", unit: "count", weight_percent: 5, target_value: 10, notes: "Merchants/agents." },
+  {
+    code: "LOANS",
+    name: "Loans",
+    category: "Lending",
+    unit: "KES",
+    weight_percent: 30,
+    target_value: 2_000_000,
+  },
+  {
+    code: "SALARY_ACCOUNTS",
+    name: "Salary Accounts",
+    category: "Accounts",
+    unit: "count",
+    weight_percent: 5,
+    target_value: 10,
+  },
+  {
+    code: "OTHER_RETAIL_ACCOUNTS",
+    name: "Other Retail Accounts",
+    category: "Accounts",
+    unit: "count",
+    weight_percent: 5,
+    target_value: 15,
+  },
+  {
+    code: "DEPOSITS",
+    name: "Deposits",
+    category: "Liabilities",
+    unit: "KES",
+    weight_percent: 40,
+    target_value: 1_000_000,
+  },
+  {
+    code: "MOBI",
+    name: "Mobi",
+    category: "Digital",
+    unit: "count",
+    weight_percent: 5,
+    target_value: 9.6,
+    notes: "Configured as 80% of the specified 12-account monthly target.",
+  },
+  {
+    code: "CREDIT_CARDS",
+    name: "Credit Cards",
+    category: "Cards",
+    unit: "count",
+    weight_percent: 5,
+    target_value: null,
+    notes:
+      "Contract states a qualifying-new-customer basis, but the numeric target was not specified; configure the contractual number before scoring.",
+  },
+  {
+    code: "INSURANCE",
+    name: "Insurance",
+    category: "Insurance",
+    unit: "KES",
+    weight_percent: 5,
+    target_value: 25_000,
+  },
+  {
+    code: "VOOMA",
+    name: "Vooma",
+    category: "Digital",
+    unit: "count",
+    weight_percent: 5,
+    target_value: 10,
+    notes: "Merchants/agents.",
+  },
 ];
 
 export const bankingKpiKeys = {
-  definitions: (businessId: string | null) => ["banking-performance", "definitions", businessId] as const,
+  definitions: (businessId: string | null) =>
+    ["banking-performance", "definitions", businessId] as const,
   targets: (businessId: string | null) => ["banking-performance", "targets", businessId] as const,
   periods: (businessId: string | null) => ["banking-performance", "periods", businessId] as const,
-  performance: (periodId: string | null) => ["banking-performance", "performance", periodId] as const,
+  performance: (periodId: string | null) =>
+    ["banking-performance", "performance", periodId] as const,
 };
 
 export function calculateKpiAchievement(actual: number, target: number | null) {
@@ -109,7 +171,8 @@ export function calculateOverallAchievement(
 ) {
   return rows.reduce(
     (sum, row) =>
-      sum + calculateWeightedContribution(
+      sum +
+      calculateWeightedContribution(
         calculateKpiAchievement(row.actual_value, row.target_value),
         row.weight_percent,
       ),
@@ -189,7 +252,9 @@ export function useBankingKpiPerformance(periodId: string | null) {
 export function useCreateKpiDefinition() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: Omit<BankingKpiDefinition, "id" | "user_id" | "created_at" | "updated_at">) => {
+    mutationFn: async (
+      input: Omit<BankingKpiDefinition, "id" | "user_id" | "created_at" | "updated_at">,
+    ) => {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("Not authenticated");
       const { data, error } = await db
@@ -200,7 +265,8 @@ export function useCreateKpiDefinition() {
       if (error) throw error;
       return data as BankingKpiDefinition;
     },
-    onSuccess: (row) => void qc.invalidateQueries({ queryKey: bankingKpiKeys.definitions(row.business_id) }),
+    onSuccess: (row) =>
+      void qc.invalidateQueries({ queryKey: bankingKpiKeys.definitions(row.business_id) }),
   });
 }
 
@@ -215,18 +281,20 @@ export async function applyContractKpiTemplate(businessId: string) {
   if (existingError) throw existingError;
 
   const existingCodes = new Set((existing ?? []).map((row: { code: string }) => row.code));
-  const definitions = CONTRACT_KPI_TEMPLATE.filter((row) => !existingCodes.has(row.code)).map((row, index) => ({
-    user_id: auth.user.id,
-    business_id: businessId,
-    code: row.code,
-    name: row.name,
-    category: row.category,
-    unit: row.unit,
-    weight_percent: row.weight_percent,
-    active: true,
-    sort_order: index,
-    notes: row.notes ?? null,
-  }));
+  const definitions = CONTRACT_KPI_TEMPLATE.filter((row) => !existingCodes.has(row.code)).map(
+    (row, index) => ({
+      user_id: auth.user.id,
+      business_id: businessId,
+      code: row.code,
+      name: row.name,
+      category: row.category,
+      unit: row.unit,
+      weight_percent: row.weight_percent,
+      active: true,
+      sort_order: index,
+      notes: row.notes ?? null,
+    }),
+  );
 
   if (!definitions.length) return { inserted: 0, targeted: 0 };
 
@@ -236,19 +304,19 @@ export async function applyContractKpiTemplate(businessId: string) {
     .select("id, code");
   if (error) throw error;
 
-  const createdByCode = new Map((created ?? []).map((row: { id: string; code: string }) => [row.code, row.id]));
-  const targets = CONTRACT_KPI_TEMPLATE
-    .filter((row) => createdByCode.has(row.code))
-    .map((row) => ({
-      user_id: auth.user.id,
-      business_id: businessId,
-      kpi_definition_id: createdByCode.get(row.code),
-      target_scope: "contractual",
-      period_start: null,
-      target_value: row.target_value,
-      source_reference: "Approved Banking Growth KPI schedule",
-      notes: row.notes ?? null,
-    }));
+  const createdByCode = new Map(
+    (created ?? []).map((row: { id: string; code: string }) => [row.code, row.id]),
+  );
+  const targets = CONTRACT_KPI_TEMPLATE.filter((row) => createdByCode.has(row.code)).map((row) => ({
+    user_id: auth.user.id,
+    business_id: businessId,
+    kpi_definition_id: createdByCode.get(row.code),
+    target_scope: "contractual",
+    period_start: null,
+    target_value: row.target_value,
+    source_reference: "Approved Banking Growth KPI schedule",
+    notes: row.notes ?? null,
+  }));
 
   const { error: targetError } = await db.from("banking_kpi_targets").insert(targets);
   if (targetError) throw targetError;
@@ -256,7 +324,11 @@ export async function applyContractKpiTemplate(businessId: string) {
   return { inserted: definitions.length, targeted: targets.length };
 }
 
-export async function ensurePerformancePeriod(businessId: string, month: string, targetScope: "contractual" | "internal") {
+export async function ensurePerformancePeriod(
+  businessId: string,
+  month: string,
+  targetScope: "contractual" | "internal",
+) {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("Not authenticated");
 
@@ -308,7 +380,8 @@ export async function savePerformanceSnapshot(
 ) {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("Not authenticated");
-  if (period.status !== "open") throw new Error("This performance period is no longer open for editing.");
+  if (period.status !== "open")
+    throw new Error("This performance period is no longer open for editing.");
 
   const normalized = rows.map((row) => {
     const achievement = calculateKpiAchievement(row.actual_value, row.target_value);
@@ -388,11 +461,7 @@ export async function saveKpiTarget(input: {
     return data as BankingKpiTarget;
   }
 
-  const { data, error } = await db
-    .from("banking_kpi_targets")
-    .insert(payload)
-    .select()
-    .single();
+  const { data, error } = await db.from("banking_kpi_targets").insert(payload).select().single();
   if (error) throw error;
   return data as BankingKpiTarget;
 }

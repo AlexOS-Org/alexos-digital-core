@@ -15,6 +15,7 @@ import {
   useBankingKpiPerformance,
   useBankingKpiTargets,
   useBankingPerformancePeriods,
+  type BankingKpiTarget,
   type BankingPerformancePeriod,
 } from "@/lib/banking/performance";
 
@@ -41,13 +42,16 @@ function BankingPerformancePage() {
   const [templateWorking, setTemplateWorking] = useState(false);
 
   const existingPeriod = useMemo(
-    () => (periods.data ?? []).find((item) => item.period_start.startsWith(month) && item.target_scope === targetScope),
+    () =>
+      (periods.data ?? []).find(
+        (item) => item.period_start.startsWith(month) && item.target_scope === targetScope,
+      ),
     [periods.data, month, targetScope],
   );
   const performance = useBankingKpiPerformance(period?.id ?? existingPeriod?.id ?? null);
 
   const targetByDefinition = useMemo(() => {
-    const map = new Map<string, (typeof targets.data)[number]>();
+    const map = new Map<string, BankingKpiTarget>();
     for (const target of targets.data ?? []) {
       if (target.period_start === null && target.target_scope === targetScope) {
         map.set(target.kpi_definition_id, target);
@@ -128,7 +132,8 @@ function BankingPerformancePage() {
           kpi_definition_id: row.definition.id,
           target_scope: targetScope,
           target_value: targetDrafts[row.definition.id] ?? 0,
-          source_reference: row.targetRecord?.source_reference ?? "Banking Growth KPI configuration",
+          source_reference:
+            row.targetRecord?.source_reference ?? "Banking Growth KPI configuration",
           notes: row.targetRecord?.notes ?? null,
         });
       }
@@ -173,7 +178,9 @@ function BankingPerformancePage() {
       );
       setPeriod(ensured);
       await Promise.all([periods.refetch(), performance.refetch()]);
-      toast.success(`${month} performance saved — ${liveOverall.toFixed(1)}% weighted achievement.`);
+      toast.success(
+        `${month} performance saved — ${liveOverall.toFixed(1)}% weighted achievement.`,
+      );
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not save monthly performance");
     } finally {
@@ -185,7 +192,9 @@ function BankingPerformancePage() {
     return (
       <div className="mx-auto max-w-5xl rounded-2xl border border-dashed p-8 text-center">
         <h1 className="text-xl font-semibold">Select a business workspace</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Banking Performance is business-scoped.</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Banking Performance is business-scoped.
+        </p>
       </div>
     );
   }
@@ -197,8 +206,9 @@ function BankingPerformancePage() {
           <p className="text-sm font-medium text-primary">Banking Growth · Phase 3</p>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight">KPI & Performance</h1>
           <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-            Measure contractual targets, actual delivery and weighted achievement for {business?.name}.
-            Monthly snapshots are retained separately from the current KPI configuration.
+            Measure contractual targets, actual delivery and weighted achievement for{" "}
+            {business?.name}. Monthly snapshots are retained separately from the current KPI
+            configuration.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -208,7 +218,8 @@ function BankingPerformancePage() {
             disabled={templateWorking}
             className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm hover:bg-accent disabled:opacity-50"
           >
-            <Settings2 className="h-4 w-4" /> {templateWorking ? "Loading…" : "Load contract KPI template"}
+            <Settings2 className="h-4 w-4" />{" "}
+            {templateWorking ? "Loading…" : "Load contract KPI template"}
           </button>
           <button
             type="button"
@@ -236,13 +247,16 @@ function BankingPerformancePage() {
           <div>
             <h2 className="font-semibold">Monthly performance</h2>
             <p className="text-xs text-muted-foreground">
-              Achievement = actual ÷ target × 100. Weighted contribution = achievement × weight ÷ 100.
+              Achievement = actual ÷ target × 100. Weighted contribution = achievement × weight ÷
+              100.
             </p>
             <div className="mt-2 flex items-center gap-2 text-xs">
               <span className="text-muted-foreground">Target profile:</span>
               <select
                 value={targetScope}
-                onChange={(event) => setTargetScope(event.target.value as "contractual" | "internal")}
+                onChange={(event) =>
+                  setTargetScope(event.target.value as "contractual" | "internal")
+                }
                 className="rounded-lg border bg-background px-2 py-1"
               >
                 <option value="contractual">Contractual</option>
@@ -272,7 +286,8 @@ function BankingPerformancePage() {
           <div className="p-10 text-center">
             <p className="font-medium">No KPI configuration yet</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Load the supplied contract KPI template, then adjust targets where the contract or your internal target requires it.
+              Load the supplied contract KPI template, then adjust targets where the contract or
+              your internal target requires it.
             </p>
           </div>
         ) : (
@@ -292,12 +307,17 @@ function BankingPerformancePage() {
               <tbody className="divide-y">
                 {rows.map((row) => {
                   const achievement = calculateKpiAchievement(row.actual, row.target);
-                  const weighted = calculateWeightedContribution(achievement, row.definition.weight_percent);
+                  const weighted = calculateWeightedContribution(
+                    achievement,
+                    row.definition.weight_percent,
+                  );
                   return (
                     <tr key={row.definition.id}>
                       <td className="p-3">
                         <p className="font-medium">{row.definition.name}</p>
-                        <p className="text-xs text-muted-foreground">{row.definition.category} · {row.definition.code}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {row.definition.category} · {row.definition.code}
+                        </p>
                       </td>
                       <td className="p-3 capitalize">{targetScope}</td>
                       <td className="p-3">{row.definition.weight_percent}%</td>
@@ -310,12 +330,15 @@ function BankingPerformancePage() {
                           onChange={(event) =>
                             setTargetDrafts((current) => ({
                               ...current,
-                              [row.definition.id]: event.target.value === "" ? null : Number(event.target.value),
+                              [row.definition.id]:
+                                event.target.value === "" ? null : Number(event.target.value),
                             }))
                           }
                           className="w-32 rounded-lg border bg-background px-2 py-1.5"
                         />
-                        <span className="ml-2 text-xs text-muted-foreground">{row.definition.unit}</span>
+                        <span className="ml-2 text-xs text-muted-foreground">
+                          {row.definition.unit}
+                        </span>
                       </td>
                       <td className="p-3">
                         <input
@@ -346,7 +369,9 @@ function BankingPerformancePage() {
               </tbody>
               <tfoot className="border-t bg-muted/20">
                 <tr>
-                  <td className="p-3 font-semibold" colSpan={2}>Overall</td>
+                  <td className="p-3 font-semibold" colSpan={2}>
+                    Overall
+                  </td>
                   <td className="p-3 font-semibold">{totalWeight.toFixed(1)}%</td>
                   <td className="p-3" colSpan={2}>
                     <button
@@ -373,7 +398,8 @@ function BankingPerformancePage() {
             <div>
               <p className="font-medium">Saved period: {period.period_start.slice(0, 7)}</p>
               <p className="text-xs text-muted-foreground">
-                Status: {period.status} · Stored weighted achievement: {period.overall_achievement_percent.toFixed(1)}%
+                Status: {period.status} · Stored weighted achievement:{" "}
+                {period.overall_achievement_percent.toFixed(1)}%
               </p>
             </div>
             <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs text-primary">
@@ -381,8 +407,8 @@ function BankingPerformancePage() {
             </span>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            This phase stores verified KPI performance and weighted achievement for downstream commission logic.
-            It does not invent or calculate commission rates.
+            This phase stores verified KPI performance and weighted achievement for downstream
+            commission logic. It does not invent or calculate commission rates.
           </p>
         </div>
       ) : null}
@@ -390,11 +416,13 @@ function BankingPerformancePage() {
       <div className="rounded-xl border p-4 text-xs text-muted-foreground">
         <p className="font-medium text-foreground">Current contract template</p>
         <p className="mt-1">
-          Loans 30% · Salary Accounts 5% · Other Retail Accounts 5% · Deposits 40% · Mobi 5% · Credit Cards 5% · Insurance 5% · Vooma 5%.
+          Loans 30% · Salary Accounts 5% · Other Retail Accounts 5% · Deposits 40% · Mobi 5% ·
+          Credit Cards 5% · Insurance 5% · Vooma 5%.
         </p>
         <p className="mt-1">
-          Contractual and internal targets are stored separately per KPI, so internal goals can be changed without overwriting the contractual baseline.
-          No commission caps, rates or eligibility rules are hard-coded.
+          Contractual and internal targets are stored separately per KPI, so internal goals can be
+          changed without overwriting the contractual baseline. No commission caps, rates or
+          eligibility rules are hard-coded.
         </p>
       </div>
     </div>

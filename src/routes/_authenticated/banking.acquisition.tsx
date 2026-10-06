@@ -84,7 +84,8 @@ function BankingAcquisitionPage() {
       <div className="mx-auto max-w-5xl rounded-2xl border border-dashed p-8 text-center">
         <h1 className="text-xl font-semibold">Select a business workspace</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Banking Acquisition is now business-scoped. Select a business before creating or reviewing acquisition records.
+          Banking Acquisition is now business-scoped. Select a business before creating or reviewing
+          acquisition records.
         </p>
       </div>
     );
@@ -100,7 +101,8 @@ function BankingAcquisitionPage() {
           </h1>
           <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
             Find employers with recurring recruitment, prioritise hiring signals, and move employee
-            prospects into the existing CRM only when you choose to link them. Workspace: {business?.name}.
+            prospects into the existing CRM only when you choose to link them. Workspace:{" "}
+            {business?.name}.
           </p>
         </div>
         <div className="flex gap-2">

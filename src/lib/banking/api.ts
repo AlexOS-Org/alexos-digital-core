@@ -159,7 +159,8 @@ export function useCreateBankingEmployer() {
       if (error) throw error;
       return data as BankingEmployer;
     },
-    onSuccess: (employer) => qc.invalidateQueries({ queryKey: [...bankingEmployersKey, employer.business_id] }),
+    onSuccess: (employer) =>
+      qc.invalidateQueries({ queryKey: [...bankingEmployersKey, employer.business_id] }),
   });
 }
 
@@ -179,7 +180,8 @@ export function useCreateBankingProspect() {
       if (error) throw error;
       return data as BankingProspect;
     },
-    onSuccess: (prospect) => qc.invalidateQueries({ queryKey: [...bankingProspectsKey, prospect.business_id] }),
+    onSuccess: (prospect) =>
+      qc.invalidateQueries({ queryKey: [...bankingProspectsKey, prospect.business_id] }),
   });
 }
 

@@ -126,10 +126,7 @@ export function useCreateBankingProduct() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (
-      input: Omit<
-        BankingProduct,
-        "id" | "user_id" | "created_at" | "updated_at"
-      >,
+      input: Omit<BankingProduct, "id" | "user_id" | "created_at" | "updated_at">,
     ) => {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("Not authenticated");
