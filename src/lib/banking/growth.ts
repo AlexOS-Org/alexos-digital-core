@@ -39,6 +39,7 @@ export type BankingProduct = {
 };
 
 // Banking tables are newer than the checked-in generated Supabase contract.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
 export const bankingProfileKey = (businessId: string | null) =>
