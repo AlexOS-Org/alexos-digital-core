@@ -26,17 +26,6 @@ function currentMonth() {
   return new Date().toISOString().slice(0, 7);
 }
 
-function formatNumber(value: number, unit: string) {
-  if (unit === "KES") {
-    return new Intl.NumberFormat("en-KE", {
-      style: "currency",
-      currency: "KES",
-      maximumFractionDigits: 0,
-    }).format(value);
-  }
-  return new Intl.NumberFormat("en-KE", { maximumFractionDigits: 1 }).format(value);
-}
-
 function BankingPerformancePage() {
   const { business } = useBusinessContext();
   const businessId = business?.id ?? null;
@@ -52,8 +41,8 @@ function BankingPerformancePage() {
   const [templateWorking, setTemplateWorking] = useState(false);
 
   const existingPeriod = useMemo(
-    () => (periods.data ?? []).find((item) => item.period_start.startsWith(month)),
-    [periods.data, month],
+    () => (periods.data ?? []).find((item) => item.period_start.startsWith(month) && item.target_scope === targetScope),
+    [periods.data, month, targetScope],
   );
   const performance = useBankingKpiPerformance(period?.id ?? existingPeriod?.id ?? null);
 
@@ -169,7 +158,7 @@ function BankingPerformancePage() {
 
     setWorking(true);
     try {
-      const ensured = await ensurePerformancePeriod(businessId, month);
+      const ensured = await ensurePerformancePeriod(businessId, month, targetScope);
       await savePerformanceSnapshot(
         businessId,
         ensured,
