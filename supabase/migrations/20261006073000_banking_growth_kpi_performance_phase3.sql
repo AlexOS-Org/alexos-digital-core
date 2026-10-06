@@ -95,13 +95,15 @@ create table if not exists public.banking_performance_periods (
   business_id uuid not null references public.businesses(id) on delete restrict,
   period_start date not null,
   period_end date not null,
+  target_scope text not null default 'contractual',
   status text not null default 'open',
   overall_achievement_percent numeric(10,3) not null default 0,
   notes text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  unique (business_id, period_start),
+  unique (business_id, period_start, target_scope),
   check (period_end >= period_start),
+  check (target_scope in ('contractual','internal')),
   check (status in ('open','submitted','approved')),
   check (overall_achievement_percent >= 0)
 );
