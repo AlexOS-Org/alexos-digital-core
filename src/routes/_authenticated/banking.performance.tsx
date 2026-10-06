@@ -46,6 +46,7 @@ function BankingPerformancePage() {
   const targets = useBankingKpiTargets(businessId);
   const periods = useBankingPerformancePeriods(businessId);
   const [month, setMonth] = useState(currentMonth);
+  const [targetScope, setTargetScope] = useState<"contractual" | "internal">("contractual");
   const [period, setPeriod] = useState<BankingPerformancePeriod | null>(null);
   const [actuals, setActuals] = useState<Record<string, number>>({});
   const [targetDrafts, setTargetDrafts] = useState<Record<string, number>>({});
@@ -61,10 +62,12 @@ function BankingPerformancePage() {
   const targetByDefinition = useMemo(() => {
     const map = new Map<string, (typeof targets.data)[number]>();
     for (const target of targets.data ?? []) {
-      if (target.period_start === null) map.set(target.kpi_definition_id, target);
+      if (target.period_start === null && target.target_scope === targetScope) {
+        map.set(target.kpi_definition_id, target);
+      }
     }
     return map;
-  }, [targets.data]);
+  }, [targets.data, targetScope]);
 
   useEffect(() => {
     if (existingPeriod) setPeriod(existingPeriod);
@@ -136,7 +139,7 @@ function BankingPerformancePage() {
         await saveKpiTarget({
           business_id: businessId,
           kpi_definition_id: row.definition.id,
-          target_scope: row.definition.target_scope,
+          target_scope: targetScope,
           target_value: targetDrafts[row.definition.id] ?? 0,
           source_reference: row.targetRecord?.source_reference ?? "Banking Growth KPI configuration",
           notes: row.targetRecord?.notes ?? null,
@@ -175,7 +178,7 @@ function BankingPerformancePage() {
         rows.map((row) => ({
           kpi_definition_id: row.definition.id,
           target_id: row.targetRecord?.id ?? null,
-          target_scope: row.definition.target_scope,
+          target_scope: targetScope,
           target_value: row.target,
           actual_value: actuals[row.definition.id] ?? 0,
           weight_percent: row.definition.weight_percent,
@@ -248,6 +251,17 @@ function BankingPerformancePage() {
             <p className="text-xs text-muted-foreground">
               Achievement = actual ÷ target × 100. Weighted contribution = achievement × weight ÷ 100.
             </p>
+            <div className="mt-2 flex items-center gap-2 text-xs">
+              <span className="text-muted-foreground">Target profile:</span>
+              <select
+                value={targetScope}
+                onChange={(event) => setTargetScope(event.target.value as "contractual" | "internal")}
+                className="rounded-lg border bg-background px-2 py-1"
+              >
+                <option value="contractual">Contractual</option>
+                <option value="internal">Internal</option>
+              </select>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <input
@@ -298,7 +312,7 @@ function BankingPerformancePage() {
                         <p className="font-medium">{row.definition.name}</p>
                         <p className="text-xs text-muted-foreground">{row.definition.category} · {row.definition.code}</p>
                       </td>
-                      <td className="p-3 capitalize">{row.definition.target_scope}</td>
+                      <td className="p-3 capitalize">{targetScope}</td>
                       <td className="p-3">{row.definition.weight_percent}%</td>
                       <td className="p-3">
                         <input
@@ -392,7 +406,7 @@ function BankingPerformancePage() {
           Loans 30% · Salary Accounts 5% · Other Retail Accounts 5% · Deposits 40% · Mobi 5% · Credit Cards 5% · Insurance 5% · Vooma 5%.
         </p>
         <p className="mt-1">
-          Contractual targets are configurable per business. Internal targets can be represented without changing the performance calculation model.
+          Contractual and internal targets are stored separately per KPI, so internal goals can be changed without overwriting the contractual baseline.
           No commission caps, rates or eligibility rules are hard-coded.
         </p>
       </div>
