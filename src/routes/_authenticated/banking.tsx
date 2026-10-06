@@ -1,11 +1,28 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Building2, Landmark, Plus, Settings2, Users } from "lucide-react";
+import {
+  Building2,
+  CalendarCheck,
+  ClipboardList,
+  Clock3,
+  Landmark,
+  PhoneCall,
+  Plus,
+  Settings2,
+  Users,
+} from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  calculateActivityMetrics,
+  useBankingActivities,
+  useCreateBankingActivity,
+  type BankingActivityType,
+} from "@/lib/banking/activity";
+import { useBankingProspects } from "@/lib/banking/api";
 import { useBusinessContext } from "@/lib/businesses/context";
 import {
   useBankingProducts,
@@ -24,11 +41,15 @@ function BankingGrowthPage() {
   const businessId = business?.id ?? null;
   const profile = useBankingProfile(businessId);
   const products = useBankingProducts(businessId, true);
+  const activities = useBankingActivities(businessId);
+  const prospects = useBankingProspects(businessId);
   const saveProfile = useSaveBankingProfile();
   const createProduct = useCreateBankingProduct();
+  const createActivity = useCreateBankingActivity();
   const createBusiness = useCreateBusiness();
   const [showProductForm, setShowProductForm] = useState(false);
   const [businessName, setBusinessName] = useState("");
+  const activityMetrics = calculateActivityMetrics(activities.data ?? []);
 
   const handleCreateBusiness = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -142,6 +163,29 @@ function BankingGrowthPage() {
     }
   };
 
+  const handleActivity = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    try {
+      const followUp = String(data.get("follow_up_at") ?? "").trim();
+      await createActivity.mutateAsync({
+        business_id: businessId,
+        prospect_id: String(data.get("prospect_id") ?? "").trim() || null,
+        activity_type: String(data.get("activity_type") ?? "call") as BankingActivityType,
+        status: String(data.get("status") ?? "completed") as "planned" | "completed" | "cancelled",
+        activity_date: String(data.get("activity_date") ?? new Date().toISOString().slice(0, 10)),
+        subject: String(data.get("subject") ?? "").trim(),
+        outcome: String(data.get("outcome") ?? "").trim() || null,
+        notes: String(data.get("notes") ?? "").trim() || null,
+        follow_up_at: followUp ? new Date(followUp).toISOString() : null,
+      });
+      toast.success("Activity recorded");
+      event.currentTarget.reset();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not record activity");
+    }
+  };
+
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -156,15 +200,149 @@ function BankingGrowthPage() {
         <Badge variant="outline">{business?.name ?? "Business"}</Badge>
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Metric
           icon={Landmark}
           label="Institution"
           value={profile.data?.institution_name ?? "Not configured"}
         />
         <Metric icon={Building2} label="Active products" value={products.data?.length ?? 0} />
-        <Metric icon={Users} label="Acquisition workspace" value="Ready" />
+        <Metric icon={CalendarCheck} label="Today" value={activityMetrics.today} />
+        <Metric icon={Clock3} label="Follow-ups due" value={activityMetrics.followUpsDue} />
+        <Metric icon={Users} label="This month" value={activityMetrics.thisMonth} />
       </div>
+
+      <Card className="dashboard-surface rounded-xl">
+        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <ClipboardList className="h-4 w-4 text-primary" /> Personal KCB activity
+            </CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Record calls, visits, meetings, follow-ups and customer conversations. Metrics are
+              derived only from your recorded activity and stay inside this business workspace.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <PhoneCall className="h-4 w-4" /> {activityMetrics.completedToday} completed today
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <form
+            onSubmit={handleActivity}
+            className="grid gap-3 rounded-2xl border p-4 md:grid-cols-2 lg:grid-cols-4"
+          >
+            <select
+              name="activity_type"
+              defaultValue="call"
+              className="rounded-lg border bg-background px-3 py-2 text-sm"
+            >
+              <option value="call">Call</option>
+              <option value="visit">Visit</option>
+              <option value="meeting">Meeting</option>
+              <option value="follow_up">Follow-up</option>
+              <option value="lead_contacted">Lead contacted</option>
+              <option value="customer_conversation">Customer conversation</option>
+              <option value="application">Application</option>
+              <option value="referral">Referral</option>
+              <option value="product_discussion">Product discussion</option>
+              <option value="document_collection">Document collection</option>
+            </select>
+            <select
+              name="status"
+              defaultValue="completed"
+              className="rounded-lg border bg-background px-3 py-2 text-sm"
+            >
+              <option value="completed">Completed</option>
+              <option value="planned">Planned</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <Input
+              name="activity_date"
+              type="date"
+              defaultValue={new Date().toISOString().slice(0, 10)}
+              required
+            />
+            <select
+              name="prospect_id"
+              defaultValue=""
+              className="rounded-lg border bg-background px-3 py-2 text-sm"
+            >
+              <option value="">No linked prospect</option>
+              {(prospects.data ?? []).map((prospect) => (
+                <option key={prospect.id} value={prospect.id}>
+                  {[prospect.first_name, prospect.last_name].filter(Boolean).join(" ")}
+                </option>
+              ))}
+            </select>
+            <Input
+              name="subject"
+              required
+              placeholder="Activity subject"
+              className="lg:col-span-2"
+            />
+            <Input name="follow_up_at" type="datetime-local" placeholder="Follow-up due" />
+            <Input name="outcome" placeholder="Outcome / next step" />
+            <Input name="notes" placeholder="Notes" className="md:col-span-2 lg:col-span-3" />
+            <Button type="submit" disabled={createActivity.isPending}>
+              {createActivity.isPending ? "Recording…" : "Record activity"}
+            </Button>
+          </form>
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
+            <div className="overflow-x-auto rounded-2xl border">
+              <table className="w-full min-w-[680px] text-sm">
+                <thead className="border-b bg-muted/30 text-left text-xs text-muted-foreground">
+                  <tr>
+                    <th className="p-3">Date</th>
+                    <th className="p-3">Activity</th>
+                    <th className="p-3">Subject</th>
+                    <th className="p-3">Outcome</th>
+                    <th className="p-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {(activities.data ?? []).slice(0, 8).map((activity) => (
+                    <tr key={activity.id}>
+                      <td className="p-3 text-xs text-muted-foreground">
+                        {activity.activity_date}
+                      </td>
+                      <td className="p-3 capitalize">
+                        {activity.activity_type.replaceAll("_", " ")}
+                      </td>
+                      <td className="p-3 font-medium">{activity.subject}</td>
+                      <td className="max-w-[240px] truncate p-3 text-muted-foreground">
+                        {activity.outcome ?? "—"}
+                      </td>
+                      <td className="p-3">
+                        <Badge variant={activity.status === "completed" ? "secondary" : "outline"}>
+                          {activity.status}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {!activities.data?.length ? (
+                <p className="p-8 text-center text-sm text-muted-foreground">
+                  No personal activity recorded yet.
+                </p>
+              ) : null}
+            </div>
+            <div className="rounded-2xl border bg-muted/20 p-4">
+              <p className="font-medium">Personal scorecard</p>
+              <div className="mt-4 space-y-3 text-sm">
+                <ScoreRow label="This week" value={activityMetrics.thisWeek} />
+                <ScoreRow label="This month" value={activityMetrics.thisMonth} />
+                <ScoreRow label="Prospects contacted" value={activityMetrics.prospectsContacted} />
+                <ScoreRow label="Follow-ups due" value={activityMetrics.followUpsDue} />
+              </div>
+              <Button asChild variant="outline" className="mt-5 w-full">
+                <Link to="/banking/performance">Open KCB performance dashboard</Link>
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Card className="dashboard-surface rounded-xl">
@@ -364,5 +542,14 @@ function Metric({
         <p className="mt-2 truncate text-lg font-semibold">{value}</p>
       </CardContent>
     </Card>
+  );
+}
+
+function ScoreRow({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="flex items-center justify-between border-b border-border/60 pb-2 last:border-0 last:pb-0">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-semibold">{value}</span>
+    </div>
   );
 }
