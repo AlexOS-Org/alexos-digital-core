@@ -76,8 +76,11 @@ function BankingPerformancePage() {
   const [planActions, setPlanActions] = useState("");
   const [planMeasure, setPlanMeasure] = useState("");
   const [saleKpi, setSaleKpi] = useState("");
+  const [saleAmount, setSaleAmount] = useState("");
+  const [saleScoreValue, setSaleScoreValue] = useState("");
   const selectedKpi = kpis.find((kpi) => kpi.id === saleKpi);
   const productOptions = productOptionsForKpi(selectedKpi?.code);
+  const amountDrivesScore = selectedKpi?.unit.toLowerCase().includes("kes") ?? false;
 
   const latestByKpi = useMemo(() => {
     const map = new Map<string, WeeklyPerformance>();
@@ -165,10 +168,13 @@ function BankingPerformancePage() {
   const addCustomerSale = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!contract || !saleKpi) return;
-    const data = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const data = new FormData(form);
     const kpi = kpis.find((item) => item.id === saleKpi);
     if (!kpi) return;
-    const scoreValue = Number(data.get("score_value")) || 0;
+    const scoreValue = amountDrivesScore
+      ? Number(data.get("amount")) || 0
+      : Number(data.get("score_value")) || 0;
     const qualifiedValue = Number(data.get("qualified_value")) || 0;
     if (qualifiedValue > scoreValue) {
       toast.error("Qualified value cannot be greater than the scorecard value.");
@@ -193,8 +199,10 @@ function BankingPerformancePage() {
         evidence_reference: String(data.get("evidence_reference") || "").trim() || null,
         notes: String(data.get("notes") || "").trim() || null,
       });
-      event.currentTarget.reset();
+      form.reset();
       setSaleKpi("");
+      setSaleAmount("");
+      setSaleScoreValue("");
       toast.success("Customer sale recorded and weekly scorecard synced");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not record customer sale");
@@ -475,6 +483,8 @@ function BankingPerformancePage() {
             min="0"
             step="any"
             placeholder="Amount (KES), if applicable"
+            value={saleAmount}
+            onChange={(event) => setSaleAmount(event.target.value)}
             className="rounded-lg border bg-background px-3 py-2 text-sm"
           />
           <input
@@ -492,7 +502,15 @@ function BankingPerformancePage() {
             type="number"
             min="0"
             step="any"
-            placeholder="Scorecard value: KES / count / %"
+            placeholder={amountDrivesScore ? "Auto: amount" : "Scorecard value: KES / count / %"}
+            value={amountDrivesScore ? saleAmount : saleScoreValue}
+            onChange={(event) => setSaleScoreValue(event.target.value)}
+            readOnly={amountDrivesScore}
+            aria-label={
+              amountDrivesScore
+                ? "Scorecard value (automatically copied from amount)"
+                : "Scorecard value"
+            }
             className="rounded-lg border bg-background px-3 py-2 text-sm"
           />
           <input
