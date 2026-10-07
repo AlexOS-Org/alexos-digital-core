@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { weeklySalesTotals, type CustomerSale } from "./customer-sales";
+import { isTestCustomerSale, weeklySalesTotals, type CustomerSale } from "./customer-sales";
 
 describe("customer sales weekly synchronization", () => {
   it("counts all non-cancelled sales as actual but only verified value as qualified", () => {
@@ -45,5 +45,32 @@ describe("customer sales weekly synchronization", () => {
       },
     ] as CustomerSale[];
     expect(weeklySalesTotals(sales, [], "2026-10-05").size).toBe(0);
+  });
+
+  it("recognizes explicit test markers without matching ordinary customer names", () => {
+    expect(
+      isTestCustomerSale({
+        customer_name: "SAMPLE TEST",
+        customer_reference: null,
+        evidence_reference: null,
+        notes: null,
+      }),
+    ).toBe(true);
+    expect(
+      isTestCustomerSale({
+        customer_name: "Test Customer",
+        customer_reference: null,
+        evidence_reference: null,
+        notes: null,
+      }),
+    ).toBe(true);
+    expect(
+      isTestCustomerSale({
+        customer_name: "Amina Wanjiku",
+        customer_reference: "LOAN-001",
+        evidence_reference: "receipt-001",
+        notes: null,
+      }),
+    ).toBe(false);
   });
 });

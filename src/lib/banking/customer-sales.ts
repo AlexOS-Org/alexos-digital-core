@@ -39,10 +39,28 @@ export type CustomerSale = {
 };
 export type NewCustomerSale = Omit<CustomerSale, "id" | "user_id" | "created_at" | "updated_at">;
 
+export function isTestCustomerSale(
+  sale: Pick<CustomerSale, "customer_name" | "customer_reference" | "evidence_reference" | "notes">,
+) {
+  const testWord = /(^|[^a-z])test([^a-z]|$)/i;
+  return (
+    sale.customer_name === "SAMPLE TEST" ||
+    testWord.test(sale.customer_name) ||
+    testWord.test(sale.customer_reference ?? "") ||
+    testWord.test(sale.evidence_reference ?? "") ||
+    testWord.test(sale.notes ?? "")
+  );
+}
+
 type AtomicSyncResult = {
   sale: CustomerSale;
   week_start: string;
   week_end: string;
+};
+
+type AtomicDeleteTestResult = {
+  deleted_count: number;
+  week_starts: string[];
 };
 
 export const customerSalesKey = (contractId: string | null) =>
@@ -58,8 +76,7 @@ export function useCustomerSales(contractId: string | null) {
         .select("*")
         .eq("contract_id", contractId)
         .order("sale_date", { ascending: false })
-        .order("created_at", { ascending: false })
-        .limit(250);
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as CustomerSale[];
     },
@@ -104,6 +121,15 @@ export function useCustomerSalesActions(
   const queryClient = useQueryClient();
   const contractId = contract?.id ?? null;
   const sales = useCustomerSales(contractId);
+  const user = useQuery({
+    queryKey: ["authenticated-user"],
+    queryFn: async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) throw error;
+      return data.user;
+    },
+  });
+  const isAdmin = ["admin", "owner"].includes(String(user.data?.app_metadata?.role ?? ""));
   const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: customerSalesKey(contractId) });
     void queryClient.invalidateQueries({ queryKey: contractFrameworkKeys.weekly(contractId) });
@@ -157,5 +183,33 @@ export function useCustomerSalesActions(
     onSuccess: invalidate,
   });
 
-  return { sales, addSale, updateQualification };
+  const deleteSale = useMutation({
+    mutationFn: async (saleId: string) => {
+      if (!contractId) throw new Error("Contract is not ready");
+      const { data, error } = await db.rpc("banking_customer_sales_atomic_sync", {
+        p_operation: "delete",
+        p_contract_id: contractId,
+        p_sale_id: saleId,
+      });
+      if (error) throw error;
+      return (data as AtomicSyncResult).sale;
+    },
+    onSuccess: invalidate,
+  });
+
+  const deleteTestEntries = useMutation({
+    mutationFn: async () => {
+      if (!contractId) throw new Error("Contract is not ready");
+      if (!isAdmin) throw new Error("Admin role is required for test-entry cleanup");
+      const { data, error } = await db.rpc("banking_customer_sales_atomic_sync", {
+        p_operation: "delete_test_entries",
+        p_contract_id: contractId,
+      });
+      if (error) throw error;
+      return data as AtomicDeleteTestResult;
+    },
+    onSuccess: invalidate,
+  });
+
+  return { sales, addSale, updateQualification, deleteSale, deleteTestEntries, isAdmin };
 }
