@@ -76,8 +76,7 @@ export function useCustomerSales(contractId: string | null) {
         .select("*")
         .eq("contract_id", contractId)
         .order("sale_date", { ascending: false })
-        .order("created_at", { ascending: false })
-        .limit(250);
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as CustomerSale[];
     },
