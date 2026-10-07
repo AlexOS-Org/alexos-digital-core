@@ -14,6 +14,7 @@ import {
   type WeeklyPerformance,
 } from "@/lib/banking/contract-performance";
 import {
+  isTestCustomerSale,
   useCustomerSalesActions,
   type CustomerSaleStatus,
   type QualificationStatus,
@@ -78,9 +79,14 @@ function BankingPerformancePage() {
   const [saleKpi, setSaleKpi] = useState("");
   const [saleAmount, setSaleAmount] = useState("");
   const [saleScoreValue, setSaleScoreValue] = useState("");
+  const [saleToDelete, setSaleToDelete] = useState<
+    NonNullable<typeof salesActions.sales.data>[number] | null
+  >(null);
+  const [confirmDeleteTestEntries, setConfirmDeleteTestEntries] = useState(false);
   const selectedKpi = kpis.find((kpi) => kpi.id === saleKpi);
   const productOptions = productOptionsForKpi(selectedKpi?.code);
   const amountDrivesScore = selectedKpi?.unit.toLowerCase().includes("kes") ?? false;
+  const testSales = (salesActions.sales.data ?? []).filter(isTestCustomerSale);
 
   const latestByKpi = useMemo(() => {
     const map = new Map<string, WeeklyPerformance>();
@@ -411,9 +417,23 @@ function BankingPerformancePage() {
               unnecessary sensitive data.
             </p>
           </div>
-          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
-            Customer-level source of truth
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            {salesActions.isAdmin ? (
+              <button
+                type="button"
+                disabled={!testSales.length || salesActions.deleteTestEntries.isPending}
+                onClick={() => setConfirmDeleteTestEntries(true)}
+                className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-medium text-rose-700 disabled:cursor-not-allowed disabled:opacity-50 dark:text-rose-300"
+              >
+                {salesActions.deleteTestEntries.isPending
+                  ? "Cleaning testing data…"
+                  : `Delete all test entries${testSales.length ? ` (${testSales.length})` : ""}`}
+              </button>
+            ) : null}
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
+              Customer-level source of truth
+            </span>
+          </div>
         </div>
         <form
           onSubmit={addCustomerSale}
@@ -568,7 +588,7 @@ function BankingPerformancePage() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {(salesActions.sales.data ?? []).slice(0, 12).map((sale) => (
+              {(salesActions.sales.data ?? []).map((sale) => (
                 <tr key={sale.id}>
                   <td className="p-3 text-xs text-muted-foreground">{sale.sale_date}</td>
                   <td className="p-3 font-medium">{sale.customer_name}</td>
@@ -580,23 +600,30 @@ function BankingPerformancePage() {
                   </td>
                   <td className="p-3 capitalize">{sale.qualification_status}</td>
                   <td className="p-3">
-                    {sale.qualification_status === "pending" ? (
+                    <div className="flex flex-wrap gap-2">
+                      {sale.qualification_status === "pending" ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            void salesActions.updateQualification.mutateAsync({
+                              id: sale.id,
+                              qualification_status: "verified",
+                              qualified_value: sale.actual_value,
+                            })
+                          }
+                          className="rounded border px-2 py-1 text-xs"
+                        >
+                          Mark verified
+                        </button>
+                      ) : null}
                       <button
                         type="button"
-                        onClick={() =>
-                          void salesActions.updateQualification.mutateAsync({
-                            id: sale.id,
-                            qualification_status: "verified",
-                            qualified_value: sale.actual_value,
-                          })
-                        }
-                        className="rounded border px-2 py-1 text-xs"
+                        onClick={() => setSaleToDelete(sale)}
+                        className="rounded border border-rose-500/30 px-2 py-1 text-xs text-rose-700 dark:text-rose-300"
                       >
-                        Mark verified
+                        Delete
                       </button>
-                    ) : (
-                      "—"
-                    )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -608,6 +635,129 @@ function BankingPerformancePage() {
             </p>
           ) : null}
         </div>
+
+        {saleToDelete ? (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"
+            role="presentation"
+          >
+            <div
+              className="w-full max-w-md rounded-2xl border bg-card p-6 shadow-2xl"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="delete-sale-title"
+            >
+              <h3 id="delete-sale-title" className="text-lg font-semibold">
+                Delete customer sale?
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                This permanently removes the sale, linked evidence, and its recalculated scorecard
+                contribution.
+              </p>
+              <dl className="mt-4 space-y-2 rounded-lg bg-muted/40 p-4 text-sm">
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted-foreground">Customer</dt>
+                  <dd className="font-medium text-right">{saleToDelete.customer_name}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted-foreground">Loan amount</dt>
+                  <dd className="font-medium text-right">
+                    KES {Number(saleToDelete.amount).toLocaleString()}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted-foreground">Date</dt>
+                  <dd className="font-medium text-right">{saleToDelete.sale_date}</dd>
+                </div>
+              </dl>
+              <div className="mt-5 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSaleToDelete(null)}
+                  className="rounded-lg border px-3 py-2 text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={salesActions.deleteSale.isPending}
+                  onClick={async () => {
+                    try {
+                      await salesActions.deleteSale.mutateAsync(saleToDelete.id);
+                      setSaleToDelete(null);
+                      toast.success("Sale deleted and scorecard recalculated");
+                    } catch (error) {
+                      toast.error(error instanceof Error ? error.message : "Could not delete sale");
+                    }
+                  }}
+                  className="rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                >
+                  {salesActions.deleteSale.isPending ? "Deleting…" : "Delete sale"}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {confirmDeleteTestEntries ? (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"
+            role="presentation"
+          >
+            <div
+              className="w-full max-w-md rounded-2xl border bg-card p-6 shadow-2xl"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="delete-test-title"
+            >
+              <h3 id="delete-test-title" className="text-lg font-semibold">
+                Delete all test entries?
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                This will permanently remove {testSales.length} marked test sale
+                {testSales.length === 1 ? "" : "s"}, linked evidence, and affected scorecard
+                contributions. Real entries are not included.
+              </p>
+              <div className="mt-4 max-h-40 overflow-auto rounded-lg bg-muted/40 p-3 text-sm">
+                {testSales.map((sale) => (
+                  <div key={sale.id}>
+                    {sale.customer_name} · KES {Number(sale.amount).toLocaleString()} ·{" "}
+                    {sale.sale_date}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-5 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirmDeleteTestEntries(false)}
+                  className="rounded-lg border px-3 py-2 text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={salesActions.deleteTestEntries.isPending}
+                  onClick={async () => {
+                    try {
+                      const result = await salesActions.deleteTestEntries.mutateAsync();
+                      setConfirmDeleteTestEntries(false);
+                      toast.success(
+                        `${result.deleted_count} test sale${result.deleted_count === 1 ? "" : "s"} deleted and scorecard recalculated`,
+                      );
+                    } catch (error) {
+                      toast.error(
+                        error instanceof Error ? error.message : "Could not clean up test entries",
+                      );
+                    }
+                  }}
+                  className="rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                >
+                  {salesActions.deleteTestEntries.isPending ? "Cleaning…" : "Delete test entries"}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
