@@ -25,6 +25,11 @@ describe("KCB contract performance framework", () => {
     expect(weeklyTarget(loans!)).toBeCloseTo(2_000_000 / 4.33, 6);
   });
 
+  it("converts rolling three-month targets into thirteen weekly periods", () => {
+    const deposits = CONTRACT_KPIS.find((kpi) => kpi.code === "DEPOSITS");
+    expect(weeklyTarget(deposits!)).toBeCloseTo(1_000_000 / 13, 6);
+  });
+
   it("caps each area's weighted contribution at its contract weight", () => {
     expect(scoreAchievement(2, 1)).toBe(200);
     expect(weightedContribution(2, 1, 30)).toBe(30);
