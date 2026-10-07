@@ -220,6 +220,7 @@ export function weekStartFor(date = new Date()) {
 }
 export function weeklyTarget(kpi: Pick<ContractKpi, "target_value" | "target_period">) {
   if (kpi.target_period === "weekly") return kpi.target_value;
+  if (kpi.target_period === "rolling_3_month") return kpi.target_value / 13;
   return kpi.target_value / 4.33;
 }
 
