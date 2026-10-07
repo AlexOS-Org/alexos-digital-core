@@ -18,10 +18,48 @@ import {
   type CustomerSaleStatus,
   type QualificationStatus,
 } from "@/lib/banking/customer-sales";
+import { productOptionsForKpi } from "@/lib/banking/kcb-products";
 
 export const Route = createFileRoute("/_authenticated/banking/performance")({
   component: BankingPerformancePage,
 });
+
+function scoreTone(score: number) {
+  if (score >= 100) {
+    return {
+      label: "Target exceeded",
+      card: "border-emerald-500/30 bg-emerald-500/[0.06]",
+      text: "text-emerald-700 dark:text-emerald-300",
+      bar: "bg-emerald-500",
+      dot: "bg-emerald-500",
+    };
+  }
+  if (score >= 90) {
+    return {
+      label: "Full performance",
+      card: "border-sky-500/30 bg-sky-500/[0.06]",
+      text: "text-sky-700 dark:text-sky-300",
+      bar: "bg-sky-500",
+      dot: "bg-sky-500",
+    };
+  }
+  if (score >= 75) {
+    return {
+      label: "Improving",
+      card: "border-amber-500/30 bg-amber-500/[0.07]",
+      text: "text-amber-700 dark:text-amber-300",
+      bar: "bg-amber-500",
+      dot: "bg-amber-500",
+    };
+  }
+  return {
+    label: "Critical focus",
+    card: "border-rose-500/30 bg-rose-500/[0.06]",
+    text: "text-rose-700 dark:text-rose-300",
+    bar: "bg-rose-500",
+    dot: "bg-rose-500",
+  };
+}
 
 function BankingPerformancePage() {
   const { business } = useBusinessContext();
@@ -30,9 +68,6 @@ function BankingPerformancePage() {
   const contract = framework.data?.contract;
   const salesActions = useCustomerSalesActions(contract, kpis);
   const weekStart = weekStartFor();
-  const [actuals, setActuals] = useState<Record<string, number>>({});
-  const [qualified, setQualified] = useState<Record<string, number>>({});
-  const [blockers, setBlockers] = useState<Record<string, string>>({});
   const [nextActions, setNextActions] = useState<Record<string, string>>({});
   const [evidenceKpi, setEvidenceKpi] = useState("");
   const [evidenceRef, setEvidenceRef] = useState("");
@@ -41,6 +76,8 @@ function BankingPerformancePage() {
   const [planActions, setPlanActions] = useState("");
   const [planMeasure, setPlanMeasure] = useState("");
   const [saleKpi, setSaleKpi] = useState("");
+  const selectedKpi = kpis.find((kpi) => kpi.id === saleKpi);
+  const productOptions = productOptionsForKpi(selectedKpi?.code);
 
   const latestByKpi = useMemo(() => {
     const map = new Map<string, WeeklyPerformance>();
@@ -50,8 +87,8 @@ function BankingPerformancePage() {
   }, [framework.weekly.data]);
   const currentRows = kpis.map((kpi) => ({
     kpi,
-    actual: actuals[kpi.id] ?? latestByKpi.get(kpi.id)?.actual_value ?? 0,
-    qualified: qualified[kpi.id] ?? latestByKpi.get(kpi.id)?.qualified_value ?? 0,
+    actual: latestByKpi.get(kpi.id)?.actual_value ?? 0,
+    qualified: latestByKpi.get(kpi.id)?.qualified_value ?? 0,
     target: weeklyTarget(kpi),
   }));
   const score = weightedScore(
@@ -81,29 +118,6 @@ function BankingPerformancePage() {
     })),
   );
 
-  const saveWeekly = async () => {
-    if (!contract) return;
-    try {
-      await Promise.all(
-        currentRows.map((row) =>
-          framework.recordWeekly.mutateAsync({
-            contract_id: contract.id,
-            kpi_id: row.kpi.id,
-            week_start: weekStart,
-            actual_value: row.actual,
-            qualified_value: row.qualified,
-            target_value: row.target,
-            blockers: blockers[row.kpi.id] || null,
-            next_action: nextActions[row.kpi.id] || row.kpi.improvement_action,
-            manager_note: null,
-          }),
-        ),
-      );
-      toast.success("Weekly contract performance saved");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not save weekly performance");
-    }
-  };
   const addEvidence = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!contract || !evidenceKpi || !evidenceRef.trim()) return;
@@ -215,32 +229,34 @@ function BankingPerformancePage() {
     );
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div className="mx-auto max-w-7xl space-y-6 pb-10">
+      <header className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-6 text-white shadow-2xl shadow-slate-900/10 dark:border-white/10 sm:p-8 lg:flex lg:items-end lg:justify-between">
+        <div className="pointer-events-none absolute -right-24 -top-28 h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-32 left-1/3 h-56 w-56 rounded-full bg-violet-500/20 blur-3xl" />
         <div>
-          <p className="text-sm font-medium text-primary">
+          <p className="relative text-sm font-semibold tracking-wide text-cyan-300">
             KCB Performance · Contract {CONTRACT_VERSION}
           </p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight">
+          <h1 className="relative mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">
             Promotion Readiness Dashboard
           </h1>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+          <p className="relative mt-2 max-w-3xl text-sm leading-6 text-slate-300">
             Track the eight contract areas weekly, validate qualifying results, see your three-month
             rolling position, and build evidence for your promotion conversation.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="relative mt-2 flex gap-2 lg:mt-0">
           <button
             type="button"
             onClick={() => framework.refresh()}
-            className="rounded-lg border px-3 py-2 text-sm"
+            className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white backdrop-blur transition hover:bg-white/15"
           >
             Refresh
           </button>
           <button
             type="button"
             onClick={downloadReport}
-            className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground"
+            className="rounded-lg bg-cyan-400 px-3 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-300"
           >
             Download promotion report
           </button>
@@ -254,41 +270,47 @@ function BankingPerformancePage() {
             label="Weekly weighted pace"
             value={`${score.toFixed(1)}%`}
             hint="90% is the contract full-performance threshold"
+            tone={scoreTone(score)}
           />
           <SummaryCard
             label="3-month rolling score"
             value={`${rollingScore.toFixed(1)}%`}
             hint="Use this for promotion evidence and trend review"
+            tone={scoreTone(rollingScore)}
           />
           <SummaryCard
             label="Active improvement plans"
             value={(framework.plans.data ?? []).filter((plan) => plan.status === "active").length}
             hint="Keep actions specific and measurable"
+            tone={{
+              card: "border-violet-500/30 bg-violet-500/[0.06]",
+              text: "text-violet-700 dark:text-violet-300",
+              bar: "bg-violet-500",
+              dot: "bg-violet-500",
+            }}
           />
         </div>
       </section>
 
-      <section className="rounded-2xl border bg-card">
-        <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
+      <section className="overflow-hidden rounded-3xl border border-slate-200/80 bg-card shadow-xl shadow-slate-900/5 dark:border-white/10">
+        <div className="flex flex-col gap-3 border-b bg-gradient-to-r from-slate-50 to-indigo-50/70 p-5 dark:from-slate-900/80 dark:to-indigo-950/30 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="font-semibold">Eight-area weekly scorecard</h2>
-            <p className="text-xs text-muted-foreground">
-              Week beginning {weekStart}. Enter actual and qualified values separately; only
-              qualified values earn weighted performance.
-            </p>
+            <div>
+              <h2 className="font-semibold tracking-tight">Eight-area weekly scorecard</h2>
+              <p className="text-xs text-muted-foreground">
+                Week beginning {weekStart}. Enter actual and qualified values separately; only
+                qualified values earn weighted performance.
+              </p>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={() => void saveWeekly()}
-            disabled={framework.recordWeekly.isPending}
-            className="rounded-lg bg-primary px-3 py-2 text-sm text-primary-foreground"
-          >
-            {framework.recordWeekly.isPending ? "Saving…" : "Save weekly snapshot"}
-          </button>
+          <span className="inline-flex items-center gap-2 self-start rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-300 sm:self-auto">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            Live · auto-synced
+          </span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1120px] text-sm">
-            <thead className="border-b bg-muted/30 text-left text-xs text-muted-foreground">
+            <thead className="border-b bg-slate-950/[0.03] text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground dark:bg-white/[0.03]">
               <tr>
                 <th className="p-3">Area</th>
                 <th className="p-3">Weight</th>
@@ -302,10 +324,11 @@ function BankingPerformancePage() {
             <tbody className="divide-y">
               {currentRows.map((row) => {
                 const achievement = scoreAchievement(row.qualified, row.target);
+                const tone = scoreTone(achievement);
                 return (
                   <tr
                     key={row.kpi.id}
-                    className={row.qualified < row.target ? "bg-amber-500/5" : ""}
+                    className={`border-l-2 ${tone.card} transition-colors hover:bg-slate-500/[0.04]`}
                   >
                     <td className="p-3">
                       <p className="font-medium">{row.kpi.name}</p>
@@ -320,35 +343,34 @@ function BankingPerformancePage() {
                     </td>
                     <td className="p-3">
                       <input
-                        type="number"
-                        min="0"
-                        step="any"
-                        value={row.actual || ""}
-                        onChange={(event) =>
-                          setActuals((current) => ({
-                            ...current,
-                            [row.kpi.id]: Number(event.target.value) || 0,
-                          }))
-                        }
-                        className="w-28 rounded border bg-background px-2 py-1.5"
+                        type="text"
+                        value={row.actual.toLocaleString()}
+                        readOnly
+                        aria-label={`${row.kpi.name} actual value`}
+                        className="w-28 rounded border bg-muted px-2 py-1.5"
                       />
                     </td>
                     <td className="p-3">
                       <input
-                        type="number"
-                        min="0"
-                        step="any"
-                        value={row.qualified || ""}
-                        onChange={(event) =>
-                          setQualified((current) => ({
-                            ...current,
-                            [row.kpi.id]: Number(event.target.value) || 0,
-                          }))
-                        }
-                        className="w-28 rounded border bg-background px-2 py-1.5"
+                        type="text"
+                        value={row.qualified.toLocaleString()}
+                        readOnly
+                        aria-label={`${row.kpi.name} qualified value`}
+                        className="w-28 rounded border bg-muted px-2 py-1.5"
                       />
                     </td>
-                    <td className="p-3 font-semibold">{achievement.toFixed(1)}%</td>
+                    <td className="p-3">
+                      <div className={`mb-1 flex items-center gap-2 font-semibold ${tone.text}`}>
+                        <span className={`h-2 w-2 rounded-full ${tone.dot}`} />
+                        {achievement.toFixed(1)}%
+                      </div>
+                      <div className="h-1.5 w-24 overflow-hidden rounded-full bg-muted">
+                        <div
+                          className={`h-full rounded-full ${tone.bar}`}
+                          style={{ width: `${Math.min(100, achievement)}%` }}
+                        />
+                      </div>
+                    </td>
                     <td className="p-3">
                       <input
                         placeholder={row.kpi.improvement_action}
@@ -360,17 +382,6 @@ function BankingPerformancePage() {
                           }))
                         }
                         className="mb-1 w-full rounded border bg-background px-2 py-1.5"
-                      />
-                      <input
-                        placeholder="Blocker / validation note"
-                        value={blockers[row.kpi.id] ?? ""}
-                        onChange={(event) =>
-                          setBlockers((current) => ({
-                            ...current,
-                            [row.kpi.id]: event.target.value,
-                          }))
-                        }
-                        className="w-full rounded border bg-background px-2 py-1.5 text-xs"
                       />
                     </td>
                   </tr>
@@ -424,12 +435,20 @@ function BankingPerformancePage() {
             placeholder="Safe customer reference (optional)"
             className="rounded-lg border bg-background px-3 py-2 text-sm"
           />
-          <input
+          <select
+            key={saleKpi || "no-contract-area"}
             name="product_name"
             required
-            placeholder="Product sold e.g. Personal Loan"
+            defaultValue=""
             className="rounded-lg border bg-background px-3 py-2 text-sm"
-          />
+          >
+            <option value="">Product given to customer</option>
+            {productOptions.map((product) => (
+              <option key={product} value={product}>
+                {product}
+              </option>
+            ))}
+          </select>
           <input
             name="sale_date"
             type="date"
@@ -731,10 +750,13 @@ function BankingPerformancePage() {
 }
 
 function Speedometer({ score, band }: { score: number; band: string }) {
+  const tone = scoreTone(score);
   const bounded = Math.max(0, Math.min(100, score));
   const angle = -135 + bounded * 2.7;
   return (
-    <div className="rounded-2xl border bg-card p-4">
+    <div
+      className={`relative overflow-hidden rounded-3xl border bg-card p-5 shadow-xl shadow-slate-900/5 ${tone.card}`}
+    >
       <p className="text-xs uppercase tracking-wide text-muted-foreground">
         Weighted performance speedometer
       </p>
@@ -755,7 +777,15 @@ function Speedometer({ score, band }: { score: number; band: string }) {
         <path
           d="M35 125 A85 85 0 0 1 205 125"
           fill="none"
-          stroke="hsl(var(--primary))"
+          stroke={
+            tone.bar.includes("emerald")
+              ? "#10b981"
+              : tone.bar.includes("sky")
+                ? "#0ea5e9"
+                : tone.bar.includes("amber")
+                  ? "#f59e0b"
+                  : "#f43f5e"
+          }
           strokeWidth="18"
           strokeLinecap="round"
           pathLength="100"
@@ -773,8 +803,10 @@ function Speedometer({ score, band }: { score: number; band: string }) {
         <circle cx="120" cy="125" r="7" fill="currentColor" />
       </svg>
       <div className="text-center">
-        <p className="text-4xl font-bold">{score.toFixed(1)}%</p>
-        <p className="mt-1 text-sm text-muted-foreground">{band}</p>
+        <p className={`text-4xl font-bold tracking-tight ${tone.text}`}>{score.toFixed(1)}%</p>
+        <p className={`mt-1 text-sm font-medium ${tone.text}`}>
+          {tone.label} · {band}
+        </p>
         <p className="mt-3 text-[11px] text-muted-foreground">
           0 critical · 75 improving · 90 full-performance · 100 target
         </p>
@@ -786,15 +818,20 @@ function SummaryCard({
   label,
   value,
   hint,
+  tone,
 }: {
   label: string;
   value: string | number;
   hint: string;
+  tone: { card: string; text: string; bar: string; dot: string };
 }) {
   return (
-    <div className="rounded-2xl border bg-card p-5">
+    <div
+      className={`rounded-3xl border p-5 shadow-xl shadow-slate-900/5 transition-transform hover:-translate-y-0.5 ${tone.card}`}
+    >
       <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
-      <p className="mt-3 text-3xl font-semibold">{value}</p>
+      <p className={`mt-3 text-3xl font-semibold tracking-tight ${tone.text}`}>{value}</p>
+      <div className={`mt-4 h-1 w-12 rounded-full ${tone.bar}`} />
       <p className="mt-2 text-xs leading-5 text-muted-foreground">{hint}</p>
     </div>
   );
