@@ -31,8 +31,10 @@ export const KCB_PRODUCT_OPTIONS = {
 
 export function productOptionsForKpi(code: string | null | undefined): readonly string[] {
   const normalizedCode = code?.trim().toUpperCase();
+  if (!normalizedCode || normalizedCode.includes("-")) {
+    return Object.values(KCB_PRODUCT_OPTIONS).flat();
+  }
   return (
-    (normalizedCode &&
-      KCB_PRODUCT_OPTIONS[normalizedCode as keyof typeof KCB_PRODUCT_OPTIONS]) || ["Other product"]
+    KCB_PRODUCT_OPTIONS[normalizedCode as keyof typeof KCB_PRODUCT_OPTIONS] || ["Other product"]
   );
 }
