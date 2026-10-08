@@ -81,6 +81,9 @@ function BankingPerformancePage() {
   const [saleKpi, setSaleKpi] = useState("");
   const [saleCustomerName, setSaleCustomerName] = useState("");
   const [saleCustomerReference, setSaleCustomerReference] = useState("");
+  const [selectedProducts, setSelectedProducts] = useState<
+    Array<{ kpi_id: string; product_name: string }>
+  >([]);
   const [saleAmount, setSaleAmount] = useState("");
   const [saleScoreValue, setSaleScoreValue] = useState("");
   const [saleToDelete, setSaleToDelete] = useState<
@@ -93,6 +96,9 @@ function BankingPerformancePage() {
   const [confirmDeleteTestEntries, setConfirmDeleteTestEntries] = useState(false);
   const selectedKpi = kpis.find((kpi) => kpi.id === saleKpi);
   const productOptions = productOptionsForKpi(selectedKpi?.code);
+  const multiProductChoices = kpis.flatMap((kpi) =>
+    productOptionsForKpi(kpi.code).map((product_name) => ({ kpi_id: kpi.id, product_name })),
+  );
   const amountDrivesScore = selectedKpi?.unit.toLowerCase().includes("kes") ?? false;
   const countDrivesScore = Boolean(
     selectedKpi && !amountDrivesScore && !selectedKpi.unit.includes("%"),
@@ -211,9 +217,64 @@ function BankingPerformancePage() {
   };
   const addCustomerSale = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!contract || !saleKpi) return;
+    if (!contract || (!saleKpi && selectedProducts.length === 0)) return;
     const form = event.currentTarget;
     const data = new FormData(form);
+    const common = {
+      sale_date: String(data.get("sale_date") || new Date().toISOString().slice(0, 10)),
+      customer_name: String(data.get("customer_name") || "").trim(),
+      customer_reference: String(data.get("customer_reference") || "").trim() || null,
+      product_status: String(data.get("product_status") || "sold") as CustomerSaleStatus,
+      qualification_status: String(
+        data.get("qualification_status") || "pending",
+      ) as QualificationStatus,
+      evidence_reference: String(data.get("evidence_reference") || "").trim() || null,
+      notes: String(data.get("notes") || "").trim() || null,
+    };
+    if (selectedProducts.length > 0) {
+      const amount = Number(data.get("amount")) || 0;
+      const quantity = Number(data.get("quantity")) || 1;
+      const items = selectedProducts.map((choice) => {
+        const choiceKpi = kpis.find((item) => item.id === choice.kpi_id);
+        const amountBased = choiceKpi?.unit.toLowerCase().includes("kes") ?? false;
+        const countBased = Boolean(choiceKpi && !amountBased && !choiceKpi.unit.includes("%"));
+        const actualValue = amountBased
+          ? amount
+          : countBased
+            ? quantity
+            : Number(data.get("score_value")) || 0;
+        return {
+          ...choice,
+          amount,
+          quantity,
+          actual_value: actualValue,
+          qualified_value:
+            countBased && common.qualification_status === "verified"
+              ? actualValue
+              : countBased
+                ? 0
+                : Number(data.get("qualified_value")) || 0,
+        };
+      });
+      try {
+        await salesActions.addSalesBatch.mutateAsync({
+          contract_id: contract.id,
+          items,
+          ...common,
+        });
+        form.reset();
+        setSaleKpi("");
+        setSaleCustomerName("");
+        setSaleCustomerReference("");
+        setSaleAmount("");
+        setSaleScoreValue("");
+        setSelectedProducts([]);
+        toast.success(`${items.length} customer products recorded atomically`);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Could not record customer products");
+      }
+      return;
+    }
     const kpi = kpis.find((item) => item.id === saleKpi);
     if (!kpi) return;
     const scoreValue = amountDrivesScore
@@ -234,23 +295,23 @@ function BankingPerformancePage() {
       await salesActions.addSale.mutateAsync({
         contract_id: contract.id,
         kpi_id: kpi.id,
-        sale_date: String(data.get("sale_date") || new Date().toISOString().slice(0, 10)),
-        customer_name: String(data.get("customer_name") || "").trim(),
-        customer_reference: String(data.get("customer_reference") || "").trim() || null,
+        sale_date: common.sale_date,
+        customer_name: common.customer_name,
+        customer_reference: common.customer_reference,
         product_name: String(data.get("product_name") || "").trim(),
-        product_status: String(data.get("product_status") || "sold") as CustomerSaleStatus,
+        product_status: common.product_status,
         amount: Number(data.get("amount")) || 0,
         quantity: Number(data.get("quantity")) || 1,
         actual_value: scoreValue,
         qualified_value: qualifiedValue,
-        qualification_status: String(
-          data.get("qualification_status") || "pending",
-        ) as QualificationStatus,
-        evidence_reference: String(data.get("evidence_reference") || "").trim() || null,
-        notes: String(data.get("notes") || "").trim() || null,
+        qualification_status: common.qualification_status,
+        evidence_reference: common.evidence_reference,
+        notes: common.notes,
       });
       form.reset();
       setSaleKpi("");
+      setSaleCustomerName("");
+      setSaleCustomerReference("");
       setSaleAmount("");
       setSaleScoreValue("");
       toast.success("Customer sale recorded and weekly scorecard synced");
@@ -550,7 +611,7 @@ function BankingPerformancePage() {
           className="mt-4 grid gap-3 rounded-xl border p-4 md:grid-cols-2 lg:grid-cols-4"
         >
           <select
-            required
+            required={selectedProducts.length === 0}
             value={saleKpi}
             onChange={(event) => setSaleKpi(event.target.value)}
             className="rounded-lg border bg-background px-3 py-2 text-sm"
@@ -580,7 +641,7 @@ function BankingPerformancePage() {
           <select
             key={saleKpi || "no-contract-area"}
             name="product_name"
-            required
+            required={selectedProducts.length === 0}
             defaultValue=""
             className="rounded-lg border bg-background px-3 py-2 text-sm"
           >
@@ -591,6 +652,65 @@ function BankingPerformancePage() {
               </option>
             ))}
           </select>
+          <div className="rounded-lg border bg-muted/20 p-3 text-sm lg:col-span-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="font-medium">Add multiple products for this customer</p>
+                <p className="text-xs text-muted-foreground">
+                  Select products such as Salary Account, Mobi, and Vooma, then save them together.
+                  Each selected item becomes its own KPI row and evidence record.
+                </p>
+              </div>
+              {selectedProducts.length ? (
+                <button
+                  type="button"
+                  onClick={() => setSelectedProducts([])}
+                  className="text-xs text-muted-foreground underline"
+                >
+                  Clear selection
+                </button>
+              ) : null}
+            </div>
+            <div className="mt-2 grid max-h-36 gap-2 overflow-y-auto sm:grid-cols-2 lg:grid-cols-4">
+              {multiProductChoices.map((choice) => {
+                const kpi = kpis.find((item) => item.id === choice.kpi_id);
+                const checked = selectedProducts.some(
+                  (item) =>
+                    item.kpi_id === choice.kpi_id && item.product_name === choice.product_name,
+                );
+                return (
+                  <label
+                    key={`${choice.kpi_id}-${choice.product_name}`}
+                    className="flex items-center gap-2"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() =>
+                        setSelectedProducts((current) =>
+                          checked
+                            ? current.filter(
+                                (item) =>
+                                  item.kpi_id !== choice.kpi_id ||
+                                  item.product_name !== choice.product_name,
+                              )
+                            : [...current, choice],
+                        )
+                      }
+                    />
+                    <span>
+                      {kpi?.name}: {choice.product_name}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+            {selectedProducts.length ? (
+              <p className="mt-2 text-xs font-medium text-primary">
+                {selectedProducts.length} product(s) selected; this will use the atomic batch save.
+              </p>
+            ) : null}
+          </div>
           <input
             name="sale_date"
             type="date"
@@ -632,7 +752,7 @@ function BankingPerformancePage() {
           />
           <input
             name="score_value"
-            required={!amountDrivesScore && !countDrivesScore}
+            required={!amountDrivesScore && !countDrivesScore && selectedProducts.length === 0}
             type="number"
             min="0"
             step="any"
@@ -655,7 +775,7 @@ function BankingPerformancePage() {
           />
           <input
             name="qualified_value"
-            required={!countDrivesScore}
+            required={!countDrivesScore && selectedProducts.length === 0}
             type="number"
             min="0"
             step="any"

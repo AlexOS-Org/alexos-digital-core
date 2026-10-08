@@ -163,6 +163,44 @@ export function useCustomerSalesActions(
     onSuccess: invalidate,
   });
 
+  const addSalesBatch = useMutation({
+    mutationFn: async (input: {
+      contract_id: string;
+      items: Array<{
+        kpi_id: string;
+        product_name: string;
+        amount: number;
+        quantity: number;
+        actual_value: number;
+        qualified_value: number;
+      }>;
+      sale_date: string;
+      customer_name: string;
+      customer_reference: string | null;
+      product_status: CustomerSaleStatus;
+      qualification_status: QualificationStatus;
+      evidence_reference: string | null;
+      notes: string | null;
+    }) => {
+      const { data, error } = await db.rpc("banking_customer_sales_atomic_batch_create", {
+        p_contract_id: input.contract_id,
+        p_sale: {
+          sale_date: input.sale_date,
+          customer_name: input.customer_name,
+          customer_reference: input.customer_reference,
+          product_status: input.product_status,
+          qualification_status: input.qualification_status,
+          evidence_reference: input.evidence_reference,
+          notes: input.notes,
+          items: input.items,
+        },
+      });
+      if (error) throw error;
+      return data as { created_count: number };
+    },
+    onSuccess: invalidate,
+  });
+
   const updateQualification = useMutation({
     mutationFn: async (input: {
       id: string;
@@ -258,6 +296,7 @@ export function useCustomerSalesActions(
   return {
     sales,
     addSale,
+    addSalesBatch,
     updateSale,
     updateQualification,
     deleteSale,
