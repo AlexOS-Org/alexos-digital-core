@@ -224,6 +224,16 @@ export function weeklyTarget(kpi: Pick<ContractKpi, "target_value" | "target_per
   return kpi.target_value / 4.33;
 }
 
+export function monthStartFor(date = new Date()) {
+  const result = new Date(date);
+  return new Date(Date.UTC(result.getFullYear(), result.getMonth(), 1)).toISOString().slice(0, 10);
+}
+
+export function monthEndFor(date = new Date()) {
+  const result = new Date(date);
+  return new Date(Date.UTC(result.getFullYear(), result.getMonth() + 1, 0)).toISOString().slice(0, 10);
+}
+
 export const contractFrameworkKeys = {
   contract: ["kcb-contract-framework", "contract"] as const,
   weekly: (contractId: string | null) => ["kcb-contract-framework", "weekly", contractId] as const,

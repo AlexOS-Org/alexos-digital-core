@@ -6,6 +6,8 @@ import {
   weightedContribution,
   weightedScore,
   weeklyTarget,
+  monthEndFor,
+  monthStartFor,
 } from "./contract-performance";
 
 describe("KCB contract performance framework", () => {
@@ -28,6 +30,16 @@ describe("KCB contract performance framework", () => {
   it("converts rolling three-month targets into thirteen weekly periods", () => {
     const deposits = CONTRACT_KPIS.find((kpi) => kpi.code === "DEPOSITS");
     expect(weeklyTarget(deposits!)).toBeCloseTo(1_000_000 / 13, 6);
+  });
+
+  it("calculates monthly account progress directly from the monthly target", () => {
+    const salaryAccounts = CONTRACT_KPIS.find((kpi) => kpi.code === "SALARY_ACCOUNTS");
+    expect(scoreAchievement(1, salaryAccounts!.target_value)).toBe(10);
+  });
+
+  it("returns the calendar month boundaries for monthly progress", () => {
+    expect(monthStartFor(new Date("2026-10-08T12:00:00Z"))).toBe("2026-10-01");
+    expect(monthEndFor(new Date("2026-10-08T12:00:00Z"))).toBe("2026-10-31");
   });
 
   it("caps each area's weighted contribution at its contract weight", () => {

@@ -8,6 +8,8 @@ import {
   scoreAchievement,
   weightedScore,
   weeklyTarget,
+  monthEndFor,
+  monthStartFor,
   weekStartFor,
   useContractFramework,
   type ContractKpi,
@@ -86,6 +88,9 @@ function BankingPerformancePage() {
   const selectedKpi = kpis.find((kpi) => kpi.id === saleKpi);
   const productOptions = productOptionsForKpi(selectedKpi?.code);
   const amountDrivesScore = selectedKpi?.unit.toLowerCase().includes("kes") ?? false;
+  const countDrivesScore = Boolean(
+    selectedKpi && !amountDrivesScore && !selectedKpi.unit.includes("%"),
+  );
   const testSales = (salesActions.sales.data ?? []).filter(isTestCustomerSale);
 
   const latestByKpi = useMemo(() => {
@@ -100,6 +105,21 @@ function BankingPerformancePage() {
     qualified: latestByKpi.get(kpi.id)?.qualified_value ?? 0,
     target: weeklyTarget(kpi),
   }));
+  const monthStart = monthStartFor();
+  const monthEnd = monthEndFor();
+  const monthlyRows = kpis.map((kpi) => {
+    const qualified = (salesActions.sales.data ?? [])
+      .filter(
+        (sale) =>
+          sale.kpi_id === kpi.id &&
+          sale.sale_date >= monthStart &&
+          sale.sale_date <= monthEnd &&
+          sale.product_status !== "cancelled" &&
+          sale.qualification_status === "verified",
+      )
+      .reduce((sum, sale) => sum + Number(sale.qualified_value), 0);
+    return { kpi, qualified, target: kpi.target_value };
+  });
   const score = weightedScore(
     currentRows.map((row) => ({
       actual: row.qualified,
@@ -180,8 +200,14 @@ function BankingPerformancePage() {
     if (!kpi) return;
     const scoreValue = amountDrivesScore
       ? Number(data.get("amount")) || 0
-      : Number(data.get("score_value")) || 0;
-    const qualifiedValue = Number(data.get("qualified_value")) || 0;
+      : countDrivesScore
+        ? Number(data.get("quantity")) || 0
+        : Number(data.get("score_value")) || 0;
+    const qualifiedValue = countDrivesScore
+      ? String(data.get("qualification_status") || "pending") === "verified"
+        ? scoreValue
+        : 0
+      : Number(data.get("qualified_value")) || 0;
     if (qualifiedValue > scoreValue) {
       toast.error("Qualified value cannot be greater than the scorecard value.");
       return;
@@ -331,13 +357,18 @@ function BankingPerformancePage() {
                 <th className="p-3">Target</th>
                 <th className="p-3">Actual</th>
                 <th className="p-3">Qualified</th>
-                <th className="p-3">Achievement</th>
+                <th className="p-3">Weekly achievement</th>
+                <th className="p-3">Monthly progress</th>
                 <th className="p-3">Gap / next action</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {currentRows.map((row) => {
                 const achievement = scoreAchievement(row.qualified, row.target);
+                const monthly = monthlyRows.find((item) => item.kpi.id === row.kpi.id);
+                const monthlyAchievement = monthly
+                  ? scoreAchievement(monthly.qualified, monthly.target)
+                  : 0;
                 const tone = scoreTone(achievement);
                 return (
                   <tr
@@ -382,6 +413,18 @@ function BankingPerformancePage() {
                         <div
                           className={`h-full rounded-full ${tone.bar}`}
                           style={{ width: `${Math.min(100, achievement)}%` }}
+                        />
+                      </div>
+                    </td>
+                    <td className="p-3">
+                      <div className="font-semibold">{monthlyAchievement.toFixed(1)}%</div>
+                      <div className="text-xs text-muted-foreground">
+                        {monthly?.qualified.toLocaleString()} / {monthly?.target.toLocaleString()} {row.kpi.unit}
+                      </div>
+                      <div className="mt-1 h-1.5 w-24 overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full bg-indigo-500"
+                          style={{ width: `${Math.min(100, monthlyAchievement)}%` }}
                         />
                       </div>
                     </td>
@@ -518,29 +561,36 @@ function BankingPerformancePage() {
           />
           <input
             name="score_value"
-            required
+            required={!amountDrivesScore && !countDrivesScore}
             type="number"
             min="0"
             step="any"
-            placeholder={amountDrivesScore ? "Auto: amount" : "Scorecard value: KES / count / %"}
-            value={amountDrivesScore ? saleAmount : saleScoreValue}
+            placeholder={
+              amountDrivesScore
+                ? "Auto: amount"
+                : countDrivesScore
+                  ? "Auto: quantity"
+                  : "Scorecard value: %"
+            }
+            value={amountDrivesScore ? saleAmount : countDrivesScore ? "" : saleScoreValue}
             onChange={(event) => setSaleScoreValue(event.target.value)}
-            readOnly={amountDrivesScore}
+            readOnly={amountDrivesScore || countDrivesScore}
             aria-label={
               amountDrivesScore
-                ? "Scorecard value (automatically copied from amount)"
+                ? "Scorecard value (automatically copied from amount or quantity)"
                 : "Scorecard value"
             }
             className="rounded-lg border bg-background px-3 py-2 text-sm"
           />
           <input
             name="qualified_value"
-            required
+            required={!countDrivesScore}
             type="number"
             min="0"
             step="any"
             defaultValue="0"
-            placeholder="Qualified value"
+            placeholder={countDrivesScore ? "Auto: verified quantity" : "Qualified value"}
+            readOnly={countDrivesScore}
             className="rounded-lg border bg-background px-3 py-2 text-sm"
           />
           <select
@@ -571,9 +621,10 @@ function BankingPerformancePage() {
           </button>
         </form>
         <p className="mt-3 text-xs text-muted-foreground">
-          For KES areas, enter the monetary amount as the scorecard value. For accounts, Mobi, and
-          Vooma enter the qualified count. For credit cards enter the eligible-customer conversion
-          percentage when verified.
+          For KES areas, the amount is the scorecard value. For account, Mobi, and Vooma areas, the
+          quantity is used automatically; marking the entry Verified makes that quantity qualified.
+          Monthly progress is calculated as qualified results divided by the monthly target, so 1 of
+          10 accounts displays 10.0%. Credit cards use the eligible-customer conversion percentage.
         </p>
         <div className="mt-5 overflow-x-auto rounded-xl border">
           <table className="w-full min-w-[900px] text-sm">
