@@ -79,6 +79,8 @@ function BankingPerformancePage() {
   const [planActions, setPlanActions] = useState("");
   const [planMeasure, setPlanMeasure] = useState("");
   const [saleKpi, setSaleKpi] = useState("");
+  const [saleCustomerName, setSaleCustomerName] = useState("");
+  const [saleCustomerReference, setSaleCustomerReference] = useState("");
   const [saleAmount, setSaleAmount] = useState("");
   const [saleScoreValue, setSaleScoreValue] = useState("");
   const [saleToDelete, setSaleToDelete] = useState<
@@ -95,6 +97,18 @@ function BankingPerformancePage() {
   const countDrivesScore = Boolean(
     selectedKpi && !amountDrivesScore && !selectedKpi.unit.includes("%"),
   );
+  const prepareAdditionalProduct = (sale: {
+    customer_name: string;
+    customer_reference: string | null;
+  }) => {
+    setSaleCustomerName(sale.customer_name);
+    setSaleCustomerReference(sale.customer_reference ?? "");
+    setSaleKpi("");
+    setSaleAmount("");
+    setSaleScoreValue("");
+    setSaleToEdit(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   const testSales = (salesActions.sales.data ?? []).filter(isTestCustomerSale);
 
   const latestByKpi = useMemo(() => {
@@ -552,11 +566,15 @@ function BankingPerformancePage() {
             name="customer_name"
             required
             placeholder="Customer name"
+            value={saleCustomerName}
+            onChange={(event) => setSaleCustomerName(event.target.value)}
             className="rounded-lg border bg-background px-3 py-2 text-sm"
           />
           <input
             name="customer_reference"
             placeholder="Safe customer reference (optional)"
+            value={saleCustomerReference}
+            onChange={(event) => setSaleCustomerReference(event.target.value)}
             className="rounded-lg border bg-background px-3 py-2 text-sm"
           />
           <select
@@ -720,6 +738,13 @@ function BankingPerformancePage() {
                           Mark verified
                         </button>
                       ) : null}
+                      <button
+                        type="button"
+                        onClick={() => prepareAdditionalProduct(sale)}
+                        className="rounded border border-sky-500/30 px-2 py-1 text-xs text-sky-700 dark:text-sky-300"
+                      >
+                        Add product
+                      </button>
                       <button
                         type="button"
                         onClick={() => {
@@ -900,6 +925,13 @@ function BankingPerformancePage() {
                 />
               </div>
               <div className="mt-5 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => prepareAdditionalProduct(saleToEdit)}
+                  className="mr-auto rounded-lg border border-sky-500/30 px-3 py-2 text-sm text-sky-700 dark:text-sky-300"
+                >
+                  Add another product
+                </button>
                 <button
                   type="button"
                   onClick={() => setSaleToEdit(null)}
