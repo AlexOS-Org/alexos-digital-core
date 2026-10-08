@@ -84,6 +84,10 @@ function BankingPerformancePage() {
   const [saleToDelete, setSaleToDelete] = useState<
     NonNullable<typeof salesActions.sales.data>[number] | null
   >(null);
+  const [saleToEdit, setSaleToEdit] = useState<
+    NonNullable<typeof salesActions.sales.data>[number] | null
+  >(null);
+  const [editKpi, setEditKpi] = useState("");
   const [confirmDeleteTestEntries, setConfirmDeleteTestEntries] = useState(false);
   const selectedKpi = kpis.find((kpi) => kpi.id === saleKpi);
   const productOptions = productOptionsForKpi(selectedKpi?.code);
@@ -240,6 +244,53 @@ function BankingPerformancePage() {
       toast.error(error instanceof Error ? error.message : "Could not record customer sale");
     }
   };
+  const editCustomerSale = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!contract || !saleToEdit || !editKpi) return;
+    const data = new FormData(event.currentTarget);
+    const kpi = kpis.find((item) => item.id === editKpi);
+    if (!kpi) return;
+    const amountDrivesEdit = kpi.unit.toLowerCase().includes("kes");
+    const countDrivesEdit = !amountDrivesEdit && !kpi.unit.includes("%");
+    const amount = Number(data.get("amount")) || 0;
+    const quantity = Number(data.get("quantity")) || 0;
+    const actualValue = amountDrivesEdit
+      ? amount
+      : countDrivesEdit
+        ? quantity
+        : Number(data.get("score_value")) || 0;
+    const qualificationStatus = String(
+      data.get("qualification_status") || "pending",
+    ) as QualificationStatus;
+    const qualifiedValue = countDrivesEdit
+      ? qualificationStatus === "verified"
+        ? actualValue
+        : 0
+      : Number(data.get("qualified_value")) || 0;
+    try {
+      await salesActions.updateSale.mutateAsync({
+        id: saleToEdit.id,
+        kpi_id: kpi.id,
+        sale_date: String(data.get("sale_date") || saleToEdit.sale_date),
+        customer_name: String(data.get("customer_name") || "").trim(),
+        customer_reference: String(data.get("customer_reference") || "").trim() || null,
+        product_name: String(data.get("product_name") || "").trim(),
+        product_status: String(data.get("product_status") || "sold") as CustomerSaleStatus,
+        amount,
+        quantity,
+        actual_value: actualValue,
+        qualified_value: qualifiedValue,
+        qualification_status: qualificationStatus,
+        evidence_reference: String(data.get("evidence_reference") || "").trim() || null,
+        notes: String(data.get("notes") || "").trim() || null,
+      });
+      setSaleToEdit(null);
+      toast.success("Customer sale updated and scorecard recalculated");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not update customer sale");
+    }
+  };
+
   const downloadReport = () => {
     const report = `# Promotion Readiness Report\n\n**Employee:** ____________________  \n**Contract:** ${contract?.title ?? "KCB Retail Direct Sales Representative"}  \n**Contract version:** ${CONTRACT_VERSION}  \n**Reporting week:** ${weekStart}  \n**Business context:** ${business?.name ?? "Personal KCB performance workspace"}\n\n## Executive score\n\n- Weekly weighted pace: **${score.toFixed(1)}%** — ${band.label}\n- Three-month rolling score: **${rollingScore.toFixed(1)}%**\n- Full-performance threshold: **90%**\n- Target exceeded threshold: **100%**\n\n## Eight-area scorecard\n\n| Area | Weight | Weekly qualified | Weekly target | Achievement | Gap / next action |\n|---|---:|---:|---:|---:|---|\n${currentRows.map((row) => `| ${row.kpi.name} | ${row.kpi.weight_percent}% | ${row.qualified} ${row.kpi.unit} | ${row.target.toFixed(1)} | ${scoreAchievement(row.qualified, row.target).toFixed(1)}% | ${nextActions[row.kpi.id] || row.kpi.improvement_action} |`).join("\n")}\n\n## Evidence submitted\n\n${(framework.evidence.data ?? []).map((item) => `- ${item.evidence_date} — ${item.evidence_type}: ${item.reference_text} (${item.status})`).join("\n") || "- No evidence submitted yet."}\n\n## Strengths\n\n- ______________________________________________\n- ______________________________________________\n\n## Improvement priorities\n\n${
       currentRows
@@ -671,6 +722,16 @@ function BankingPerformancePage() {
                       ) : null}
                       <button
                         type="button"
+                        onClick={() => {
+                          setSaleToEdit(sale);
+                          setEditKpi(sale.kpi_id);
+                        }}
+                        className="rounded border px-2 py-1 text-xs"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => setSaleToDelete(sale)}
                         className="rounded border border-rose-500/30 px-2 py-1 text-xs text-rose-700 dark:text-rose-300"
                       >
@@ -688,6 +749,175 @@ function BankingPerformancePage() {
             </p>
           ) : null}
         </div>
+
+        {saleToEdit ? (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"
+            role="presentation"
+          >
+            <form
+              key={`${saleToEdit.id}-${editKpi}`}
+              onSubmit={editCustomerSale}
+              className="w-full max-w-3xl rounded-2xl border bg-card p-6 shadow-2xl"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="edit-sale-title"
+            >
+              <h3 id="edit-sale-title" className="text-lg font-semibold">
+                Edit customer product sale
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Change the customer details, KPI, or product. The linked evidence and scorecard are
+                recalculated atomically. To add another product for the same customer, save a new
+                row instead of replacing this one.
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <input
+                  name="customer_name"
+                  required
+                  defaultValue={saleToEdit.customer_name}
+                  placeholder="Customer name"
+                  className="rounded-lg border bg-background px-3 py-2 text-sm"
+                />
+                <input
+                  name="customer_reference"
+                  defaultValue={saleToEdit.customer_reference ?? ""}
+                  placeholder="Safe customer reference"
+                  className="rounded-lg border bg-background px-3 py-2 text-sm"
+                />
+                <select
+                  name="kpi_id"
+                  required
+                  value={editKpi}
+                  onChange={(event) => setEditKpi(event.target.value)}
+                  className="rounded-lg border bg-background px-3 py-2 text-sm"
+                >
+                  {kpis.map((kpi) => (
+                    <option key={kpi.id} value={kpi.id}>
+                      {kpi.name}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  name="product_name"
+                  required
+                  defaultValue={saleToEdit.product_name}
+                  className="rounded-lg border bg-background px-3 py-2 text-sm"
+                >
+                  <option value="">Product given to customer</option>
+                  {productOptionsForKpi(kpis.find((kpi) => kpi.id === editKpi)?.code).map(
+                    (product) => (
+                      <option key={product} value={product}>
+                        {product}
+                      </option>
+                    ),
+                  )}
+                </select>
+                <input
+                  name="sale_date"
+                  type="date"
+                  required
+                  defaultValue={saleToEdit.sale_date}
+                  className="rounded-lg border bg-background px-3 py-2 text-sm"
+                />
+                <select
+                  name="product_status"
+                  defaultValue={saleToEdit.product_status}
+                  className="rounded-lg border bg-background px-3 py-2 text-sm"
+                >
+                  {(
+                    [
+                      "lead",
+                      "application",
+                      "approved",
+                      "sold",
+                      "activated",
+                      "funded",
+                      "paid",
+                    ] as const
+                  ).map((status) => (
+                    <option key={status} value={status}>
+                      {status[0].toUpperCase() + status.slice(1)}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  name="amount"
+                  type="number"
+                  min="0"
+                  step="any"
+                  defaultValue={saleToEdit.amount}
+                  placeholder="Amount (KES), if applicable"
+                  className="rounded-lg border bg-background px-3 py-2 text-sm"
+                />
+                <input
+                  name="quantity"
+                  type="number"
+                  min="0"
+                  step="any"
+                  defaultValue={saleToEdit.quantity}
+                  placeholder="Quantity"
+                  className="rounded-lg border bg-background px-3 py-2 text-sm"
+                />
+                <input
+                  name="score_value"
+                  type="number"
+                  min="0"
+                  step="any"
+                  defaultValue={saleToEdit.actual_value}
+                  placeholder="Scorecard value for percentage KPI"
+                  className="rounded-lg border bg-background px-3 py-2 text-sm"
+                />
+                <input
+                  name="qualified_value"
+                  type="number"
+                  min="0"
+                  step="any"
+                  defaultValue={saleToEdit.qualified_value}
+                  placeholder="Qualified value"
+                  className="rounded-lg border bg-background px-3 py-2 text-sm"
+                />
+                <select
+                  name="qualification_status"
+                  defaultValue={saleToEdit.qualification_status}
+                  className="rounded-lg border bg-background px-3 py-2 text-sm"
+                >
+                  <option value="pending">Pending validation</option>
+                  <option value="verified">Verified</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+                <input
+                  name="evidence_reference"
+                  defaultValue={saleToEdit.evidence_reference ?? ""}
+                  placeholder="Evidence reference"
+                  className="rounded-lg border bg-background px-3 py-2 text-sm"
+                />
+                <input
+                  name="notes"
+                  defaultValue={saleToEdit.notes ?? ""}
+                  placeholder="Notes / next step"
+                  className="rounded-lg border bg-background px-3 py-2 text-sm sm:col-span-2"
+                />
+              </div>
+              <div className="mt-5 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSaleToEdit(null)}
+                  className="rounded-lg border px-3 py-2 text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={salesActions.updateSale.isPending}
+                  className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+                >
+                  {salesActions.updateSale.isPending ? "Saving…" : "Save changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        ) : null}
 
         {saleToDelete ? (
           <div

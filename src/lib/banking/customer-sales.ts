@@ -183,6 +183,50 @@ export function useCustomerSalesActions(
     onSuccess: invalidate,
   });
 
+  const updateSale = useMutation({
+    mutationFn: async (input: {
+      id: string;
+      kpi_id: string;
+      sale_date: string;
+      customer_name: string;
+      customer_reference: string | null;
+      product_name: string;
+      product_status: CustomerSaleStatus;
+      amount: number;
+      quantity: number;
+      actual_value: number;
+      qualified_value: number;
+      qualification_status: QualificationStatus;
+      evidence_reference: string | null;
+      notes: string | null;
+    }) => {
+      if (!contractId) throw new Error("Contract is not ready");
+      const { data, error } = await db.rpc("banking_customer_sales_atomic_sync", {
+        p_operation: "update",
+        p_contract_id: contractId,
+        p_kpi_id: input.kpi_id,
+        p_sale_id: input.id,
+        p_sale: {
+          sale_date: input.sale_date,
+          customer_name: input.customer_name,
+          customer_reference: input.customer_reference,
+          product_name: input.product_name,
+          product_status: input.product_status,
+          amount: input.amount,
+          quantity: input.quantity,
+          actual_value: input.actual_value,
+          qualified_value: input.qualified_value,
+          qualification_status: input.qualification_status,
+          evidence_reference: input.evidence_reference,
+          notes: input.notes,
+        },
+      });
+      if (error) throw error;
+      return (data as AtomicSyncResult).sale;
+    },
+    onSuccess: invalidate,
+  });
+
   const deleteSale = useMutation({
     mutationFn: async (saleId: string) => {
       if (!contractId) throw new Error("Contract is not ready");
@@ -211,5 +255,13 @@ export function useCustomerSalesActions(
     onSuccess: invalidate,
   });
 
-  return { sales, addSale, updateQualification, deleteSale, deleteTestEntries, isAdmin };
+  return {
+    sales,
+    addSale,
+    updateSale,
+    updateQualification,
+    deleteSale,
+    deleteTestEntries,
+    isAdmin,
+  };
 }
