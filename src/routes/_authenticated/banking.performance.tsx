@@ -116,6 +116,29 @@ function BankingPerformancePage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const testSales = (salesActions.sales.data ?? []).filter(isTestCustomerSale);
+  const groupedSales = useMemo(() => {
+    const groups = new Map<
+      string,
+      {
+        sale_date: string;
+        customer_name: string;
+        customer_reference: string | null;
+        sales: Array<NonNullable<typeof salesActions.sales.data>[number]>;
+      }
+    >();
+    for (const sale of salesActions.sales.data ?? []) {
+      const key = `${sale.sale_date}|${sale.customer_name.toLowerCase()}|${sale.customer_reference ?? ""}`;
+      const current = groups.get(key) ?? {
+        sale_date: sale.sale_date,
+        customer_name: sale.customer_name,
+        customer_reference: sale.customer_reference,
+        sales: [],
+      };
+      current.sales.push(sale);
+      groups.set(key, current);
+    }
+    return Array.from(groups.values());
+  }, [salesActions.sales.data]);
 
   const latestByKpi = useMemo(() => {
     const map = new Map<string, WeeklyPerformance>();
@@ -830,58 +853,89 @@ function BankingPerformancePage() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {(salesActions.sales.data ?? []).map((sale) => (
-                <tr key={sale.id}>
-                  <td className="p-3 text-xs text-muted-foreground">{sale.sale_date}</td>
-                  <td className="p-3 font-medium">{sale.customer_name}</td>
-                  <td className="p-3">
-                    {kpis.find((kpi) => kpi.id === sale.kpi_id)?.name} · {sale.product_name}
+              {groupedSales.map((group) => (
+                <tr
+                  key={`${group.sale_date}-${group.customer_name}-${group.customer_reference ?? ""}`}
+                >
+                  <td className="p-3 align-top text-xs text-muted-foreground">{group.sale_date}</td>
+                  <td className="p-3 align-top font-medium">
+                    {group.customer_name}
+                    {group.sales.length > 1 ? (
+                      <div className="text-xs font-normal text-muted-foreground">
+                        {group.sales.length} products
+                      </div>
+                    ) : null}
                   </td>
-                  <td className="p-3">
-                    {sale.actual_value} / {sale.qualified_value}
+                  <td className="p-3 align-top">
+                    <div className="space-y-1">
+                      {group.sales.map((sale) => (
+                        <div key={sale.id}>
+                          {kpis.find((kpi) => kpi.id === sale.kpi_id)?.name} · {sale.product_name}
+                        </div>
+                      ))}
+                    </div>
                   </td>
-                  <td className="p-3 capitalize">{sale.qualification_status}</td>
-                  <td className="p-3">
+                  <td className="p-3 align-top">
+                    <div className="space-y-1">
+                      {group.sales.map((sale) => (
+                        <div key={sale.id}>
+                          {sale.actual_value} / {sale.qualified_value}
+                        </div>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="p-3 align-top capitalize">
+                    <div className="space-y-1">
+                      {group.sales.map((sale) => (
+                        <div key={sale.id}>{sale.qualification_status}</div>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="p-3 align-top">
                     <div className="flex flex-wrap gap-2">
-                      {sale.qualification_status === "pending" ? (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            void salesActions.updateQualification.mutateAsync({
-                              id: sale.id,
-                              qualification_status: "verified",
-                              qualified_value: sale.actual_value,
-                            })
-                          }
-                          className="rounded border px-2 py-1 text-xs"
-                        >
-                          Mark verified
-                        </button>
-                      ) : null}
                       <button
                         type="button"
-                        onClick={() => prepareAdditionalProduct(sale)}
+                        onClick={() => prepareAdditionalProduct(group.sales[0])}
                         className="rounded border border-sky-500/30 px-2 py-1 text-xs text-sky-700 dark:text-sky-300"
                       >
                         Add product
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSaleToEdit(sale);
-                          setEditKpi(sale.kpi_id);
-                        }}
-                        className="rounded border px-2 py-1 text-xs"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setSaleToDelete(sale)}
-                        className="rounded border border-rose-500/30 px-2 py-1 text-xs text-rose-700 dark:text-rose-300"
-                      >
-                        Delete
-                      </button>
+                      {group.sales.map((sale) => (
+                        <div key={sale.id} className="flex flex-wrap gap-1">
+                          {sale.qualification_status === "pending" ? (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                void salesActions.updateQualification.mutateAsync({
+                                  id: sale.id,
+                                  qualification_status: "verified",
+                                  qualified_value: sale.actual_value,
+                                })
+                              }
+                              className="rounded border px-2 py-1 text-xs"
+                            >
+                              Verify {sale.product_name}
+                            </button>
+                          ) : null}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSaleToEdit(sale);
+                              setEditKpi(sale.kpi_id);
+                            }}
+                            className="rounded border px-2 py-1 text-xs"
+                          >
+                            Edit {sale.product_name}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSaleToDelete(sale)}
+                            className="rounded border border-rose-500/30 px-2 py-1 text-xs text-rose-700 dark:text-rose-300"
+                          >
+                            Delete {sale.product_name}
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   </td>
                 </tr>
