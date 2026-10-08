@@ -231,7 +231,9 @@ export function monthStartFor(date = new Date()) {
 
 export function monthEndFor(date = new Date()) {
   const result = new Date(date);
-  return new Date(Date.UTC(result.getFullYear(), result.getMonth() + 1, 0)).toISOString().slice(0, 10);
+  return new Date(Date.UTC(result.getFullYear(), result.getMonth() + 1, 0))
+    .toISOString()
+    .slice(0, 10);
 }
 
 export const contractFrameworkKeys = {

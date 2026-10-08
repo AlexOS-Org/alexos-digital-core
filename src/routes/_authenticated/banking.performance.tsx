@@ -419,7 +419,8 @@ function BankingPerformancePage() {
                     <td className="p-3">
                       <div className="font-semibold">{monthlyAchievement.toFixed(1)}%</div>
                       <div className="text-xs text-muted-foreground">
-                        {monthly?.qualified.toLocaleString()} / {monthly?.target.toLocaleString()} {row.kpi.unit}
+                        {monthly?.qualified.toLocaleString()} / {monthly?.target.toLocaleString()}{" "}
+                        {row.kpi.unit}
                       </div>
                       <div className="mt-1 h-1.5 w-24 overflow-hidden rounded-full bg-muted">
                         <div
@@ -455,10 +456,10 @@ function BankingPerformancePage() {
             <h2 className="font-semibold">Record a customer product sale</h2>
             <p className="mt-1 max-w-3xl text-xs leading-5 text-muted-foreground">
               Enter what you sold to each customer. The record is linked to one contract area,
-              creates a validation record, and automatically recalculates this week&apos;s scorecard.
-              One customer can have multiple rows—save once for each product or KPI, such as a
-              Salary Account and Mobi. Do not enter PINs, account numbers, national ID numbers, or
-              other unnecessary sensitive data.
+              creates a validation record, and automatically recalculates this week&apos;s
+              scorecard. One customer can have multiple rows—save once for each product or KPI, such
+              as a Salary Account and Mobi. Do not enter PINs, account numbers, national ID numbers,
+              or other unnecessary sensitive data.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
