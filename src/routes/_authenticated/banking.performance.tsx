@@ -99,6 +99,20 @@ function BankingPerformancePage() {
   const multiProductChoices = kpis.flatMap((kpi) =>
     productOptionsForKpi(kpi.code).map((product_name) => ({ kpi_id: kpi.id, product_name })),
   );
+  const selectCoreCustomerJourney = () => {
+    const preferred = [
+      ["OTHER_RETAIL_ACCOUNTS", "Other Retail Account"],
+      ["MOBI", "Mobi"],
+      ["DEPOSITS", "Deposit Account"],
+    ] as const;
+    setSelectedProducts(
+      preferred.flatMap(([code, product_name]) => {
+        const kpi = kpis.find((item) => item.code === code);
+        return kpi ? [{ kpi_id: kpi.id, product_name }] : [];
+      }),
+    );
+    setSaleKpi("");
+  };
   const amountDrivesScore = selectedKpi?.unit.toLowerCase().includes("kes") ?? false;
   const countDrivesScore = Boolean(
     selectedKpi && !amountDrivesScore && !selectedKpi.unit.includes("%"),
@@ -155,17 +169,21 @@ function BankingPerformancePage() {
   const monthStart = monthStartFor();
   const monthEnd = monthEndFor();
   const monthlyRows = kpis.map((kpi) => {
-    const qualified = (salesActions.sales.data ?? [])
-      .filter(
-        (sale) =>
-          sale.kpi_id === kpi.id &&
-          sale.sale_date >= monthStart &&
-          sale.sale_date <= monthEnd &&
-          sale.product_status !== "cancelled" &&
-          sale.qualification_status === "verified",
-      )
-      .reduce((sum, sale) => sum + Number(sale.qualified_value), 0);
-    return { kpi, qualified, target: kpi.target_value };
+    const monthSales = (salesActions.sales.data ?? []).filter(
+      (sale) =>
+        sale.kpi_id === kpi.id &&
+        sale.sale_date >= monthStart &&
+        sale.sale_date <= monthEnd &&
+        sale.product_status !== "cancelled",
+    );
+    return {
+      kpi,
+      actual: monthSales.reduce((sum, sale) => sum + Number(sale.actual_value), 0),
+      qualified: monthSales
+        .filter((sale) => sale.qualification_status === "verified")
+        .reduce((sum, sale) => sum + Number(sale.qualified_value), 0),
+      target: kpi.target_value,
+    };
   });
   const score = weightedScore(
     currentRows.map((row) => ({
@@ -566,15 +584,27 @@ function BankingPerformancePage() {
                       </div>
                     </td>
                     <td className="p-3">
-                      <div className="font-semibold">{monthlyAchievement.toFixed(1)}%</div>
+                      <div className="font-semibold">
+                        Activity:{" "}
+                        {scoreAchievement(monthly?.actual ?? 0, monthly?.target ?? 0).toFixed(1)}%
+                      </div>
                       <div className="text-xs text-muted-foreground">
-                        {monthly?.qualified.toLocaleString()} / {monthly?.target.toLocaleString()}{" "}
+                        {monthly?.actual.toLocaleString()} / {monthly?.target.toLocaleString()}{" "}
                         {row.kpi.unit}
+                      </div>
+                      <div className="mt-1 text-xs text-muted-foreground">
+                        Qualified: {monthlyAchievement.toFixed(1)}% (
+                        {monthly?.qualified.toLocaleString()})
                       </div>
                       <div className="mt-1 h-1.5 w-24 overflow-hidden rounded-full bg-muted">
                         <div
                           className="h-full rounded-full bg-indigo-500"
-                          style={{ width: `${Math.min(100, monthlyAchievement)}%` }}
+                          style={{
+                            width: `${Math.min(
+                              100,
+                              scoreAchievement(monthly?.actual ?? 0, monthly?.target ?? 0),
+                            )}%`,
+                          }}
                         />
                       </div>
                     </td>
@@ -602,13 +632,11 @@ function BankingPerformancePage() {
       <section className="rounded-2xl border bg-card p-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="font-semibold">Record a customer product sale</h2>
+            <h2 className="font-semibold">Record a customer journey</h2>
             <p className="mt-1 max-w-3xl text-xs leading-5 text-muted-foreground">
-              Enter what you sold to each customer. The record is linked to one contract area,
-              creates a validation record, and automatically recalculates this week&apos;s
-              scorecard. One customer can have multiple rows—save once for each product or KPI, such
-              as a Salary Account and Mobi. Do not enter PINs, account numbers, national ID numbers,
-              or other unnecessary sensitive data.
+              Add everything you took one customer through in a single atomic save. Each selected
+              product creates its own KPI and evidence row, then recalculates the scorecard. Do not
+              enter PINs, account numbers, national ID numbers, or other unnecessary sensitive data.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -680,19 +708,28 @@ function BankingPerformancePage() {
               <div>
                 <p className="font-medium">Add multiple products for this customer</p>
                 <p className="text-xs text-muted-foreground">
-                  Select products such as Salary Account, Mobi, and Vooma, then save them together.
-                  Each selected item becomes its own KPI row and evidence record.
+                  Select the products completed in the same customer journey, then save them
+                  together. Each selected item becomes its own KPI row and evidence record.
                 </p>
               </div>
-              {selectedProducts.length ? (
+              <div className="flex items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => setSelectedProducts([])}
-                  className="text-xs text-muted-foreground underline"
+                  onClick={selectCoreCustomerJourney}
+                  className="text-xs font-medium text-primary underline"
                 >
-                  Clear selection
+                  Select account + Mobi + deposit
                 </button>
-              ) : null}
+                {selectedProducts.length ? (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedProducts([])}
+                    className="text-xs text-muted-foreground underline"
+                  >
+                    Clear
+                  </button>
+                ) : null}
+              </div>
             </div>
             <div className="mt-2 grid max-h-36 gap-2 overflow-y-auto sm:grid-cols-2 lg:grid-cols-4">
               {multiProductChoices.map((choice) => {
@@ -828,17 +865,21 @@ function BankingPerformancePage() {
           />
           <button
             type="submit"
-            disabled={salesActions.addSale.isPending}
+            disabled={salesActions.addSale.isPending || salesActions.addSalesBatch.isPending}
             className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
           >
-            {salesActions.addSale.isPending ? "Saving…" : "Save customer sale"}
+            {salesActions.addSale.isPending || salesActions.addSalesBatch.isPending
+              ? "Saving…"
+              : selectedProducts.length > 1
+                ? "Save customer journey"
+                : "Save customer product"}
           </button>
         </form>
         <p className="mt-3 text-xs text-muted-foreground">
-          For KES areas, the amount is the scorecard value. For account, Mobi, and Vooma areas, the
-          quantity is used automatically; marking the entry Verified makes that quantity qualified.
-          Monthly progress is calculated as qualified results divided by the monthly target, so 1 of
-          10 accounts displays 10.0%. Credit cards use the eligible-customer conversion percentage.
+          KES amounts and account quantities are calculated automatically. Monthly activity shows
+          everything recorded against the target; qualified progress only includes entries marked
+          Verified. For example, a KES 20,000 deposit against a KES 1,000,000 monthly target shows
+          2.0% activity progress. Credit cards use the eligible-customer conversion percentage.
         </p>
         <div className="mt-5 overflow-x-auto rounded-xl border">
           <table className="w-full min-w-[900px] text-sm">
