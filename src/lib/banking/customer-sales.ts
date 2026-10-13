@@ -38,6 +38,33 @@ export type CustomerSale = {
   updated_at: string;
 };
 export type NewCustomerSale = Omit<CustomerSale, "id" | "user_id" | "created_at" | "updated_at">;
+export type CustomerJourneyItem = {
+  kpi_id: string;
+  product_name: string;
+  amount: number;
+  quantity: number;
+  actual_value: number;
+};
+export type CustomerJourneyInput = {
+  customer_name: string;
+  items: CustomerJourneyItem[];
+  qualification_status: QualificationStatus;
+  evidence_reference: string | null;
+};
+export function validateCustomerJourneyInput(input: CustomerJourneyInput): string | null {
+  if (!input.customer_name.trim()) return "Customer name is required.";
+  if (!input.items.length) return "Select at least one customer product.";
+  const uniqueItems = new Set(input.items.map((item) => `${item.kpi_id}:${item.product_name}`));
+  if (uniqueItems.size !== input.items.length)
+    return "Each customer product may be selected only once.";
+  if (input.items.some((item) => item.amount < 0 || item.quantity <= 0 || item.actual_value < 0)) {
+    return "Amounts, quantities, and scorecard values must be valid non-negative values.";
+  }
+  if (input.qualification_status === "verified" && !input.evidence_reference?.trim()) {
+    return "Evidence reference is required when marking a journey verified.";
+  }
+  return null;
+}
 
 export function isTestCustomerSale(
   sale: Pick<CustomerSale, "customer_name" | "customer_reference" | "evidence_reference" | "notes">,
