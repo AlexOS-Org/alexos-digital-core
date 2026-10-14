@@ -32,14 +32,34 @@ export const Route = createFileRoute("/_authenticated/money-center/analytics")({
 
 function AnalyticsPage() {
   const { businessId } = useMoneyCenterScope();
-  const { data: txs = [] } = useTransactions({ businessId });
-  const { data: accounts = [] } = useAccounts(false, businessId);
-  const { data: balances = [] } = useAccountBalances(businessId);
-  const { data: budgets = [] } = useBudgets(monthKey(), businessId);
-  const { data: expected = [] } = useExpected(undefined, businessId);
-  const { data: assets = [] } = useAssets();
-  const { data: cryptoHoldings = [] } = useCryptoHoldings();
-  const { data: debts = [] } = useDebts(false, businessId);
+  const transactionsQuery = useTransactions({ businessId });
+  const accountsQuery = useAccounts(false, businessId);
+  const balancesQuery = useAccountBalances(businessId);
+  const budgetsQuery = useBudgets(monthKey(), businessId);
+  const expectedQuery = useExpected(undefined, businessId);
+  const assetsQuery = useAssets();
+  const cryptoHoldingsQuery = useCryptoHoldings();
+  const debtsQuery = useDebts(false, businessId);
+  const analyticsQueries = [
+    transactionsQuery,
+    accountsQuery,
+    balancesQuery,
+    budgetsQuery,
+    expectedQuery,
+    assetsQuery,
+    cryptoHoldingsQuery,
+    debtsQuery,
+  ];
+  const analyticsLoading = analyticsQueries.some((query) => query.isLoading);
+  const analyticsError = analyticsQueries.find((query) => query.isError)?.error;
+  const txs = transactionsQuery.data ?? [];
+  const accounts = accountsQuery.data ?? [];
+  const balances = balancesQuery.data ?? [];
+  const budgets = budgetsQuery.data ?? [];
+  const expected = expectedQuery.data ?? [];
+  const assets = assetsQuery.data ?? [];
+  const cryptoHoldings = cryptoHoldingsQuery.data ?? [];
+  const debts = debtsQuery.data ?? [];
   const scopedAssets = businessId
     ? assets.filter((asset) => asset.business_id === businessId)
     : assets;
@@ -164,7 +184,16 @@ function AnalyticsPage() {
         description="Visual trends across your money — cashflow, category spend, income sources, budget usage and net worth."
         breadcrumbs={[{ label: "Money Center", to: "/money-center" }, { label: "Analytics" }]}
       />
-      {currencySafety.isMixed ? (
+      {analyticsError ? (
+        <div
+          role="alert"
+          className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+        >
+          Analytics could not load all Money Center data. Refresh and try again.
+        </div>
+      ) : analyticsLoading ? (
+        <ChartsLoadingState />
+      ) : currencySafety.isMixed ? (
         <div
           role="alert"
           data-tone="warning"
