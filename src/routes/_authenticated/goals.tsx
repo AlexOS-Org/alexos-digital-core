@@ -71,12 +71,28 @@ function ReconciliationBadge({ status }: { status: GoalReconciliationStatus }) {
 }
 
 function GoalsPage() {
-  const { data: goals = [], isLoading } = useGoals();
-  const { data: progress = [] } = useGoalProgress();
-  const { data: accounts = [] } = useAccounts();
-  const { data: accountBalances = [] } = useAccountBalances();
-  const { data: contributions = [] } = useAllGoalContributions();
-  const { data: transactions = [] } = useTransactions({ includeVoided: true });
+  const goalsQuery = useGoals();
+  const progressQuery = useGoalProgress();
+  const accountsQuery = useAccounts();
+  const balancesQuery = useAccountBalances();
+  const contributionsQuery = useAllGoalContributions();
+  const transactionsQuery = useTransactions({ includeVoided: true });
+  const goalQueries = [
+    goalsQuery,
+    progressQuery,
+    accountsQuery,
+    balancesQuery,
+    contributionsQuery,
+    transactionsQuery,
+  ];
+  const isLoading = goalQueries.some((query) => query.isLoading);
+  const goalsError = goalQueries.find((query) => query.isError)?.error;
+  const goals = goalsQuery.data ?? [];
+  const progress = progressQuery.data ?? [];
+  const accounts = accountsQuery.data ?? [];
+  const accountBalances = balancesQuery.data ?? [];
+  const contributions = contributionsQuery.data ?? [];
+  const transactions = transactionsQuery.data ?? [];
   const archive = useArchiveGoal();
   const [formOpen, setFormOpen] = useState(false);
   const [contribOpen, setContribOpen] = useState(false);
@@ -141,6 +157,16 @@ function GoalsPage() {
           <Plus className="h-4 w-4 mr-1" /> New Goal
         </Button>
       </header>
+
+      {goalsError ? (
+        <div
+          role="alert"
+          className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+        >
+          Goals data could not be loaded completely. Refresh and try again before relying on the
+          progress totals.
+        </div>
+      ) : null}
 
       <section className="grid gap-3 sm:grid-cols-3">
         <Card className="rounded-2xl">

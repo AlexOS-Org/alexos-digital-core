@@ -42,7 +42,8 @@ const priorityTone: Record<Debt["priority"], string> = {
 
 function DebtsPage() {
   const { businessId } = useMoneyCenterScope();
-  const { data: debts = [], isLoading } = useDebts(false, businessId);
+  const debtsQuery = useDebts(false, businessId);
+  const { data: debts = [], isLoading, isError: debtsError } = debtsQuery;
 
   const archive = useArchiveDebt();
 
@@ -105,6 +106,15 @@ function DebtsPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+      {debtsError ? (
+        <div
+          role="alert"
+          className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+        >
+          Debt data could not be loaded. Refresh and try again before relying on the balances or
+          payment reminders.
+        </div>
+      ) : null}
       <Card className="rounded-2xl border-0 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
         <CardContent className="p-6 sm:p-8 space-y-4">
           <div className="flex items-start justify-between gap-4 flex-wrap">
