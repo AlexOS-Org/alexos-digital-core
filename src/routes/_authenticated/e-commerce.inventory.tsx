@@ -208,7 +208,7 @@ function StockAdjustDialog({ product, open, onOpenChange }: AdjustDialogProps) {
 /* ── Main page ────────────────────────────────────────────────── */
 
 function InventoryPage() {
-  const { products, movements, isLoading } = useCommerceData();
+  const { products, movements, isLoading, error } = useCommerceData();
   const [query, setQuery] = useState("");
   const [adjustTarget, setAdjustTarget] = useState<Product | null>(null);
   const [adjustOpen, setAdjustOpen] = useState(false);
@@ -282,6 +282,16 @@ function InventoryPage() {
         title="Inventory"
         description="Stock levels, movements, reorder signals and dead-stock alerts."
       />
+
+      {error && (
+        <div
+          role="alert"
+          className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-800 dark:text-amber-200"
+        >
+          Some inventory data could not be loaded. Stock signals may be incomplete; try refreshing
+          before making an adjustment.
+        </div>
+      )}
 
       {/* KPIs */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

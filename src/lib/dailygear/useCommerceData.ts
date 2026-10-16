@@ -19,9 +19,19 @@ export function useCommerceData() {
   const movements = useStockMovements(undefined, true, businessId);
 
   const isLoading =
-    products.isLoading || orders.isLoading || orderItems.isLoading || customers.isLoading;
+    products.isLoading ||
+    orders.isLoading ||
+    orderItems.isLoading ||
+    customers.isLoading ||
+    movements.isLoading;
 
-  const error = products.error ?? orders.error ?? orderItems.error ?? customers.error ?? null;
+  const error =
+    products.error ??
+    orders.error ??
+    orderItems.error ??
+    customers.error ??
+    movements.error ??
+    null;
 
   const context = useMemo<IntelligenceContext>(
     () => ({

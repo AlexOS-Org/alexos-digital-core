@@ -74,7 +74,7 @@ const compact = (v: number) =>
 
 function CommerceOverview() {
   const tier = useDeviceTier();
-  const { products, orders, orderItems, customers, movements, context, isLoading } =
+  const { products, orders, orderItems, customers, movements, context, isLoading, error } =
     useCommerceData();
 
   const kpis = useMemo(
@@ -92,6 +92,7 @@ function CommerceOverview() {
     trend,
     kpis,
     loading: isLoading,
+    error,
   };
 
   if (tier === "mobile") {
@@ -124,8 +125,22 @@ type Panels = {
   trend: ReturnType<typeof computeTrend>;
   kpis: ReturnType<typeof computeKpis>;
   loading: boolean;
+  error: Error | null;
   ctx: ReturnType<typeof useCommerceData>["context"];
 };
+
+function CommerceDataWarning({ error }: { error: Error | null }) {
+  if (!error) return null;
+  return (
+    <div
+      role="alert"
+      className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-800 dark:text-amber-200"
+    >
+      Some commerce data could not be loaded. The figures below may be incomplete; try refreshing
+      before making operational decisions.
+    </div>
+  );
+}
 
 /* ── Shared header ───────────────────────────────────────────── */
 
@@ -538,6 +553,7 @@ function KpiWall({ kpis, loading }: { kpis: Panels["kpis"]; loading: boolean }) 
 function MobileDashboard(p: Panels) {
   return (
     <div className="dashboard-canvas space-y-4 pb-40">
+      <CommerceDataWarning error={p.error} />
       <Hero kpis={p.kpis} compactMode />
       <FacebookAdsBalanceCard />
       <MobileStoreOverview kpis={p.kpis} trend={p.trend} loading={p.loading} />
@@ -569,6 +585,7 @@ function MobileDashboard(p: Panels) {
 function StandardDashboard(p: Panels & { tablet?: boolean }) {
   return (
     <div className="dashboard-canvas space-y-5">
+      <CommerceDataWarning error={p.error} />
       <Hero kpis={p.kpis} />
       <FacebookAdsBalanceCard />
       <CatalogueReadinessCard products={p.products} loading={p.loading} />
@@ -621,6 +638,7 @@ function StandardDashboard(p: Panels & { tablet?: boolean }) {
 function WideDashboard(p: Panels & { dense?: boolean }) {
   return (
     <div className="dashboard-canvas space-y-6">
+      <CommerceDataWarning error={p.error} />
       <Hero kpis={p.kpis} />
       <FacebookAdsBalanceCard />
       <CatalogueReadinessCard products={p.products} loading={p.loading} />
