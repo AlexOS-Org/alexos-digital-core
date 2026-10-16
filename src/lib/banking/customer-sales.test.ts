@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { isTestCustomerSale, weeklySalesTotals, type CustomerSale } from "./customer-sales";
+import {
+  isTestCustomerSale,
+  validateCustomerJourneyInput,
+  weeklySalesTotals,
+  type CustomerSale,
+} from "./customer-sales";
 
 describe("customer sales weekly synchronization", () => {
   it("counts all non-cancelled sales as actual but only verified value as qualified", () => {
@@ -72,5 +77,56 @@ describe("customer sales weekly synchronization", () => {
         notes: null,
       }),
     ).toBe(false);
+  });
+
+  it("rejects incomplete or duplicated customer journeys before submission", () => {
+    expect(
+      validateCustomerJourneyInput({
+        customer_name: "",
+        items: [],
+        qualification_status: "pending",
+        evidence_reference: null,
+      }),
+    ).toBe("Customer name is required.");
+    expect(
+      validateCustomerJourneyInput({
+        customer_name: "Rahab",
+        items: [
+          { kpi_id: "mobi", product_name: "Mobi", amount: 0, quantity: 1, actual_value: 1 },
+          { kpi_id: "mobi", product_name: "Mobi", amount: 0, quantity: 1, actual_value: 1 },
+        ],
+        qualification_status: "pending",
+        evidence_reference: null,
+      }),
+    ).toBe("Each customer product may be selected only once.");
+  });
+
+  it("requires evidence for verified journeys and accepts valid pending journeys", () => {
+    const base = {
+      customer_name: "Rahab",
+      items: [
+        {
+          kpi_id: "deposits",
+          product_name: "Deposit Account",
+          amount: 20000,
+          quantity: 1,
+          actual_value: 20000,
+        },
+      ],
+    };
+    expect(
+      validateCustomerJourneyInput({
+        ...base,
+        qualification_status: "verified",
+        evidence_reference: null,
+      }),
+    ).toBe("Evidence reference is required when marking a journey verified.");
+    expect(
+      validateCustomerJourneyInput({
+        ...base,
+        qualification_status: "pending",
+        evidence_reference: null,
+      }),
+    ).toBeNull();
   });
 });

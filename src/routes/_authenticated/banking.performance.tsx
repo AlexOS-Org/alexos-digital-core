@@ -17,6 +17,7 @@ import {
 } from "@/lib/banking/contract-performance";
 import {
   isTestCustomerSale,
+  validateCustomerJourneyInput,
   useCustomerSalesActions,
   type CustomerSaleStatus,
   type QualificationStatus,
@@ -130,6 +131,7 @@ function BankingPerformancePage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const testSales = (salesActions.sales.data ?? []).filter(isTestCustomerSale);
+  const customerSales = salesActions.sales.data ?? [];
   const groupedSales = useMemo(() => {
     const groups = new Map<
       string,
@@ -140,7 +142,7 @@ function BankingPerformancePage() {
         sales: Array<NonNullable<typeof salesActions.sales.data>[number]>;
       }
     >();
-    for (const sale of salesActions.sales.data ?? []) {
+    for (const sale of customerSales) {
       const key = `${sale.sale_date}|${sale.customer_name.toLowerCase()}|${sale.customer_reference ?? ""}`;
       const current = groups.get(key) ?? {
         sale_date: sale.sale_date,
@@ -152,7 +154,7 @@ function BankingPerformancePage() {
       groups.set(key, current);
     }
     return Array.from(groups.values());
-  }, [salesActions.sales.data]);
+  }, [customerSales]);
 
   const latestByKpi = useMemo(() => {
     const map = new Map<string, WeeklyPerformance>();
@@ -169,7 +171,7 @@ function BankingPerformancePage() {
   const monthStart = monthStartFor();
   const monthEnd = monthEndFor();
   const monthlyRows = kpis.map((kpi) => {
-    const monthSales = (salesActions.sales.data ?? []).filter(
+    const monthSales = customerSales.filter(
       (sale) =>
         sale.kpi_id === kpi.id &&
         sale.sale_date >= monthStart &&
@@ -297,6 +299,16 @@ function BankingPerformancePage() {
                 : Number(data.get("qualified_value")) || 0,
         };
       });
+      const validationError = validateCustomerJourneyInput({
+        customer_name: common.customer_name,
+        items,
+        qualification_status: common.qualification_status,
+        evidence_reference: common.evidence_reference,
+      });
+      if (validationError) {
+        toast.error(validationError);
+        return;
+      }
       try {
         await salesActions.addSalesBatch.mutateAsync({
           contract_id: contract.id,
@@ -328,6 +340,24 @@ function BankingPerformancePage() {
         ? scoreValue
         : 0
       : Number(data.get("qualified_value")) || 0;
+    const validationError = validateCustomerJourneyInput({
+      customer_name: common.customer_name,
+      items: [
+        {
+          kpi_id: kpi.id,
+          product_name: String(data.get("product_name") || "").trim(),
+          amount: Number(data.get("amount")) || 0,
+          quantity: Number(data.get("quantity")) || 1,
+          actual_value: scoreValue,
+        },
+      ],
+      qualification_status: common.qualification_status,
+      evidence_reference: common.evidence_reference,
+    });
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
     if (qualifiedValue > scoreValue) {
       toast.error("Qualified value cannot be greater than the scorecard value.");
       return;
