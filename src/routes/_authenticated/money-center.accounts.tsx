@@ -34,8 +34,12 @@ function AccountsPage() {
   const qc = useQueryClient();
   const { businessId } = useMoneyCenterScope();
   const [showArchived, setShowArchived] = useState(false);
-  const { data: accounts = [], isLoading } = useAccounts(showArchived, businessId);
-  const { data: balances = [] } = useAccountBalances(businessId);
+  const {
+    data: accounts = [],
+    isLoading,
+    error: accountsError,
+  } = useAccounts(showArchived, businessId);
+  const { data: balances = [], error: balancesError } = useAccountBalances(businessId);
   const liveBinance = useLiveBinanceBalance();
   const archive = useArchiveAccount();
   const [open, setOpen] = useState(false);
@@ -90,7 +94,25 @@ function AccountsPage() {
         }
       />
 
-      {isLoading ? (
+      {accountsError ? (
+        <div
+          role="alert"
+          className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+        >
+          Accounts could not be loaded. Refresh the page and try again before managing account
+          records.
+        </div>
+      ) : balancesError ? (
+        <div
+          role="alert"
+          className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-800 dark:text-amber-200"
+        >
+          Account balances could not be loaded. The account list may be visible, but balances are
+          incomplete.
+        </div>
+      ) : null}
+
+      {accountsError ? null : isLoading ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 3 }, (_, index) => (
             <Skeleton key={index} className="h-56 w-full rounded-xl" />
