@@ -18,25 +18,12 @@ export interface BusinessContextValue extends BusinessContext {
   clearBusiness: () => void;
 }
 
-export const BUSINESS_MODULE_MAP: Readonly<Record<string, string>> = {
-  dailygear: "ecommerce",
-  novera: "service",
-  carbaramotion: "vehicle",
-};
+export const BUSINESS_MODULE_MAP: Readonly<Record<string, string>> = {};
 
 export function getBusinessUrlSlug(slug: string): string {
-  const normalized = slug.toLowerCase().trim();
-  if (normalized === "dailygear" || normalized === "dailygears") return "dailygear";
-  if (normalized === "novera") return "novera";
-  if (normalized === "carbaramotion" || normalized === "carbar_motion") return "carbaramotion";
-  return normalized;
+  return slug.toLowerCase().trim();
 }
 
-export function businessTypeFromSlug(slug: string): BusinessType {
-  const normalized = getBusinessUrlSlug(slug);
-  const type = BUSINESS_MODULE_MAP[normalized];
-  if (type === "ecommerce") return "ecommerce";
-  if (type === "vehicle") return "vehicle";
-  if (type === "service") return "service";
+export function businessTypeFromSlug(_slug: string): BusinessType {
   return null;
 }

@@ -383,7 +383,7 @@ export function TransactionFormDialog({ open, onOpenChange, mode, editing }: Pro
                             aria-label="New business name"
                             value={newBusinessName}
                             onChange={(event) => setNewBusinessName(event.target.value)}
-                            placeholder="e.g. DailyGear"
+                            placeholder="e.g. Business name"
                           />
                           <Button
                             type="button"

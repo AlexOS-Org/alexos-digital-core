@@ -1,9 +1,6 @@
 import {
   LayoutDashboard,
   Building2,
-  Car,
-  ShoppingBag,
-  Gem,
   Users,
   Wallet,
   TrendingDown,
@@ -57,32 +54,6 @@ export const modules: ModuleDef[] = [
   },
 
   // ── Businesses ───────────────────────────────────────
-  {
-    title: "CarBar Motion",
-    url: "/vehicle-sales",
-    icon: Car,
-    description: "Roadmap preview — vehicle inventory, financing and sales pipeline.",
-    group: "Businesses",
-    businessSlug: "carbaramotion",
-    preview: true,
-  },
-  {
-    title: "DailyGear",
-    url: "/e-commerce",
-    icon: ShoppingBag,
-    description: "Products, inventory, orders and online sales.",
-    group: "Businesses",
-    businessSlug: "dailygear",
-  },
-  {
-    title: "Novera",
-    url: "/businesses/novera",
-    icon: Gem,
-    description: "Roadmap preview — business operations and growth for Novera.",
-    group: "Businesses",
-    businessSlug: "novera",
-    preview: true,
-  },
   {
     title: "People",
     url: "/people",

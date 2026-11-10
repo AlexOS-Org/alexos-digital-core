@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
-import { Bell, ShoppingBag, Sparkles } from "lucide-react";
+import { Bell, Sparkles } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { SupabaseConfigBanner } from "@/components/SupabaseConfigBanner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -31,24 +31,14 @@ export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
 });
 
-function MobileWorkspaceHeader({
-  isDailyGearRoute,
-  currentTitle,
-}: {
-  isDailyGearRoute: boolean;
-  currentTitle?: string;
-}) {
-  const isAurenRoute = !isDailyGearRoute && currentTitle === "Auren";
+function MobileWorkspaceHeader({ currentTitle }: { currentTitle?: string }) {
+  const isAurenRoute = currentTitle === "Auren";
   const title = isAurenRoute ? "Auren" : "AlexOS";
   const subtitle = isAurenRoute ? "Auren Intelligence" : "Business OS";
 
   return (
-    <header
-      className={`relative isolate sticky top-0 z-20 flex h-[4.5rem] touch-pan-y items-center gap-3 overflow-hidden border-b px-4 backdrop-blur-xl ${isDailyGearRoute ? "border-white/10 bg-sidebar/80 text-white" : "border-border/60 bg-background/90"}`}
-    >
-      <SidebarTrigger
-        className={`tap-target min-h-11 min-w-11 rounded-xl ${isDailyGearRoute ? "text-white hover:bg-white/10 hover:text-white" : ""}`}
-      />
+    <header className="relative isolate sticky top-0 z-20 flex h-[4.5rem] touch-pan-y items-center gap-3 overflow-hidden border-b border-border/60 bg-background/90 px-4 backdrop-blur-xl">
+      <SidebarTrigger className="tap-target min-h-11 min-w-11 rounded-xl" />
       <div className="flex min-w-0 flex-1 items-center gap-2.5">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--alexos-purple)] to-[var(--alexos-blue)] text-white shadow-lg shadow-[var(--alexos-glow)]">
           <Sparkles className="h-[18px] w-[18px]" />
@@ -59,15 +49,10 @@ function MobileWorkspaceHeader({
             {subtitle}
           </p>
         </div>
-        {isDailyGearRoute ? (
-          <span className="ml-1 truncate rounded-full border border-white/15 bg-white/10 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/75">
-            DailyGear
-          </span>
-        ) : null}
       </div>
       <Link
         to="/notifications"
-        className={`tap-target min-h-11 min-w-11 grid place-items-center rounded-xl transition-colors ${isDailyGearRoute ? "text-white/75 hover:bg-white/10 hover:text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+        className="tap-target min-h-11 min-w-11 grid place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         aria-label="Notifications"
       >
         <Bell className="h-[19px] w-[19px]" />
@@ -86,7 +71,6 @@ function MobileWorkspaceHeader({
 
 function AuthenticatedLayout() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const isDailyGearRoute = pathname.startsWith("/e-commerce");
   const isMobile = useIsMobile();
 
   // Match the deepest module whose URL is a prefix of the current path
@@ -96,23 +80,14 @@ function AuthenticatedLayout() {
       (m.url !== "/dashboard" && pathname.startsWith(m.url + "/")) ||
       (m.url !== "/dashboard" && pathname.startsWith(m.url)),
   );
-  const businessContext = pathname.startsWith("/e-commerce")
-    ? "DailyGear"
-    : pathname.startsWith("/vehicle-sales")
-      ? "CarBar Motion"
-      : pathname.startsWith("/businesses")
-        ? "Novera"
-        : null;
-  const breadcrumb = ["AlexOS", businessContext, current?.title].filter(
+  const breadcrumb = ["AlexOS", current?.title].filter(
     (label, index, labels): label is string => Boolean(label) && labels.indexOf(label) === index,
   );
 
   return (
     <BalanceVisibilityProvider>
       <SidebarProvider defaultOpen={false}>
-        <div
-          className={`min-h-screen flex w-full text-foreground transition-colors duration-300 ${isDailyGearRoute ? "bg-background" : "alexos-internal-workspace"}`}
-        >
+        <div className="min-h-screen flex w-full text-foreground transition-colors duration-300 alexos-internal-workspace">
           <AppSidebar />
           <div className="flex min-w-0 flex-1 flex-col">
             {!isMobile && (
@@ -144,12 +119,7 @@ function AuthenticatedLayout() {
                 </div>
               </header>
             )}
-            {isMobile && (
-              <MobileWorkspaceHeader
-                isDailyGearRoute={isDailyGearRoute}
-                currentTitle={current?.title}
-              />
-            )}
+            {isMobile && <MobileWorkspaceHeader currentTitle={current?.title} />}
             <SupabaseConfigBanner />
             <main
               className={`alexos-route-canvas min-w-0 flex-1 touch-pan-y overflow-x-hidden p-4 sm:p-6 lg:p-8 ${isMobile ? "pb-28" : "pb-8"}`}
@@ -158,7 +128,7 @@ function AuthenticatedLayout() {
                 <Outlet />
               </div>
             </main>
-            {!isDailyGearRoute && <MobileBottomNav />}
+            <MobileBottomNav />
           </div>
         </div>
       </SidebarProvider>

@@ -1,11 +1,4 @@
-const HOSTNAME_TO_SLUG: Readonly<Record<string, string>> = {
-  "dailygear.co.ke": "dailygear",
-  "www.dailygear.co.ke": "dailygear",
-  "app.dailygear.co.ke": "dailygear",
-  "novera.dailygear.co.ke": "novera",
-  "cbm.dailygear.co.ke": "carbaramotion",
-  "cbm.co.ke": "carbaramotion",
-};
+const HOSTNAME_TO_SLUG: Readonly<Record<string, string>> = {};
 
 const PORTFOLIO_HOSTNAMES: Readonly<Set<string>> = new Set([
   "alexos.co.ke",

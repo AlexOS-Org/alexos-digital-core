@@ -5,7 +5,6 @@ const LINKS = [
   { to: "/dashboard", label: "Home" },
   { to: "/auren", label: "Auren" },
   { to: "/settings", label: "Settings" },
-  { to: "/e-commerce", label: "DailyGear" },
 ] as const;
 
 export function AlexosDashboardFooter() {

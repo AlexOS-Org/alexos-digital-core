@@ -23,7 +23,6 @@ import { getSectionsForBusiness } from "@/lib/businesses/registry";
 import { useBusinessContext } from "@/lib/businesses/context";
 import { MONEY_CENTER_SECTIONS } from "@/lib/money/registry";
 import { AlexOSLogo } from "@/components/alexos-logo";
-import { DailyGearBrand } from "@/components/dailygear/DailyGearBrand";
 import { VisualThemePicker } from "@/components/theme/VisualThemePicker";
 import alexosMountainDuskWide from "@/assets/visuals/alexos-mountain-dusk-wide.webp";
 import { Building2, ChevronRight, LogOut } from "lucide-react";
@@ -44,7 +43,6 @@ export function AppSidebar() {
   const currentPath = useRouterState({
     select: (r) => r.location.pathname,
   });
-  const isDailyGearRoute = currentPath.startsWith("/e-commerce");
   const isMoneyCenterRoute = currentPath.startsWith("/money-center");
 
   const navigate = useNavigate();
@@ -221,13 +219,9 @@ export function AppSidebar() {
                 </div>
               ) : (
                 <div className="rounded-2xl border border-sidebar-border/70 bg-sidebar-accent/40 px-3 py-2.5">
-                  {activeBusinessSlug === "dailygear" ? (
-                    <DailyGearBrand compact tone="sidebar" />
-                  ) : (
-                    <span className="text-sm font-semibold text-sidebar-foreground">
-                      {activeBusiness?.name ?? activeBusinessSlug}
-                    </span>
-                  )}
+                  <span className="text-sm font-semibold text-sidebar-foreground">
+                    {activeBusiness?.name ?? activeBusinessSlug}
+                  </span>
                 </div>
               )}
             </div>

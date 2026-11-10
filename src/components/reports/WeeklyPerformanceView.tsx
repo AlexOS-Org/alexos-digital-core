@@ -11,24 +11,19 @@ import {
   HelpCircle,
   Info,
   RefreshCw,
-  ShoppingBag,
   Sparkles,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAccounts, useDeliveryPrepayments, useExpected, useTransactions } from "@/lib/money/api";
-import { useDailyGearScope } from "@/lib/dailygear/scope";
 import { formatMoney } from "@/lib/money/format";
-import { getDailyGearProfitCashFlow } from "@/lib/dailygear/profit-cash-flow.functions";
-import type { DailyGearProfitCashFlowResponse } from "@/lib/dailygear/profit-cash-flow.server";
 import { supabase } from "@/integrations/supabase/client";
 import {
   computeWeeklyFinancials,
   generateAurenWeeklyObservations,
   getWeekBoundaries,
   getWeeklySummaryPreference,
-  summarizeWeeklyEcommerce,
   summarizeWeeklyWebVitals,
   type WebVitalRawEvent,
 } from "@/lib/reports/weekly-performance";
@@ -41,20 +36,14 @@ export function WeeklyPerformanceView() {
   const period = useMemo(() => getWeekBoundaries(new Date(), offsetWeeks), [offsetWeeks]);
 
   // Financial data hooks
-  const { businessId } = useDailyGearScope();
-  const { data: transactions = [], isLoading: txLoading } = useTransactions({ businessId });
-  const { data: accounts = [], isLoading: accountsLoading } = useAccounts(false, businessId);
-  const { data: expected = [], isLoading: expectedLoading } = useExpected(undefined, businessId);
+  const { data: transactions = [], isLoading: txLoading } = useTransactions();
+  const { data: accounts = [], isLoading: accountsLoading } = useAccounts();
+  const { data: expected = [], isLoading: expectedLoading } = useExpected();
   const previousPeriod = useMemo(() => getWeekBoundaries(new Date(), -1), []);
   const { data: courierPrepayments = [], isLoading: courierLoading } = useDeliveryPrepayments(
     previousPeriod.from,
     period.until,
   );
-
-  // E-commerce state
-  const [ecommerceData, setEcommerceData] = useState<DailyGearProfitCashFlowResponse | null>(null);
-  const [ecommerceLoading, setEcommerceLoading] = useState(true);
-  const [ecommerceError, setEcommerceError] = useState<string | null>(null);
 
   // Web Vitals state
   const [vitalsEvents, setVitalsEvents] = useState<WebVitalRawEvent[]>([]);
@@ -66,41 +55,6 @@ export function WeeklyPerformanceView() {
   useEffect(() => {
     setWeeklyPref(getWeeklySummaryPreference());
   }, []);
-
-  // Fetch DailyGear E-Commerce financials for the week
-  useEffect(() => {
-    let active = true;
-    setEcommerceLoading(true);
-    setEcommerceError(null);
-
-    getDailyGearProfitCashFlow({
-      data: {
-        from: period.from,
-        until: period.until,
-        includeInsights: true,
-        maxPages: 10,
-        businessId,
-      },
-    })
-      .then((res) => {
-        if (active) setEcommerceData(res);
-      })
-      .catch((err: unknown) => {
-        if (active) {
-          setEcommerceData(null);
-          setEcommerceError(
-            err instanceof Error ? err.message : "Failed to load e-commerce weekly performance.",
-          );
-        }
-      })
-      .finally(() => {
-        if (active) setEcommerceLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [period.from, period.until, refreshNonce, businessId]);
 
   // Fetch Web Vitals events for the week
   useEffect(() => {
@@ -132,7 +86,7 @@ export function WeeklyPerformanceView() {
     return () => {
       active = false;
     };
-  }, [period.from, period.until, refreshNonce, businessId]);
+  }, [period.from, period.until, refreshNonce]);
 
   // Derived summaries
   const financialSummary = useMemo(
@@ -148,13 +102,11 @@ export function WeeklyPerformanceView() {
     [transactions, accounts, expected, period.from, period.until, courierPrepayments],
   );
 
-  const ecommerceSummary = useMemo(() => summarizeWeeklyEcommerce(ecommerceData), [ecommerceData]);
-
   const vitalsSummary = useMemo(() => summarizeWeeklyWebVitals(vitalsEvents), [vitalsEvents]);
 
   const aurenObservations = useMemo(
-    () => generateAurenWeeklyObservations(financialSummary, ecommerceSummary, vitalsSummary),
-    [financialSummary, ecommerceSummary, vitalsSummary],
+    () => generateAurenWeeklyObservations(financialSummary, vitalsSummary),
+    [financialSummary, vitalsSummary],
   );
 
   const isInitialLoading = txLoading || accountsLoading || expectedLoading || courierLoading;
@@ -405,127 +357,6 @@ export function WeeklyPerformanceView() {
         </div>
       </section>
 
-      {/* E-Commerce (DailyGear) Performance Section */}
-      <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <ShoppingBag className="h-4 w-4 text-primary" />
-          <h3 className="text-sm font-semibold tracking-wide uppercase text-muted-foreground">
-            E-Commerce Performance (DailyGear)
-          </h3>
-        </div>
-
-        {ecommerceLoading ? (
-          <div className="grid gap-4 sm:grid-cols-4">
-            {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="rounded-2xl border-border/60">
-                <CardContent className="p-5">
-                  <div className="h-4 w-20 animate-pulse rounded bg-muted" />
-                  <div className="mt-3 h-7 w-28 animate-pulse rounded bg-muted" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : ecommerceError ? (
-          <Card className="rounded-2xl border-border/60">
-            <CardContent className="flex items-center gap-3 p-5 text-sm text-rose-600">
-              <AlertTriangle className="h-5 w-5 shrink-0" />
-              <span>{ecommerceError}</span>
-            </CardContent>
-          </Card>
-        ) : !ecommerceSummary.hasOrders ? (
-          <Card className="rounded-2xl border-dashed border-border/60">
-            <CardContent className="flex flex-col items-center justify-center p-8 text-center">
-              <ShoppingBag className="h-8 w-8 text-muted-foreground/50" />
-              <p className="mt-2 font-medium text-foreground">No customer orders this week</p>
-              <p className="mt-1 max-w-sm text-xs text-muted-foreground">
-                No customer orders were placed for DailyGear during this weekly period.
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Orders */}
-            <Card className="rounded-2xl border-border/60">
-              <CardHeader className="p-4 pb-1">
-                <span className="text-xs font-medium text-muted-foreground">Orders Placed</span>
-              </CardHeader>
-              <CardContent className="p-4 pt-0">
-                <p className="text-2xl font-bold tabular-nums text-foreground">
-                  {ecommerceSummary.orders}
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {ecommerceSummary.paidOrders} confirmed paid
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Recognized Revenue */}
-            <Card className="rounded-2xl border-border/60">
-              <CardHeader className="p-4 pb-1">
-                <span className="text-xs font-medium text-muted-foreground">
-                  Recognized Revenue
-                </span>
-              </CardHeader>
-              <CardContent className="p-4 pt-0">
-                <p className="text-2xl font-bold tabular-nums text-foreground">
-                  {ecommerceSummary.revenue !== null
-                    ? formatMoney(ecommerceSummary.revenue, ecommerceSummary.currency || "KES")
-                    : "No data"}
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">Excludes cancelled/refunded</p>
-              </CardContent>
-            </Card>
-
-            {/* Operating Profit */}
-            <Card className="rounded-2xl border-border/60">
-              <CardHeader className="p-4 pb-1">
-                <span className="text-xs font-medium text-muted-foreground">Operating Profit</span>
-              </CardHeader>
-              <CardContent className="p-4 pt-0">
-                <p className="text-2xl font-bold tabular-nums text-foreground">
-                  {ecommerceSummary.operatingProfit !== null
-                    ? formatMoney(
-                        ecommerceSummary.operatingProfit,
-                        ecommerceSummary.currency || "KES",
-                      )
-                    : "No data"}
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {ecommerceSummary.operatingMarginPct !== null
-                    ? `${ecommerceSummary.operatingMarginPct.toFixed(1)}% operating margin`
-                    : "After COGS and operating costs"}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Meta Ads Spend */}
-            <Card className="rounded-2xl border-border/60">
-              <CardHeader className="p-4 pb-1">
-                <span className="text-xs font-medium text-muted-foreground">Meta Ads Spend</span>
-              </CardHeader>
-              <CardContent className="p-4 pt-0">
-                {ecommerceSummary.metaSpendStatus === "available" &&
-                ecommerceSummary.metaSpend !== null ? (
-                  <>
-                    <p className="text-2xl font-bold tabular-nums text-foreground">
-                      {formatMoney(ecommerceSummary.metaSpend, ecommerceSummary.currency || "KES")}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">Meta Graph API verified</p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-sm font-semibold text-muted-foreground">Unavailable</p>
-                    <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
-                      {ecommerceSummary.metaSpendReason || "Meta Ads sync not connected"}
-                    </p>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        )}
-      </section>
-
       {/* Operational Signals & Web Vitals Section */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
@@ -541,11 +372,8 @@ export function WeeklyPerformanceView() {
             <CardHeader className="p-5 pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base font-semibold">
-                  Storefront Experience (Web Vitals)
+                  Web Vitals Experience
                 </CardTitle>
-                <Badge variant="outline" className="text-xs">
-                  /e-commerce
-                </Badge>
               </div>
             </CardHeader>
             <CardContent className="p-5 pt-0">
@@ -558,8 +386,7 @@ export function WeeklyPerformanceView() {
                 <div className="flex items-start gap-3 text-xs text-muted-foreground">
                   <Info className="mt-0.5 h-4 w-4 text-muted-foreground shrink-0" />
                   <p>
-                    No Web Vitals performance telemetry captured during this week. Telemetry records
-                    authentically when signed-in users visit /e-commerce pages.
+                    No Web Vitals performance telemetry captured during this week.
                   </p>
                 </div>
               ) : (
@@ -598,23 +425,10 @@ export function WeeklyPerformanceView() {
               <CardTitle className="text-base font-semibold">Data Quality & Safeguards</CardTitle>
             </CardHeader>
             <CardContent className="p-5 pt-0">
-              {ecommerceSummary.warnings.length === 0 ? (
-                <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
-                  <CheckCircle2 className="h-4 w-4 shrink-0" />
-                  <span>
-                    All recognized orders have verified costs and single-currency consistency.
-                  </span>
-                </div>
-              ) : (
-                <ul className="space-y-1 text-xs text-amber-700 dark:text-amber-300">
-                  {ecommerceSummary.warnings.map((w, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                      <span>{w}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+                <span>Weekly financial metrics are derived from posted transaction data only.</span>
+              </div>
               <p className="mt-3 text-[11px] text-muted-foreground">
                 No metric is ever estimated or fabricated. Missing signals are explicitly marked as
                 unavailable.

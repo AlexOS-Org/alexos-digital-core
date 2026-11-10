@@ -1,17 +1,16 @@
-import { DAILYGEAR_SECTIONS, type DailyGearSection } from "@/lib/dailygear/registry";
-
-export type BusinessSection = DailyGearSection;
+export interface BusinessSection {
+  label: string;
+  to: string;
+  icon?: unknown;
+  exact?: boolean;
+}
 
 export interface BusinessSections {
   businessSlug: string;
   sections: BusinessSection[];
 }
 
-const BUSINESS_SECTIONS_MAP: Record<string, BusinessSection[]> = {
-  dailygear: DAILYGEAR_SECTIONS,
-  novera: [],
-  carbaramotion: [],
-};
+const BUSINESS_SECTIONS_MAP: Record<string, BusinessSection[]> = {};
 
 export function getSectionsForBusiness(businessSlug: string | null): BusinessSection[] {
   if (!businessSlug) return [];

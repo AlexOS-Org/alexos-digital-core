@@ -2,13 +2,13 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, MoreHorizontal, ShoppingBag, Users, Wallet } from "lucide-react";
+import { LayoutDashboard, MoreHorizontal, Building2, Users, Wallet } from "lucide-react";
 
 const primaryItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Money", url: "/money-center", icon: Wallet },
   { title: "CRM", url: "/people", icon: Users },
-  { title: "DailyGear", url: "/e-commerce", icon: ShoppingBag },
+  { title: "Businesses", url: "/businesses", icon: ShoppingBag },
 ] as const;
 
 export function MobileBottomNav() {

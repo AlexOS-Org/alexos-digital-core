@@ -1,7 +1,6 @@
 import { formatDate } from "@/lib/money/format";
 import { summarizeCurrencySafety } from "@/lib/money/currency-safety";
 import type { Account, Expected, Transaction } from "@/lib/money/api";
-import type { DailyGearProfitCashFlowResponse } from "@/lib/dailygear/profit-cash-flow.server";
 
 export interface WeekPeriod {
   from: string; // YYYY-MM-DD
@@ -178,76 +177,6 @@ export function computeWeeklyFinancials(
   };
 }
 
-export interface WeeklyEcommerceSummary {
-  orders: number;
-  paidOrders: number;
-  revenue: number | null;
-  cogs: number | null;
-  grossProfit: number | null;
-  grossMarginPct: number | null;
-  operatingExpenses: number | null;
-  operatingProfit: number | null;
-  operatingMarginPct: number | null;
-  currency: string | null;
-  metaSpend: number | null;
-  metaSpendStatus: "available" | "unavailable";
-  metaSpendReason: string | null;
-  hasOrders: boolean;
-  warnings: string[];
-}
-
-export function summarizeWeeklyEcommerce(
-  response: DailyGearProfitCashFlowResponse | null,
-): WeeklyEcommerceSummary {
-  if (!response) {
-    return {
-      orders: 0,
-      paidOrders: 0,
-      revenue: null,
-      cogs: null,
-      grossProfit: null,
-      grossMarginPct: null,
-      operatingExpenses: null,
-      operatingProfit: null,
-      operatingMarginPct: null,
-      currency: null,
-      metaSpend: null,
-      metaSpendStatus: "unavailable",
-      metaSpendReason: "Financial data not loaded or unavailable.",
-      hasOrders: false,
-      warnings: [],
-    };
-  }
-
-  const fin = response.financials;
-  const hasOrders = fin.orders > 0;
-  const meta = response.meta;
-
-  const metaSpendStatus = meta.available ? "available" : "unavailable";
-  const metaSpendReason = meta.available
-    ? null
-    : meta.error || "Meta Graph API sync not connected.";
-  const metaSpend = meta.available ? fin.adSpend : null;
-
-  return {
-    orders: fin.orders,
-    paidOrders: fin.paidOrders,
-    revenue: hasOrders ? fin.revenue : null,
-    cogs: hasOrders ? fin.cogs : null,
-    grossProfit: hasOrders ? fin.grossProfit : null,
-    grossMarginPct: hasOrders ? fin.grossMarginPct : null,
-    operatingExpenses: hasOrders ? fin.operatingExpenses : null,
-    operatingProfit: hasOrders ? fin.operatingProfit : null,
-    operatingMarginPct: hasOrders ? fin.operatingMarginPct : null,
-    currency: fin.currency,
-    metaSpend,
-    metaSpendStatus,
-    metaSpendReason,
-    hasOrders,
-    warnings: fin.dataQuality?.warnings || [],
-  };
-}
-
 export interface WebVitalsSummary {
   totalEvents: number;
   status: "ready" | "no_data";
@@ -336,7 +265,6 @@ export interface AurenWeeklyObservation {
 
 export function generateAurenWeeklyObservations(
   financials: WeeklyFinancialSummary,
-  ecommerce: WeeklyEcommerceSummary,
   vitals: WebVitalsSummary,
 ): AurenWeeklyObservation[] {
   const observations: AurenWeeklyObservation[] = [];
@@ -373,40 +301,6 @@ export function generateAurenWeeklyObservations(
     });
   }
 
-  // E-commerce observation
-  if (ecommerce.hasOrders && ecommerce.revenue !== null) {
-    observations.push({
-      id: "obs-ecommerce-performance",
-      tone: "positive",
-      title: "DailyGear order activity recognized",
-      detail: `${ecommerce.orders} order${ecommerce.orders === 1 ? "" : "s"} recognized with ${
-        ecommerce.currency ?? "KES"
-      } ${ecommerce.revenue.toLocaleString(undefined, {
-        maximumFractionDigits: 0,
-      })} recognized revenue.`,
-    });
-  } else {
-    observations.push({
-      id: "obs-ecommerce-waiting",
-      tone: "informational",
-      title: "No e-commerce sales recognized",
-      detail:
-        "No new recognized customer orders were recorded for DailyGear in this weekly period.",
-    });
-  }
-
-  // Meta Ads observation
-  if (ecommerce.metaSpendStatus === "unavailable") {
-    observations.push({
-      id: "obs-meta-unavailable",
-      tone: "informational",
-      title: "Meta Ads telemetry unavailable",
-      detail:
-        ecommerce.metaSpendReason ||
-        "Meta Ads spend is not synced for this period. Spend cannot be fabricated.",
-    });
-  }
-
   // Web vitals observation
   if (vitals.status === "ready") {
     observations.push({
@@ -422,8 +316,7 @@ export function generateAurenWeeklyObservations(
       id: "obs-vitals-waiting",
       tone: "informational",
       title: "Web Vitals waiting for telemetry",
-      detail:
-        "No Web Vitals performance events captured on /e-commerce routes for this weekly period.",
+      detail: "No Web Vitals performance events captured during this weekly period.",
     });
   }
 
